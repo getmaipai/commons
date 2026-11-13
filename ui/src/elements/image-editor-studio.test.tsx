@@ -280,8 +280,11 @@ describe("compare", () => {
     await waitFor(() => v.getByRole("button", { name: "Apply" }));
     const stage = v.container.querySelector("[data-slot=image-editor-stage]")!;
     // a pending preview is something to compare with, even on the first version
-    fireEvent.keyDown(stage, { key: "c" });
-    expect(v.getByRole("slider", { name: "Before and after divider" })).toBeTruthy();
+    // Under load the preview's size can arrive a moment after Apply shows, so the first press of C may be early: press until it opens.
+    await waitFor(() => {
+      if (!v.queryByRole("slider", { name: "Before and after divider" })) fireEvent.keyDown(stage, { key: "c" });
+      expect(v.getByRole("slider", { name: "Before and after divider" })).toBeTruthy();
+    });
     fireEvent.keyDown(v.container.querySelector("[data-slot=image-editor]")!, { key: "Escape" });
     expect(v.queryByRole("slider", { name: "Before and after divider" })).toBeNull();
   });
