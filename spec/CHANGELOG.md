@@ -1,3 +1,7 @@
+## [spec-v0.1.380] - 2026-11-13
+
+- STACKCHAN-HOME-01, copy only. `robot.dance.auto_sensitivity` option lines read as the names the settings page shows in its list (Low, Medium, High with a few words each).
+
 ## [spec-v0.1.379] - 2026-11-13
 
 - STACKCHAN-HOME-01, additive. Seven robot device-scope keys (honoured by home and bot, on the robot's device card): `robot.dance.enabled` (true), `robot.dance.show_ring` (true), `robot.dance.auto` (false), `robot.dance.auto_sensitivity` (low, medium, high; default medium), `robot.timers.enabled` (true), `robot.announce.enabled` (true) and `robot.repeat.enabled` (true). `device-command` gains the kinds `dance` (empty payload), `music_test` (optional `fast`) and `announce` (`text`, optional `urgent`); the robot's answer rides in the ack state. The robot's light keys (`robot.indicator.*`) stay robot-only, declared by the robot on hello, and are not in this registry.
