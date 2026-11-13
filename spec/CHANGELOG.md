@@ -1,4 +1,4 @@
-## [spec-v0.1.386] - 2026-11-13
+## [spec-v0.1.387] - 2026-11-13
 
 - SCENE-01a, additive. Adds runtime-only `SceneObservation` and `Scene` schemas for in-memory conversation context, plus generated TypeScript and Python models and validation tests.
 
