@@ -226,6 +226,7 @@ export function MediaViewer({
   const stageRef = useRef<HTMLDivElement | null>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const opener = useRef<HTMLElement | null>(null);
+  const contentRef = useRef<HTMLDivElement | null>(null);
   const pointers = useRef(new Map<number, Point>());
   const gesture = useRef({ start: { x: 0, y: 0 }, pinchDistance: 0, pinchStart: 1, multi: false, type: "mouse" });
   const lastTap = useRef<{ at: number; x: number; y: number } | null>(null);
@@ -307,7 +308,31 @@ export function MediaViewer({
     return () => stage.removeEventListener("wheel", onWheel);
   }, [centreOf, maxZoom, sizes, zoomable, item?.id, open]);
 
+  // MOTION-01: the viewer grows from the thumbnail that opened it and returns to it. The thumbnail is the element that had focus when
+  // the viewer opened; its rect becomes the starting transform (`--viewer-from`). With no thumbnail the viewer rises instead.
+  function setFromThumbnail() {
+    const el = contentRef.current;
+    const from = opener.current;
+    if (!el) return;
+    if (!from || !document.contains(from)) {
+      el.style.removeProperty("--viewer-from");
+      return;
+    }
+    const r = from.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    if (!r.width || !r.height || !vw || !vh) {
+      el.style.removeProperty("--viewer-from");
+      return;
+    }
+    const s = Math.max(r.width / vw, r.height / vh);
+    const x = r.left + r.width / 2 - (s * vw) / 2;
+    const y = r.top + r.height / 2 - (s * vh) / 2;
+    el.style.setProperty("--viewer-from", `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) scale(${s.toFixed(4)})`);
+  }
+
   function handleOpenChange(next: boolean) {
+    if (!next) setFromThumbnail();
     onOpenChange(next);
     if (!next) onClose?.();
   }
@@ -467,6 +492,7 @@ export function MediaViewer({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent
+        ref={contentRef}
         data-slot="media-viewer"
         data-kind={item.kind}
         showCloseButton={false}
@@ -474,6 +500,7 @@ export function MediaViewer({
         onOpenAutoFocus={(event) => {
           const active = document.activeElement;
           opener.current = active instanceof HTMLElement && active !== document.body ? active : null;
+          setFromThumbnail();
           // Focus lands on the stage so the arrow keys work at once.
           event.preventDefault();
           stageRef.current?.focus();
@@ -494,7 +521,7 @@ export function MediaViewer({
         }}
         className={cn(
           "dark [--art-surface:var(--background)] [--art-overlay:color-mix(in_srgb,#000_55%,transparent)] top-0 left-0 flex h-dvh w-screen max-w-none translate-x-0 translate-y-0 flex-col gap-0 rounded-none border-0 bg-background p-0 text-foreground shadow-none sm:max-w-none",
-          "data-[state=open]:zoom-in-100 data-[state=closed]:zoom-out-100 motion-reduce:animate-none motion-reduce:duration-0",
+          "data-[state=open]:motion-viewer-in data-[state=closed]:motion-viewer-out motion-reduce:animate-none",
         )}
       >
         <header data-slot="media-viewer-bar" className="flex shrink-0 flex-wrap items-center gap-2 bg-background px-3 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2">
