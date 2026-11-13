@@ -16,6 +16,10 @@ from pydantic import (
 )
 
 
+class Vote(RootModel[constr(pattern=r'^person-[a-z0-9]{6,}$')]):
+    root: constr(pattern=r'^person-[a-z0-9]{6,}$')
+
+
 class Item(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -23,8 +27,8 @@ class Item(BaseModel):
     media_id: constr(pattern=r'^media-[a-z0-9]{6,}$')
     added_at: AwareDatetime
     position: conint(ge=0)
-    votes: list[constr(pattern=r'^person-[a-z0-9]{6,}$')] = Field(default_factory=list)
-    added_by: constr(pattern=r'^person-[a-z0-9]{6,}$') | None = Field(None)
+    votes: list[constr(pattern=r'^person-[a-z0-9]{6,}$')] = []
+    added_by: constr(pattern=r'^person-[a-z0-9]{6,}$') | None = None
     status: Literal['want', 'watching', 'completed'] | None = Field(
         None, description='Watchlist only.'
     )
@@ -73,7 +77,7 @@ class Rules(BaseModel):
 
 class MediaCollection(BaseModel):
     """
-    MEDIA-SPEC-01 (media design section 7). A person's ordered references to media items: liked, watch later, the queue, a playlist, the watchlist, pins. One liked, one watch_later and one queue per person exist by construction. The list record stays for text lists (its items are text with a checked state; these are references with order, status and a pointer). PODCAST-PORT-03: a filter is a saved episode filter; its items stay empty and its rules say which episodes match.
+    MEDIA-SPEC-01 (media design section 7). A person's ordered references to media items: liked, watch later, the queue, a playlist, the watchlist, pins. One liked, one watch_later and one queue per person exist by construction. The list record stays for text lists (its items are text with a checked state; these are references with order, status and a pointer). PODCAST-PORT-03: a filter is a saved episode filter; its items stay empty and its rules say which episodes match. VIDEO-LD-04: family_picks is one shared household collection where anyone adds and everyone votes; the top pick plays next.
     """
 
     model_config = ConfigDict(
@@ -82,8 +86,14 @@ class MediaCollection(BaseModel):
     id: constr(pattern=r'^mcol-[a-z0-9]{6,}$')
     person_id: constr(pattern=r'^person-[a-z0-9]{6,}$')
     kind: Literal[
-        'liked', 'watch_later', 'queue', 'playlist', 'watchlist', 'pins', 'filter',
-        'family_picks'
+        'liked',
+        'watch_later',
+        'queue',
+        'playlist',
+        'watchlist',
+        'pins',
+        'filter',
+        'family_picks',
     ]
     title: constr(min_length=1)
     items: list[Item]
