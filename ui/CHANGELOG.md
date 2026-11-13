@@ -1,3 +1,7 @@
+## [ui-v0.5.650] - 2026-11-13
+
+- MAKE-CLEARER-02 (MAKE-CLEARER-2026-11-13). `ImageEditor` takes `resizeUpscale` (default true) and the `image_editor` schema node takes `resize_upscale` (default true). When false, the Resize bar draws no Upscale 2x and 4x buttons and no upscale note, so a host with Make clearer has one upscaler. Left out, nothing changes. `ui/package.json` is 0.5.650.
+
 ## [ui-v0.5.649] - 2026-11-13
 
 - SURFACE-SYSTEM-01 follow-up: `surfaceLints` ignores ids and words that only mention a shadow (`option_label.shadow`, a lint family name), so a host app can run the same scanner over its own source. The Toaster now takes its radius and shadow from the level-2 tokens (sonner's own stylesheet had outranked the rule in 0.5.648).

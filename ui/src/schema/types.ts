@@ -847,6 +847,8 @@ export const ImageEditorNodeSchema = z.object({
     .optional(),
   compare: z.boolean().default(true),
   comment_brush: z.boolean().default(true),
+  /** MAKE-CLEARER-02: false hides the Resize bar's own Upscale 2x and 4x buttons (the host offers Make clearer instead). */
+  resize_upscale: z.boolean().default(true),
   operations: z.object({ bind: BindingSchema }).strict().optional(),
   add_picture: z.object({ label: z.string().min(1).max(40).optional(), action: ActionSchema }).strict().optional(),
   actions: z

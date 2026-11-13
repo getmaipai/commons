@@ -82,6 +82,8 @@ describe("image_editor node", () => {
     const parsed = ImageEditorNodeSchema.parse({ type: "image_editor", bind: { source: "package", path: "p" } });
     expect(parsed.compare).toBe(true);
     expect(parsed.comment_brush).toBe(true);
+    expect(parsed.resize_upscale).toBe(true);
+    expect(ImageEditorNodeSchema.parse({ type: "image_editor", bind: { source: "package", path: "p" }, resize_upscale: false }).resize_upscale).toBe(false);
     expect(() => ImageEditorNodeSchema.parse({ type: "image_editor", bind: { source: "package", path: "p" }, initial_tool: "draw" })).toThrow();
     expect(() => ImageEditorNodeSchema.parse({ type: "image_editor", bind: { source: "package", path: "p" }, handlers: { delete: { call: { target: "/x" } } } })).toThrow();
   });

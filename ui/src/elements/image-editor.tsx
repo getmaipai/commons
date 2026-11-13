@@ -257,6 +257,8 @@ export interface ImageEditorProps {
   compare?: boolean;
   /** IMG-STUDIO-01: Comment gains a Brush mode that sends `mask`. Default false. */
   commentBrush?: boolean;
+  /** MAKE-CLEARER-02: draw the Resize bar's own Upscale 2x and 4x buttons and their note. Default true. A host that offers one upscaler elsewhere (Make clearer) sets false. */
+  resizeUpscale?: boolean;
   /** IMG-STUDIO-01: the host's picker for a Comment's reference picture; Comment shows "Add a reference picture" when set. */
   onPickReference?: () => Promise<ImageEditorReference | null>;
   statusNote?: string | null;
@@ -366,7 +368,8 @@ function ResizeBar({
   base: Size;
   locked: boolean;
   onResize: (width: number, height: number) => void;
-  onUpscale: (scale: 2 | 4) => void;
+  /** Left out, the Upscale buttons and their note are not drawn (MAKE-CLEARER-02). */
+  onUpscale?: (scale: 2 | 4) => void;
 }) {
   const ids = { w: useId(), h: useId() };
   const [unit, setUnit] = useState<ResizeUnit>("px");
@@ -471,18 +474,22 @@ function ResizeBar({
       >
         {i18n._({ id: "ui.Resize (verb)", message: "Resize" })}
       </Button>
-      <Separator orientation="vertical" className="hidden h-6 sm:block" />
-      <div className="flex items-center gap-2">
-        <Button type="button" size="sm" variant="outline" disabled={locked} onClick={() => onUpscale(2)}>
-          {i18n._({ id: "ui.Upscale 2x", message: "Upscale 2x" })}
-        </Button>
-        <Button type="button" size="sm" variant="outline" disabled={locked} onClick={() => onUpscale(4)}>
-          {i18n._({ id: "ui.Upscale 4x", message: "Upscale 4x" })}
-        </Button>
-      </div>
-      <p className="text-muted-foreground w-full text-center text-xs">
-        {i18n._({ id: "ui.Upscaling adds detail the picture did not have; faces may change.", message: "Upscaling adds detail the picture did not have; faces may change." })}
-      </p>
+      {onUpscale ? (
+        <>
+          <Separator orientation="vertical" className="hidden h-6 sm:block" />
+          <div className="flex items-center gap-2">
+            <Button type="button" size="sm" variant="outline" disabled={locked} onClick={() => onUpscale(2)}>
+              {i18n._({ id: "ui.Upscale 2x", message: "Upscale 2x" })}
+            </Button>
+            <Button type="button" size="sm" variant="outline" disabled={locked} onClick={() => onUpscale(4)}>
+              {i18n._({ id: "ui.Upscale 4x", message: "Upscale 4x" })}
+            </Button>
+          </div>
+          <p className="text-muted-foreground w-full text-center text-xs">
+            {i18n._({ id: "ui.Upscaling adds detail the picture did not have; faces may change.", message: "Upscaling adds detail the picture did not have; faces may change." })}
+          </p>
+        </>
+      ) : null}
       {!check.ok ? (
         <p className="text-destructive w-full text-center text-xs" data-slot="image-editor-resize-error">
           {check.error}
@@ -505,6 +512,7 @@ export function ImageEditor({
   initialTool,
   compare = false,
   commentBrush = false,
+  resizeUpscale = true,
   onPickReference,
   statusNote,
   onRunOperation,
@@ -1558,7 +1566,7 @@ export function ImageEditor({
               base={natural}
               locked={locked}
               onResize={(width, height) => void run({ operation: "resize", width, height }, resizeLabel(width, height))}
-              onUpscale={(factor) => void run({ operation: "upscale", scale: factor }, i18n._({ id: "ui.Upscaled {factor}x", message: "Upscaled {factor}x", values: { factor } }))}
+              onUpscale={!resizeUpscale ? undefined : (factor) => void run({ operation: "upscale", scale: factor }, i18n._({ id: "ui.Upscaled {factor}x", message: "Upscaled {factor}x", values: { factor } }))}
             />
           </div>
         ) : null;

@@ -677,6 +677,16 @@ describe("resize", () => {
     await waitFor(() => v.getByRole("button", { name: "Undo preview" }));
     expect(v.getByText(/Preview: Upscaled 4x/)).toBeTruthy();
   });
+
+  test("resizeUpscale false draws no Upscale buttons and no upscale note; Resize still works (MAKE-CLEARER-02)", () => {
+    const v = setup({ resizeUpscale: false });
+    fireEvent.click(tool(v, "Resize"));
+    expect(v.queryByRole("button", { name: "Upscale 2x" })).toBeNull();
+    expect(v.queryByRole("button", { name: "Upscale 4x" })).toBeNull();
+    expect(v.queryByText("Upscaling adds detail the picture did not have; faces may change.")).toBeNull();
+    expect(v.getByLabelText("Width")).toBeTruthy();
+    expect(v.getByRole("button", { name: "Resize" })).toBeTruthy();
+  });
 });
 
 describe("comment", () => {

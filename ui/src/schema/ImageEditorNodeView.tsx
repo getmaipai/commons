@@ -442,6 +442,7 @@ function EditorOpen({ node, row, operations, toolStates }: { node: ImageEditorNo
         initialTool={node.initial_tool === "more" ? undefined : node.initial_tool}
         compare={node.compare}
         commentBrush={node.comment_brush && !!handlers.comment}
+        resizeUpscale={node.resize_upscale}
         onPickReference={onPickReference}
         actions={handoffs}
         onRunOperation={onRunOperation}
