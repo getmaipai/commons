@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { useId, useRef, useState, type ReactNode } from "react";
 import { ChevronDown, Film, Image as ImageIcon, Mic, Plus, SlidersHorizontal, Trash2, ArrowUp, X, CircleAlert } from "lucide-react";
 import { cn } from "cn";
 import { FOCUS_RING_INSET, hitArea } from "../utils";
@@ -17,6 +17,7 @@ import { SafeImage } from "../primitives/SafeImage";
 import { TierSegment, type TierId, type TierOptionDef } from "./tier-segment";
 import { i18n } from "@/kit/i18n"
 import { getIcon, type IconName } from "../icons";
+import { ComposerChips, ComposerFieldTools, ComposerModePill, ComposerModeZone, ComposerPresetsButton, ComposerSlots, qualityChipFor, usePlaceholderFade, type ComposerModeData, type ComposerQualityData, type ComposerTool } from "./composer-parts";
 
 export interface PromptBarModeOption {
   id: string;
@@ -27,13 +28,12 @@ export interface PromptBarModeOption {
   onValueChange?: (value: string) => void;
 }
 
-export interface PromptBarMode {
-  id: string;
-  label: string;
-  icon: IconName;
-  references?: readonly { id: string; label: string; kind: PromptBarReference["kind"]; onPick?: () => void }[];
+export interface PromptBarMode extends Omit<ComposerModeData, "references"> {
+  references?: readonly { id: string; label: string; kind: PromptBarReference["kind"]; max?: number; value?: string | null; thumb?: string; disabledReason?: string; onPick?: () => void; onRemove?: () => void }[];
   options?: readonly PromptBarModeOption[];
   primaryLabel: string;
+  /** COMPOSER-01: called with a field tool (`improve`, `lyrics`, or `clear`). Without it `clear` empties the field. */
+  onTool?: (tool: ComposerTool) => void;
 }
 
 export interface PromptBarOption {
@@ -149,6 +149,8 @@ export interface PromptBarProps {
   modes?: readonly PromptBarMode[];
   mode?: string;
   onModeChange?: (mode: string) => void;
+  /** COMPOSER-01: the one Quality chip (Standard, Boost, Max), drawn in the mode row. For a child or teen the kit never offers Thinking or a model choice. */
+  quality?: ComposerQualityData;
   /** Dashed square slots under the prompt box. */
   references?: readonly PromptBarReference[];
   tier?: PromptBarTier;
@@ -220,20 +222,14 @@ function ChipCards({ chip, locked, columns }: { chip: PromptBarChip; locked: boo
 
 /** The prompt box of a make flow: a text box, chips that each choose one value, the Standard, Boost, Max segment and one Make button.
  * It holds no state of its own. Videos Create draws it through the `prompt_bar` schema node and the chat video card draws it directly. */
-export function PromptBar({ label, placeholder, value, onValueChange, maxLength, chips = [], modeSelector, modes, mode: selectedMode, onModeChange, references = [], tier, submitLabel = i18n._({ id: "ui.Make", message: "Make" }), fieldSize = "default", submitDetailPlacement = "below", onSubmit, busy = false, disabledReason, leading, error, className, placement = "inline", layout: barLayout = "block", chatDistribution, suggestions = [], submitDetail, optionsLabel = i18n._({ id: "ui.Options", message: "Options" }), foldLabel = i18n._({ id: "ui.More settings", message: "More settings" }), suggestedStyles = [], onDismissSuggestion, shape = "default", accent }: PromptBarProps) {
+export function PromptBar({ label, placeholder, value, onValueChange, maxLength, chips = [], modeSelector, modes, mode: selectedMode, onModeChange, quality, references = [], tier, submitLabel = i18n._({ id: "ui.Make", message: "Make" }), fieldSize = "default", submitDetailPlacement = "below", onSubmit, busy = false, disabledReason, leading, error, className, placement = "inline", layout: barLayout = "block", chatDistribution, suggestions = [], submitDetail, optionsLabel = i18n._({ id: "ui.Options", message: "Options" }), foldLabel = i18n._({ id: "ui.More settings", message: "More settings" }), suggestedStyles = [], onDismissSuggestion, shape = "default", accent }: PromptBarProps) {
   const layout = useSplitViewLayout();
   const phone = useIsPhoneLayout();
   const mode: Mode = placement === "panel" && layout ? (layout === "side" ? "panel" : "dock") : "inline";
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [modeMenuOpen, setModeMenuOpen] = useState(false);
   const [activeChoiceMenu, setActiveChoiceMenu] = useState<string | null>(null);
-  const [highlightedMode, setHighlightedMode] = useState(0);
   const [modeChoices, setModeChoices] = useState<Record<string, string>>({});
-  const [zonesVisible, setZonesVisible] = useState(true);
   const field = useRef<HTMLTextAreaElement | null>(null);
-  const modeMenuButton = useRef<HTMLButtonElement | null>(null);
-  const modeMenuList = useRef<HTMLDivElement | null>(null);
-  const previousMode = useRef(selectedMode);
   const detailId = useId();
   const blocked = busy || Boolean(disabledReason);
   const empty = value.trim() === "";
@@ -250,16 +246,9 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
   const folded = chips.filter((c) => c.fold);
   const shown = suggestions.slice(0, 4);
   const currentMode = modes?.find((item) => item.id === selectedMode) ?? modes?.[0];
-  const modeSubmitLabel = currentMode?.primaryLabel ?? submitLabel;
+  const modeSubmitLabel = currentMode?.primary?.label ?? currentMode?.primaryLabel ?? submitLabel;
   const modeEnabled = Boolean(modes?.length && currentMode);
-
-  useEffect(() => {
-    if (previousMode.current === selectedMode) return;
-    previousMode.current = selectedMode;
-    setZonesVisible(false);
-    const frame = requestAnimationFrame(() => setZonesVisible(true));
-    return () => cancelAnimationFrame(frame);
-  }, [selectedMode]);
+  const placeholderFade = usePlaceholderFade(currentMode?.placeholder ?? placeholder);
 
   function trySubmit() { if (chatDistribution === "start_end" && inChat ? canChatSubmit : ready) onSubmit(); }
 
@@ -289,7 +278,8 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
         rows={inChat ? 1 : undefined}
         value={value}
         aria-label={label}
-        placeholder={placeholder}
+        placeholder={currentMode?.placeholder ?? placeholder}
+        data-placeholder-fade={placeholderFade}
         maxLength={maxLength}
         disabled={locked}
         className={cn(bare && "rounded-2xl border-0 bg-transparent shadow-none focus-visible:border-0 focus-visible:ring-0 dark:bg-transparent dark:disabled:bg-transparent", inChat && "aui-composer-input min-h-10 max-h-48 resize-none rounded-none px-2.5 py-1 text-base leading-6", extra, large && mode !== "dock" && "min-h-[calc(5lh+1.5rem)]")}
@@ -472,7 +462,6 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
     const plainChips = unfolded.filter((c) => c.presentation !== "popover");
     if (inComposer) {
       if (modeEnabled && currentMode) {
-        const ModeIcon = getIcon(currentMode.icon);
         const preserveField = (action: () => void) => {
           const start = field.current?.selectionStart ?? value.length;
           const end = field.current?.selectionEnd ?? start;
@@ -482,31 +471,31 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
             field.current?.setSelectionRange(start, end);
           });
         };
+        const slots = currentMode.references ?? [];
+        const topRowOpen = slots.length > 0 || Boolean(currentMode.presets?.chips.length);
+        const tools = currentMode.tools ?? [];
+        const qualityChip = qualityChipFor(quality);
+        const primary = currentMode.primary?.label ?? modeSubmitLabel;
+        const primaryDetail = currentMode.primary?.detail;
         return (
-          <form data-slot="prompt-bar" data-layout={barLayout} data-composer-modes="true" className="flex w-full min-w-0 flex-col gap-2" onSubmit={(e) => { e.preventDefault(); trySubmit(); }} onKeyDown={(e) => { if (e.key === "Escape") { setModeMenuOpen(false); setActiveChoiceMenu(null); } }}>
+          <form data-slot="prompt-bar" data-layout={barLayout} data-composer-modes="true" className="flex w-full min-w-0 flex-col gap-2" onSubmit={(e) => { e.preventDefault(); trySubmit(); }} onKeyDown={(e) => { if (e.key === "Escape") { setActiveChoiceMenu(null); } }}>
             {errorRow}
             <div data-slot="prompt-bar-composer" data-chat-input="true" className="flex min-w-0 flex-col gap-2 rounded-2xl border border-input bg-background p-2 shadow-sm transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/30">
-              <div data-slot="prompt-bar-mode-zones" data-mode={currentMode.id} className={cn("flex min-w-0 flex-col gap-2 transition-opacity duration-150 motion-reduce:transition-none", zonesVisible ? "opacity-100" : "opacity-0")}>
-                {(currentMode.references?.length || true) ? <div data-slot="prompt-bar-mode-attachments" className="flex min-w-0 flex-wrap items-center gap-2">
-                  {currentMode.references?.map((ref) => <button key={ref.id} type="button" aria-label={i18n._({ id: "ui.Add {label}", message: "Add {label}", values: { label: ref.label } })} onClick={ref.onPick} className={`flex min-h-12 min-w-24 items-center justify-center gap-2 rounded-xl border border-dashed border-border px-3 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground ${hitArea(1)}`}>
-                    <Plus className="size-4" aria-hidden="true" /><span>{ref.label}</span>
-                  </button>)}
-                  <button type="button" aria-label={i18n._({ id: "ui.Upload reference", message: "Upload reference" })} className={`flex size-12 items-center justify-center rounded-xl border border-dashed border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground ${hitArea(1)}`}><Plus className="size-5" aria-hidden="true" /></button>
-                </div> : null}
-                {textbox(5, "min-h-24 resize-none")}
+              <ComposerModeZone modeId={currentMode.id} open={topRowOpen}>
+                <div data-slot="prompt-bar-mode-attachments" className="flex min-w-0 flex-wrap items-center gap-2 pb-2">
+                  <ComposerSlots slots={slots} />
+                  {currentMode.presets ? <div className="ml-auto"><ComposerPresetsButton presets={currentMode.presets} /></div> : null}
+                </div>
+              </ComposerModeZone>
+              <div data-slot="prompt-bar-mode-field" data-mode={currentMode.id} className="flex min-w-0 items-start gap-1">
+                <div className="min-w-0 flex-1">{textbox(5, "min-h-24 resize-none")}</div>
+                <ComposerFieldTools tools={tools} hasText={!empty} reasons={currentMode.toolDisabledReasons} onTool={(tool) => { if (currentMode.onTool) currentMode.onTool(tool); else if (tool === "clear") { onValueChange(""); field.current?.focus(); } }} />
               </div>
               <div data-slot="prompt-bar-composer-controls" className="flex min-w-0 flex-wrap items-center gap-1.5 border-t border-border/70 pt-2">
-                <div className="relative shrink-0">
-                  <button ref={modeMenuButton} type="button" aria-haspopup="listbox" aria-expanded={modeMenuOpen} aria-label={`Mode: ${currentMode.label}`} onClick={() => { const next = !modeMenuOpen; setModeMenuOpen(next); setHighlightedMode(Math.max(0, modes!.findIndex((item) => item.id === selectedMode))); if (next) requestAnimationFrame(() => modeMenuList.current?.focus()); }} onKeyDown={(e) => { if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); setModeMenuOpen(true); setHighlightedMode(Math.max(0, modes!.findIndex((item) => item.id === selectedMode))); requestAnimationFrame(() => modeMenuList.current?.focus()); } }} className={`flex min-h-12 items-center gap-2 rounded-full border border-border bg-background/70 px-3 text-sm font-medium text-foreground shadow-sm backdrop-blur-md transition-colors hover:bg-muted ${hitArea(1)}`}>
-                    <ModeIcon className="size-4" aria-hidden="true" /><span>{currentMode.label}</span><ChevronDown className="size-4" aria-hidden="true" />
-                  </button>
-                  {modeMenuOpen ? <div ref={modeMenuList} role="listbox" aria-label={i18n._({ id: "ui.Composer modes", message: "Composer modes" })} tabIndex={-1} className="absolute bottom-full left-0 z-50 mb-2 min-w-44 rounded-xl border border-border bg-popover/90 p-1.5 text-popover-foreground shadow-lg backdrop-blur-xl" onKeyDown={(e) => {
-                    if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); setHighlightedMode((index) => (index + (e.key === "ArrowDown" ? 1 : -1) + modes!.length) % modes!.length); }
-                    if (e.key === "Enter") { e.preventDefault(); const chosen = modes![highlightedMode]; if (chosen) preserveField(() => onModeChange?.(chosen.id)); setModeMenuOpen(false); }
-                  }}>
-                    {modes!.map((item, index) => { const ItemIcon = getIcon(item.icon); return <button key={item.id} role="option" aria-selected={item.id === currentMode.id} type="button" onMouseEnter={() => setHighlightedMode(index)} onClick={() => { preserveField(() => onModeChange?.(item.id)); setModeMenuOpen(false); }} className={`flex min-h-12 w-full items-center gap-2 rounded-lg px-3 text-sm text-left transition-colors hover:bg-muted ${index === highlightedMode ? "bg-muted" : ""}`}><ItemIcon className="size-4" aria-hidden="true" /><span>{item.label}</span></button>; })}
-                  </div> : null}
-                </div>
+                <ComposerModePill modes={modes!} mode={currentMode.id} onModeChange={(id) => onModeChange?.(id)} onChosen={preserveField} />
+                <ComposerModeZone modeId={currentMode.id} open className="min-w-0 max-w-full">
+                  <ComposerChips chips={currentMode.chips ?? []} quality={qualityChip} />
+                </ComposerModeZone>
                 {currentMode.options?.map((option) => {
                   const OptionIcon = option.icon ? getIcon(option.icon) : null;
                   const chosen = option.value ?? modeChoices[option.id] ?? option.choices[0]?.value;
@@ -515,11 +504,11 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
                     <button type="button" aria-haspopup="listbox" aria-expanded={activeChoiceMenu === option.id} aria-label={`${option.label}: ${chosenText}`} onClick={() => setActiveChoiceMenu((id) => id === option.id ? null : option.id)} className={`flex min-h-12 items-center gap-1.5 rounded-full border border-border bg-background/70 px-3 text-sm text-foreground transition-colors hover:bg-muted ${hitArea(1)}`}>
                       {OptionIcon ? <OptionIcon className="size-4" aria-hidden="true" /> : null}<span>{chosenText}</span><ChevronDown className="size-3.5" aria-hidden="true" />
                     </button>
-                    {activeChoiceMenu === option.id ? <div role="listbox" aria-label={option.label} className="absolute bottom-full left-0 z-50 mb-2 min-w-40 rounded-xl border border-border bg-popover/90 p-1.5 text-popover-foreground shadow-lg backdrop-blur-xl">{option.choices.map((choice) => <button key={choice.value} type="button" role="option" aria-selected={choice.value === chosen} onClick={() => { setModeChoices((all) => ({ ...all, [option.id]: choice.value })); option.onValueChange?.(choice.value); setActiveChoiceMenu(null); }} className="flex min-h-12 w-full items-center rounded-lg px-3 text-left text-sm hover:bg-muted">{choice.label}</button>)}</div> : null}
+                    {activeChoiceMenu === option.id ? <div role="listbox" aria-label={option.label} className="absolute bottom-full left-0 z-50 mb-2 min-w-40 motion-reveal rounded-xl border border-border bg-popover/90 p-1.5 text-popover-foreground shadow-lg backdrop-blur-xl">{option.choices.map((choice) => <button key={choice.value} type="button" role="option" aria-selected={choice.value === chosen} onClick={() => { setModeChoices((all) => ({ ...all, [option.id]: choice.value })); option.onValueChange?.(choice.value); setActiveChoiceMenu(null); }} className="flex min-h-12 w-full items-center rounded-lg px-3 text-left text-sm hover:bg-muted">{choice.label}</button>)}</div> : null}
                   </div>;
                 })}
-                <Button type="submit" size="icon" shape="pill" disabled={!ready} className={`ml-auto size-12 shrink-0 ${hitArea(1)}`} aria-label={modeSubmitLabel} title={modeSubmitLabel}><ArrowUp className="size-5" aria-hidden="true" /></Button>
-                <span className="sr-only">{modeSubmitLabel}</span>
+                {primaryDetail ? <span id={detailId} className="ml-auto sr-only min-w-0 truncate px-1 text-xs text-muted-foreground lg:not-sr-only">{primaryDetail}</span> : null}
+                <Button type="submit" size="icon" shape="pill" disabled={!ready} className={cn("size-12 shrink-0", primaryDetail ? "" : "ml-auto", hitArea(1))} aria-label={primary} aria-describedby={primaryDetail ? detailId : undefined} title={primaryDetail ? `${primary} · ${primaryDetail}` : primary}><ArrowUp className="size-5" aria-hidden="true" /></Button>
               </div>
             </div>
             {disabledNote}

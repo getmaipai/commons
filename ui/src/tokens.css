@@ -2338,6 +2338,19 @@ html[data-ease-motion="calm"] body {
     animation: motion-fade-out var(--motion-fade-out) var(--motion-ease-in) both;
   }
 }
+/* ONE-COMPOSER: a mode change cross-fades the field's placeholder. The composer flips data-placeholder-fade between "a" and "b" (two
+ * keyframe names, so the animation restarts without remounting the field). Reduced motion zeroes the duration (rule above). */
+@keyframes motion-fade-in-alt {
+  from {
+    opacity: 0;
+  }
+}
+[data-placeholder-fade="a"]::placeholder {
+  animation: motion-fade-in var(--motion-fade-in) var(--motion-ease-out) both;
+}
+[data-placeholder-fade="b"]::placeholder {
+  animation: motion-fade-in-alt var(--motion-fade-in) var(--motion-ease-out) both;
+}
 /* Phone dialogs: a bottom sheet that slides up on the slide family (a dialog that sits at the bottom edge below the sm breakpoint). */
 @keyframes motion-sheet-in {
   from {

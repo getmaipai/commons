@@ -18,6 +18,7 @@ import {
   ReasoningText,
   ReasoningTrigger,
 } from "./reasoning.aui";
+import { ComposerChips, ComposerFieldTools, ComposerModePill, ComposerModeZone, ComposerPresetsButton, ComposerSlots, qualityChipFor, usePlaceholderFade, type ComposerModeData, type ComposerQualityData, type ComposerTool, ComposerChipPopover } from "./composer-parts";
 import { ThinkingIndicator } from "./thinking-indicator";
 import { ToolFallback } from "./tool-fallback.aui";
 import {
@@ -278,6 +279,12 @@ export type ThreadComponents = {
   /** Compact talk pill using the same assistant-ui composer primitives and state. */
   composerVariant?: ComposerVariant | undefined;
   ComposerInputOverride?: ComponentType | undefined;
+  /** ONE-COMPOSER (COMPOSER-02): the one composer's modes, drawn by the kit inside the Thread. The host passes data only: the modes
+   * (placeholder, reference slots, combined chips, presets, field tools), the picked `mode`, `onModeChange`, and optionally the Quality
+   * chip. The kit draws the mode pill beside Send, the slots and chips as one row under the field (one extra row on a phone, scrolling
+   * sideways), the Presets button and the field-end tools, and cross-fades the placeholder. A composer with the default mode and no
+   * slots or chips draws today's row plus the pill. */
+  composerModes?: ThreadComposerModes | undefined;
   ComposerNotice?: ComponentType | undefined;
   /** Composer notice layout. Defaults to the existing one-line truncation. */
   composerNoticeLayout?: ComposerNoticeLayout | undefined;
@@ -424,6 +431,17 @@ const ThreadHistorySkeleton: FC = () => (
     </div>
   </div>
 );
+
+export interface ThreadComposerModes {
+  modes: readonly ComposerModeData[];
+  /** The picked mode id; the first mode when absent or unknown. */
+  mode: string;
+  onModeChange: (id: string) => void;
+  /** The Quality chip, in the trailing group beside the pill. The band comes in as data: a child or teen never sees Thinking or a model choice. */
+  quality?: ComposerQualityData | undefined;
+  /** A field tool was pressed. Without it `clear` empties the composer text. */
+  onTool?: ((tool: ComposerTool, modeId: string) => void) | undefined;
+}
 
 export const Thread: FC<ThreadProps> = ({
   tourId,
@@ -978,7 +996,17 @@ export const ComposerInputField: FC<ComponentProps<typeof ComposerPrimitive.Inpu
 );
 
 const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
-  const { ComposerInputOverride, ComposerQuotePreview, ComposerNotice, sendHeld: sendHeldProp, composerDensity, composerVariant, composerNoticeLayout, composerNoticeReserve, composerPlaceholder, composerTourId } = useContext(ThreadComponentsContext);
+  const { ComposerInputOverride, ComposerQuotePreview, ComposerNotice, sendHeld: sendHeldProp, composerDensity, composerVariant, composerNoticeLayout, composerNoticeReserve, composerPlaceholder, composerTourId, composerModes } = useContext(ThreadComponentsContext);
+  const aui = useAui();
+  const text = useAuiState((st) => st.composer.text);
+  const currentMode = composerModes ? (composerModes.modes.find((m) => m.id === composerModes.mode) ?? composerModes.modes[0]) : undefined;
+  const placeholderText = currentMode?.placeholder ?? composerPlaceholder;
+  const placeholderFade = usePlaceholderFade(placeholderText);
+  const slots = currentMode?.references ?? [];
+  const chips = currentMode?.chips ?? [];
+  const presets = currentMode?.presets;
+  const rowOpen = slots.length > 0 || chips.length > 0 || Boolean(presets?.chips.length);
+  const tools = currentMode?.tools ?? [];
   const engineDownNow = useEngineDown().down;
   const sendHeld = sendHeldProp || engineDownNow;
   const shellRef = useRef<HTMLDivElement>(null);
@@ -1016,13 +1044,37 @@ const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
             {ComposerInputOverride && composerVariant !== "pill" ? (
               <ComposerInputOverride />
             ) : (
+              tools.length > 0 && composerVariant !== "pill" ? (
+                <div data-slot="composer-input-row" className="flex min-w-0 items-start gap-1">
+                  <div className="min-w-0 flex-1">
+                    <ComposerInputField
+                      placeholder={placeholderText ?? i18n._({ id: "ui.Send a message...", message: "Send a message..." })}
+                      data-placeholder-fade={placeholderFade}
+                      autoFocus={autoFocus}
+                      submitMode={sendHeld ? "none" : undefined}
+                    />
+                  </div>
+                  <ComposerFieldTools tools={tools} hasText={text.trim() !== ""} reasons={currentMode?.toolDisabledReasons} onTool={(tool) => { if (composerModes?.onTool) composerModes.onTool(tool, currentMode!.id); else if (tool === "clear") aui.composer().setText(""); }} />
+                </div>
+              ) : (
               <ComposerInputField
-                placeholder={composerPlaceholder ?? i18n._({ id: "ui.Send a message...", message: "Send a message..." })}
+                placeholder={placeholderText ?? i18n._({ id: "ui.Send a message...", message: "Send a message..." })}
+                data-placeholder-fade={placeholderFade}
                 autoFocus={autoFocus}
                 submitMode={sendHeld ? "none" : undefined}
                 className={composerVariant === "pill" ? "min-h-9 flex-1 px-2 text-sm" : undefined}
               />
+              )
             )}
+            {composerModes && composerVariant !== "pill" && composerModes.modes.some((m) => (m.references?.length ?? 0) > 0 || (m.chips?.length ?? 0) > 0 || m.presets) ? (
+              <ComposerModeZone modeId={currentMode?.id ?? ""} open={rowOpen} className="data-[open=false]:-mb-2">
+                <div data-slot="composer-mode-row" className="flex min-w-0 touch-pan-x flex-nowrap items-center gap-2 overflow-x-auto sm:flex-wrap sm:overflow-visible">
+                  <ComposerSlots slots={slots} />
+                  <ComposerChips chips={chips} />
+                  {presets ? <div className="ml-auto shrink-0"><ComposerPresetsButton presets={presets} /></div> : null}
+                </div>
+              </ComposerModeZone>
+            ) : null}
             <ComposerAction pill={composerVariant === "pill"} />
           </div>
         </DraftRestoreRegionContext.Provider>
@@ -1044,8 +1096,19 @@ const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
   );
 };
 
+/** The mode pill and the Quality chip, in the trailing group beside Send. */
+const ComposerModeControls: FC<{ composerModes: ThreadComposerModes }> = ({ composerModes }) => {
+  const quality = qualityChipFor(composerModes.quality);
+  return (
+    <>
+      {quality ? <ComposerChipPopover name={quality.label} chips={[quality]} slot="composer-quality" align="end" /> : null}
+      <ComposerModePill modes={composerModes.modes} mode={composerModes.mode} onModeChange={composerModes.onModeChange} />
+    </>
+  );
+};
+
 const ComposerAction: FC<{ pill?: boolean }> = ({ pill = false }) => {
-  const { ComposerExtra, ComposerAddAttachmentOverride, ComposerExtraEnd, sendHeld: sendHeldProp, sendButtonTourId } = useContext(ThreadComponentsContext);
+  const { ComposerExtra, ComposerAddAttachmentOverride, ComposerExtraEnd, composerModes, sendHeld: sendHeldProp, sendButtonTourId } = useContext(ThreadComponentsContext);
   const engineDownNow = useEngineDown().down;
   const sendHeld = sendHeldProp || engineDownNow;
   if (pill) return <div className="flex shrink-0 items-center gap-1">
@@ -1063,6 +1126,7 @@ const ComposerAction: FC<{ pill?: boolean }> = ({ pill = false }) => {
         {ComposerExtra && <ComposerExtra />}
       </div>
       <div className="flex items-center gap-1.5">
+        {composerModes ? <ComposerModeControls composerModes={composerModes} /> : null}
         {ComposerExtraEnd && <ComposerExtraEnd />}
         <AuiIf condition={(s) => s.thread.capabilities.dictation}>
           <AuiIf condition={(s) => s.composer.dictation == null}>

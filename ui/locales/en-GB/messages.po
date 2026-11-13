@@ -312,7 +312,12 @@ msgid "ui.{name}: {label}"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:388
+#: src/elements/composer-parts.tsx:315
+msgid "ui.{name}: {summary}"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/elements/thread.aui.tsx:395
 msgid "ui.{name}. {reason}"
 msgstr ""
 
@@ -322,7 +327,7 @@ msgid "ui.{name}'s face, {expression}"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/prompt-bar.tsx:799
+#: src/elements/prompt-bar.tsx:788
 msgid "ui.{names} and {last}"
 msgstr ""
 
@@ -615,11 +620,11 @@ msgid "ui.Activity"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/prompt-bar.tsx:342
-#: src/elements/prompt-bar.tsx:491
-#: src/elements/prompt-bar.tsx:541
-#: src/elements/prompt-bar.tsx:730
-#: src/elements/prompt-bar.tsx:746
+#: src/elements/composer-parts.tsx:234
+#: src/elements/prompt-bar.tsx:332
+#: src/elements/prompt-bar.tsx:530
+#: src/elements/prompt-bar.tsx:719
+#: src/elements/prompt-bar.tsx:735
 msgid "ui.Add {label}"
 msgstr ""
 
@@ -925,12 +930,12 @@ msgid "ui.asking"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:789
+#: src/elements/thread.aui.tsx:807
 msgid "ui.Assistant is speaking"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:780
+#: src/elements/thread.aui.tsx:798
 msgid "ui.Assistant said"
 msgstr ""
 
@@ -1149,7 +1154,7 @@ msgstr ""
 #: src/elements/project-home-page.tsx:29
 #: src/elements/project-settings.tsx:72
 #: src/elements/thread-list.aui.tsx:182
-#: src/elements/thread.aui.tsx:1582
+#: src/elements/thread.aui.tsx:1646
 #: src/elements/tier-segment.tsx:50
 #: src/elements/video-player.tsx:109
 #: src/primitives/Player.tsx:186
@@ -1201,7 +1206,7 @@ msgid "ui.Card size"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/prompt-bar.tsx:820
+#: src/elements/prompt-bar.tsx:809
 #: src/settings/LocationField.tsx:249
 #: src/settings/SettingRow.tsx:203
 #: src/settings/SettingRow.tsx:261
@@ -1243,7 +1248,7 @@ msgid "ui.Chapters"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/prompt-bar.tsx:319
+#: src/elements/prompt-bar.tsx:309
 msgid "ui.Character: {name}"
 msgstr ""
 
@@ -1293,6 +1298,7 @@ msgid "ui.Choose who in your home can see this. Nothing is sent outside your hom
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/elements/composer-parts.tsx:384
 #: src/elements/image-editor.tsx:1200
 #: src/elements/image-editor.tsx:1230
 #: src/elements/image-editor.tsx:1282
@@ -1359,7 +1365,7 @@ msgid "ui.Close {name}"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio-compare-bar.tsx:66
+#: src/elements/track-studio-compare-bar.tsx:68
 msgid "ui.Close compare"
 msgstr ""
 
@@ -1472,7 +1478,7 @@ msgid "ui.completed"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/prompt-bar.tsx:503
+#: src/elements/composer-parts.tsx:186
 msgid "ui.Composer modes"
 msgstr ""
 
@@ -1595,9 +1601,9 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/markdown-text.tsx:415
-#: src/elements/thread.aui.tsx:823
-#: src/elements/thread.aui.tsx:1333
-#: src/elements/thread.aui.tsx:1551
+#: src/elements/thread.aui.tsx:841
+#: src/elements/thread.aui.tsx:1397
+#: src/elements/thread.aui.tsx:1615
 msgid "ui.Copy"
 msgstr ""
 
@@ -2014,7 +2020,7 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/activity-feed.tsx:34
-#: src/elements/prompt-bar.tsx:867
+#: src/elements/prompt-bar.tsx:856
 #: src/elements/share-dialog.tsx:130
 #: src/primitives/BatchBar.tsx:40
 #: src/primitives/reorder.tsx:155
@@ -2112,7 +2118,7 @@ msgstr ""
 #: src/elements/music-track.tsx:35
 #: src/elements/music-track.tsx:67
 #: src/elements/song-style.tsx:67
-#: src/elements/thread.aui.tsx:1546
+#: src/elements/thread.aui.tsx:1610
 #: src/elements/track-studio.tsx:397
 #: src/elements/track-studio.tsx:478
 msgid "ui.Edit"
@@ -2281,7 +2287,7 @@ msgid "ui.Export as a new clip"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1394
+#: src/elements/thread.aui.tsx:1458
 msgid "ui.Export as Markdown"
 msgstr ""
 
@@ -2636,7 +2642,7 @@ msgid "ui.Help"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1356
+#: src/elements/thread.aui.tsx:1420
 msgid "ui.Helpful"
 msgstr ""
 
@@ -2725,7 +2731,7 @@ msgid "ui.Household"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:850
+#: src/elements/thread.aui.tsx:868
 msgid "ui.How can I help you today?"
 msgstr ""
 
@@ -2765,7 +2771,7 @@ msgid "ui.Icon"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/prompt-bar.tsx:306
+#: src/elements/prompt-bar.tsx:296
 msgid "ui.Ideas"
 msgstr ""
 
@@ -2804,6 +2810,11 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/elements/image.tsx:247
 msgid "ui.Image preview"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/elements/composer-parts.tsx:385
+msgid "ui.Improve"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -3113,7 +3124,7 @@ msgid "ui.Loading article"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:413
+#: src/elements/thread.aui.tsx:420
 msgid "ui.Loading conversation"
 msgstr ""
 
@@ -3253,7 +3264,7 @@ msgid "ui.MaiPai ran into a problem showing this page. Reloading usually fixes i
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/prompt-bar.tsx:223
+#: src/elements/prompt-bar.tsx:225
 msgid "ui.Make"
 msgstr ""
 
@@ -3358,7 +3369,7 @@ msgid "ui.Menu"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:971
+#: src/elements/thread.aui.tsx:989
 msgid "ui.Message input"
 msgstr ""
 
@@ -3380,6 +3391,11 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/elements/music-track.tsx:38
 msgid "ui.Mixing"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/elements/composer-parts.tsx:175
+msgid "ui.Mode: {label}"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -3408,7 +3424,7 @@ msgstr ""
 #: src/elements/creation-header.tsx:75
 #: src/elements/creation-header.tsx:117
 #: src/elements/image-editor.tsx:281
-#: src/elements/thread.aui.tsx:1379
+#: src/elements/thread.aui.tsx:1443
 #: src/elements/video-player.tsx:111
 #: src/PhoneNav.tsx:130
 #: src/PhoneNav.tsx:137
@@ -3445,7 +3461,7 @@ msgid "ui.More options"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/prompt-bar.tsx:223
+#: src/elements/prompt-bar.tsx:225
 msgid "ui.More settings"
 msgstr ""
 
@@ -3615,7 +3631,7 @@ msgstr ""
 #: src/elements/media-viewer.tsx:113
 #: src/elements/music-track.tsx:35
 #: src/elements/question-flow.tsx:47
-#: src/elements/thread.aui.tsx:1622
+#: src/elements/thread.aui.tsx:1686
 #: src/primitives/Player.tsx:178
 #: src/primitives/Tour.tsx:46
 msgid "ui.Next"
@@ -3836,7 +3852,7 @@ msgid "ui.Not available right now."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1364
+#: src/elements/thread.aui.tsx:1428
 msgid "ui.Not helpful"
 msgstr ""
 
@@ -4151,7 +4167,7 @@ msgid "ui.optional"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/prompt-bar.tsx:223
+#: src/elements/prompt-bar.tsx:225
 msgid "ui.Options"
 msgstr ""
 
@@ -4268,8 +4284,8 @@ msgstr ""
 #: src/elements/clip-feed.tsx:42
 #: src/elements/job-progress.tsx:194
 #: src/elements/music-track.tsx:35
-#: src/elements/track-studio-compare-bar.tsx:60
-#: src/elements/track-studio-compare-bar.tsx:60
+#: src/elements/track-studio-compare-bar.tsx:62
+#: src/elements/track-studio-compare-bar.tsx:62
 #: src/elements/track-studio.tsx:537
 #: src/elements/track-studio.tsx:537
 #: src/primitives/Player.tsx:164
@@ -4474,8 +4490,8 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/elements/clip-feed.tsx:41
 #: src/elements/music-track.tsx:35
-#: src/elements/track-studio-compare-bar.tsx:60
-#: src/elements/track-studio-compare-bar.tsx:60
+#: src/elements/track-studio-compare-bar.tsx:62
+#: src/elements/track-studio-compare-bar.tsx:62
 #: src/elements/track-studio.tsx:537
 #: src/elements/track-studio.tsx:537
 #: src/elements/video-player.tsx:112
@@ -4576,6 +4592,11 @@ msgid "ui.present"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/elements/composer-parts.tsx:371
+msgid "ui.Presets"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:353
 msgid "ui.Press Enter to search the web · Esc to close"
 msgstr ""
@@ -4612,7 +4633,7 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/elements/media-viewer.tsx:112
 #: src/elements/music-track.tsx:35
-#: src/elements/thread.aui.tsx:1614
+#: src/elements/thread.aui.tsx:1678
 #: src/primitives/Player.tsx:177
 msgid "ui.Previous"
 msgstr ""
@@ -4702,6 +4723,7 @@ msgid "ui.Projects"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/elements/composer-parts.tsx:116
 #: src/elements/tier-segment.tsx:50
 msgid "ui.Quality"
 msgstr ""
@@ -4743,7 +4765,7 @@ msgid "ui.Ratio"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1340
+#: src/elements/thread.aui.tsx:1404
 msgid "ui.Read aloud"
 msgstr ""
 
@@ -4835,7 +4857,12 @@ msgid "ui.Reference library"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1372
+#: src/elements/composer-parts.tsx:212
+msgid "ui.References"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/elements/thread.aui.tsx:1436
 msgid "ui.Refresh"
 msgstr ""
 
@@ -4905,8 +4932,9 @@ msgid "ui.Remove \"{text}\" from the queue"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/prompt-bar.tsx:725
-#: src/elements/prompt-bar.tsx:769
+#: src/elements/composer-parts.tsx:222
+#: src/elements/prompt-bar.tsx:714
+#: src/elements/prompt-bar.tsx:758
 msgid "ui.Remove {label}"
 msgstr ""
 
@@ -4948,7 +4976,7 @@ msgid "ui.Remove BG"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/prompt-bar.tsx:320
+#: src/elements/prompt-bar.tsx:310
 msgid "ui.Remove character {name}"
 msgstr ""
 
@@ -4973,7 +5001,7 @@ msgid "ui.Remove location"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/prompt-bar.tsx:320
+#: src/elements/prompt-bar.tsx:310
 msgid "ui.Remove style {name}"
 msgstr ""
 
@@ -5139,7 +5167,7 @@ msgstr ""
 #: src/elements/error-state.tsx:40
 #: src/elements/job-progress.tsx:194
 #: src/elements/job-progress.tsx:267
-#: src/elements/thread.aui.tsx:1522
+#: src/elements/thread.aui.tsx:1586
 msgid "ui.Retry"
 msgstr ""
 
@@ -5273,7 +5301,7 @@ msgid "ui.Saving…"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:835
+#: src/elements/thread.aui.tsx:853
 msgid "ui.Scroll to bottom"
 msgstr ""
 
@@ -5450,7 +5478,8 @@ msgid "ui.Send"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1020
+#: src/elements/thread.aui.tsx:1051
+#: src/elements/thread.aui.tsx:1061
 msgid "ui.Send a message..."
 msgstr ""
 
@@ -5461,14 +5490,14 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/composer.tsx:655
-#: src/elements/thread.aui.tsx:1053
-#: src/elements/thread.aui.tsx:1053
-#: src/elements/thread.aui.tsx:1053
-#: src/elements/thread.aui.tsx:1053
-#: src/elements/thread.aui.tsx:1106
-#: src/elements/thread.aui.tsx:1113
-#: src/elements/thread.aui.tsx:1121
-#: src/elements/thread.aui.tsx:1128
+#: src/elements/thread.aui.tsx:1116
+#: src/elements/thread.aui.tsx:1116
+#: src/elements/thread.aui.tsx:1116
+#: src/elements/thread.aui.tsx:1116
+#: src/elements/thread.aui.tsx:1170
+#: src/elements/thread.aui.tsx:1177
+#: src/elements/thread.aui.tsx:1185
+#: src/elements/thread.aui.tsx:1192
 msgid "ui.Send message"
 msgstr ""
 
@@ -5854,8 +5883,8 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/elements/composer-voice.aui.tsx:18
 #: src/elements/composer.tsx:621
-#: src/elements/thread.aui.tsx:1009
-#: src/elements/thread.aui.tsx:1077
+#: src/elements/thread.aui.tsx:1037
+#: src/elements/thread.aui.tsx:1141
 msgid "ui.Start voice input"
 msgstr ""
 
@@ -5905,21 +5934,21 @@ msgid "ui.Stop {name}"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1013
-#: src/elements/thread.aui.tsx:1013
-#: src/elements/thread.aui.tsx:1087
+#: src/elements/thread.aui.tsx:1041
+#: src/elements/thread.aui.tsx:1041
+#: src/elements/thread.aui.tsx:1151
 msgid "ui.Stop dictation"
 msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/composer.tsx:655
-#: src/elements/thread.aui.tsx:1056
-#: src/elements/thread.aui.tsx:1144
+#: src/elements/thread.aui.tsx:1119
+#: src/elements/thread.aui.tsx:1208
 msgid "ui.Stop generating"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1347
+#: src/elements/thread.aui.tsx:1411
 msgid "ui.Stop reading"
 msgstr ""
 
@@ -5930,7 +5959,7 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/composer-voice.aui.tsx:19
-#: src/elements/thread.aui.tsx:1093
+#: src/elements/thread.aui.tsx:1157
 msgid "ui.Stop voice input"
 msgstr ""
 
@@ -5998,7 +6027,7 @@ msgid "ui.Style words for the song. Never lyrics."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/prompt-bar.tsx:319
+#: src/elements/prompt-bar.tsx:309
 msgid "ui.Style: {name}"
 msgstr ""
 
@@ -6015,7 +6044,7 @@ msgid "ui.Submitting…"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/prompt-bar.tsx:315
+#: src/elements/prompt-bar.tsx:305
 msgid "ui.Suggested styles"
 msgstr ""
 
@@ -6061,7 +6090,7 @@ msgid "ui.Table of contents"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:570
+#: src/elements/thread.aui.tsx:588
 msgid "ui.Talk..."
 msgstr ""
 
@@ -6183,12 +6212,12 @@ msgid "ui.The area to erase could not be prepared. Try drawing it again."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio-compare-bar.tsx:65
+#: src/elements/track-studio-compare-bar.tsx:67
 msgid "ui.The current version"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio-compare-bar.tsx:65
+#: src/elements/track-studio-compare-bar.tsx:67
 msgid "ui.The earlier version"
 msgstr ""
 
@@ -6293,7 +6322,7 @@ msgid "ui.Thinking"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1298
+#: src/elements/thread.aui.tsx:1362
 msgid "ui.Thinking…"
 msgstr ""
 
@@ -6577,7 +6606,7 @@ msgid "ui.typically replies in a minute"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:935
+#: src/elements/thread.aui.tsx:953
 msgid "ui.Unavailable"
 msgstr ""
 
@@ -6665,7 +6694,7 @@ msgid "ui.Up next in {seconds}"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1591
+#: src/elements/thread.aui.tsx:1655
 msgid "ui.Update"
 msgstr ""
 
@@ -6681,11 +6710,6 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/elements/attachment.aui.tsx:177
 msgid "ui.Upload failed"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/elements/prompt-bar.tsx:494
-msgid "ui.Upload reference"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -6766,7 +6790,7 @@ msgid "ui.Version {n} of {total}"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio-compare-bar.tsx:61
+#: src/elements/track-studio-compare-bar.tsx:63
 msgid "ui.Version to hear"
 msgstr ""
 
@@ -6829,13 +6853,13 @@ msgid "ui.Voice"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:765
+#: src/elements/thread.aui.tsx:783
 msgid "ui.Voice conversation"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1009
-#: src/elements/thread.aui.tsx:1071
+#: src/elements/thread.aui.tsx:1037
+#: src/elements/thread.aui.tsx:1135
 msgid "ui.Voice input"
 msgstr ""
 
@@ -7012,6 +7036,11 @@ msgid "ui.Wrench"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/elements/composer-parts.tsx:386
+msgid "ui.Write lyrics"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/elements/artifact-card.tsx:52
 msgid "ui.Writing"
 msgstr ""
@@ -7053,7 +7082,7 @@ msgid "ui.You hear this in the preview. The saved song changes when you apply it
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:780
+#: src/elements/thread.aui.tsx:798
 msgid "ui.You said"
 msgstr ""
 
