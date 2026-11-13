@@ -901,4 +901,62 @@ describe("versions popover", () => {
     fireEvent.click(level("quick"));
     expect((within(document.body).getByRole("button", { name: "Preview" }) as HTMLButtonElement).disabled).toBe(false);
   });
+
+  describe("tool option panels stay in the editor and read as one left-aligned column (EDITOR-PANEL-LAYOUT)", () => {
+    const clearer = {
+      id: "clearer", label: "Make clearer", enabled: true, summary: "A long wordy explanation that the level line replaces.",
+      controls: [
+        { kind: "choice" as const, name: "level", label: "Level", options: ["quick", "better", "best"] },
+        { kind: "choice" as const, name: "size", label: "Size", options: ["1", "1.5", "2"] },
+      ],
+      levels: [
+        { id: "quick", label: "Quick", summary: "Less grain.", eta: "a few seconds", enabled: true },
+        { id: "better", label: "Better", summary: "Smart enlarging.", enabled: true },
+        { id: "best", label: "Best", summary: "Careful repair.", enabled: false, reason: "Needs a download." },
+      ],
+    };
+    const panel = () => document.querySelector<HTMLElement>("[data-slot=image-editor-panel]")!;
+
+    test("the panel is capped in width and bounded by the editor, never the whole window", async () => {
+      const v = setup({ operations: [clearer] });
+      fireEvent.click(v.getByRole("radio", { name: "More" }));
+      expect(panel().className).toContain("w-max");
+      expect(panel().className).toMatch(/max-w-\[min\(32rem,var\(--radix-popover-content-available-width\)\)\]/);
+      // The boundary is the editor's own section; Radix reads it off the Content props.
+      const source = await Bun.file(new URL("./image-editor.tsx", import.meta.url)).text();
+      expect(source).toContain("collisionBoundary={rootRef.current ?? undefined}");
+    });
+
+    test("More is one column: operations, levels with their line, a labelled size row, then Preview last", () => {
+      const v = setup({ operations: [clearer] });
+      fireEvent.click(v.getByRole("radio", { name: "More" }));
+      fireEvent.click(within(document.body).getByRole("button", { name: "Make clearer" }));
+      const bar = document.querySelector("[data-slot=image-editor-more-bar]")!;
+      expect(bar.className).toContain("text-left");
+      expect(bar.className).not.toContain("justify-center");
+      const order = ["image-editor-operations", "image-editor-levels", "image-editor-choice", "image-editor-panel-actions"].map((slot) => bar.querySelector(`[data-slot=${slot}]`));
+      order.forEach((el) => expect(el).toBeTruthy());
+      for (let i = 1; i < order.length; i += 1) expect(order[i - 1]!.compareDocumentPosition(order[i]!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      // The wordy operation summary is not drawn inside the panel; the level line is.
+      expect(bar.textContent).not.toContain("long wordy");
+      expect(bar.querySelector("[data-slot=image-editor-level-line]")!.textContent).toBe("Less grain. Takes a few seconds.");
+      const size = bar.querySelector("[data-slot=image-editor-choice]")!;
+      expect(size.textContent).toContain("Size");
+      expect(Array.from(size.querySelectorAll("[role=radio]")).map((el) => el.textContent)).toEqual(["Same size", "1.5x", "2x"]);
+    });
+
+    test("Resize, Crop, Adjust, Erase, Comment and Markup use the same panel box (no second pill surface, left-aligned)", () => {
+      setup({ operations: [clearer], tools: { ...allEnabled, crop: { enabled: true }, adjust: { enabled: true } } });
+      const slots = [["resize", "image-editor-resize"], ["crop", "image-editor-crop-bar"], ["adjust", "image-editor-adjust-bar"], ["erase", "image-editor-erase-bar"], ["comment", "image-editor-comment-bar"], ["markup", "image-editor-markup-bar"]];
+      for (const [tool, slot] of slots) {
+        fireEvent.click(document.querySelector(`[data-tool=${tool}]`)!);
+        const box = document.querySelector(`[data-slot=${slot}]`) as HTMLElement | null;
+        expect(box).toBeTruthy();
+        expect(box!.closest("[data-slot=image-editor-panel]")).toBeTruthy();
+        expect(box!.className).not.toContain("rounded-");
+        expect(box!.className).not.toContain("justify-center");
+        expect(box!.className).toContain("p-3");
+      }
+    });
+  });
 });

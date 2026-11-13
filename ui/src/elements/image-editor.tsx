@@ -68,7 +68,6 @@ import { Card, CardContent } from "@/kit/ui/card";
 import { Label } from "@/kit/ui/label";
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from "@/kit/ui/popover";
 import { Progress } from "@/kit/ui/progress";
-import { Separator } from "@/kit/ui/separator";
 import { Slider } from "@/kit/ui/slider";
 import { Toggle } from "@/kit/ui/toggle";
 import { ToggleGroup, ToggleGroupItem } from "@/kit/ui/toggle-group";
@@ -323,6 +322,9 @@ const messageOf = (error: unknown) =>
 const isEditable = (target: EventTarget | null) =>
   target instanceof Element && target.closest("input, textarea, select, [contenteditable='true']") !== null;
 
+/** The tool option panels (popovers) share one box: a left-aligned column, kit spacing, no second surface (the popover is the surface). */
+const panelColumn = "grid w-full gap-3 p-3 text-left";
+const panelRow = "flex w-full flex-wrap items-center justify-start gap-2 p-3";
 const pill = "surface-float text-popover-foreground flex items-center gap-1 p-1";
 
 /** Transparency checkerboard from kit tokens. */
@@ -402,8 +404,8 @@ function ResizeBar({
   };
 
   return (
-    <div className="flex flex-wrap items-end justify-center gap-x-3 gap-y-2" data-slot="image-editor-resize">
-      <div className="flex items-end gap-2">
+    <div className={panelColumn} data-slot="image-editor-resize">
+      <div className="flex flex-wrap items-end gap-2">
         <div className="grid gap-1">
           <Label htmlFor={ids.w} className="text-xs">{i18n._({ id: "ui.Width", message: "Width" })}</Label>
           <Input
@@ -450,7 +452,6 @@ function ResizeBar({
             className="w-24"
           />
         </div>
-      </div>
       <ToggleGroup
         type="single"
         variant="outline"
@@ -464,6 +465,28 @@ function ResizeBar({
         <ToggleGroupItem value="px" aria-label={i18n._({ id: "ui.Pixels", message: "Pixels" })} disabled={locked}>px</ToggleGroupItem>
         <ToggleGroupItem value="%" aria-label={i18n._({ id: "ui.Percent", message: "Percent" })} disabled={locked}>%</ToggleGroupItem>
       </ToggleGroup>
+      </div>
+      {onUpscale ? (
+        <>
+          <div className="flex flex-wrap items-center gap-2" data-slot="image-editor-upscale">
+            <Button type="button" size="sm" variant="outline" disabled={locked} onClick={() => onUpscale(2)}>
+              {i18n._({ id: "ui.Upscale 2x", message: "Upscale 2x" })}
+            </Button>
+            <Button type="button" size="sm" variant="outline" disabled={locked} onClick={() => onUpscale(4)}>
+              {i18n._({ id: "ui.Upscale 4x", message: "Upscale 4x" })}
+            </Button>
+          </div>
+          <p className="text-muted-foreground w-full text-xs">
+            {i18n._({ id: "ui.Upscaling adds detail the picture did not have; faces may change.", message: "Upscaling adds detail the picture did not have; faces may change." })}
+          </p>
+        </>
+      ) : null}
+      {!check.ok ? (
+        <p className="text-destructive w-full text-xs" data-slot="image-editor-resize-error">
+          {check.error}
+        </p>
+      ) : null}
+      <div className="flex justify-end" data-slot="image-editor-panel-actions">
       <Button
         type="button"
         size="sm"
@@ -474,27 +497,7 @@ function ResizeBar({
       >
         {i18n._({ id: "ui.Resize (verb)", message: "Resize" })}
       </Button>
-      {onUpscale ? (
-        <>
-          <Separator orientation="vertical" className="hidden h-6 sm:block" />
-          <div className="flex items-center gap-2">
-            <Button type="button" size="sm" variant="outline" disabled={locked} onClick={() => onUpscale(2)}>
-              {i18n._({ id: "ui.Upscale 2x", message: "Upscale 2x" })}
-            </Button>
-            <Button type="button" size="sm" variant="outline" disabled={locked} onClick={() => onUpscale(4)}>
-              {i18n._({ id: "ui.Upscale 4x", message: "Upscale 4x" })}
-            </Button>
-          </div>
-          <p className="text-muted-foreground w-full text-center text-xs">
-            {i18n._({ id: "ui.Upscaling adds detail the picture did not have; faces may change.", message: "Upscaling adds detail the picture did not have; faces may change." })}
-          </p>
-        </>
-      ) : null}
-      {!check.ok ? (
-        <p className="text-destructive w-full text-center text-xs" data-slot="image-editor-resize-error">
-          {check.error}
-        </p>
-      ) : null}
+      </div>
     </div>
   );
 }
@@ -1135,7 +1138,7 @@ export function ImageEditor({
   );
 
   const markupBar = (
-    <div className={cn(pill, "max-w-full flex-wrap justify-center overflow-x-auto")} data-slot="image-editor-markup-bar">
+    <div className={panelRow} data-slot="image-editor-markup-bar">
       <ToggleGroup
         type="single"
         aria-label={i18n._({ id: "ui.Markup tool", message: "Markup tool" })}
@@ -1226,7 +1229,7 @@ export function ImageEditor({
   );
 
   const eraseBar = (
-    <div className={cn(pill, "max-w-full flex-wrap justify-center overflow-x-auto")} data-slot="image-editor-erase-bar">
+    <div className={panelRow} data-slot="image-editor-erase-bar">
       <span className="text-muted-foreground px-2 text-xs">{i18n._({ id: "ui.Paint over what to erase", message: "Paint over what to erase" })}</span>
       <Slider
         aria-label={i18n._({ id: "ui.Brush size", message: "Brush size" })}
@@ -1256,7 +1259,7 @@ export function ImageEditor({
   );
 
   const commentBar = (
-    <div className={cn(pill, "max-w-full flex-wrap justify-center")} data-slot="image-editor-comment-bar">
+    <div className={panelRow} data-slot="image-editor-comment-bar">
       {commentBrush ? (
         <ToggleGroup
           type="single"
@@ -1321,7 +1324,7 @@ export function ImageEditor({
   );
 
   const removeBar = (
-    <div className={cn(pill, "max-w-full flex-wrap justify-center")} data-slot="image-editor-remove-bar">
+    <div className={panelRow} data-slot="image-editor-remove-bar">
       <Button type="button" size="sm" disabled={locked} onClick={() => void run({ operation: "remove_background" }, i18n._({ id: "ui.Background removed", message: "Background removed" }))}>
         <WandSparklesIcon aria-hidden />
         {i18n._({ id: "ui.Remove background", message: "Remove background" })}
@@ -1331,7 +1334,7 @@ export function ImageEditor({
 
   const cropFrame = natural ? rotatedSize(natural, crop.rotate) : null;
   const cropBar = (
-    <div className={cn(pill, "max-w-full flex-wrap justify-center")} data-slot="image-editor-crop-bar">
+    <div className={panelColumn} data-slot="image-editor-crop-bar">
       <ToggleGroup
         type="single"
         variant="outline"
@@ -1351,7 +1354,7 @@ export function ImageEditor({
           </ToggleGroupItem>
         ))}
       </ToggleGroup>
-      <Separator orientation="vertical" className="hidden h-6 sm:block" />
+      <div className="flex flex-wrap items-center gap-1" data-slot="image-editor-crop-turns">
       <ToolButton label={i18n._({ id: "ui.Rotate left", message: "Rotate left" })} hint="[" disabled={locked} onClick={() => natural && setCrop((state) => turnCrop(state, -1, natural))}>
         <RotateCcwIcon aria-hidden />
       </ToolButton>
@@ -1364,6 +1367,8 @@ export function ImageEditor({
       <ToolButton label={i18n._({ id: "ui.Flip vertical", message: "Flip vertical" })} disabled={locked} aria-pressed={crop.flipVertical} onClick={() => setCrop((state) => ({ ...state, flipVertical: !state.flipVertical }))}>
         <FlipVertical2Icon aria-hidden />
       </ToolButton>
+      </div>
+      <div className="flex flex-wrap items-center justify-end gap-2" data-slot="image-editor-panel-actions">
       {natural && cropChanged(crop) ? (
         <span className="text-muted-foreground px-1 text-xs tabular-nums" data-slot="image-editor-crop-size">
           {i18n._({ id: "ui.{width} x {height}", message: "{width} x {height}", values: { width: croppedPixels(crop, natural).width, height: croppedPixels(crop, natural).height } })}
@@ -1375,13 +1380,14 @@ export function ImageEditor({
       <Button type="button" size="sm" disabled={locked || !cropChanged(crop)} onClick={() => void runCrop()}>
         {i18n._({ id: "ui.Preview", message: "Preview" })}
       </Button>
+      </div>
     </div>
   );
 
   const adjustBar = (
-    <div className={cn(pill, "max-w-full flex-wrap justify-center gap-x-3 px-3 py-2")} data-slot="image-editor-adjust-bar">
+    <div className={panelColumn} data-slot="image-editor-adjust-bar">
       {ADJUST_KEYS.map((key) => (
-        <div key={key} className="grid min-w-32 flex-1 gap-1">
+        <div key={key} className="grid w-full gap-1">
           <div className="flex items-center justify-between gap-2 text-xs">
             <span>{ADJUST_LABEL(key)}</span>
             <span className="text-muted-foreground tabular-nums" data-slot={`image-editor-adjust-${key}`}>{adjust[key]}</span>
@@ -1397,7 +1403,7 @@ export function ImageEditor({
           />
         </div>
       ))}
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center justify-end gap-2" data-slot="image-editor-panel-actions">
         <Tooltip>
           <TooltipTrigger asChild>
             <Button type="button" size="sm" variant="outline" disabled={locked} onClick={() => void runAdjust(true)}>
@@ -1420,9 +1426,14 @@ export function ImageEditor({
   const chosenOperation = operations?.find((operation) => operation.id === moreChoice) ?? null;
   const chosenLevel = chosenOperation?.levels?.find((level) => level.id === moreArgs.level) ?? null;
   const levelOff = chosenLevel !== null && !chosenLevel.enabled;
+  /** A numeric `size` or `scale` choice reads as "2x", and 1 as "Same size" (MAKE-CLEARER-03). */
+  const choiceOptionText = (name: string, options: readonly string[], option: string) => {
+    if ((name !== "size" && name !== "scale") || !options.every((value) => Number.isFinite(Number(value)))) return option;
+    return Number(option) === 1 ? i18n._({ id: "ui.Same size", message: "Same size" }) : i18n._({ id: "ui.{factor}x", message: "{factor}x", values: { factor: option } });
+  };
   const moreBar = (
-    <div className={cn(pill, "max-w-full flex-col items-stretch px-3 py-2")} data-slot="image-editor-more-bar">
-      <div className="flex flex-wrap items-center justify-center gap-1">
+    <div className={cn(panelColumn, "w-[28rem] max-w-full")} data-slot="image-editor-more-bar">
+      <div className="flex flex-wrap items-center gap-1" role="group" aria-label={i18n._({ id: "ui.Operation", message: "Operation" })} data-slot="image-editor-operations">
         {(operations ?? []).map((operation) => (
           <Tooltip key={operation.id}>
             <TooltipTrigger asChild>
@@ -1446,11 +1457,12 @@ export function ImageEditor({
         ))}
       </div>
       {chosenOperation ? (
-        <div className="flex flex-wrap items-end justify-center gap-x-3 gap-y-2" data-slot="image-editor-more-controls">
-          {chosenOperation.summary ? <p className="text-muted-foreground w-full text-center text-xs">{chosenOperation.summary}</p> : null}
+        <div className="grid w-full gap-3" data-slot="image-editor-more-controls">
+          {/* An operation that lists levels says its line per level; one with none says its own line. */}
+          {chosenOperation.summary && !chosenOperation.levels ? <p className="text-muted-foreground text-xs">{chosenOperation.summary}</p> : null}
           {(chosenOperation.controls ?? []).map((control) =>
             control.kind === "number" ? (
-              <div key={control.name} className="grid min-w-32 flex-1 gap-1">
+              <div key={control.name} className="grid w-full gap-1">
                 <div className="flex items-center justify-between gap-2 text-xs">
                   <span>{control.label}</span>
                   <span className="text-muted-foreground tabular-nums">{String(moreArgs[control.name] ?? control.min)}</span>
@@ -1466,12 +1478,12 @@ export function ImageEditor({
                 />
               </div>
             ) : control.name === "level" && chosenOperation.levels ? (
-              <div key={control.name} className="grid w-full gap-1" data-slot="image-editor-levels">
+              <div key={control.name} className="grid w-full gap-1.5" data-slot="image-editor-levels">
                 <ToggleGroup
                   type="single"
                   variant="outline"
                   spacing={0}
-                  className="justify-center"
+                  className="w-fit"
                   aria-label={control.label}
                   value={String(moreArgs[control.name] ?? "")}
                   onValueChange={(value) => {
@@ -1479,13 +1491,18 @@ export function ImageEditor({
                   }}
                 >
                   {chosenOperation.levels.map((level) => (
-                    <ToggleGroupItem key={level.id} value={level.id} disabled={locked} aria-disabled={level.enabled ? undefined : true} data-level={level.id} className={level.enabled ? "" : "opacity-50"}>
-                      {level.label}
-                    </ToggleGroupItem>
+                    <Tooltip key={level.id}>
+                      <TooltipTrigger asChild>
+                        <ToggleGroupItem value={level.id} disabled={locked} aria-disabled={level.enabled ? undefined : true} data-level={level.id} className={level.enabled ? "" : "opacity-50"}>
+                          {level.label}
+                        </ToggleGroupItem>
+                      </TooltipTrigger>
+                      {level.enabled ? null : <TooltipContent side={compact ? "top" : "bottom"}>{level.reason ?? i18n._({ id: "ui.That is not available right now.", message: "That is not available right now." })}</TooltipContent>}
+                    </Tooltip>
                   ))}
                 </ToggleGroup>
                 {chosenLevel ? (
-                  <p className="text-muted-foreground text-center text-xs" role="status" data-slot="image-editor-level-line">
+                  <p className="text-muted-foreground text-xs" role="status" data-slot="image-editor-level-line">
                     {chosenLevel.enabled
                       ? chosenLevel.eta
                         ? i18n._({ id: "ui.{summary} Takes {eta}.", message: "{summary} Takes {eta}.", values: { summary: chosenLevel.summary ?? chosenLevel.label, eta: chosenLevel.eta } })
@@ -1495,33 +1512,37 @@ export function ImageEditor({
                 ) : null}
               </div>
             ) : (
-              <ToggleGroup
-                key={control.name}
-                type="single"
-                variant="outline"
-                spacing={0}
-                aria-label={control.label}
-                value={String(moreArgs[control.name] ?? control.options[0] ?? "")}
-                onValueChange={(value) => {
-                  if (value) setMoreArgs((args) => ({ ...args, [control.name]: value }));
-                }}
-              >
-                {control.options.map((option) => (
-                  <ToggleGroupItem key={option} value={option} disabled={locked} aria-label={option}>
-                    {option}
-                  </ToggleGroupItem>
-                ))}
-              </ToggleGroup>
+              <div key={control.name} className="flex flex-wrap items-center gap-x-3 gap-y-1" data-slot="image-editor-choice" data-control={control.name}>
+                <span className="text-xs" aria-hidden>{control.label}</span>
+                <ToggleGroup
+                  type="single"
+                  variant="outline"
+                  spacing={0}
+                  aria-label={control.label}
+                  value={String(moreArgs[control.name] ?? control.options[0] ?? "")}
+                  onValueChange={(value) => {
+                    if (value) setMoreArgs((args) => ({ ...args, [control.name]: value }));
+                  }}
+                >
+                  {control.options.map((option) => (
+                    <ToggleGroupItem key={option} value={option} disabled={locked} aria-label={choiceOptionText(control.name, control.options, option)}>
+                      {choiceOptionText(control.name, control.options, option)}
+                    </ToggleGroupItem>
+                  ))}
+                </ToggleGroup>
+              </div>
             ),
           )}
-          <Button
-            type="button"
-            size="sm"
-            disabled={locked || levelOff}
-            onClick={() => void run({ operation: "custom", id: chosenOperation.id, args: moreArgs }, chosenOperation.label)}
-          >
-            {i18n._({ id: "ui.Preview", message: "Preview" })}
-          </Button>
+          <div className="flex justify-end" data-slot="image-editor-panel-actions">
+            <Button
+              type="button"
+              size="sm"
+              disabled={locked || levelOff}
+              onClick={() => void run({ operation: "custom", id: chosenOperation.id, args: moreArgs }, chosenOperation.label)}
+            >
+              {i18n._({ id: "ui.Preview", message: "Preview" })}
+            </Button>
+          </div>
         </div>
       ) : null}
     </div>
@@ -1560,7 +1581,7 @@ export function ImageEditor({
         return operations && operations.length > 0 ? moreBar : null;
       case "resize":
         return natural && current ? (
-          <div className={cn(pill, "max-w-full rounded-2xl px-3 py-2")}>
+          <div className="w-full">
             <ResizeBar
               key={`${current.id}:${natural.width}x${natural.height}`}
               base={natural}
@@ -1618,6 +1639,8 @@ export function ImageEditor({
             align="center"
             sideOffset={8}
             collisionPadding={8}
+            // The panel stays inside the editor: it never covers the app's own sidebar or leaves the editor's box.
+            collisionBoundary={rootRef.current ?? undefined}
             padding="none"
             width="auto"
             data-slot="image-editor-panel"
@@ -1632,7 +1655,7 @@ export function ImageEditor({
               const target = event.target;
               if ((target instanceof Element && target.closest("[data-tool]")) || workingOnPicture(target, menuLike)) event.preventDefault();
             }}
-            className="max-h-(--radix-popover-content-available-height) max-w-[calc(100vw-1rem)] overflow-y-auto rounded-2xl border-0 bg-transparent shadow-none"
+            className="max-h-(--radix-popover-content-available-height) w-max max-w-[min(32rem,var(--radix-popover-content-available-width))] overflow-y-auto"
           >
             {panelBar}
           </PopoverContent>
