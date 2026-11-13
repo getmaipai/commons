@@ -1,4 +1,4 @@
-import { FilmIcon } from "lucide-react";
+import { getIcon } from "@/kit/icons";
 import { useCallback, useContext, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { i18n } from "@/kit/i18n";
 import { AsyncState } from "@/kit/primitives/AsyncState";
@@ -27,6 +27,8 @@ type Row = Record<string, unknown>;
 const str = (v: unknown): string | undefined => (typeof v === "string" && v !== "" ? v : undefined);
 const num = (v: unknown): number | undefined => (typeof v === "number" && Number.isFinite(v) ? v : typeof v === "string" && v.trim() !== "" && Number.isFinite(Number(v)) ? Number(v) : undefined);
 const isRow = (v: unknown): v is Row => typeof v === "object" && v !== null && !Array.isArray(v);
+
+const FilmIcon = getIcon("film");
 
 const FIT_MAX_PX = 832;
 /** Left free under the editor so its tool pill never touches a bar fixed to the bottom of the screen. */
