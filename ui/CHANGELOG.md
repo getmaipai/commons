@@ -1,3 +1,11 @@
+## [ui-v0.5.648] - 2026-11-13
+
+- SURFACE-SYSTEM-01 (owner bug: modal shadows were square and did not follow the rounded panel). Cause: global `[data-slot=...] { box-shadow }` rules for the dialog, alert dialog, popover, menu, tooltip and card sat in unlayered CSS, so they beat every utility, even `shadow-none`: a variant that draws its look on an inner element (the command palette) got a second, square shadow on its radius-less outer box. The rules are gone. One definition replaces them: surface levels `--elev-1..4-{bg,border,radius,shadow}` and the utilities `surface-card`, `surface-float`, `surface-menu`, `surface-dialog`, `surface-sheet`, `surface-sheet-bottom`, which put background, border, radius and shadow on the same element. Card, Popover, DropdownMenu (and sub menu), Select, HoverCard, Dialog (default and flow), AlertDialog, Sheet, Drawer, the command palette, the dashboard card, sheet and context menu, `floating` and the Toaster use them; the Neutral and other looks flatten level 1 through `--elev-1-border` and `--elev-1-shadow` (gen-looks output). `shadow-xs` to `shadow-2xl` read the elevation tokens, `--elevation-4` gains a tight contact layer. New kit lint `surfaceLints.test.ts`. No prop or schema change; a Card, menu or dialog keeps its size, only its shadow now follows its radius. Home pins this and its own lint covers local shadows.
+
+## [ui-v0.5.647] - 2026-11-13
+
+- `ErrorBoundary` takes an optional `fallback`. When given, a render error in the children draws that (`null` draws nothing) instead of the whole-page recovery screen, so one shell part (Home's Music player bar) that fails leaves the rest of the app on screen. Left out, nothing changes. `ui/package.json` is 0.5.647.
+
 ## [ui-v0.5.647] - 2026-11-13
 
 - `ErrorBoundary` takes an optional `fallback`. When given, a render error in the children draws that (`null` draws nothing) instead of the whole-page recovery screen, so one shell part (Home's Music player bar) that fails leaves the rest of the app on screen. Left out, nothing changes. `ui/package.json` is 0.5.647.

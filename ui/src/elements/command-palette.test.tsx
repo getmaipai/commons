@@ -112,7 +112,7 @@ test("renders optional result subtitles and icon tiles with an active row", () =
   expect(option.className).toContain("bg-accent");
   expect(option.querySelector("img")?.getAttribute("src")).toBe("/icons/chat.png");
   const palette = document.querySelector('[data-slot="command-palette"]')?.getAttribute("class") ?? "";
-  expect(palette).toContain("rounded-[24px]");
+  expect(palette).toContain("surface-dialog");
   expect(palette).toContain("backdrop-blur-2xl");
 });
 

@@ -130,11 +130,13 @@ describe("CALM-TOKENS contrast and radius contract", () => {
     expect(dashboardCss).toMatch(/--radius-xl:\s*calc\(var\(--radius\) \+ 4px\)/);
   });
 
-  test("kit slot rules paint Card and popovers", () => {
-    expect(css).toContain('[data-slot="card"]');
-    expect(css).toContain("var(--elevation-1)");
-    expect(css).toContain('[data-slot="popover-content"]');
-    expect(css).toContain("var(--elevation-3)");
+  test("surface levels pair a shadow with a radius, and no slot rule paints a shadow", () => {
+    // SURFACE-SYSTEM-01: the level tokens and their utilities replace the global `[data-slot=...] { box-shadow }` rules.
+    expect(css).toContain("--elev-1-shadow: var(--elevation-1)");
+    expect(css).toContain("--elev-3-shadow: var(--elevation-3)");
+    expect(css).toContain("--elev-4-shadow: var(--elevation-4)");
+    for (const name of ["card", "float", "menu", "dialog", "sheet", "sheet-bottom"]) expect(css).toContain(`@utility surface-${name} {`);
+    expect(css.replace(/\/\*[\s\S]*?\*\//g, "")).not.toMatch(/\[data-slot="(?:popover|dropdown-menu|dialog|alert-dialog|tooltip)-content"\]\s*[,{]/);
   });
 });
 

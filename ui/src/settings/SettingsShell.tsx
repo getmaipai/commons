@@ -185,7 +185,7 @@ export function SettingsShell({
           className: cn(
             "h-auto min-w-0 w-full self-stretch border-settings-column-divider bg-settings-column lg:h-full lg:w-(--settings-column-width) lg:border-r",
             columnClass,
-            peeking && "lg:absolute lg:inset-y-0 lg:start-0 lg:z-30 lg:shadow-lg",
+            peeking && "lg:absolute lg:inset-y-0 lg:start-0 lg:z-30 lg:rounded-none lg:shadow-lg",
           ),
         }}
         headerTop={

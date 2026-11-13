@@ -4,7 +4,7 @@ import { useEffect, useId, useRef, type ComponentProps, type ReactNode } from "r
 import { SearchIcon } from "lucide-react";
 import { cn } from "cn";
 import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
-import { field, floating, mono } from "./surfaces";
+import { field, mono } from "./surfaces";
 import { SafeImage } from "../primitives/SafeImage";
 import { i18n } from "@/kit/i18n";
 
@@ -187,8 +187,7 @@ export function CommandPalette({
     <div
       data-slot="command-palette"
       className={cn(
-        floating,
-        "flex w-full flex-col overflow-hidden rounded-[24px] shadow-xl ring-1 ring-border/60 backdrop-blur-2xl",
+        "surface-dialog flex w-full flex-col overflow-hidden backdrop-blur-2xl",
         size === "lg"
           ? "h-[min(40rem,calc(100dvh-4rem))] max-w-none"
           : "max-w-xl",

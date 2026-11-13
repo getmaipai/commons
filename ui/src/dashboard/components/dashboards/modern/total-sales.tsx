@@ -168,7 +168,7 @@ export default function TotalSales() {
           </div>
 
           <Select value={period} onValueChange={(v) => v && setPeriod(v)}>
-            <SelectTrigger className="h-auto! w-fit text-sm font-medium text-foreground border-border shadow-[0px_1px_2px_rgba(0,0,0,0.05)] cursor-pointer gap-1.5 px-3">
+            <SelectTrigger className="h-auto! w-fit text-sm font-medium text-foreground border-border shadow-xs cursor-pointer gap-1.5 px-3">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

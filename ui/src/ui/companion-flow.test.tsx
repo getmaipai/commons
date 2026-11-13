@@ -101,7 +101,7 @@ describe("Dialog flow variant", () => {
       <DialogBody columns="two"><DialogSection title="Required" aside="0 of 4"><span>x</span></DialogSection></DialogBody>
       <DialogFooter align="between"><Button>Back</Button><Button>Next</Button></DialogFooter></DialogContent></Dialog>);
     const content = document.body.querySelector("[data-slot=dialog-content]");
-    for (const c of ["h-[calc(100dvh-env(safe-area-inset-top,0px)-var(--phone-header-height,3.5rem))]", "w-screen", "max-w-none", "rounded-none", "sm:max-w-5xl", "sm:rounded-3xl", "bg-background"]) expect(cls(content)).toContain(c);
+    for (const c of ["h-[calc(100dvh-env(safe-area-inset-top,0px)-var(--phone-header-height,3.5rem))]", "w-screen", "max-w-none", "max-sm:rounded-none", "sm:max-w-5xl", "sm:rounded-3xl", "surface-dialog"]) expect(cls(content)).toContain(c);
     expect(cls(document.body.querySelector("[data-slot=dialog-title]"))).toContain("text-3xl");
     expect(cls(document.body.querySelector("[data-slot=dialog-body]"))).toContain("lg:grid-cols-2");
     expect(document.body.querySelector("[data-slot=dialog-section-aside]")?.textContent).toBe("0 of 4");

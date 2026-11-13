@@ -184,7 +184,7 @@ export function ThreadListSidebar({
       <div
         data-slot="aui_thread-list-sidebar-panel"
         className={showPeek
-          ? "absolute inset-y-0 start-0 z-30 w-72 shadow-xl"
+          ? "absolute inset-y-0 start-0 z-30 w-72 rounded-none shadow-xl"
           : collapsed
             ? "invisible h-full w-72 overflow-hidden"
             : "h-full w-72"}

@@ -67,6 +67,6 @@ export function RightPane({ open, onOpenChange, pinned, onPinnedChange, companio
   if (pinned) return <div data-slot="right-pane" data-pinned="" className="h-full">{body}</div>;
   return <>
     <div aria-hidden="true" data-slot="right-pane-backdrop" className="fixed inset-0 z-30" onClick={() => onOpenChange(false)} />
-    <div data-slot="right-pane" className="fixed inset-y-0 right-0 z-40 shadow-xl">{body}</div>
+    <div data-slot="right-pane" className="fixed inset-y-0 right-0 z-40 rounded-none shadow-xl">{body}</div>
   </>;
 }

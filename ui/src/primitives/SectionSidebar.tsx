@@ -530,7 +530,7 @@ export function SectionSidebar({
         data-slot="section-sidebar-panel"
         className={
           peeking
-            ? "absolute inset-y-0 start-0 z-30 w-(--settings-column-width) shadow-xl motion-safe:animate-[section-sidebar-peek-in_var(--motion-reveal-in)_var(--motion-ease-out)]"
+            ? "absolute inset-y-0 start-0 z-30 w-(--settings-column-width) rounded-none shadow-xl motion-safe:animate-[section-sidebar-peek-in_var(--motion-reveal-in)_var(--motion-ease-out)]"
             : closed
               ? "invisible h-full w-(--settings-column-width) overflow-hidden"
               : "h-full"

@@ -7,7 +7,7 @@ function Card({ className, surface = "default", ...props }: React.ComponentProps
     <div
       data-slot="card"
       className={cn(
-        surface === "flat" ? "flex flex-col gap-6 rounded-[var(--radius-card)] bg-[var(--surface-1)] p-4 text-card-foreground shadow-none" : "flex flex-col gap-6 rounded-xl border bg-[var(--surface-card)] py-6 text-card-foreground",
+        surface === "flat" ? "flex flex-col gap-6 rounded-[var(--radius-card)] bg-[var(--surface-1)] p-4 text-card-foreground shadow-none" : "surface-card flex flex-col gap-6 py-6 text-card-foreground",
         className
       )}
       {...props}

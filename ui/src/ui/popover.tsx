@@ -35,7 +35,7 @@ function PopoverContent({
         align={align}
         sideOffset={sideOffset}
         className={cn(
-          "z-50 w-72 motion-reveal rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-hidden",
+          "z-50 w-72 motion-reveal surface-menu p-4 text-popover-foreground outline-hidden",
           padding === "none" && "p-0",
           width === "auto" && "w-auto",
           className

@@ -59,7 +59,7 @@ export function renderLookBlock(data: Looks): string {
     }
     lines.push(`:root body.style-${look} {\n${emitted.join("\n")}\n}`);
     if (b.card_edge !== null) {
-      lines.push(`:root body.style-${look} [data-slot="kit-card"],\n:root body.style-${look} [data-slot="card"] {\n  border-color: var(--card-edge-border);\n  box-shadow: var(--card-edge-shadow);\n}`);
+      lines.push(`:root body.style-${look} {\n  --elev-1-border: var(--card-edge-border);\n  --elev-1-shadow: var(--card-edge-shadow);\n}\n:root body.style-${look} [data-slot="kit-card"] {\n  border-color: var(--card-edge-border);\n}`);
     }
   }
   lines.push(END);

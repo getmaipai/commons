@@ -54,7 +54,7 @@ function DropdownMenuContent({
         data-density={density}
         sideOffset={sideOffset}
         className={cn(
-          "z-50 max-h-(--radix-dropdown-menu-content-available-height) min-w-[8rem] motion-reveal overflow-x-hidden overflow-y-auto rounded-md border bg-popover p-1 text-popover-foreground shadow-md data-[density=compact]:min-w-48 data-[density=compact]:rounded-xl data-[density=compact]:p-1.5",
+          "z-50 max-h-(--radix-dropdown-menu-content-available-height) min-w-[8rem] motion-reveal overflow-x-hidden overflow-y-auto surface-menu p-1 text-popover-foreground data-[density=compact]:min-w-48 data-[density=compact]:rounded-xl data-[density=compact]:p-1.5",
           className
         )}
         {...props}
@@ -251,7 +251,7 @@ function DropdownMenuSubContent({
     <DropdownMenuPrimitive.SubContent
       data-slot="dropdown-menu-sub-content"
       className={cn(
-        "z-50 min-w-[8rem] motion-reveal overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-lg",
+        "z-50 min-w-[8rem] motion-reveal overflow-hidden surface-menu p-1 text-popover-foreground",
         className
       )}
       {...props}

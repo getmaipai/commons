@@ -63,7 +63,8 @@ function SheetContent({
       <SheetPrimitive.Content
         data-slot="sheet-content"
         className={cn(
-          "fixed z-50 flex flex-col gap-4 bg-background shadow-lg data-[state=closed]:animate-out data-[state=closed]:duration-(--motion-slide-out) data-[state=closed]:ease-(--motion-ease-in) data-[state=open]:animate-in data-[state=open]:duration-(--motion-slide-in) data-[state=open]:ease-(--motion-ease-slide)",
+          side === "bottom" ? "surface-sheet-bottom" : "surface-sheet",
+          "fixed z-50 flex flex-col gap-4 data-[state=closed]:animate-out data-[state=closed]:duration-(--motion-slide-out) data-[state=closed]:ease-(--motion-ease-in) data-[state=open]:animate-in data-[state=open]:duration-(--motion-slide-in) data-[state=open]:ease-(--motion-ease-slide)",
           side === "right" &&
             "inset-y-0 right-0 h-full w-3/4 border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm",
           side === "left" &&

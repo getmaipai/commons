@@ -145,7 +145,7 @@ function ContextMenuSubContent({
   return (
     <ContextMenuContent
       data-slot="context-menu-sub-content"
-      className="cn-context-menu-sub-content shadow-lg"
+      className="cn-context-menu-sub-content surface-menu"
       side="right"
       {...props}
     />

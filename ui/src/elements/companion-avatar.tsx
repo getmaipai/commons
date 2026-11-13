@@ -192,7 +192,7 @@ function CompanionAvatarVisual({ name, clips, state, wanted, once, size = "md", 
   const ringClass = ring === "idle" ? "-inset-1 border-2 border-dotted border-muted-foreground/60"
     : ring === "listening" ? "-inset-1.5 border-2 border-solid border-primary"
     : ring === "thinking" ? cn("-inset-1.5 border-4 border-dashed border-primary/80", !reduced && "animate-[spin_6s_linear_infinite]")
-    : ring === "speaking" ? cn("-inset-1.5 border-4 border-solid border-primary shadow-lg shadow-primary/50", !reduced && "animate-pulse") : "";
+    : ring === "speaking" ? cn("-inset-1.5 rounded-full border-4 border-solid border-primary shadow-lg shadow-primary/50", !reduced && "animate-pulse") : "";
   return <div role="img" aria-label={ring ? i18n._({ id: "ui.{name}, {ring}", message: "{name}, {ring}", values: { name, ring } }) : name} data-ring={ring ?? undefined} className={cn(SIZES[size], "pointer-events-none relative", className)}>
     {ring ? <span aria-hidden="true" className={cn("absolute rounded-full", ringClass)} /> : null}
     {ring === "listening" && !reduced ? <span aria-hidden="true" data-ring-ripple="" className="absolute -inset-1.5 animate-ping rounded-full border-2 border-primary/50" /> : null}

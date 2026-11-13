@@ -81,6 +81,16 @@ body.style-neutral .text-hero em {
   --radius-control: 10px;
   --radius-pill: 999px;
   --shadow-panel: var(--elevation-3);
+  /* SURFACE-SYSTEM-01: Tailwind's default shadow scale is fixed black and
+   * ignores the theme. Every `shadow-*` class now reads the elevation tokens
+   * (soft, layered, tuned per mode), so even a one-off shadow follows the look. */
+  --shadow-2xs: var(--elevation-1);
+  --shadow-xs: var(--elevation-1);
+  --shadow-sm: var(--elevation-1);
+  --shadow-md: var(--elevation-2);
+  --shadow-lg: var(--elevation-3);
+  --shadow-xl: var(--elevation-4);
+  --shadow-2xl: var(--elevation-4);
 
   --font-size-title: 30px;
   --font-weight-title: 600;
@@ -367,17 +377,96 @@ body.style-neutral .text-hero em {
   min-height: 0;
 }
 
-[data-slot="card"] {
-  box-shadow: var(--elevation-1);
-  border-color: var(--elevation-hairline);
+/* SURFACE-SYSTEM-01 (owner bug, 2026-11-13: "the shadows on your modals are
+ * square and do not match the rounded of the modal").
+ *
+ * Cause: a global `[data-slot="dialog-content"] { box-shadow }` rule (and its
+ * siblings for the card, popover, menu and alert dialog) sat in unlayered CSS,
+ * so it outranked every Tailwind utility. A variant that moved its look to an
+ * inner element (the command palette, the call dialog: transparent outer,
+ * `shadow-none`, radius on a child) still got a shadow on the outer box, which
+ * has no radius: a square shadow behind a rounded panel. `shadow-none` could not
+ * stop it.
+ *
+ * Rule: background, border, radius and shadow of a surface live on ONE element,
+ * and come from one definition. Five levels, each a token set plus a utility
+ * that applies the four together:
+ *
+ *   level   utility          what draws it                          shadow
+ *   1       surface-card     cards, panels, list tiles             --elevation-1
+ *   2       surface-float    toasts, floating bars, composer panel  --elevation-2
+ *   3       surface-menu     menus, popovers, selects, hover cards  --elevation-3
+ *   4       surface-dialog   dialogs, alert dialogs, the palette    --elevation-4
+ *   4       surface-sheet    edge sheets and drawers (+ -bottom)    --elevation-4
+ *
+ * Shadows are the --elevation-* tokens (soft, layered, one value per mode); the
+ * radii are the kit's radius scale, so a look that changes --radius reshapes
+ * the surface and its shadow together. A look can restyle a whole level by
+ * setting these tokens (style-neutral flattens level 1 below). To change a
+ * surface's shape, override the token on the element (`[--elev-3-radius:0]`),
+ * never add a second radius or shadow class. ui/src/surfaceLints.test.ts fails
+ * a shadow without its radius, a global shadow rule and a shadow off the tokens.
+ *
+ * The level tokens are declared on `body` as well as `:root`: a custom property
+ * that reads another one resolves where it is declared, and a look sets
+ * --radius, --popover and the card edge on `body.style-*`, so a `:root`-only
+ * declaration would freeze the :root values and ignore the look. */
+:root,
+body {
+  --elev-1-bg: var(--surface-card);
+  --elev-1-border: var(--elevation-hairline);
+  --elev-1-radius: var(--radius-card);
+  --elev-1-shadow: var(--elevation-1);
+  --elev-2-bg: var(--popover);
+  --elev-2-border: var(--border);
+  --elev-2-radius: var(--radius-card);
+  --elev-2-shadow: var(--elevation-2);
+  --elev-3-bg: var(--popover);
+  --elev-3-border: var(--border);
+  --elev-3-radius: var(--radius-md);
+  --elev-3-shadow: var(--elevation-3);
+  --elev-4-bg: var(--popover);
+  --elev-4-border: var(--border);
+  --elev-4-radius: var(--radius-xl);
+  --elev-4-shadow: var(--elevation-4);
 }
-
-[data-slot="popover-content"],
-[data-slot="dropdown-menu-content"],
-[data-slot="dialog-content"],
-[data-slot="alert-dialog-content"],
-[data-slot="tooltip-content"] {
-  box-shadow: var(--elevation-3);
+@utility surface-card {
+  background-color: var(--elev-1-bg);
+  border: 1px solid var(--elev-1-border);
+  border-radius: var(--elev-1-radius);
+  box-shadow: var(--elev-1-shadow);
+}
+@utility surface-float {
+  background-color: var(--elev-2-bg);
+  border: 1px solid var(--elev-2-border);
+  border-radius: var(--elev-2-radius);
+  box-shadow: var(--elev-2-shadow);
+}
+@utility surface-menu {
+  background-color: var(--elev-3-bg);
+  border: 1px solid var(--elev-3-border);
+  border-radius: var(--elev-3-radius);
+  box-shadow: var(--elev-3-shadow);
+}
+@utility surface-dialog {
+  background-color: var(--elev-4-bg);
+  border: 1px solid var(--elev-4-border);
+  border-radius: var(--elev-4-radius);
+  box-shadow: var(--elev-4-shadow);
+}
+/* An edge sheet is flush with the screen: it keeps the level-4 shadow and the border on its inner edge only (the side classes add the width). */
+@utility surface-sheet {
+  background-color: var(--elev-4-bg);
+  border-color: var(--elev-4-border);
+  border-radius: 0;
+  box-shadow: var(--elev-4-shadow);
+}
+/* A bottom sheet that does not touch the corners: the free top corners round with the dialog's radius. */
+@utility surface-sheet-bottom {
+  background-color: var(--elev-4-bg);
+  border-color: var(--elev-4-border);
+  border-radius: var(--elev-4-radius) var(--elev-4-radius) 0 0;
+  box-shadow: var(--elev-4-shadow);
 }
 
 /* APPROVE-CALM-01: Element's approval fallback is the rendered slot in
@@ -648,7 +737,7 @@ body.style-neutral .text-hero em {
   --elevation-1: 0 1px 2px -1px var(--elevation-color);
   --elevation-2: 0 1px 2px -1px var(--elevation-color), 0 8px 24px -16px var(--elevation-color);
   --elevation-3: 0 2px 8px -2px var(--elevation-color), 0 16px 40px -12px var(--elevation-color);
-  --elevation-4: 0 24px 64px -16px var(--elevation-color);
+  --elevation-4: 0 2px 6px -2px var(--elevation-color), 0 24px 64px -16px var(--elevation-color);
   --elevation-accent: 0 6px 16px -10px var(--primary);
   /* STATUS-CARD-TINT-01: StatusCard and JobProgress kinds. progress = lime family, done = teal; both are AA text on the card and on their own 12% wash. */
   --status-progress-ink: #365000;
@@ -1313,7 +1402,7 @@ body.style-neutral .text-hero em {
     --elevation-1: 0 1px 2px -1px var(--elevation-color);
     --elevation-2: 0 1px 2px -1px var(--elevation-color), 0 8px 24px -16px var(--elevation-color);
     --elevation-3: 0 2px 8px -2px var(--elevation-color), 0 16px 40px -12px var(--elevation-color);
-    --elevation-4: 0 24px 64px -16px var(--elevation-color);
+    --elevation-4: 0 2px 6px -2px var(--elevation-color), 0 24px 64px -16px var(--elevation-color);
     --elevation-accent: 0 6px 16px -10px var(--primary);
     --status-progress-ink: #c0f447;
     --status-done-ink: #00e3ae;
@@ -1394,7 +1483,7 @@ body.style-neutral .text-hero em {
   --elevation-1: 0 1px 2px -1px var(--elevation-color);
   --elevation-2: 0 1px 2px -1px var(--elevation-color), 0 8px 24px -16px var(--elevation-color);
   --elevation-3: 0 2px 8px -2px var(--elevation-color), 0 16px 40px -12px var(--elevation-color);
-  --elevation-4: 0 24px 64px -16px var(--elevation-color);
+  --elevation-4: 0 2px 6px -2px var(--elevation-color), 0 24px 64px -16px var(--elevation-color);
   --elevation-accent: 0 6px 16px -10px var(--primary);
   --status-progress-ink: #c0f447;
   --status-done-ink: #00e3ae;
@@ -2397,7 +2486,10 @@ html[data-ease-motion="calm"] body {
 }
 /* Third-party toasts and drawers: their own transitions move onto the tokens (they set them in their own stylesheet, so these win by
  * specificity). */
+/* A toast is a level-2 surface: its radius and shadow are set together on the toast itself (sonner's own box-shadow is a fixed black). */
 [data-sonner-toaster] [data-sonner-toast] {
+  border-radius: var(--elev-2-radius);
+  box-shadow: var(--elev-2-shadow);
   transition-duration: var(--motion-slide-in), var(--motion-slide-in), var(--motion-slide-in), var(--motion-fade-in);
   transition-timing-function: var(--motion-ease-slide);
 }
@@ -3020,10 +3112,12 @@ html[data-pro-look] [data-slot="row-action"] [data-slot="row-action-label"] { di
   --radius-3xl: calc(var(--radius-card) + 12px);
   --radius-4xl: calc(var(--radius-card) + 16px);
 }
-:root body.style-neutral [data-slot="kit-card"],
-:root body.style-neutral [data-slot="card"] {
+:root body.style-neutral {
+  --elev-1-border: var(--card-edge-border);
+  --elev-1-shadow: var(--card-edge-shadow);
+}
+:root body.style-neutral [data-slot="kit-card"] {
   border-color: var(--card-edge-border);
-  box-shadow: var(--card-edge-shadow);
 }
 :root body.style-stone {
   --type-scale: 1;

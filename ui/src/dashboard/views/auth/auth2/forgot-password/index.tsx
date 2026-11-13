@@ -12,7 +12,7 @@ const BoxedForgotpwd = () => {
     <>
       <div className="relative overflow-hidden h-screen bg-muted ">
         <div className="flex h-full justify-center items-center px-4">
-          <Card className="md:w-112.5 w-full border-none shadow-lg  p-6">
+          <Card className="md:w-112.5 w-full border-none  p-6">
             <div className="mx-auto  w-fit">
               <FullLogo />
             </div>
