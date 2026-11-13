@@ -1,7 +1,8 @@
 import { useIsPhoneLayout } from "../../../hooks/useIsPhoneLayout";
 export { useIsPhoneLayout } from "../../../hooks/useIsPhoneLayout";
 import MobileNavDrawer from "./vertical/rail/MobileNavDrawer";
-import { FC, useState, type ReactNode } from 'react';
+import { FC, useRef, useState, type ReactNode } from 'react';
+import { useRouteFade } from "../../../hooks/useRouteFade";
 import AppRail, { type AppRailProps, type RailApp, type RailCoreDestination } from './vertical/rail/AppRail';
 import { useHeaderExtraLeft, useHeaderExtraRight } from './vertical/header/HeaderExtraContext';
 import Sidebar from './vertical/sidebar/Sidebar';
@@ -108,6 +109,8 @@ function RailPageHeader({ reserveBand, reserveEnd, end, fallbackTitle, headerSur
 function RailLayout({ rail, headerSearchRemote, sidebarItemStatus, railProfile, activeAppHref, railTourId, railItemTourId, railApps, railCoreDestinations, onRailAppPinChange, railAllAppsHref, mobileSections, settingsHref, hideMobileMenu, topRight, topRightBand, fallbackTitle, rightPane, headerSurface, headerOverArt }: FullLayoutProps) {
   const phone = useIsPhoneLayout();
   const Navigation = phone ? MobileNavDrawer : AppRail;
+  const bodyRef = useRef<HTMLDivElement | null>(null);
+  useRouteFade(bodyRef);
   return (
     <HeaderExtraProvider>
       {/* The page scrolls as a document, as it did beside the sidebar;
@@ -118,7 +121,7 @@ function RailLayout({ rail, headerSearchRemote, sidebarItemStatus, railProfile, 
         <main data-slot="rail-workspace" data-phone-menu={phone && !hideMobileMenu ? "" : undefined} className="flex min-w-0 max-w-full flex-1 flex-col" style={{ background: "var(--page)" }}>
           {topRight && !topRightBand ? <div data-slot="rail-top-right" className="pointer-events-none sticky top-2 z-30 h-0"><div className="flex h-9 justify-end pe-3 *:pointer-events-auto">{topRight}</div></div> : null}
           <RailPageHeader reserveBand={phone && !hideMobileMenu || Boolean(topRightBand)} reserveEnd={Boolean(topRight)} end={topRightBand ? topRight : undefined} fallbackTitle={fallbackTitle} headerSurface={headerSurface} headerOverArt={headerOverArt} />
-          <div data-slot="rail-body" className="min-w-0 max-w-full flex-1">
+          <div ref={bodyRef} data-slot="rail-body" className="min-w-0 max-w-full flex-1">
             <div className={cn("box-border min-w-0 max-w-full w-full mx-auto p-4", "container")}>
               <Outlet />
             </div>
