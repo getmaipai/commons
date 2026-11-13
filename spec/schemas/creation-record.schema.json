@@ -1,0 +1,440 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/creation-record.schema.json",
+  "title": "CreationRecord",
+  "description": "CREATOR-01 (home docs/design/creatoros-port-2026-11-13.md, section 7.2). One record per made item: what it was made from. Written only by a finished job's writer (a picture, clip, film or song that exists as a file), never from a live Studio plan or an autosave (a saved Studio plan is a different record). The made files, the job rows, the production and shot, the route, the cast with their look, the source files with roles, the generation-provenance block (by reference, the one definition of model, engine, seed and tier), the settings and the checks. `words` and `plan` are private to the person who made the item and are NEVER copied into file.provenance.generation (that block stays small and visible to anyone who can open the file); file.provenance keeps only a pointer. audience, made_audience and lock are the maximum over the sources and the parent, written by the same function as the file note.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "version",
+    "made_at",
+    "kind",
+    "file_ids",
+    "job_ids",
+    "recipe",
+    "cast",
+    "sources",
+    "settings",
+    "review",
+    "provenance",
+    "created_at",
+    "updated_at",
+    "hlc"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^crt-[a-z0-9]{6,}$"
+    },
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "made_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "picture",
+        "video",
+        "film",
+        "reel",
+        "song",
+        "sound",
+        "show"
+      ]
+    },
+    "file_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^file-[a-z0-9]{6,}$"
+      },
+      "description": "The made files: clip, poster, 5.1 sibling, finished cut. Library file ids only, never paths."
+    },
+    "job_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "default": [],
+      "description": "The job rows that ran it (picture, video, music, media edit). The job rows stay what they are for running a job."
+    },
+    "production_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^mprd-[a-z0-9]{6,}$",
+      "default": null
+    },
+    "shot_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1,
+      "maxLength": 80,
+      "default": null,
+      "description": "The id of the shot inside the production (media-production shot.id)."
+    },
+    "recipe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tool",
+        "route"
+      ],
+      "description": "The tool and page that made it, and the route.",
+      "properties": {
+        "tool": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "route": {
+          "type": "string",
+          "enum": [
+            "text",
+            "picture",
+            "sheet",
+            "first_frame",
+            "edit",
+            "film",
+            "other"
+          ]
+        }
+      }
+    },
+    "words": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false,
+      "default": null,
+      "description": "Private to the person who made the item. What the person wrote and the composed prompt. Never copied into file.provenance.generation.",
+      "properties": {
+        "written": {
+          "type": "string",
+          "maxLength": 20000
+        },
+        "composed": {
+          "type": "string",
+          "maxLength": 20000
+        }
+      }
+    },
+    "plan": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false,
+      "default": null,
+      "description": "Private to the person who made the item. The shot plan or film plan: inline up to 12 shots, else the film_run id.",
+      "properties": {
+        "shots": {
+          "type": "array",
+          "maxItems": 12,
+          "items": {
+            "type": "object"
+          }
+        },
+        "film_run_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "cast": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/cast"
+      }
+    },
+    "sources": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/source"
+      }
+    },
+    "generation": {
+      "oneOf": [
+        {
+          "$ref": "generation-provenance.schema.json"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The generation-provenance block: models with licence, engine, seed, tier. By reference, so there is one definition. Holds no words and no plan."
+    },
+    "settings": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "How it was set up.",
+      "properties": {
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "quality": {
+          "type": "string",
+          "maxLength": 40
+        },
+        "styles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "style_id"
+            ],
+            "properties": {
+              "style_id": {
+                "type": "string",
+                "pattern": "^lora-[a-z0-9]{6,}$"
+              },
+              "strength": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "shot_card": {
+          "type": "object",
+          "description": "The camera or shot card values (fragment ids and the palette)."
+        },
+        "takes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "loop": {
+          "type": "boolean"
+        },
+        "route": {
+          "type": "string",
+          "maxLength": 80
+        }
+      }
+    },
+    "checks": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "default": null,
+      "description": "What the clip check and the face check measured (numbers and findings, never a verdict that a clip is fine)."
+    },
+    "parent_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^crt-[a-z0-9]{6,}$",
+      "default": null,
+      "description": "The record this one was made from: another take, re-shoot, next shot, edit. Follows media-item.parent_id."
+    },
+    "review": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "kept",
+        "rejected"
+      ],
+      "description": "The one review state the film grade, the takes and the clip check's re-shoot rule read. A rejected take is marked, never deleted."
+    },
+    "audience": {
+      "type": "string",
+      "enum": [
+        "all-ages",
+        "adult-only"
+      ],
+      "default": "all-ages"
+    },
+    "made_audience": {
+      "type": "string",
+      "enum": [
+        "all-ages",
+        "adult-only"
+      ],
+      "default": "all-ages",
+      "description": "Same meaning as file.made_audience."
+    },
+    "lock": {
+      "type": "string",
+      "enum": [
+        "on",
+        "off"
+      ],
+      "default": "off",
+      "description": "Same meaning as file.lock. Never on while made_audience is all-ages."
+    },
+    "provenance": {
+      "type": "string",
+      "minLength": 1
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "hlc": {
+      "type": "string",
+      "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "made_audience": {
+            "const": "all-ages"
+          }
+        },
+        "required": [
+          "made_audience"
+        ]
+      },
+      "then": {
+        "properties": {
+          "lock": {
+            "const": "off"
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "cast": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "subject_id",
+        "role"
+      ],
+      "properties": {
+        "subject_id": {
+          "type": "string",
+          "pattern": "^msub-[a-z0-9]{6,}$"
+        },
+        "synth_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-z0-9][a-z0-9-]{0,39}$",
+          "default": null
+        },
+        "role": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "look": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "The look the subject had when it was cast.",
+          "properties": {
+            "sheet_file_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^file-[a-z0-9]{6,}$",
+              "default": null
+            },
+            "locked_description": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 400,
+              "default": null
+            },
+            "pack_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "minLength": 1,
+              "default": null
+            },
+            "lora_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^lora-[a-z0-9]{6,}$",
+              "default": null
+            },
+            "strength": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "default": null
+            }
+          }
+        },
+        "voice": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 500,
+          "default": null
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file_id",
+        "role"
+      ],
+      "properties": {
+        "file_id": {
+          "type": "string",
+          "pattern": "^file-[a-z0-9]{6,}$"
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "start",
+            "end",
+            "reference",
+            "sheet",
+            "edit_source",
+            "mask",
+            "audio",
+            "clip"
+          ]
+        }
+      }
+    }
+  }
+}

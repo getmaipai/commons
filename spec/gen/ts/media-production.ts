@@ -142,6 +142,24 @@ export const MediaProduction = z
                           .strict(),
                       )
                       .default([]),
+                    /**CREATOR-01. Optional act label the long-form Timeline groups scenes by.*/
+                    act: z
+                      .string()
+                      .min(1)
+                      .max(80)
+                      .describe(
+                        "CREATOR-01. Optional act label the long-form Timeline groups scenes by.",
+                      )
+                      .optional(),
+                    /**CREATOR-01. Optional sequence label within an act.*/
+                    sequence: z
+                      .string()
+                      .min(1)
+                      .max(80)
+                      .describe(
+                        "CREATOR-01. Optional sequence label within an act.",
+                      )
+                      .optional(),
                   })
                   .strict(),
               )

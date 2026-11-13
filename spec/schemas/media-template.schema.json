@@ -2,13 +2,14 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://getmaipai.github.io/shared/spec/schemas/media-template.schema.json",
   "title": "MediaTemplate",
-  "description": "MEDIA-01. A reusable picture or video prompt skeleton. Blanks are filled when a creation is made; references are Library file ids.",
+  "description": "MEDIA-01. A reusable picture or video prompt skeleton. Blanks are filled when a creation is made; references are Library file ids. CREATOR-01: kind \"fragment\" is a short English prompt fragment (a camera, lens, light, grade and so on, in `prompt`, with its `group`) that the shot-card chips and the prompt builder read; it is not a template a person starts from. Reader rule: every template reader (the template list, the Create and Studio template pickers, the check.sh template validation) MUST skip fragment records, and only the fragment readers read them.",
   "type": "object",
   "additionalProperties": false,
   "required": ["id", "kind", "title", "category", "audience", "prompt", "provenance", "created_at", "updated_at", "hlc"],
   "properties": {
     "id": {"type":"string","pattern":"^mtpl-[a-z0-9]{6,}$"},
-    "kind": {"type":"string","enum":["picture","video"]},
+    "kind": {"type":"string","enum":["picture","video","fragment"]},
+    "group": {"type":"string","enum":["camera","lens","focal","aperture","framing","light","film_stock","look","grade"],"description":"CREATOR-01. Which shot-card vocabulary a fragment belongs to. Required when kind is fragment; absent otherwise."},
     "title": {"type":"string","minLength":1,"maxLength":120},
     "summary": {"type":"string","maxLength":500,"default":""},
     "category": {"type":"string","minLength":1,"maxLength":60,"description":"A category id from vocab/media-template-categories.json."},
@@ -22,5 +23,6 @@
     "created_at": {"type":"string","format":"date-time"},
     "updated_at": {"type":"string","format":"date-time"},
     "hlc": {"type":"string","pattern":"^[0-9]+:[0-9]+:[a-z0-9]{6,}$"}
-  }
+  },
+  "allOf": [{"if":{"properties":{"kind":{"const":"fragment"}},"required":["kind"]},"then":{"required":["group"]}}]
 }

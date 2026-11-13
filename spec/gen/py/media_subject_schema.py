@@ -22,7 +22,7 @@ class ReferenceFileId(RootModel[constr(pattern=r'^file-[a-z0-9]{6,}$')]):
 
 class MediaSubject(BaseModel):
     """
-    MEDIA-01. A saved character, prop or place for consistent use in media. Sharing is private unless explicitly granted to named people. Real people are labelled; subject_age_band is deliberately absent.
+    MEDIA-01. A saved character, prop or place for consistent use in media. Sharing is private unless explicitly granted to named people. Real people are labelled; subject_age_band is deliberately absent. CREATOR-01 adds the optional person_id link and the locked_description sentence.
     """
 
     model_config = ConfigDict(
@@ -55,3 +55,11 @@ class MediaSubject(BaseModel):
     updated_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
     synth_id: constr(pattern=r'^[a-z0-9][a-z0-9-]{0,39}$') | None = None
+    person_id: constr(pattern=r'^person-[a-z0-9]{6,}$') | None = Field(
+        None,
+        description="CREATOR-01. Optional person link: the household member this subject was made from their own photos. Casting a household member is governed by generation.household_likeness alone and creates no synth. When set, `real` and the minor fact are derived from that person at read time (the person's age band, so a child who turns eighteen changes without an edit); a reader never trusts the stored `real` over the person, and a writer never stores a minor fact on the subject. Absent or null: the subject is not a household member (a synth-linked subject derives `real` from the synth's based_on instead).",
+    )
+    locked_description: constr(max_length=400) | None = Field(
+        None,
+        description="CREATOR-01. The subject's locked sentence: one description a writer repeats word for word in every prompt that casts this subject. Optional.",
+    )

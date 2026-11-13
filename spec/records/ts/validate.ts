@@ -678,6 +678,19 @@ export function validateFileAdultLock(file: FileRecord): Problems {
   return [];
 }
 
+/** CREATOR-01: a creation record's lock follows the file rule (a lock on an all-ages record has no meaning). */
+export function validateCreationRecord(record: { made_audience?: string; lock?: string }): Problems {
+  if (record.lock === "on" && record.made_audience === "all-ages") {
+    return ["lock is on but made_audience is all-ages: the Adult lock only applies to an adult-only record"];
+  }
+  return [];
+}
+
+/** CREATOR-01: a fragment template names its shot-card group (the generators drop the if/then rule). */
+export function validateMediaTemplate(template: { kind: string; group?: string }): Problems {
+  return template.kind === "fragment" && template.group === undefined ? ["group is required when kind is fragment"] : [];
+}
+
 /** Cross-field time and operation rules for CAPTION-01a. */
 export function validateTranscript(record: Transcript): Problems {
   const problems: Problems = [];

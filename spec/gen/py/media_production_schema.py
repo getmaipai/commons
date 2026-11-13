@@ -5,7 +5,15 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, RootModel, conint, constr
+from pydantic import (
+    AwareDatetime,
+    BaseModel,
+    ConfigDict,
+    Field,
+    RootModel,
+    conint,
+    constr,
+)
 
 
 class SharedToItem(RootModel[constr(pattern=r'^person-[a-z0-9]{6,}$')]):
@@ -161,6 +169,13 @@ class Scene(BaseModel):
     id: constr(min_length=1, max_length=80)
     title: constr(max_length=160) | None = None
     shots: list[Shot]
+    act: constr(min_length=1, max_length=80) | None = Field(
+        None,
+        description='CREATOR-01. Optional act label the long-form Timeline groups scenes by.',
+    )
+    sequence: constr(min_length=1, max_length=80) | None = Field(
+        None, description='CREATOR-01. Optional sequence label within an act.'
+    )
 
 
 class Episode(BaseModel):

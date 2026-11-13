@@ -15,6 +15,7 @@ export * from "./companion-pack.js";
 export * from "./content-ceiling.js";
 export * from "./conversation-turn.js";
 export * from "./conversation.js";
+export * from "./creation-record.js";
 export * from "./data-class.js";
 export * from "./data-folder.js";
 export * from "./data-location.js";

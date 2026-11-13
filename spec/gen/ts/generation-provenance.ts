@@ -4,12 +4,12 @@
 
 import { z } from "zod";
 
-/**MUSIC-SPEC-01 (Home docs/design/music-generation-2026-10-17.md, sections 8 and 9). How a generated file was made: which Stack job, which task, which model and engine, the seed, the length, the parent version it was made from, and whether the result may be used commercially and why. Carried on file.provenance.generation. The person's own words (description, lyrics, title) are never in this record. Music is the first kind to use it; a show is a made episode of a show. Pictures and videos may adopt it later by adding to the kind enum.*/
+/**MUSIC-SPEC-01 (Home docs/design/music-generation-2026-10-17.md, sections 8 and 9). How a generated file was made: which Stack job, which task, which model and engine, the seed, the length, the parent version it was made from, and whether the result may be used commercially and why. Carried on file.provenance.generation. The person's own words (description, lyrics, title) are never in this record. Music is the first kind to use it; a show is a made episode of a show. Pictures and videos may adopt it later by adding to the kind enum. CREATOR-01: pictures, videos and films adopt it (kind picture, video, film; task generate, edit, film) as the generation block of a creation record; the words and the plan never go here.*/
 export const GenerationProvenance = z
   .object({
     /**What was generated: a song or other music, or a short sound effect or ambience (`sound`, MUSIC-GEN-11). Pictures and videos may adopt this record later. A show is a made episode of a show.*/
     kind: z
-      .enum(["music", "sound", "show"])
+      .enum(["music", "sound", "show", "picture", "video", "film"])
       .describe(
         "What was generated: a song or other music, or a short sound effect or ambience (`sound`, MUSIC-GEN-11). Pictures and videos may adopt this record later. A show is a made episode of a show.",
       ),
@@ -33,6 +33,9 @@ export const GenerationProvenance = z
         "fade",
         "loudness",
         "sfx",
+        "generate",
+        "edit",
+        "film",
       ])
       .describe(
         "What the job did: a new song (text2music), or a change to an existing version (the rest).",
@@ -162,6 +165,6 @@ export const GenerationProvenance = z
   })
   .strict()
   .describe(
-    "MUSIC-SPEC-01 (Home docs/design/music-generation-2026-10-17.md, sections 8 and 9). How a generated file was made: which Stack job, which task, which model and engine, the seed, the length, the parent version it was made from, and whether the result may be used commercially and why. Carried on file.provenance.generation. The person's own words (description, lyrics, title) are never in this record. Music is the first kind to use it; a show is a made episode of a show. Pictures and videos may adopt it later by adding to the kind enum.",
+    "MUSIC-SPEC-01 (Home docs/design/music-generation-2026-10-17.md, sections 8 and 9). How a generated file was made: which Stack job, which task, which model and engine, the seed, the length, the parent version it was made from, and whether the result may be used commercially and why. Carried on file.provenance.generation. The person's own words (description, lyrics, title) are never in this record. Music is the first kind to use it; a show is a made episode of a show. Pictures and videos may adopt it later by adding to the kind enum. CREATOR-01: pictures, videos and films adopt it (kind picture, video, film; task generate, edit, film) as the generation block of a creation record; the words and the plan never go here.",
   );
 export type GenerationProvenance = z.infer<typeof GenerationProvenance>;

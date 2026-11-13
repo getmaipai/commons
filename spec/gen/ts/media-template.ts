@@ -4,11 +4,28 @@
 
 import { z } from "zod";
 
-/**MEDIA-01. A reusable picture or video prompt skeleton. Blanks are filled when a creation is made; references are Library file ids.*/
+/**MEDIA-01. A reusable picture or video prompt skeleton. Blanks are filled when a creation is made; references are Library file ids. CREATOR-01: kind "fragment" is a short English prompt fragment (a camera, lens, light, grade and so on, in `prompt`, with its `group`) that the shot-card chips and the prompt builder read; it is not a template a person starts from. Reader rule: every template reader (the template list, the Create and Studio template pickers, the check.sh template validation) MUST skip fragment records, and only the fragment readers read them.*/
 export const MediaTemplate = z
   .object({
     id: z.string().regex(new RegExp("^mtpl-[a-z0-9]{6,}$")),
-    kind: z.enum(["picture", "video"]),
+    kind: z.enum(["picture", "video", "fragment"]),
+    /**CREATOR-01. Which shot-card vocabulary a fragment belongs to. Required when kind is fragment; absent otherwise.*/
+    group: z
+      .enum([
+        "camera",
+        "lens",
+        "focal",
+        "aperture",
+        "framing",
+        "light",
+        "film_stock",
+        "look",
+        "grade",
+      ])
+      .describe(
+        "CREATOR-01. Which shot-card vocabulary a fragment belongs to. Required when kind is fragment; absent otherwise.",
+      )
+      .optional(),
     title: z.string().min(1).max(120),
     summary: z.string().max(500).default(""),
     /**A category id from vocab/media-template-categories.json.*/
@@ -63,6 +80,6 @@ export const MediaTemplate = z
   })
   .strict()
   .describe(
-    "MEDIA-01. A reusable picture or video prompt skeleton. Blanks are filled when a creation is made; references are Library file ids.",
+    'MEDIA-01. A reusable picture or video prompt skeleton. Blanks are filled when a creation is made; references are Library file ids. CREATOR-01: kind "fragment" is a short English prompt fragment (a camera, lens, light, grade and so on, in `prompt`, with its `group`) that the shot-card chips and the prompt builder read; it is not a template a person starts from. Reader rule: every template reader (the template list, the Create and Studio template pickers, the check.sh template validation) MUST skip fragment records, and only the fragment readers read them.',
   );
 export type MediaTemplate = z.infer<typeof MediaTemplate>;

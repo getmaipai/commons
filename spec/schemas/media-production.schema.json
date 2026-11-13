@@ -446,6 +446,18 @@
             "$ref": "#/$defs/shot"
           },
           "default": []
+        },
+        "act": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "description": "CREATOR-01. Optional act label the long-form Timeline groups scenes by."
+        },
+        "sequence": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "description": "CREATOR-01. Optional sequence label within an act."
         }
       }
     },

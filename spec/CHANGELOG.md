@@ -1,3 +1,7 @@
+## [spec-v0.1.378] - 2026-11-13
+
+- CREATOR-01 (CREATOR-PORT-2026-11-13), additive. New record `creation-record`: one per made item, written only by a finished job's writer, holding the made files, jobs, production and shot, recipe and route, cast with look, sources with roles, a `generation-provenance` block by reference, settings, checks, `parent_id`, `review` (pending, kept, rejected), `audience`, `made_audience` and `lock`; `words` and `plan` are private to the maker and never go in `file.provenance.generation`. `generation-provenance` `kind` gains `picture`, `video`, `film` and `task` gains `generate`, `edit`, `film` so pictures, clips and films can carry it. `media-subject` gains optional `person_id` (a household member's subject; `real` and the minor fact are derived from the person at read time) and `locked_description` (up to 400 characters). `media-template` `kind` gains `fragment` with a required `group`; every template reader must skip fragment records. `media-production` `scene` gains optional `act` and `sequence` labels. `records/ts/validate.ts` gains `validateCreationRecord` and `validateMediaTemplate`.
+
 ## [spec-v0.1.377] - 2026-11-13
 
 - EDITOR-HANDOFF, additive. An `image_editor` `actions` entry takes `hand_off: "video_create"` instead of `action`: the host opens the Video app's Create form with the picture in place and starts nothing (a package page cannot navigate into another app).

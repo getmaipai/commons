@@ -72,3 +72,27 @@ def test_media_records_reject_paths_where_file_ids_are_required():
         "provenance": "person-bruno",
     }
     MediaSource.model_validate(source)
+
+
+def test_creator_01_records_round_trip():
+    from gen.py.creation_record_schema import CreationRecord
+
+    for name, model in [
+        ("creation-record.nova.example.json", CreationRecord),
+        ("media-subject.marlow.example.json", MediaSubject),
+        ("media-template.fragment.example.json", MediaTemplate),
+    ]:
+        data = fixture(name)
+        assert (
+            model.model_validate(data).model_dump(mode="json", exclude_unset=True)
+            == data
+        )
+
+
+def test_creation_record_generation_block_refuses_words():
+    from gen.py.creation_record_schema import CreationRecord
+
+    data = fixture("creation-record.nova.example.json")
+    data["generation"]["words"] = {"written": "x"}
+    with pytest.raises(ValidationError):
+        CreationRecord.model_validate(data)

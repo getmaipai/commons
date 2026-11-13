@@ -18,14 +18,31 @@ class Style(RootModel[constr(pattern=r'^lora-[a-z0-9]{6,}$')]):
 
 class MediaTemplate(BaseModel):
     """
-    MEDIA-01. A reusable picture or video prompt skeleton. Blanks are filled when a creation is made; references are Library file ids.
+    MEDIA-01. A reusable picture or video prompt skeleton. Blanks are filled when a creation is made; references are Library file ids. CREATOR-01: kind "fragment" is a short English prompt fragment (a camera, lens, light, grade and so on, in `prompt`, with its `group`) that the shot-card chips and the prompt builder read; it is not a template a person starts from. Reader rule: every template reader (the template list, the Create and Studio template pickers, the check.sh template validation) MUST skip fragment records, and only the fragment readers read them.
     """
 
     model_config = ConfigDict(
         extra='forbid',
     )
     id: constr(pattern=r'^mtpl-[a-z0-9]{6,}$')
-    kind: Literal['picture', 'video']
+    kind: Literal['picture', 'video', 'fragment']
+    group: (
+        Literal[
+            'camera',
+            'lens',
+            'focal',
+            'aperture',
+            'framing',
+            'light',
+            'film_stock',
+            'look',
+            'grade',
+        ]
+        | None
+    ) = Field(
+        None,
+        description='CREATOR-01. Which shot-card vocabulary a fragment belongs to. Required when kind is fragment; absent otherwise.',
+    )
     title: constr(min_length=1, max_length=120)
     summary: constr(max_length=500) = ''
     category: constr(min_length=1, max_length=60) = Field(

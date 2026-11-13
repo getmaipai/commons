@@ -47,13 +47,13 @@ class Engine(BaseModel):
 
 class GenerationProvenance(BaseModel):
     """
-    MUSIC-SPEC-01 (Home docs/design/music-generation-2026-10-17.md, sections 8 and 9). How a generated file was made: which Stack job, which task, which model and engine, the seed, the length, the parent version it was made from, and whether the result may be used commercially and why. Carried on file.provenance.generation. The person's own words (description, lyrics, title) are never in this record. Music is the first kind to use it; a show is a made episode of a show. Pictures and videos may adopt it later by adding to the kind enum.
+    MUSIC-SPEC-01 (Home docs/design/music-generation-2026-10-17.md, sections 8 and 9). How a generated file was made: which Stack job, which task, which model and engine, the seed, the length, the parent version it was made from, and whether the result may be used commercially and why. Carried on file.provenance.generation. The person's own words (description, lyrics, title) are never in this record. Music is the first kind to use it; a show is a made episode of a show. Pictures and videos may adopt it later by adding to the kind enum. CREATOR-01: pictures, videos and films adopt it (kind picture, video, film; task generate, edit, film) as the generation block of a creation record; the words and the plan never go here.
     """
 
     model_config = ConfigDict(
         extra='forbid',
     )
-    kind: Literal['music', 'sound', 'show'] = Field(
+    kind: Literal['music', 'sound', 'show', 'picture', 'video', 'film'] = Field(
         ...,
         description='What was generated: a song or other music, or a short sound effect or ambience (`sound`, MUSIC-GEN-11). Pictures and videos may adopt this record later. A show is a made episode of a show.',
     )
@@ -71,6 +71,9 @@ class GenerationProvenance(BaseModel):
         'fade',
         'loudness',
         'sfx',
+        'generate',
+        'edit',
+        'film',
     ] = Field(
         ...,
         description='What the job did: a new song (text2music), or a change to an existing version (the rest).',
