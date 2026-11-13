@@ -425,6 +425,69 @@ class DeviceCommand17(BaseModel):
     payload: Payload15
 
 
+class DeviceCommand18(BaseModel):
+    """
+    The robot does its little dance. The robot answers with whether it started; it refuses when the dance is off, it is muted, asleep or low on battery.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(min_length=1, max_length=128)
+    kind: Literal['dance']
+    issued_at: AwareDatetime
+    expires_at: AwareDatetime
+    hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
+    payload: dict[str, Any] = Field(..., max_length=0)
+
+
+class Payload16(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    fast: bool | None = None
+
+
+class DeviceCommand19(BaseModel):
+    """
+    The robot runs its music-dance check: a short nod, then it listens for music and dances if it hears a beat. `fast` shortens the run to about 40 seconds for testing.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(min_length=1, max_length=128)
+    kind: Literal['music_test']
+    issued_at: AwareDatetime
+    expires_at: AwareDatetime
+    hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
+    payload: Payload16
+
+
+class Payload17(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    text: constr(min_length=1, max_length=400)
+    urgent: bool | None = None
+
+
+class DeviceCommand20(BaseModel):
+    """
+    The robot shows a card and says the text aloud. The robot refuses (and says why in its answer) when announcements are off, it is muted, in quiet hours or at night, or the text is empty.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(min_length=1, max_length=128)
+    kind: Literal['announce']
+    issued_at: AwareDatetime
+    expires_at: AwareDatetime
+    hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
+    payload: Payload17
+
+
 class DeviceCommand(
     RootModel[
         DeviceCommand1
@@ -444,6 +507,9 @@ class DeviceCommand(
         | DeviceCommand15
         | DeviceCommand16
         | DeviceCommand17
+        | DeviceCommand18
+        | DeviceCommand19
+        | DeviceCommand20
     ]
 ):
     root: (
@@ -464,6 +530,9 @@ class DeviceCommand(
         | DeviceCommand15
         | DeviceCommand16
         | DeviceCommand17
+        | DeviceCommand18
+        | DeviceCommand19
+        | DeviceCommand20
     ) = Field(
         ...,
         description='A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.',

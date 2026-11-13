@@ -183,5 +183,34 @@
     "issued_at": "2026-10-20T12:00:00Z",
     "expires_at": "2026-10-20T12:01:00Z",
     "hlc": "1792497600000:0:robot123"
+  },
+  {
+    "id": "cmd-dance",
+    "kind": "dance",
+    "payload": {},
+    "issued_at": "2026-10-05T12:00:00Z",
+    "expires_at": "2026-10-05T12:01:00Z",
+    "hlc": "1791201600000:0:robot123"
+  },
+  {
+    "id": "cmd-music-test",
+    "kind": "music_test",
+    "payload": {
+      "fast": true
+    },
+    "issued_at": "2026-10-05T12:00:00Z",
+    "expires_at": "2026-10-05T12:01:00Z",
+    "hlc": "1791201600000:0:robot123"
+  },
+  {
+    "id": "cmd-announce",
+    "kind": "announce",
+    "payload": {
+      "text": "Dinner is ready.",
+      "urgent": false
+    },
+    "issued_at": "2026-10-05T12:00:00Z",
+    "expires_at": "2026-10-05T12:01:00Z",
+    "hlc": "1791201600000:0:robot123"
   }
 ]

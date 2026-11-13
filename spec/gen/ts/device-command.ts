@@ -304,6 +304,50 @@ export const DeviceCommand = z
             .strict(),
         })
         .strict(),
+      z
+        .object({
+          id: z.string().min(1).max(128),
+          kind: z.literal("dance"),
+          issued_at: z.string().datetime({ offset: true }),
+          expires_at: z.string().datetime({ offset: true }),
+          hlc: z.string().regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$")),
+          payload: z.record(z.string(), z.never()),
+        })
+        .strict()
+        .describe(
+          "The robot does its little dance. The robot answers with whether it started; it refuses when the dance is off, it is muted, asleep or low on battery.",
+        ),
+      z
+        .object({
+          id: z.string().min(1).max(128),
+          kind: z.literal("music_test"),
+          issued_at: z.string().datetime({ offset: true }),
+          expires_at: z.string().datetime({ offset: true }),
+          hlc: z.string().regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$")),
+          payload: z.object({ fast: z.boolean().optional() }).strict(),
+        })
+        .strict()
+        .describe(
+          "The robot runs its music-dance check: a short nod, then it listens for music and dances if it hears a beat. `fast` shortens the run to about 40 seconds for testing.",
+        ),
+      z
+        .object({
+          id: z.string().min(1).max(128),
+          kind: z.literal("announce"),
+          issued_at: z.string().datetime({ offset: true }),
+          expires_at: z.string().datetime({ offset: true }),
+          hlc: z.string().regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$")),
+          payload: z
+            .object({
+              text: z.string().min(1).max(400),
+              urgent: z.boolean().optional(),
+            })
+            .strict(),
+        })
+        .strict()
+        .describe(
+          "The robot shows a card and says the text aloud. The robot refuses (and says why in its answer) when announcements are off, it is muted, in quiet hours or at night, or the text is empty.",
+        ),
     ];
     const { errors, failed } = schemas.reduce<{
       errors: z.core.$ZodIssue[];
