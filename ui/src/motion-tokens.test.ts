@@ -90,6 +90,7 @@ describe("motion phase 2", () => {
       const src = read(`./${f}.tsx`)
       expect(src, f).toContain("max-sm:motion-sheet-bottom")
       expect(src, f).toContain("max-sm:bottom-0")
+      expect(src, f).toContain("max-sm:before:")
     }
   })
   test("the media viewer grows from its thumbnail", () => {

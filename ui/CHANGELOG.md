@@ -1,3 +1,7 @@
+## [ui-v0.5.635] - 2026-11-13
+
+- MOTION-01: the Base UI `Dialog` bottom sheet below sm draws its drag-handle bar (the Radix one already did). `ui/package.json` version matches the tag again (0.5.633 was tagged with 0.5.632 inside).
+
 ## [ui-v0.5.634] - 2026-11-13
 
 - MOTION-01 phase 2. Sonner toasts and the vaul Drawer use the slide and fade tokens; tool disclosures and reasoning use the collapse token and slide curve; a plain Dialog is a bottom sheet below sm (slide-up, handle, safe-area padding, both dialog sets; call, flow, command and AlertDialog unchanged); `FullLayout` fades the page body on a route change (opacity only, no remount); `useInsertedKeys` and `motion-list` animate rows added to RunningNow, ActivityFeed, ResultFeed and MediaShelf; `MediaViewer` grows from the thumbnail that opened it and returns to it. Additive: no prop changed.
