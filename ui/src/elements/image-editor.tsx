@@ -1491,14 +1491,18 @@ export function ImageEditor({
                   }}
                 >
                   {chosenOperation.levels.map((level) => (
-                    <Tooltip key={level.id}>
-                      <TooltipTrigger asChild>
-                        <ToggleGroupItem value={level.id} disabled={locked} aria-disabled={level.enabled ? undefined : true} data-level={level.id} className={level.enabled ? "" : "opacity-50"}>
-                          {level.label}
-                        </ToggleGroupItem>
-                      </TooltipTrigger>
-                      {level.enabled ? null : <TooltipContent side={compact ? "top" : "bottom"}>{level.reason ?? i18n._({ id: "ui.That is not available right now.", message: "That is not available right now." })}</TooltipContent>}
-                    </Tooltip>
+                    <ToggleGroupItem
+                      key={level.id}
+                      value={level.id}
+                      disabled={locked}
+                      aria-disabled={level.enabled ? undefined : true}
+                      data-level={level.id}
+                      // A kit Tooltip around a toggle item overwrites its pressed state, so an off level says its reason through the native tooltip and the line below.
+                      title={level.enabled ? undefined : level.reason ?? i18n._({ id: "ui.That is not available right now.", message: "That is not available right now." })}
+                      className={level.enabled ? "" : "opacity-50"}
+                    >
+                      {level.label}
+                    </ToggleGroupItem>
                   ))}
                 </ToggleGroup>
                 {chosenLevel ? (

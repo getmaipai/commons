@@ -1,3 +1,7 @@
+## [ui-v0.5.654] - 2026-11-13
+
+- EDITOR-PANEL-LAYOUT follow-up. In an operation's level control, the chosen level (Quick, Better, Best) reads as pressed again: a kit Tooltip around each toggle item had overwritten its pressed state, so an off level now says its reason through the native tooltip and the description line. `ui/package.json` is 0.5.654.
+
 ## [ui-v0.5.653] - 2026-11-13
 
 - EDITOR-PANEL-LAYOUT. The ImageEditor's tool option panels (More, Resize, Crop, Adjust, Erase, Comment, Markup, Remove BG) no longer stretch across the window. The popover is `w-max` capped at 32 rem (and at the room Radix reports), and its collision boundary is the editor's own section, so it never covers the app's sidebar. The panels drop their second pill surface (the popover's `surface-menu` is the surface) and share one left-aligned column with kit spacing and a Preview/Apply row at the bottom right. More draws the operation buttons, the Quick/Better/Best control (an off level shows its reason as a tooltip and as the description line), one level line with the time, a labelled choice row ("Size": Same size, 1.5x, 2x) and Preview. The operation's long summary is no longer drawn inside a panel that lists levels. `ui/package.json` is 0.5.653.

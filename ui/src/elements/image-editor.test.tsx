@@ -940,6 +940,9 @@ describe("versions popover", () => {
       // The wordy operation summary is not drawn inside the panel; the level line is.
       expect(bar.textContent).not.toContain("long wordy");
       expect(bar.querySelector("[data-slot=image-editor-level-line]")!.textContent).toBe("Less grain. Takes a few seconds.");
+      // The chosen level reads as pressed, and an off level carries its reason as a tooltip.
+      expect(bar.querySelector("[data-level=quick]")!.getAttribute("data-state")).toBe("on");
+      expect(bar.querySelector("[data-level=best]")!.getAttribute("title")).toBe("Needs a download.");
       const size = bar.querySelector("[data-slot=image-editor-choice]")!;
       expect(size.textContent).toContain("Size");
       expect(Array.from(size.querySelectorAll("[role=radio]")).map((el) => el.textContent)).toEqual(["Same size", "1.5x", "2x"]);
