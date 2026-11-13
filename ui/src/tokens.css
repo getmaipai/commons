@@ -2487,9 +2487,11 @@ html[data-ease-motion="calm"] body {
 /* Third-party toasts and drawers: their own transitions move onto the tokens (they set them in their own stylesheet, so these win by
  * specificity). */
 /* A toast is a level-2 surface: its radius and shadow are set together on the toast itself (sonner's own box-shadow is a fixed black). */
-[data-sonner-toaster] [data-sonner-toast] {
+[data-sonner-toaster] [data-sonner-toast][data-styled="true"] {
   border-radius: var(--elev-2-radius);
   box-shadow: var(--elev-2-shadow);
+}
+[data-sonner-toaster] [data-sonner-toast] {
   transition-duration: var(--motion-slide-in), var(--motion-slide-in), var(--motion-slide-in), var(--motion-fade-in);
   transition-timing-function: var(--motion-ease-slide);
 }

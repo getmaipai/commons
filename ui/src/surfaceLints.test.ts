@@ -26,6 +26,9 @@ describe("surface lint scanner", () => {
   test("passes a shadow with a radius, a surface utility, shadow-none and shadow colour classes", () => {
     expect(findClassShadows(`x("rounded-md shadow-sm", "surface-menu hover:shadow-md", "shadow-none", "shadow-primary/20")`)).toEqual([])
   })
+  test("ignores ids and words that only mention a shadow", () => {
+    expect(findClassShadows(`x("setting.chat.option_label.shadow", "shadow", { family: "shadow" })`)).toEqual([])
+  })
   test("flags an arbitrary shadow that reads no elevation token", () => {
     const kinds = findClassShadows(`x("rounded-md shadow-[0_8px_24px_black] ", "rounded-md shadow-[var(--elev-3-shadow)]")`).map((x) => x.kind)
     expect(kinds).toEqual(["shadow-off-tokens"])

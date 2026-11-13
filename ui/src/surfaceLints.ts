@@ -23,8 +23,8 @@ export type SurfaceKind = "shadow-without-radius" | "shadow-off-tokens" | "css-s
 export type SurfaceFinding = { kind: SurfaceKind; file: string; line: number; text: string }
 export type SurfaceAllow = { file: string; match: RegExp; reason: string }
 
-// `shadow-md`, `hover:shadow-lg`, `shadow-[...]`, `drop-shadow-sm`; `shadow-none` and the shadow colour classes (`shadow-primary/20`) set no box.
-const SHADOW_CLASS = /(?<![\w-])((?:[\w-]+:|\[[^\]]+\]:)*)((?:drop-)?shadow(?:-(?!none(?![\w-]))[\w./[\]()%:,-]+)?)(?![\w-])/g
+// `shadow-md`, `hover:shadow-lg`, `shadow-[...]`, `drop-shadow-sm`; `shadow-none` and the shadow colour classes (`shadow-primary/20`) set no box. A dotted id (`option_label.shadow`) or a bare word is prose, not a class.
+const SHADOW_CLASS = /(?<![\w.-])((?:[\w-]+:|\[[^\]]+\]:)*)((?:drop-)?shadow-(?!none(?![\w-]))[\w./[\]()%:,-]+)(?![\w-])/g
 const RADIUS_CLASS = /(?<![\w-])(?:[\w-]+:|\[[^\]]+\]:)*(?:rounded(?:-[\w./[\]()-]+)?|surface-(?:card|float|menu|dialog|sheet|sheet-bottom))(?![\w-])/
 const SHADOW_COLOR_ONLY = /^(?:drop-)?shadow-(?:inherit|current|transparent|(?:primary|secondary|foreground|background|destructive|muted|accent|popover|card|ring|border)(?:\/[\d.[\]%]+)?)$/
 const ELEVATION_TOKEN = /var\(--(?:elev|elevation|shadow)[\w-]*\)/
