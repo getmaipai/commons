@@ -511,7 +511,7 @@ export function SectionSidebar({
       data-slot="section-sidebar-box"
       data-state={peeking ? "peek" : hiddenMode ? "closed" : rail ? "rail" : "open"}
       className={cn(
-        "relative h-full shrink-0 transition-[width] duration-200 ease-linear motion-reduce:transition-none",
+        "relative h-full shrink-0 transition-[width] duration-(--motion-slide-in) ease-(--motion-ease-slide) motion-reduce:transition-none",
         hiddenMode ? "w-1.5" : rail ? "w-(--settings-rail-width)" : "w-(--settings-column-width)",
       )}
     >
@@ -530,7 +530,7 @@ export function SectionSidebar({
         data-slot="section-sidebar-panel"
         className={
           peeking
-            ? "absolute inset-y-0 start-0 z-30 w-(--settings-column-width) shadow-xl motion-safe:animate-[section-sidebar-peek-in_160ms_ease-out]"
+            ? "absolute inset-y-0 start-0 z-30 w-(--settings-column-width) shadow-xl motion-safe:animate-[section-sidebar-peek-in_var(--motion-reveal-in)_var(--motion-ease-out)]"
             : closed
               ? "invisible h-full w-(--settings-column-width) overflow-hidden"
               : "h-full"

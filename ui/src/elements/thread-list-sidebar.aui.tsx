@@ -167,7 +167,7 @@ export function ThreadListSidebar({
       data-slot="aui_thread-list-sidebar"
       data-variant="compact"
       data-state={collapsed ? (peek ? "peek" : "collapsed") : "expanded"}
-      className="relative h-full shrink-0 transition-[width] duration-200 ease-linear"
+      className="relative h-full shrink-0 transition-[width] duration-(--motion-slide-in) ease-(--motion-ease-slide)"
       style={{ width: collapsed ? (peek ? "18rem" : "0.375rem") : "18rem" }}
     >
       {showZone ? (

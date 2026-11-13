@@ -262,10 +262,10 @@ describe("SectionSidebar", () => {
       }
     });
 
-    test("the collapse animation is Chat's: a 200 ms linear width slide on a box that keeps the panel at full width, no motion under reduced motion", () => {
+    test("the collapse animation is Chat's: one width slide on the slide tokens on a box that keeps the panel at full width, no motion under reduced motion", () => {
       const { container, rerender } = standalone({ collapsed: true });
       const box = boxOf(container);
-      for (const cls of ["transition-[width]", "duration-200", "ease-linear", "motion-reduce:transition-none", "w-1.5"]) expect(box.className).toContain(cls);
+      for (const cls of ["transition-[width]", "duration-(--motion-slide-in)", "ease-(--motion-ease-slide)", "motion-reduce:transition-none", "w-1.5"]) expect(box.className).toContain(cls);
       const panel = container.querySelector('[data-slot="section-sidebar-panel"]') as HTMLElement;
       expect(panel.className).toContain("invisible");
       expect(panel.className).toContain("w-(--settings-column-width)");
@@ -279,7 +279,7 @@ describe("SectionSidebar", () => {
         fireEvent.pointerEnter(zoneOf(container), { pointerType: "mouse" });
         advance(120);
         const panel = container.querySelector('[data-slot="section-sidebar-panel"]') as HTMLElement;
-        expect(panel.className).toContain("motion-safe:animate-[section-sidebar-peek-in_160ms_ease-out]");
+        expect(panel.className).toContain("motion-safe:animate-[section-sidebar-peek-in_var(--motion-reveal-in)_var(--motion-ease-out)]");
         expect(panel.className).toContain("shadow-xl");
       });
       const css = readFileSync(new URL("../tokens.css", import.meta.url), "utf8");
