@@ -552,7 +552,7 @@ function StudioBody(props: TrackStudioProps) {
               <TooltipTrigger asChild>
                 {/* A span carries the tooltip when the button is disabled (a disabled button gets no pointer events). */}
                 <span tabIndex={canCompare ? undefined : 0}>
-                  <Button type="button" variant="outline" size={isPhone ? "default" : "lg"} className="rounded-full" aria-pressed={comparing} aria-keyshortcuts="C" disabled={!canCompare} data-slot="track-studio-compare-toggle" onClick={toggleCompare}>
+                  <Button type="button" variant="outline" size="sm" className="rounded-full" aria-pressed={comparing} aria-keyshortcuts="C" disabled={!canCompare} data-slot="track-studio-compare-toggle" onClick={toggleCompare}>
                     <ContrastIcon aria-hidden />{i18n._({ id: "ui.Compare", message: "Compare" })}
                   </Button>
                 </span>

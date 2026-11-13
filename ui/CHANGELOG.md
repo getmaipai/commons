@@ -1,3 +1,7 @@
+## [ui-v0.5.651] - 2026-11-13
+
+- `Player` takes an optional `spectrum={{ levels }}` for the `mini` layout: a faint live spectrum behind the whole bar (`data-slot="player-spectrum"`). Bars rise from the bottom edge across the full width, drawn on a canvas from the host's `levels()` (0..1 per bar per frame; the host owns the AnalyserNode, the kit does no audio analysis) in the `--progress-accent` token at low opacity. `pointer-events: none`, `aria-hidden`; under reduced motion one static frame; the loop runs only while playing and the page is visible, at half rate when the window is unfocused. Absent: no canvas, no cost. New `PlayerSpectrum` and `drawSpectrum` in `primitives/PlayerSpectrum.tsx`. TrackStudio's Compare toggle is size `sm`, matching the ImageEditor's. `ui/package.json` is 0.5.651.
+
 ## [ui-v0.5.650] - 2026-11-13
 
 - MAKE-CLEARER-02 (MAKE-CLEARER-2026-11-13). `ImageEditor` takes `resizeUpscale` (default true) and the `image_editor` schema node takes `resize_upscale` (default true). When false, the Resize bar draws no Upscale 2x and 4x buttons and no upscale note, so a host with Make clearer has one upscaler. Left out, nothing changes. `ui/package.json` is 0.5.650.

@@ -763,6 +763,7 @@ describe("Compare (audio)", () => {
     const { container, getByText } = openSong({ compare: { versions: [{ id: "v1", url: "/v1.m4a" }], current_id: "v1" } });
     expect(toggle(container).disabled).toBe(true);
     expect(toggle(container).getAttribute("aria-keyshortcuts")).toBe("C");
+    expect(toggle(container).getAttribute("data-size")).toBe("sm");
     fireEvent.focus(toggle(container).parentElement!);
     await waitFor(() => expect(document.body.textContent).toContain("Nothing to compare yet: this is the first version."));
     key(container.querySelector("section")!, "c");

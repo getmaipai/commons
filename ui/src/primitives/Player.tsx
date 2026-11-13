@@ -68,6 +68,7 @@ import {
 } from "@/kit/primitives/playerLogic";
 import { ArtGradient } from "@/kit/primitives/ArtGradient";
 import { LIKE_POP_CLASS, likeHaptic, useLikePop } from "@/kit/primitives/likeFeedback";
+import { PlayerSpectrum } from "@/kit/primitives/PlayerSpectrum";
 import { SleepTimer } from "@/kit/primitives/SleepTimer";
 import type { SleepState } from "@/kit/primitives/sleepLogic";
 import { TranscriptPanel, type TranscriptLine } from "@/kit/primitives/TranscriptPanel";
@@ -274,6 +275,11 @@ export interface PlayerProps {
   /** MUSIC-KIT-01: in the `mini` layout, dragging up on the bar (touch or pen) calls `onExpand`, like tapping it. The
    * bar keeps its horizontal scroll; the swipe never fires a tap. Default off. */
   swipeUpToExpand?: boolean;
+  /** In the `mini` layout, a faint live spectrum behind the whole bar: bars rise from the bottom edge across the full width,
+   * drawn in the accent token at low opacity. `levels()` returns 0..1 values (one per bar) each frame; the host owns the
+   * analyser, the kit does no audio analysis. Draws only while playing and the page is visible, once under reduced motion.
+   * Absent: nothing is drawn and nothing runs. */
+  spectrum?: { levels: () => readonly number[] };
   /** In the `mini` layout, a horizontal swipe (touch or pen) on the bar calls `onNext` (left) or `onPrevious` (right) when the
    * host passes them. Only acts when the travel is mostly sideways, so it never fights the swipe up. Default off. */
   swipeToSkip?: boolean;
@@ -440,6 +446,7 @@ export function Player(props: PlayerProps) {
     media: external = null,
     placement = "inline",
     swipeUpToExpand = false,
+    spectrum,
     ambient = true,
     swipeToSkip = false,
     artSpring = false,
@@ -1453,7 +1460,8 @@ export function Player(props: PlayerProps) {
         )}
         <MediaController key="controller" ref={controllerRef as never} audio noHotkeys autohide="-1" defaultStreamType="on-demand" style={audioVars}>
           {mediaElement}
-          <div className="flex w-full items-center gap-3 px-3 py-2">
+          {spectrum ? <PlayerSpectrum levels={spectrum.levels} active={playing} /> : null}
+          <div className="relative z-[1] flex w-full items-center gap-3 px-3 py-2">
             {onExpand ? (
               <Button
                 variant="ghost"
