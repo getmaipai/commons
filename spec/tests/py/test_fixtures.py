@@ -63,6 +63,7 @@ from gen.py.stack_fit_plan_schema import StackFitPlan
 from gen.py.subject_ref_schema import Household, Unresolved, World
 from gen.py.synth_schema import Synth
 from gen.py.turn_artifact_schema import TurnArtifact
+from gen.py.turn_composer_schema import TurnComposer
 from gen.py.turn_signal_schema import TurnSignal
 from gen.py.world_place_schema import WorldPlace
 
@@ -1125,6 +1126,17 @@ def test_page_context_fixture_and_invalid_shapes():
     ):
         with pytest.raises(ValidationError):
             PageContext.model_validate(invalid)
+
+
+def test_turn_composer_fixture_and_invalid_shapes():
+    TurnComposer.model_validate(load_fixture("turn-composer.example.json"))
+    with pytest.raises(ValidationError):
+        TurnComposer.model_validate(
+            load_fixture("turn-composer.unknown-key.invalid.example.json")
+        )
+    for invalid in ({}, {"mode": "Picture"}, {"mode": "picture", "cast": ["a"] * 7}):
+        with pytest.raises(ValidationError):
+            TurnComposer.model_validate(invalid)
 
 
 def test_quick_action_enum():

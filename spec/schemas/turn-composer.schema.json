@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://maip.ai/spec/schemas/turn-composer.schema.json",
+  "title": "TurnComposer",
+  "description": "What the person chose in the chat composer's mode and chips, sent beside the words of one written chat turn. A hint the model reads, never a route: the hub checks it against the person's own band and offered tools, and ignores it on a spoken, robot, satellite or shared turn.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["mode"],
+  "properties": {
+    "mode": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 32,
+      "pattern": "^[a-z][a-z0-9_-]*$",
+      "description": "The mode id from GET /api/composer/modes, for example `picture`, `video` or `song`. `ask` (plain chat) carries no hint."
+    },
+    "settings": {
+      "type": "object",
+      "maxProperties": 8,
+      "propertyNames": { "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 32 },
+      "additionalProperties": {
+        "oneOf": [
+          { "type": "string", "maxLength": 40 },
+          { "type": "integer", "minimum": -1000000, "maximum": 1000000 }
+        ]
+      },
+      "description": "The chip values the person picked, keyed by the chip's state id (`shape`, `count`, `quality`). The hub keeps only keys and values the mode offers this person; an unknown or out-of-range entry is dropped."
+    },
+    "cast": {
+      "type": "array",
+      "maxItems": 6,
+      "items": { "type": "string", "minLength": 1, "maxLength": 128 },
+      "description": "Cast ids the person added with @. The hub keeps only the ids this person may cast. Never logged."
+    }
+  }
+}

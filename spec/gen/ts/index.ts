@@ -110,6 +110,7 @@ export * from "./tour.js";
 export * from "./transcript-revision.js";
 export * from "./transcript.js";
 export * from "./turn-artifact.js";
+export * from "./turn-composer.js";
 export * from "./turn-label.js";
 export * from "./turn-signal.js";
 export * from "./world-place.js";

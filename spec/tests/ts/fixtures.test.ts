@@ -44,6 +44,7 @@ import { Feed } from "../../gen/ts/feed.js";
 import { NewsItem } from "../../gen/ts/news-item.js";
 import { NewsStory } from "../../gen/ts/news-story.js";
 import { PageContext } from "../../gen/ts/page-context.js";
+import { TurnComposer } from "../../gen/ts/turn-composer.js";
 import { QuickAction } from "../../gen/ts/quick-action.js";
 import { Alarm } from "../../gen/ts/alarm.js";
 import { WorldPlace } from "../../gen/ts/world-place.js";
@@ -817,6 +818,27 @@ test("robot-self-test-result accepts valid answers and rejects invalid ones", ()
   expect(() => RobotSelfTestResult.parse(loadFixture("robot-self-test-result.example.json"))).not.toThrow();
   expect(() => RobotSelfTestResult.parse(loadFixture("robot-self-test-result.invalid-detail.example.json"))).toThrow();
   expect(() => RobotSelfTestResult.parse(loadFixture("robot-self-test-result.missing-ok.invalid.example.json"))).toThrow();
+});
+
+describe("turn-composer (the chat composer's hint on one written turn)", () => {
+  test("the example is valid", () => {
+    expect(() => TurnComposer.parse(loadFixture("turn-composer.example.json"))).not.toThrow();
+  });
+
+  test("an unknown key is rejected, so the hint can never carry a route or a tool name", () => {
+    expect(() => TurnComposer.parse(loadFixture("turn-composer.unknown-key.invalid.example.json"))).toThrow();
+  });
+
+  test("mode is required and bounded, settings take text or whole numbers, cast holds up to six ids", () => {
+    expect(TurnComposer.parse({ mode: "video" })).toEqual({ mode: "video" });
+    expect(() => TurnComposer.parse({})).toThrow();
+    expect(() => TurnComposer.parse({ mode: "Picture" })).toThrow();
+    expect(() => TurnComposer.parse({ mode: "x".repeat(33) })).toThrow();
+    expect(() => TurnComposer.parse({ mode: "picture", settings: { count: 1.5 } })).toThrow();
+    expect(() => TurnComposer.parse({ mode: "picture", settings: { shape: { nested: true } } })).toThrow();
+    expect(() => TurnComposer.parse({ mode: "picture", cast: ["a", "b", "c", "d", "e", "f", "g"] })).toThrow();
+    expect(() => TurnComposer.parse({ mode: "picture", cast: [""] })).toThrow();
+  });
 });
 
 describe("page-context and ambient quick actions", () => {
