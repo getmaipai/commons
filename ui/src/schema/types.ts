@@ -570,7 +570,7 @@ export const PromptBarNodeSchema = z.object({
         private: z.boolean().optional(),
       }),
     )
-    .max(10)
+    .max(16)
     .optional(),
   mode_selector: z.object({
     state: z.string().regex(/^[a-z][a-z0-9_]*$/).max(40),

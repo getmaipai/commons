@@ -137,17 +137,17 @@ describe("unified panel look", () => {
     const view = render(<Harness list={list} />);
     expect(view.getByRole("button", { name: "Settings: Landscape · 1" }).textContent).toBe("Landscape · 1");
   });
-  test("icon-only choices show their chosen icon and name while other group choices keep text", () => {
+  test("icon-only choices show their chosen icon and the whole group reads as the icon alone", () => {
     const list = modes();
     list[0] = { ...list[0]!, chips: [
       { ...shape(), iconOnly: true, icon: "sliders-horizontal", options: [{ value: "landscape", label: "Landscape", icon: "image" }, { value: "portrait", label: "Portrait" }] },
       { id: "count", label: "Count", group: "Settings", value: 1, onValueChange: () => {}, options: [{ value: 1, label: "1 picture" }] },
     ] };
     const view = render(<Harness list={list} />);
-    const trigger = view.getByRole("button", { name: "Shape: Landscape" });
-    expect(trigger.getAttribute("title")).toBe("Shape: Landscape");
+    const trigger = view.getByRole("button", { name: "Shape · Count: Landscape · 1 picture" });
+    expect(trigger.getAttribute("title")).toBe("Shape · Count: Landscape · 1 picture");
     expect(trigger.querySelector("svg")?.getAttribute("class")).toContain("lucide-image");
-    expect(trigger.textContent).toContain("1 picture");
+    expect(trigger.textContent).toBe("");
     fireEvent.click(trigger);
     expect(view.getByRole("radio", { name: "Landscape" })).not.toBeNull();
     expect(view.getByRole("radio", { name: "Portrait" })).not.toBeNull();
@@ -230,6 +230,21 @@ describe("combined chips", () => {
     const view = render(<Harness list={list} />);
     fireEvent.click(view.getByRole("button", { name: "Add files" }));
     expect(added).toBe(1);
+  });
+});
+
+describe("icon_only on a combined chip", () => {
+  test("a group with an icon-only chip is the icon alone, its name reads every family, the popover lists both", () => {
+    const list = modes();
+    const shape2: ComposerChipData = { id: "shape", label: "Shape", group: "Settings", iconOnly: true, icon: "image", value: "l", onValueChange: () => {}, options: [{ value: "l", label: "Landscape" }, { value: "p", label: "Portrait" }] };
+    const length: ComposerChipData = { id: "length", label: "Length", group: "Settings", value: 5, onValueChange: () => {}, options: [{ value: 5, label: "5 s" }, { value: 10, label: "10 s" }] };
+    list[0] = { ...list[0]!, chips: [shape2, length] };
+    const view = render(<Harness list={list} />);
+    const chip = view.getByRole("button", { name: "Shape · Length: Landscape · 5 s" });
+    expect(chip.getAttribute("title")).toBe("Shape · Length: Landscape · 5 s");
+    expect(chip.textContent).toBe("");
+    fireEvent.click(chip);
+    expect(view.getAllByRole("radiogroup").map((r) => r.getAttribute("aria-labelledby"))).toEqual(["composer-chip-shape", "composer-chip-length"]);
   });
 });
 

@@ -1,3 +1,7 @@
+## [ui-v0.5.660] - 2026-11-13
+
+- ONE-COMPOSER, additive. A combined group chip honours `icon_only`: when any chip of the group sets it the trigger is the icon alone (no words) and its tooltip and accessible name read "Shape · Length: Landscape · 5 s"; the popover still lists every family. The `prompt_bar` `chips` cap is 16 (was 10; spec-v0.1.388). `ui/package.json` is 0.5.660.
+
 ## [ui-v0.5.659] - 2026-11-13
 
 - ONE-COMPOSER label fix. A single chip group over the three-chip cap is drawn as itself (its own name, icon and words, for example Shot); the "More" chip appears only when two or more groups overflow. Ledger note: the `prompt_bar` `chips` cap of 10 stays (the composer folds chips into groups, so it only bounds page data). `ui/package.json` is 0.5.659.

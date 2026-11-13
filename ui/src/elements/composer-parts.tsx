@@ -403,7 +403,7 @@ export function ComposerChipPopover({ name, chips, icon, slot = "composer-chip-g
   const summary = showSummary ? chips.map(chosenLabel).filter(Boolean).join(" · ") : "";
   const iconOnlyChip = chips.find((chip) => chip.iconOnly);
   const iconOnlyOption = iconOnlyChip ? chosenOption(iconOnlyChip) : undefined;
-  const iconOnlyName = iconOnlyChip && iconOnlyOption ? `${iconOnlyChip.label}: ${iconOnlyOption.label}` : undefined;
+  const iconOnlyName = iconOnlyChip && iconOnlyOption ? (chips.length > 1 ? `${chips.map((c) => c.label).join(" · ")}: ${chips.map(chosenLabel).filter(Boolean).join(" · ")}` : `${iconOnlyChip.label}: ${iconOnlyOption.label}`) : undefined;
   const IconOnly = iconOnlyOption?.icon ?? iconOnlyChip?.icon ?? chips.find((chip) => chip.icon)?.icon ?? "sliders-horizontal";
   const ChosenIcon = IconOnly ? getIcon(IconOnly) : undefined;
   const unavailable = chips.every((c) => Boolean(c.disabledReason));
@@ -421,7 +421,7 @@ export function ComposerChipPopover({ name, chips, icon, slot = "composer-chip-g
       onClick={phone ? () => setOpen(true) : undefined}
       className={cn(variant === "soft" ? SOFT : CHIP, unavailable && "opacity-60")}
     >
-      {iconOnlyTrigger ? icon ?? <GroupIcon chips={chips} /> : iconOnlyChip ? (ChosenIcon ? <ChosenIcon className="size-5 shrink-0" aria-hidden="true" /> : icon ?? <GroupIcon chips={chips} />) : icon ?? <GroupIcon chips={chips} />}{iconOnlyTrigger ? null : iconOnlyChip ? (chips.filter((chip) => chip !== iconOnlyChip).length > 0 ? <span className="min-w-0 truncate">{chips.filter((chip) => chip !== iconOnlyChip).map(chosenLabel).filter(Boolean).join(" · ")}</span> : null) : <span className="min-w-0 truncate">{summary || name}</span>}<ChevronDown className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+      {iconOnlyTrigger ? icon ?? <GroupIcon chips={chips} /> : iconOnlyChip ? (ChosenIcon ? <ChosenIcon className="size-5 shrink-0" aria-hidden="true" /> : icon ?? <GroupIcon chips={chips} />) : icon ?? <GroupIcon chips={chips} />}{iconOnlyTrigger || iconOnlyChip ? null : <span className="min-w-0 truncate">{summary || name}</span>}<ChevronDown className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
     </button>
   );
   const body = chips.length >= 3 ? <ChipTabs chips={chips} /> : <div className="flex min-w-0 flex-col gap-4">{chips.map((c) => <OptionRadios key={c.id} chip={c} />)}</div>;

@@ -483,11 +483,11 @@ describe("UI schema, package apps", () => {
     expect(validate({ ...ok, chips: [{ ...style, options: [{ value: "a", label: "A", note: "" }] }] })).toBe(false);
   });
 
-  test("VIDEO-LORA-09: a prompt bar takes up to ten chips", () => {
+  test("VIDEO-LORA-09: a prompt bar takes up to sixteen chips", () => {
     const chip = (n: number) => ({ state: `c${n}`, label: `Chip ${n}`, options: [{ value: "a", label: "A" }] });
     const bar = (count: number) => ({ type: "prompt_bar", label: "Describe", chips: Array.from({ length: count }, (_, n) => chip(n)), submit: { call: { target: "/api/plugins/videos/make" } } });
-    expect(validate(bar(10))).toBe(true);
-    expect(validate(bar(11))).toBe(false);
+    expect(validate(bar(16))).toBe(true);
+    expect(validate(bar(17))).toBe(false);
   });
 
   test("ADULT-LOCK-01: media_shelf locked_field and making_field, result_feed fields.locked and making; defaults unchanged", () => {
