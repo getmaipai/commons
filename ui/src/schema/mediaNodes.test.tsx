@@ -46,6 +46,7 @@ beforeEach(() => {
     const url = typeof input === "string" ? input : input.toString();
     calls.push({ url, method: init?.method ?? "GET", body: init?.body ? JSON.parse(String(init.body)) : undefined, keepalive: init?.keepalive });
     if (url.endsWith("/data/item")) return Promise.resolve(new Response(JSON.stringify([ITEM]), { status: 200 }));
+    if (url.endsWith("/data/recent")) return Promise.resolve(new Response(JSON.stringify([{ id: "picture-1", title: "Making picture", image: "/one.jpg", badge: "making" }]), { status: 200 }));
     if (url.includes("/data/")) return Promise.resolve(new Response(JSON.stringify(ROWS), { status: 200 }));
     return Promise.resolve(new Response(JSON.stringify({ ok: true }), { status: 200 }));
   }) as unknown as typeof fetch;
@@ -70,6 +71,15 @@ const shelf = homePage.body[1]!;
 const billboard = homePage.body[0]!;
 
 describe("media_shelf", () => {
+  test("polls the full bound shelf while a configured row field is making", async () => {
+    const node = MediaShelfNodeSchema.parse({ type: "media_shelf", bind: { source: "package", path: "recent", stream: false }, item_key_field: "id", item_label_field: "title", item_media_field: "image", poll_while: { field: "badge", values: ["making"] } });
+    expect(node.poll_while).toEqual({ field: "badge", values: ["making"] });
+    const view = inVideos(node, null);
+    await view.findByText("Making picture");
+    await new Promise((resolve) => setTimeout(resolve, 3200));
+    expect(calls.filter((call) => call.url.endsWith("/data/recent"))).toHaveLength(2);
+    view.unmount();
+  });
   test("parses the optional backdrop art look", () => {
     const node = MediaShelfNodeSchema.parse({ type: "media_shelf", bind: { source: "package", path: "clips", stream: false }, item_key_field: "id", item_label_field: "title", item_media_field: "thumbnail", look: "backdrop" });
     expect(node.look).toBe("backdrop");

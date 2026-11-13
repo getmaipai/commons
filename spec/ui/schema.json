@@ -433,6 +433,16 @@
         "heading": { "type": "string", "minLength": 1, "maxLength": 60, "description": "MEDIA-PLAYER-01: the shelf's heading (\"Continue watching\"), which also names the rail." },
         "heading_style": { "type": "string", "enum": ["default", "eyebrow"], "default": "default", "description": "VIDEO-STUDIO-03 (K5): `eyebrow` draws the heading, and the day group labels, as a small uppercase tracked line in the muted text colour. Default `default`, unchanged." },
         "bind": { "$ref": "#/$defs/binding" },
+        "poll_while": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["field", "values"],
+          "description": "While any row's dotted `field` equals one of `values`, refetch the entire bound shelf every 3 seconds. Polling pauses while the tab is hidden and stops when no loaded row matches or the shelf unmounts. The shelf keeps showing its current rows while a refresh is in flight.",
+          "properties": {
+            "field": { "type": "string", "minLength": 1, "description": "Dotted row-field path that marks work still in progress (for example `badge`)." },
+            "values": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 }, "description": "Field values that mean the row is still being made." }
+          }
+        },
         "item_key_field": { "type": "string" },
         "item_label_field": { "type": "string" },
         "item_subtitle_field": { "type": "string", "description": "MEDIA-PLAYER-01: a `{field}` template for the caption's second line (the channel, the artist), as list.item_subtitle_field." },

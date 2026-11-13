@@ -1,3 +1,7 @@
+## [spec-v0.1.392] - 2026-11-13
+
+- `media_shelf` accepts optional `poll_while: { field, values }` to refetch its bound rows while any row's configured field has a value that means work is still in progress (matches ui 0.5.664).
+
 ## [spec-v0.1.391] - 2026-11-13
 
 - `prompt_bar.references` takes `max`, an integer from 1 to 3 with a default of 1, matching ui 0.5.663.

@@ -269,6 +269,13 @@ describe("UI schema", () => {
     ).toBe(true);
   });
 
+  test("media_shelf poll_while names row values that keep the whole shelf current", () => {
+    const shelf = { type: "media_shelf", bind: { source: "package", path: "recent" }, item_key_field: "id", item_label_field: "title", item_media_field: "image", poll_while: { field: "badge", values: ["making"] } };
+    expect(validate(shelf)).toBe(true);
+    expect(validate({ ...shelf, poll_while: { field: "badge", values: [] } })).toBe(false);
+    expect(validate({ ...shelf, poll_while: { statuses: ["queued"], record: { path: "recent" } } })).toBe(false);
+  });
+
   test("widget_card and widget_row validate a minimal bind and reject an unbound one", () => {
     expect(validate({ type: "widget_card", bind: { source: "route", path: "/api/widgets" } })).toBe(true);
     expect(validate({ type: "widget_row", bind: { source: "route", path: "/api/widgets" } })).toBe(true);

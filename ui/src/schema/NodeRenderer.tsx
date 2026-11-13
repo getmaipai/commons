@@ -1382,6 +1382,22 @@ function MediaShelfNodeView({ node, state }: { node: MediaShelfNode; state: Row 
 
 function MediaShelfBody({ node, state }: { node: MediaShelfNode; state: Row }) {
   const query = useBinding<Row[]>(node.bind, state);
+  const rows = query.data ?? [];
+  const isMaking = Boolean(node.poll_while && rows.some((row) => node.poll_while!.values.includes(String(readField(row, node.poll_while!.field) ?? ""))));
+  useEffect(() => {
+    if (!isMaking) return;
+    let alive = true;
+    let busy = false;
+    const refetch = async () => {
+      if (!alive || busy || document.visibilityState === "hidden") return;
+      busy = true;
+      try { if (alive) await query.refetch(); } finally { busy = false; }
+    };
+    const timer = window.setInterval(() => void refetch(), 3000);
+    const onVisibility = () => { if (document.visibilityState === "visible") void refetch(); };
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => { alive = false; window.clearInterval(timer); document.removeEventListener("visibilitychange", onVisibility); };
+  }, [isMaking, query.refetch]);
   const { dispatch, lastError, pendingConfirm } = useDispatchAction();
   const reorderWiring = useReorderWiring(node.reorder);
   // The slider's size is per shelf and per device (the card-size hook's own storage), whether or not a slider is drawn.

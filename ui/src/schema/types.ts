@@ -214,12 +214,16 @@ export const ReorderSchema = z.object({
 }).strict();
 export type ReorderSpec = z.infer<typeof ReorderSchema>;
 
+/** Row-field condition shared by nodes that refetch a complete bound collection while work is active. */
+export const PollWhileFieldSchema = z.object({ field: z.string().min(1), values: z.array(z.string().min(1)).min(1) }).strict();
+
 export const MediaShelfNodeSchema = z.object({
   type: z.literal("media_shelf"),
   heading: z.string().min(1).max(60).optional(),
   // VIDEO-STUDIO-03 (K5): the heading as a small uppercase tracked eyebrow.
   heading_style: z.enum(["default", "eyebrow"]).optional(),
   bind: BindingSchema,
+  poll_while: PollWhileFieldSchema.optional(),
   item_key_field: z.string(),
   item_label_field: z.string(),
   item_subtitle_field: z.string().optional(),
@@ -732,6 +736,11 @@ export type FeedHandler = z.infer<typeof FeedHandlerSchema>;
 export const FEED_HANDLER_KEYS = ["stop", "retry", "make_another", "render", "another_still", "edit_words", "favorite"] as const;
 export type FeedHandlerKey = (typeof FEED_HANDLER_KEYS)[number];
 
+export const ResultFeedPollWhileSchema = z.object({
+  statuses: z.array(z.enum(["queued", "generating"])).min(1),
+  record: z.object({ path: z.string().regex(/^[a-z][a-z0-9-]*$/).max(40), params: z.record(z.string(), z.unknown()).optional() }).strict(),
+}).strict();
+
 export const ResultFeedNodeSchema = z.object({
   type: z.literal("result_feed"),
   bind: BindingSchema,
@@ -802,12 +811,7 @@ export const ResultFeedNodeSchema = z.object({
   filters_presentation: z.enum(["inline", "popover"]).default("inline"),
   // VIDEO-STUDIO-03 (K5): the day headings and filter labels as a small uppercase tracked eyebrow.
   heading_style: z.enum(["default", "eyebrow"]).optional(),
-  poll_while: z
-    .object({
-      statuses: z.array(z.enum(["queued", "generating"])).min(1),
-      record: z.object({ path: z.string().regex(/^[a-z][a-z0-9-]*$/).max(40), params: z.record(z.string(), z.unknown()).optional() }).strict(),
-    })
-    .strict(),
+  poll_while: ResultFeedPollWhileSchema,
   empty_state: EmptyStateNodeSchema.optional(),
 });
 export type ResultFeedNode = z.infer<typeof ResultFeedNodeSchema>;

@@ -1,3 +1,7 @@
+## [ui-v0.5.664] - 2026-11-13
+
+- `media_shelf.poll_while` takes `{ field, values }`: while a row field such as `badge` matches one of the configured values, the shelf refetches its whole bound list every three seconds. It pauses while the tab is hidden, resumes when visible, and keeps the current tiles on screen during each refresh.
+
 ## [ui-v0.5.663] - 2026-11-13
 
 - A `prompt_bar` reference takes `max` (1 to 3, default 1). Picture and character slots can add up to that many distinct references, show each as its own tile with a numbered remove control, and send their ids joined by commas in state and submit arguments. Existing single reference values stay unchanged.
