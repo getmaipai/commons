@@ -1,3 +1,7 @@
+## [spec-v0.1.376] - 2026-11-13
+
+- EDITOR-HANDOFF, additive. `image_editor` gains `actions` (up to three `{ label, action }`): the page's own hand-offs for the picture on screen, drawn as header buttons; each runs its action with `{file}` set to the Library file id of the version being shown and starts nothing itself.
+
 ## [spec-v0.1.375] - 2026-11-13
 
 - EDITOR-AGE-ADD and EDITOR-TOOLS-READY, additive. `image_editor` gains `add_picture` (`{ label, action }`: an "Add a picture" control that opens the host's media picker and hands the chosen file id to `action` as `{id}`). A row of `operations` may carry `tool` (markup, comment, remove_background, erase, resize, crop or adjust): it is then the readiness of that built-in tool, `{ tool, enabled, reason }`, and is never listed under More. `handlers.pick_reference` is now run with `{ file, ref }` (`ref` is the Library file id the person chose in the host's picker).

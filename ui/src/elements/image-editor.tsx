@@ -191,6 +191,13 @@ export type ImageEditorOperation =
   /** One of the host's `operations`, by id, with the values of its controls. */
   | { operation: "custom"; id: string; args: Record<string, ImageEditorOperationValue> };
 
+/** EDITOR-HANDOFF: one hand-off the host offers for the picture being shown. */
+export interface ImageEditorAction {
+  key: string;
+  label: string;
+  onSelect: (version: ImageEditorVersion) => void;
+}
+
 /** A picture the person chose as a reference for a Comment. */
 export interface ImageEditorReference {
   id: string;
@@ -243,6 +250,8 @@ export interface ImageEditorProps {
   onShare?: (version: ImageEditorVersion) => void;
   /** EDITOR-07: opens the picture being shown in the host's full Studio (the chat canvas sets it for a picture that is a Library file). The editor draws "Open in Studio" beside Share when set. */
   onOpenInStudio?: (version: ImageEditorVersion) => void;
+  /** EDITOR-HANDOFF: the host's own hand-offs for the picture being shown ("Make a video from this"). Each is a quiet header button that calls `onSelect` with the current version; the host opens its own form and starts nothing. */
+  actions?: readonly ImageEditorAction[];
   downloadName?: string;
   onClose: () => void;
   errorMessage?: string | null;
@@ -484,6 +493,7 @@ export function ImageEditor({
   onComment,
   onShare,
   onOpenInStudio,
+  actions,
   downloadName,
   onClose,
   errorMessage,
@@ -1019,6 +1029,11 @@ export function ImageEditor({
           </Button>
         )
       ) : null}
+      {current ? (actions ?? []).map((action) => (
+        <Button key={action.key} type="button" variant="ghost" size="sm" data-slot="image-editor-action" onClick={() => action.onSelect(current)}>
+          {action.label}
+        </Button>
+      )) : null}
       {onShare && current ? (
         compact ? (
           <ToolButton label={i18n._({ id: "ui.Share", message: "Share" })} side="bottom" onClick={() => onShare(current)}>

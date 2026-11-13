@@ -309,6 +309,9 @@ function EditorOpen({ node, row, operations, toolStates }: { node: ImageEditorNo
     return null;
   }, [tools, toolStates]);
 
+  // EDITOR-HANDOFF: the page's own hand-offs; each runs its action with the version on screen as `{file}` and starts nothing itself.
+  const handoffs = useMemo(() => (node.actions ?? []).map((a, i) => ({ key: `action-${i}`, label: a.label, onSelect: (version: ImageEditorVersion) => dispatch(a.action, [{ file: version.id }]) })), [node.actions, dispatch]);
+
   const shownOperations = !node.tools || node.tools.includes("more") ? operations : undefined;
 
   const onRunOperation = useCallback(
@@ -414,6 +417,7 @@ function EditorOpen({ node, row, operations, toolStates }: { node: ImageEditorNo
         compare={node.compare}
         commentBrush={node.comment_brush && !!handlers.comment}
         onPickReference={onPickReference}
+        actions={handoffs}
         onRunOperation={onRunOperation}
         onApplyPending={onApplyPending}
         onSaveMarkup={onSaveMarkup}

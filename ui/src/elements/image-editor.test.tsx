@@ -155,6 +155,17 @@ describe("layout and names", () => {
     expect(onOpenInStudio.mock.calls[0]![0]).toEqual(versions[1]!);
   });
 
+  test("a host hand-off is a header button that calls onSelect with the current version (EDITOR-HANDOFF)", () => {
+    const first = setup();
+    expect(first.container.querySelector("[data-slot=image-editor-action]")).toBeNull();
+    cleanup();
+    const onSelect = mock((_v: ImageEditorVersion) => {});
+    const v = setup({ actions: [{ key: "video", label: "Make a video from this", onSelect }] });
+    fireEvent.click(v.getByRole("button", { name: "Make a video from this" }));
+    expect(onSelect).toHaveBeenCalledTimes(1);
+    expect(onSelect.mock.calls[0]![0]).toEqual(versions[1]!);
+  });
+
   test("Download triggers an anchor download of the current version", () => {
     const v = setup({ downloadName: "sunset.png" });
     fireEvent.click(v.getByRole("button", { name: "Download" }));

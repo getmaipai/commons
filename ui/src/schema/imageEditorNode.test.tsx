@@ -274,6 +274,19 @@ describe("image_editor node: Add a picture, reference picture, tools not ready (
     expect(calls.find((c) => c.url.endsWith("/actions/comment"))!.body).toMatchObject({ reference: { id: "lib-7", label: "Dog.png" } });
   });
 
+  test("a hand-off runs its action with the version on screen as {file}, and nothing else", async () => {
+    const n = ImageEditorNodeSchema.parse({
+      type: "image_editor",
+      bind: { source: "package", path: "picture", params: { id: "$state.file" } },
+      actions: [{ label: "Make a video from this", action: { call: { target: "/api/plugins/images/actions/handoff", args: { picture: "{file}" } } } }],
+    }) as unknown as UiNode;
+    const { findByRole } = renderWithQueryClient(<Harness n={n} />);
+    fireEvent.click(await findByRole("button", { name: "Make a video from this" }));
+    await waitFor(() => expect(calls.some((c) => c.url.endsWith("/actions/handoff"))).toBe(true));
+    expect(calls.find((c) => c.url.endsWith("/actions/handoff"))!.body).toMatchObject({ picture: "lib-2" });
+    expect(calls.filter((c) => c.url.includes("/actions/")).length).toBe(1);
+  });
+
   test("a row with a tool says that tool is not ready: it is drawn disabled before any click with one line of why, and it is not listed under More", async () => {
     const baseFetch = globalThis.fetch;
     globalThis.fetch = mock((input: RequestInfo | URL, init?: RequestInit) => {

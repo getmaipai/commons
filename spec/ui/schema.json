@@ -829,6 +829,12 @@
           "description": "EDITOR-AGE-ADD: an \"Add a picture\" control for a page whose editor has no picture open. It opens the host's own media picker (the person's Library pictures, or an upload through the Library's own route with its gates); the chosen file's id is given to `action` as `{id}` (usually a `navigate` that writes it to the page state). It is drawn as the main action of the placeholder row's empty state (the empty state's own action moves to the second place) and as a button under the page's picker, which is where `hide_when_empty` otherwise draws nothing. A host with no picker draws it disabled with the reason.",
           "properties": { "label": { "type": "string", "minLength": 1, "maxLength": 40 }, "action": { "$ref": "#/$defs/action" } }
         },
+        "actions": {
+          "type": "array",
+          "maxItems": 3,
+          "items": { "type": "object", "additionalProperties": false, "required": ["label", "action"], "properties": { "label": { "type": "string", "minLength": 1, "maxLength": 40 }, "action": { "$ref": "#/$defs/action" } } },
+          "description": "EDITOR-HANDOFF: the page's own hand-offs for the picture on screen, drawn as quiet buttons in the editor's header (for example \"Make a video from this\", a `navigate` to the Video Create form with `state: { start_frame: \"{file}\" }`). `{file}` is the Library file id of the version being shown. A hand-off fills a form and starts nothing."
+        },
         "handlers": {
           "type": "object",
           "additionalProperties": false,

@@ -1,3 +1,7 @@
+## [ui-v0.5.629] - 2026-11-13
+
+- EDITOR-HANDOFF, additive, with spec 0.1.376. `ImageEditor` gains `actions` (`{ key, label, onSelect }`): quiet header buttons for the host's own hand-offs, called with the current version. `image_editor` gains `actions`, so a page can offer "Make a video from this" (a `navigate` to the Video Create form with the picture as its start picture) without a wrapper.
+
 ## [ui-v0.5.628] - 2026-11-13
 
 - EDITOR-AGE-ADD, EDITOR-TOOLS-READY and EDITOR-07, additive, with spec 0.1.375. `image_editor` draws "Add a picture" (the host's `pickMedia`, which lists the person's Library pictures and takes an upload through the Library's own route) as the main action of its empty state and as a button under the page's picker; with no picker the button is disabled and says why. Its Comment "Add a reference picture" now opens the host's picker first, then asks `pick_reference` with `{ file, ref }`. Rows of `operations` with a `tool` set a built-in tool's readiness: a tool the host says is not ready is drawn disabled from the start and its reason is the editor's one line before any click (the host's `makingNotice("picture")` when the row has no words). `ImageEditor` gains `onOpenInStudio`, drawn as "Open in Studio" beside Share.
