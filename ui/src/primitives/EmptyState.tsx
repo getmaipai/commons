@@ -7,6 +7,9 @@ interface EmptyStateProps {
   text: string;
   actionLabel?: string;
   onAction?: () => void;
+  /** A quiet second button beside the first (only drawn with the first). */
+  secondaryLabel?: string;
+  onSecondary?: () => void;
   variant?: "default" | "tile";
   title?: string;
   accent?: "primary" | "create" | "hero";
@@ -16,7 +19,7 @@ interface EmptyStateProps {
 // action here is a plain callback rather than the schema's typed `action`
 // union (navigate/call/play/confirm/ask). That dispatch belongs to the
 // generic UiNode interpreter, deferred (home/docs/dev.md, this slice).
-export function EmptyState({ icon, text, actionLabel, onAction, variant = "default", title, accent = "primary" }: EmptyStateProps) {
+export function EmptyState({ icon, text, actionLabel, onAction, secondaryLabel, onSecondary, variant = "default", title, accent = "primary" }: EmptyStateProps) {
   const Icon = getIcon(icon);
   if (variant === "tile") return (
     <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
@@ -36,9 +39,16 @@ export function EmptyState({ icon, text, actionLabel, onAction, variant = "defau
       <Icon className="h-10 w-10 text-[var(--muted-foreground)]" aria-hidden />
       <p className="text-base text-[var(--muted-foreground)]">{text}</p>
       {actionLabel && onAction ? (
-        <Button variant="secondary" onClick={onAction}>
-          {actionLabel}
-        </Button>
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <Button variant="secondary" onClick={onAction}>
+            {actionLabel}
+          </Button>
+          {secondaryLabel && onSecondary ? (
+            <Button variant="ghost" onClick={onSecondary}>
+              {secondaryLabel}
+            </Button>
+          ) : null}
+        </div>
       ) : null}
     </div>
   );

@@ -72,6 +72,9 @@ export const EmptyStateNodeSchema = z.object({
   action: ActionSchema.optional(),
   /** The button's own words for the action (spec `empty_state.action_label`); without it the kit derives a plain label. */
   action_label: z.string().min(1).max(40).optional(),
+  /** A second way forward, drawn as a quiet button beside the first (spec `empty_state.secondary_action`). Only drawn when `action` is set. */
+  secondary_action: ActionSchema.optional(),
+  secondary_action_label: z.string().min(1).max(40).optional(),
 });
 export type EmptyStateNode = z.infer<typeof EmptyStateNodeSchema>;
 
@@ -831,9 +834,11 @@ export const ImageEditorNodeSchema = z.object({
   type: z.literal("image_editor"),
   bind: BindingSchema,
   fields: z
-    .object({ key: z.string().optional(), title: z.string().optional(), url: z.string().optional(), width: z.string().optional(), height: z.string().optional(), versions: z.string().optional(), locked: z.string().optional() })
+    .object({ key: z.string().optional(), title: z.string().optional(), url: z.string().optional(), width: z.string().optional(), height: z.string().optional(), versions: z.string().optional(), locked: z.string().optional(), empty: z.string().optional() })
     .strict()
     .optional(),
+  empty_state: EmptyStateNodeSchema.optional(),
+  hide_when_empty: z.boolean().default(false),
   initial_tool: z.enum(IMAGE_EDITOR_TOOLS).optional(),
   tools: z.array(z.enum(IMAGE_EDITOR_TOOLS)).max(8).refine((a) => new Set(a).size === a.length, "tools are unique").optional(),
   tool_reasons: z

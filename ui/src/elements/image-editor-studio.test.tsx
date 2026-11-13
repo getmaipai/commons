@@ -250,6 +250,22 @@ describe("compare", () => {
     expect(v.queryByRole("slider", { name: "Before and after divider" })).toBeNull();
   });
 
+  test("after a crop or a turn the before side is the newest earlier picture of the same shape, and with none Compare is off and says why", () => {
+    const cropped: ImageEditorVersion[] = [
+      { id: "v1", url: "https://example.test/v1.png", label: "Original", width: 1200, height: 800 },
+      { id: "v2", url: "https://example.test/v2.png", label: "Edited", width: 1200, height: 800 },
+      { id: "v3", url: "https://example.test/v3.png", label: "Cropped to 800 x 800", width: 800, height: 800 },
+    ];
+    const first = setup({ compare: true, versions: cropped, currentVersionId: "v3" });
+    expect(first.getByRole("button", { name: "Compare" })).toBeDisabled();
+    expect(first.container.querySelector("[data-slot=image-editor-compare-toggle]")!.parentElement!.getAttribute("tabindex")).toBe("0");
+    cleanup();
+    const second = setup({ compare: true, versions: [...cropped, { id: "v4", url: "https://example.test/v4.png", label: "Adjusted", width: 800, height: 800 }], currentVersionId: "v4" });
+    fireEvent.click(second.getByRole("button", { name: "Compare" }));
+    const images = Array.from(second.container.querySelectorAll("[data-slot=image-editor-compare] img")).map((i) => i.getAttribute("src"));
+    expect(images).toEqual(["https://example.test/v3.png", "https://example.test/v4.png"]);
+  });
+
   test("dragging the divider places it where the pointer is", () => {
     layOut();
     const v = setup({ compare: true });
@@ -383,5 +399,23 @@ describe("keyboard and tool opening", () => {
     cleanup();
     const b = setup({ initialTool: "crop", tools: { ...studioTools, crop: { enabled: false, reason: "no" } } });
     expect(b.queryByRole("group", { name: /Crop frame/ })).toBeNull();
+  });
+});
+
+describe("versions menu", () => {
+  test("a version's long label is cut with an ellipsis inside a column that can shrink, and its time stays", async () => {
+    const long: ImageEditorVersion[] = [
+      { id: "v1", url: "https://example.test/v1.png", label: "Original", width: 1200, height: 800 },
+      { id: "v2", url: "https://example.test/v2.png", label: "Cropped to 800 x 1200 and then some more words", width: 800, height: 1200, createdAt: new Date(Date.now() - 60_000).toISOString() },
+    ];
+    const v = setup({ versions: long, currentVersionId: "v2" });
+    fireEvent.click(v.getByRole("button", { name: "Versions" }));
+    const list = await waitFor(() => document.querySelector("ul[aria-label=Versions]")!);
+    expect(list.className).toContain("grid-cols-[minmax(0,1fr)]");
+    const label = Array.from(list.querySelectorAll("span")).find((s) => s.textContent?.startsWith("Cropped to"))!;
+    expect(label.className).toContain("truncate");
+    expect(label.className).toContain("min-w-0");
+    expect(list.textContent).toMatch(/1m/);
+    fireEvent.keyDown(document.body, { key: "Escape" });
   });
 });

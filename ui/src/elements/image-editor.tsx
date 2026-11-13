@@ -88,6 +88,7 @@ import {
   adjustChanged,
   adjustFilter,
   aspectRatioOf,
+  compareBase,
   canRedoStroke,
   canUndoStroke,
   clampBrush,
@@ -564,8 +565,8 @@ export function ImageEditor({
   const interactive = !locked && !pending;
   const brushing = mode === "erase" || (mode === "comment" && commentBrush && commentTool === "brush");
   const layer = mode === "markup" ? markup : brushing ? mask : null;
-  const original = versions[0];
-  const canCompare = compare && !!original && !!current && (current.id !== original.id || pending !== null);
+  const original = compareBase(versions, currentVersionId, natural, pending !== null, (version) => naturalByUrl[version.url] ?? null) ?? undefined;
+  const canCompare = compare && !!original && !!current;
   const strokePx = natural ? markupStrokePx(markupSize, natural) : 4;
   const selectedColor = PALETTE.find((color) => color.key === colorKey) ?? PALETTE[0]!;
 
@@ -963,9 +964,9 @@ export function ImageEditor({
           <TooltipContent side="bottom">{i18n._({ id: "ui.Versions", message: "Versions" })}</TooltipContent>
         </Tooltip>
         <PopoverContent align="end" width="auto" className="w-72 max-w-[calc(100vw-2rem)]">
-          <ul className="grid gap-1" aria-label={i18n._({ id: "ui.Versions", message: "Versions" })}>
+          <ul className="grid grid-cols-[minmax(0,1fr)] gap-1" aria-label={i18n._({ id: "ui.Versions", message: "Versions" })}>
             {versions.map((version) => (
-              <li key={version.id}>
+              <li key={version.id} className="min-w-0">
                 <Button
                   type="button"
                   variant="ghost"
@@ -1791,8 +1792,12 @@ export function ImageEditor({
               </TooltipTrigger>
               <TooltipContent side="top">
                 {canCompare
-                  ? i18n._({ id: "ui.Compare with the original (C)", message: "Compare with the original (C)" })
-                  : i18n._({ id: "ui.Nothing to compare yet: this is the original picture.", message: "Nothing to compare yet: this is the original picture." })}
+                  ? original && versions[0]?.id === original.id
+                    ? i18n._({ id: "ui.Compare with the original (C)", message: "Compare with the original (C)" })
+                    : i18n._({ id: "ui.Compare with the earlier version (C)", message: "Compare with the earlier version (C)" })
+                  : current && versions[0]?.id === current.id
+                    ? i18n._({ id: "ui.Nothing to compare yet: this is the original picture.", message: "Nothing to compare yet: this is the original picture." })
+                    : i18n._({ id: "ui.Nothing the same shape to compare with yet.", message: "Nothing the same shape to compare with yet." })}
               </TooltipContent>
             </Tooltip>
           ) : null}

@@ -122,6 +122,8 @@ function EmptyStateNodeView({ node }: { node: EmptyStateNode }) {
       text={node.text}
       actionLabel={node.action ? (node.action_label ?? actionLabel(node.action)) : undefined}
       onAction={node.action ? () => dispatch(node.action!) : undefined}
+      secondaryLabel={node.action && node.secondary_action ? (node.secondary_action_label ?? actionLabel(node.secondary_action)) : undefined}
+      onSecondary={node.action && node.secondary_action ? () => dispatch(node.secondary_action!) : undefined}
     />
   );
 }

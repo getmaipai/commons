@@ -227,6 +227,42 @@ export function stepVersion<T extends VersionLike>(versions: readonly T[], curre
   return versions[index + direction] ?? null;
 }
 
+export interface SizedVersion extends VersionLike {
+  width?: number;
+  height?: number;
+}
+
+const SHAPE_TOLERANCE = 0.005;
+
+/** True when two sizes are the same shape (width over height, within half a percent). An unknown size cannot prove a difference, so it matches. */
+export function sameShape(a: { width: number; height: number } | null | undefined, b: { width: number; height: number } | null | undefined): boolean {
+  if (!a || !b || !(a.width > 0) || !(a.height > 0) || !(b.width > 0) || !(b.height > 0)) return true;
+  return Math.abs(a.width / a.height - b.width / b.height) <= (a.width / a.height) * SHAPE_TOLERANCE;
+}
+
+/**
+ * The picture Compare shows on the "before" side: the newest version earlier than the current one that has the same shape as what is
+ * shown on the "after" side (a crop or a turn changes the shape, and a picture stretched into another shape is not a comparison).
+ * With a pending preview the current version itself is a candidate (the preview is its result). `sizeOf` supplies a size the version
+ * itself does not carry (measured from the loaded picture). Null when there is none.
+ */
+export function compareBase<T extends SizedVersion>(
+  versions: readonly T[],
+  currentId: string,
+  after: { width: number; height: number } | null,
+  pending: boolean,
+  sizeOf?: (version: T) => { width: number; height: number } | null,
+): T | null {
+  const index = versions.findIndex((version) => version.id === currentId);
+  if (index === -1) return null;
+  for (let at = pending ? index : index - 1; at >= 0; at -= 1) {
+    const version = versions[at]!;
+    const size = version.width && version.height ? { width: version.width, height: version.height } : (sizeOf?.(version) ?? null);
+    if (sameShape(size, after)) return version;
+  }
+  return null;
+}
+
 // ------------------------------------------------------------------- resize
 
 export const RESIZE_MAX = 8000;

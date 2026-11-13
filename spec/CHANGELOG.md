@@ -1,3 +1,7 @@
+## [spec-v0.1.374] - 2026-11-13
+
+- IMG-STUDIO-03, additive. `empty_state` gains `secondary_action` and `secondary_action_label` (a quiet second button, drawn only beside `action`). `image_editor` gains `empty_state`, `hide_when_empty` and `fields.empty` (a placeholder row draws the page's own empty state), and its `apply` and `markup` replies may carry `locked: true` and a `note` (the new version was saved behind the person's lock; the editor keeps the picture being edited and says so).
+
 ## [spec-v0.1.373] - 2026-11-13
 
 - IMG-STUDIO-01, additive. `ui/schema.json` gains the `image_editor` node (the picture Studio): `bind` (one picture row, chosen by a Library file id from page state), `fields`, `initial_tool`, `tools`, `tool_reasons`, `compare`, `comment_brush`, `operations.bind` (the host's one-click operation rows `{ id, label, summary, controls, enabled, reason }`), `handlers` (`run`, `apply`, `markup`, `comment`, `pick_reference`) and `on_close`. It is allowed on a package page (`app-check.ts`).

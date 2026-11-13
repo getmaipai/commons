@@ -526,6 +526,16 @@ describe("UI schema, package apps", () => {
     expect(validate({ ...editor, bind: undefined })).toBe(false);
   });
 
+  test("IMG-STUDIO-03: image_editor takes an empty_state, a placeholder field and hide_when_empty; empty_state takes a second action", () => {
+    const editor = { type: "image_editor", bind: { source: "package", path: "picture" } };
+    const empty = { type: "empty_state", icon: "image", text: "No pictures yet.", action: { navigate: { to: "/apps/image/create" } }, action_label: "Make a picture", secondary_action: { navigate: { to: "/files" } }, secondary_action_label: "Upload a picture" };
+    expect(validate({ ...editor, empty_state: empty, hide_when_empty: true, fields: { empty: "empty" } })).toBe(true);
+    expect(validate({ type: "page", id: "p", title: "P", body: [empty] })).toBe(true);
+    for (const patch of [{ hide_when_empty: "yes" }, { empty_state: { ...empty, icon: undefined } }, { empty_state: { ...empty, secondary_action_label: "" } }, { empty_state: { ...empty, secondary_action_label: "x".repeat(41) } }, { fields: { empty: 1 } }]) {
+      expect(validate({ ...editor, ...patch })).toBe(false);
+    }
+  });
+
   test("VIDEO-STUDIO-04: the studio node (TrackStudio) is additive and strict", () => {
     const studio = { type: "studio", bind: { source: "package", path: "studio" } };
     expect(validate(studio)).toBe(true);

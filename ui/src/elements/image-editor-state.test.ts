@@ -19,6 +19,8 @@ import {
   canUndoStroke,
   clampBrush,
   clampZoom,
+  compareBase,
+  sameShape,
   clientToImage,
   emptyStrokes,
   fitZoom,
@@ -315,5 +317,29 @@ describe("adjust math (IMG-STUDIO-01)", () => {
   });
   test("the picture transform turns then flips, centred", () => {
     expect(pictureTransform({ ...initialCrop, rotate: 90, flipHorizontal: true })).toBe("translate(-50%, -50%) scale(-1, 1) rotate(90deg)");
+  });
+});
+
+describe("compareBase: the before side of Compare", () => {
+  const v = (id: string, width?: number, height?: number) => ({ id, width, height });
+  const chain = [v("a", 1200, 800), v("b", 1200, 800), v("c", 800, 800), v("d", 800, 1200)];
+  test("it is the newest earlier version of the same shape, skipping ones that would be stretched", () => {
+    expect(compareBase(chain, "b", { width: 1200, height: 800 }, false)?.id).toBe("a");
+    expect(compareBase(chain, "c", { width: 800, height: 800 }, false)).toBeNull();
+    expect(compareBase(chain, "d", { width: 800, height: 1200 }, false)).toBeNull();
+    expect(compareBase([...chain, v("e", 400, 600)], "e", { width: 400, height: 600 }, false)?.id).toBe("d");
+  });
+  test("the original on its own has nothing, a pending preview may use the current version, and a same-shape resize still compares", () => {
+    expect(compareBase(chain, "a", { width: 1200, height: 800 }, false)).toBeNull();
+    expect(compareBase(chain, "a", { width: 1200, height: 800 }, true)?.id).toBe("a");
+    expect(compareBase(chain, "c", { width: 1200, height: 1200 }, true)?.id).toBe("c");
+    expect(compareBase(chain, "b", { width: 600, height: 400 }, false)?.id).toBe("a");
+    expect(compareBase(chain, "missing", null, false)).toBeNull();
+  });
+  test("an unknown size cannot prove a difference; a measured one fills it in", () => {
+    expect(sameShape(null, { width: 10, height: 20 })).toBe(true);
+    expect(sameShape({ width: 10, height: 20 }, { width: 20, height: 10 })).toBe(false);
+    expect(compareBase([v("a"), v("b")], "b", { width: 5, height: 5 }, false)?.id).toBe("a");
+    expect(compareBase([v("a"), v("b")], "b", { width: 5, height: 5 }, false, () => ({ width: 9, height: 3 }))).toBeNull();
   });
 });

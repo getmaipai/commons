@@ -1,7 +1,8 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { i18n } from "@/kit/i18n";
 import { AsyncState } from "@/kit/primitives/AsyncState";
 import { LockTile } from "@/kit/elements/adult-lock";
+import { EmptyState } from "@/kit/primitives/EmptyState";
 import {
   ImageEditor,
   type ImageEditorCommentRequest,
@@ -23,6 +24,59 @@ type Row = Record<string, unknown>;
 const str = (v: unknown): string | undefined => (typeof v === "string" && v !== "" ? v : undefined);
 const num = (v: unknown): number | undefined => (typeof v === "number" && Number.isFinite(v) ? v : typeof v === "string" && v.trim() !== "" && Number.isFinite(Number(v)) ? Number(v) : undefined);
 const isRow = (v: unknown): v is Row => typeof v === "object" && v !== null && !Array.isArray(v);
+
+const FIT_MAX_PX = 832;
+
+/**
+ * The height a page gives the editor: from where the editor starts to the bottom of the nearest scrolling area, less that area's (and its
+ * inner boxes') bottom padding, which is where a page keeps room for fixed bars such as a phone's bottom navigation. Null until measured, or
+ * when nothing can be measured (the CSS height then stands). Measured in the scrolling area's own coordinates so scrolling does not change it.
+ */
+export function fitHeightOf(el: HTMLElement): number | null {
+  let pad = 0;
+  let scroller: HTMLElement | null = null;
+  for (let node = el.parentElement; node; node = node.parentElement) {
+    const style = getComputedStyle(node);
+    pad += Number.parseFloat(style.paddingBottom) || 0;
+    if (/(auto|scroll)/.test(style.overflowY) && node.clientHeight > 0) {
+      scroller = node;
+      break;
+    }
+  }
+  const rect = el.getBoundingClientRect();
+  let space: number;
+  if (scroller) space = scroller.clientHeight - (rect.top - scroller.getBoundingClientRect().top + scroller.scrollTop) - pad;
+  else space = window.innerHeight - (rect.top + window.scrollY) - pad;
+  if (!Number.isFinite(space) || space <= 0) return null;
+  return Math.floor(Math.min(FIT_MAX_PX, space));
+}
+
+/** Keeps `ref`'s element at the height its page gives it (see `fitHeightOf`), re-measured when the window or the scrolling area changes size. */
+function useFitHeight(ref: React.RefObject<HTMLElement | null>): number | null {
+  const [height, setHeight] = useState<number | null>(null);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const measure = () => {
+      const next = fitHeightOf(el);
+      setHeight((was) => (was === next ? was : next));
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(measure);
+    for (let node = el.parentElement; node && observer; node = node.parentElement) {
+      if (/(auto|scroll)/.test(getComputedStyle(node).overflowY)) {
+        observer.observe(node);
+        break;
+      }
+    }
+    return () => {
+      window.removeEventListener("resize", measure);
+      observer?.disconnect();
+    };
+  }, [ref]);
+  return height;
+}
 
 function handlerAction(handler: FeedHandler): Action {
   const action: Record<string, unknown> = { ...handler };
@@ -60,6 +114,13 @@ function toVersion(reply: unknown): ImageEditorVersion {
   return { id, url, label: str(r.label) ?? "", width: num(r.width), height: num(r.height), createdAt: str(r.created_at) };
 }
 
+/** A reply that saved the new version behind the person's lock: the picture cannot be shown to them, so the editor keeps the one it had. */
+function lockedNote(reply: unknown): string | null {
+  const r = isRow(reply) ? reply : {};
+  if (r.locked !== true) return null;
+  return str(r.note) ?? i18n._({ id: "ui.Saved to your Library behind your Adult lock. Unlock it there to keep editing it.", message: "Saved to your Library behind your Adult lock. Unlock it there to keep editing it." });
+}
+
 function toVersions(row: Row, f: NonNullable<ImageEditorNode["fields"]>): ImageEditorVersion[] {
   const raw = readField(row, f.versions ?? "versions");
   const listed = Array.isArray(raw)
@@ -75,6 +136,8 @@ function toVersions(row: Row, f: NonNullable<ImageEditorNode["fields"]>): ImageE
 export function ImageEditorNodeView({ node, state }: { node: ImageEditorNode; state: Row }) {
   const query = useBinding<Row | Row[]>(node.bind, state);
   const row = Array.isArray(query.data) ? query.data[0] : query.data;
+  // A page with its own picker draws nothing here until a picture is open.
+  if (node.hide_when_empty && query.data && !query.isError && !row) return null;
   return (
     <AsyncState data={query.data} error={query.isError} isFetching={query.isFetching} onRetry={() => query.refetch()} errorMessage={i18n._({ id: "ui.Could not open this picture.", message: "Could not open this picture." })} isEmpty={() => !row} emptyIcon="image" emptyText={i18n._({ id: "ui.Pick a picture to open it in the Studio.", message: "Pick a picture to open it in the Studio." })}>
       {() => (row ? <EditorRow node={node} state={state} row={row} /> : null)}
@@ -85,7 +148,26 @@ export function ImageEditorNodeView({ node, state }: { node: ImageEditorNode; st
 function EditorRow({ node, state, row }: { node: ImageEditorNode; state: Row; row: Row }) {
   const f = node.fields ?? {};
   if (readField(row, f.locked ?? "locked") === true) return <LockTile making={readField(row, "making") === true} shape="card" />;
+  if (readField(row, f.empty ?? "empty") === true) return <EmptyPlaceholder node={node} />;
   return node.operations ? <WithOperations node={node} state={state} row={row} /> : <EditorOpen node={node} row={row} operations={undefined} />;
+}
+
+/** The page's own words and actions for "no pictures at all" (a placeholder row), instead of the default line. */
+function EmptyPlaceholder({ node }: { node: ImageEditorNode }) {
+  const { dispatch } = useDispatchAction();
+  const empty = node.empty_state;
+  if (!empty) return <EmptyState icon="image" text={i18n._({ id: "ui.Pick a picture to open it in the Studio.", message: "Pick a picture to open it in the Studio." })} />;
+  const label = (action: Action, own: string | undefined) => own ?? ("navigate" in action ? i18n._({ id: "ui.Go", message: "Go" }) : i18n._({ id: "ui.Continue", message: "Continue" }));
+  return (
+    <EmptyState
+      icon={empty.icon}
+      text={empty.text}
+      actionLabel={empty.action ? label(empty.action, empty.action_label) : undefined}
+      onAction={empty.action ? () => dispatch(empty.action!) : undefined}
+      secondaryLabel={empty.action && empty.secondary_action ? label(empty.secondary_action, empty.secondary_action_label) : undefined}
+      onSecondary={empty.action && empty.secondary_action ? () => dispatch(empty.secondary_action!) : undefined}
+    />
+  );
 }
 
 function WithOperations({ node, state, row }: { node: ImageEditorNode; state: Row; row: Row }) {
@@ -110,8 +192,12 @@ function EditorOpen({ node, row, operations }: { node: ImageEditorNode; row: Row
   const rowVersions = toVersions(row, f);
   const [added, setAdded] = useState<ImageEditorVersion[]>([]);
   const versions = useMemo(() => [...rowVersions, ...added.filter((a) => !rowVersions.some((v) => v.id === a.id))], [rowVersions, added]);
+  const [lockNote, setLockNote] = useState<string | null>(null);
+  const lockedIds = useRef(new Set<string>());
   const [currentId, setCurrentId] = useState<string>(() => versions[versions.length - 1]?.id ?? "");
   const handlers = node.handlers ?? {};
+  const frameRef = useRef<HTMLDivElement | null>(null);
+  const fitted = useFitHeight(frameRef);
 
   const call = useCallback(
     (handler: FeedHandler, item: Row): Promise<unknown> =>
@@ -181,8 +267,12 @@ function EditorOpen({ node, row, operations }: { node: ImageEditorNode; row: Row
   const onApplyPending = useCallback(
     async (pending: ImageEditorPending, label: string): Promise<ImageEditorVersion> => {
       if (!handlers.apply) throw new Error(i18n._({ id: "ui.Not set up yet.", message: "Not set up yet." }));
-      const version = toVersion(await call(handlers.apply, { file, token: pending.token, label }));
-      setAdded((list) => [...list, version]);
+      const reply = await call(handlers.apply, { file, token: pending.token, label });
+      const version = toVersion(reply);
+      const note = lockedNote(reply);
+      setLockNote(note);
+      if (note) lockedIds.current.add(version.id);
+      else setAdded((list) => [...list, version]);
       return version;
     },
     [handlers.apply, call, file],
@@ -191,8 +281,12 @@ function EditorOpen({ node, row, operations }: { node: ImageEditorNode; row: Row
   const onSaveMarkup = useCallback(
     async (png: Blob): Promise<ImageEditorVersion> => {
       if (!handlers.markup) throw new Error(i18n._({ id: "ui.Not set up yet.", message: "Not set up yet." }));
-      const version = toVersion(await call(handlers.markup, { file, png: await dataUrl(png) }));
-      setAdded((list) => [...list, version]);
+      const reply = await call(handlers.markup, { file, png: await dataUrl(png) });
+      const version = toVersion(reply);
+      const note = lockedNote(reply);
+      setLockNote(note);
+      if (note) lockedIds.current.add(version.id);
+      else setAdded((list) => [...list, version]);
       return version;
     },
     [handlers.markup, call, file],
@@ -218,13 +312,19 @@ function EditorOpen({ node, row, operations }: { node: ImageEditorNode; row: Row
   }, [handlers.pick_reference, call, file]);
 
   return (
-    <div className="flex h-[min(52rem,calc(100dvh-8rem))] min-h-96 w-full flex-col gap-2" data-slot="image-editor-node">
+    <div ref={frameRef} className="flex h-[min(52rem,calc(100dvh-8rem))] min-h-96 w-full flex-col gap-2" style={fitted ? { height: fitted } : undefined} data-slot="image-editor-node">
       <div className="min-h-0 flex-1">
       <ImageEditor
         title={title}
         versions={versions}
         currentVersionId={versions.some((v) => v.id === currentId) ? currentId : (versions[versions.length - 1]?.id ?? "")}
-        onSelectVersion={setCurrentId}
+        onSelectVersion={(id) => {
+          // The version just saved behind the lock is not in the list: keep the one on screen.
+          if (lockedIds.current.has(id)) return;
+          setLockNote(null);
+          setCurrentId(id);
+        }}
+        statusNote={lockNote}
         tools={tools}
         operations={shownOperations}
         initialTool={node.initial_tool === "more" ? undefined : node.initial_tool}
