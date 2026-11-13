@@ -49,7 +49,7 @@ describe("Thread composerModes (COMPOSER-02)", () => {
     fireEvent.click(view.getByRole("option", { name: "Image" }));
     const shell = view.container.querySelector('[data-slot="aui_composer-shell"]') as HTMLElement;
     expect(shell.getAttribute("data-unified")).toBe("true");
-    expect(shell.style.getPropertyValue("--composer-radius")).toBe("30px");
+    expect(shell.className).toContain("surface-float");
     const chip = view.getByRole("button", { name: "Settings: Landscape" });
     expect(chip.className).not.toMatch(/\bborder\b/);
     expect(chip.closest(".aui-composer-action-wrapper")).not.toBeNull();

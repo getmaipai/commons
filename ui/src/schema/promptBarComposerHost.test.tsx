@@ -78,4 +78,9 @@ describe("prompt_bar with the host's composer modes", () => {
     await waitFor(() => expect(document.querySelector('[data-chip="look"]')).not.toBeNull());
     expect(document.body.textContent).toContain("Anime");
   });
+
+  test("the host's presets draw one Presets pill on the current mode", () => {
+    const view = draw({ composer: { modes, current: "picture", onModeChange: () => {}, presets: { chips: [{ id: "look", label: "Look", group: "Look / Light", value: "none", onValueChange: () => {}, options: [{ value: "none", label: "None" }, { value: "noir", label: "Noir" }] }] } } });
+    expect(view.getByRole("button", { name: "Presets" }).textContent).toBe("Presets");
+  });
 });

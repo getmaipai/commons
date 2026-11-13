@@ -886,7 +886,7 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
 
   // K8: the host's one line while the engine this bar starts is not ready; it stops the bar and is shown instead of an error.
   const modeAction = node.mode_actions?.[mode];
-  const notice = node.starts && !modeAction ? host?.makingNotice?.(node.starts) : undefined;
+  const notice = node.disabled_reason ?? (node.starts && !modeAction ? host?.makingNotice?.(node.starts) : undefined);
 
   const detailValue = node.submit_detail ? (node.submit_detail.state === node.tier?.state ? tier : picked[node.submit_detail.state]) : undefined;
   const submitDetail = node.submit_detail && detailValue !== undefined ? node.submit_detail.labels[String(detailValue)] : undefined;
@@ -920,6 +920,7 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
       icon: m.icon as never,
       primaryLabel: node.submit_label ?? m.primaryLabel,
       ...(node.placeholder ? { placeholder: node.placeholder } : {}),
+      ...(composerHost.presets ? { presets: composerHost.presets } : {}),
       references: refs.map((ref) => ({
         id: ref.state, label: ref.label, kind: ref.kind, value: filled[ref.state]?.id ?? null, thumb: filled[ref.state]?.thumb,
         onPick: () => {

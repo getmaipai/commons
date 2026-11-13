@@ -116,8 +116,9 @@ describe("unified panel look", () => {
     const view = render(<Harness />);
     const panel = view.container.querySelector('[data-slot="prompt-bar-composer"]') as HTMLElement;
     expect(panel.getAttribute("data-unified")).toBe("true");
-    expect(panel.className).toContain("rounded-[30px]");
-    expect(panel.className).toContain("--hairline");
+    expect(panel.className).toContain("surface-float");
+    expect(panel.className).toContain("--elev-2-radius:30px");
+    expect(panel.className).not.toMatch(/\brounded-|\bshadow-|bg-\[/);
     expect(view.getByRole("textbox", { name: "Describe" }).className).toContain("text-xl");
     const chip = view.getByRole("button", { name: "Settings: Landscape" });
     expect(chip.className).not.toMatch(/\bborder\b|bg-background/);
@@ -132,6 +133,54 @@ describe("unified panel look", () => {
     list[0] = { ...list[0]!, chips: [shape(), { id: "n", label: "Count", group: "Settings", value: 1, onValueChange: () => {}, options: [{ value: 1, label: "1" }, { value: 4, label: "4" }] }] };
     const view = render(<Harness list={list} />);
     expect(view.getByRole("button", { name: "Settings: Landscape / 1" }).textContent).toBe("Landscape / 1");
+  });
+});
+
+describe("fixes from use", () => {
+  test("allowEmpty lets a mode submit from its chips alone; other modes still need words", () => {
+    let made = 0;
+    const list = modes();
+    list[0] = { ...list[0]!, allowEmpty: true, primary: { label: "Make sound" } };
+    function Empty({ list: l }: { list: PromptBarMode[] }) {
+      return <PromptBar label="Describe" value="" onValueChange={() => {}} onSubmit={() => { made += 1; }} modes={l} mode="image" onModeChange={() => {}} />;
+    }
+    const view = render(<Empty list={list} />);
+    const go = view.getByRole("button", { name: "Make sound" }) as HTMLButtonElement;
+    expect(go.disabled).toBe(false);
+    fireEvent.click(go);
+    expect(made).toBe(1);
+    cleanup();
+    const strict = render(<Empty list={modes()} />);
+    expect((strict.getByRole("button", { name: "Generate" }) as HTMLButtonElement).disabled).toBe(true);
+  });
+  test("chip popovers scroll inside the available height, and the mode list uses the opaque menu surface", () => {
+    const view = render(<Harness />);
+    fireEvent.click(view.getByRole("button", { name: "Settings: Landscape" }));
+    const pop = document.querySelector('[data-slot="popover-content"]') as HTMLElement;
+    expect(pop.className).toContain("overflow-y-auto");
+    expect(pop.className).toContain("--radix-popover-content-available-height");
+    fireEvent.click(view.getByRole("button", { name: "Mode: Image" }));
+    const list = view.getByRole("listbox", { name: "Composer modes" });
+    expect(list.className).toContain("surface-menu");
+    expect(list.className).not.toMatch(/bg-popover\/|backdrop-blur/);
+  });
+  test("on a phone the chips take their own line above the bottom row (the submit never sits in the scroll area)", () => {
+    const view = render(<Harness />);
+    const row = view.container.querySelector('[data-slot="prompt-bar-composer-controls"]')!;
+    expect(row.className).toContain("flex-wrap");
+    const zone = row.querySelector('[data-slot="composer-mode-zone"]')!;
+    expect(zone.className).toContain("max-sm:order-first");
+    expect(zone.className).toContain("max-sm:basis-full");
+    expect(zone.contains(view.getByRole("button", { name: "Generate" }))).toBe(false);
+  });
+});
+
+describe("single mode", () => {
+  test("a composer with one mode draws no mode pill, and still shows its slots and chips", () => {
+    const view = render(<Harness list={[modes()[0]!]} />);
+    expect(view.queryByRole("button", { name: /^Mode:/ })).toBeNull();
+    expect(view.getByRole("button", { name: "Add Picture" })).not.toBeNull();
+    expect(view.getByRole("button", { name: "Settings: Landscape" })).not.toBeNull();
   });
 });
 

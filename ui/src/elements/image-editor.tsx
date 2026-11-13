@@ -323,7 +323,7 @@ const messageOf = (error: unknown) =>
 const isEditable = (target: EventTarget | null) =>
   target instanceof Element && target.closest("input, textarea, select, [contenteditable='true']") !== null;
 
-const pill = "bg-popover text-popover-foreground border-border flex items-center gap-1 rounded-full border p-1 shadow-lg";
+const pill = "surface-float text-popover-foreground flex items-center gap-1 p-1";
 
 /** Transparency checkerboard from kit tokens. */
 const checkerboard = {
@@ -1135,7 +1135,7 @@ export function ImageEditor({
   );
 
   const markupBar = (
-    <div className={cn(pill, "max-w-full flex-wrap justify-center overflow-x-auto rounded-2xl")} data-slot="image-editor-markup-bar">
+    <div className={cn(pill, "max-w-full flex-wrap justify-center overflow-x-auto")} data-slot="image-editor-markup-bar">
       <ToggleGroup
         type="single"
         aria-label={i18n._({ id: "ui.Markup tool", message: "Markup tool" })}
@@ -1226,7 +1226,7 @@ export function ImageEditor({
   );
 
   const eraseBar = (
-    <div className={cn(pill, "max-w-full flex-wrap justify-center overflow-x-auto rounded-2xl")} data-slot="image-editor-erase-bar">
+    <div className={cn(pill, "max-w-full flex-wrap justify-center overflow-x-auto")} data-slot="image-editor-erase-bar">
       <span className="text-muted-foreground px-2 text-xs">{i18n._({ id: "ui.Paint over what to erase", message: "Paint over what to erase" })}</span>
       <Slider
         aria-label={i18n._({ id: "ui.Brush size", message: "Brush size" })}
@@ -1256,7 +1256,7 @@ export function ImageEditor({
   );
 
   const commentBar = (
-    <div className={cn(pill, "max-w-full flex-wrap justify-center rounded-2xl")} data-slot="image-editor-comment-bar">
+    <div className={cn(pill, "max-w-full flex-wrap justify-center")} data-slot="image-editor-comment-bar">
       {commentBrush ? (
         <ToggleGroup
           type="single"
@@ -1321,7 +1321,7 @@ export function ImageEditor({
   );
 
   const removeBar = (
-    <div className={cn(pill, "max-w-full flex-wrap justify-center rounded-2xl")} data-slot="image-editor-remove-bar">
+    <div className={cn(pill, "max-w-full flex-wrap justify-center")} data-slot="image-editor-remove-bar">
       <Button type="button" size="sm" disabled={locked} onClick={() => void run({ operation: "remove_background" }, i18n._({ id: "ui.Background removed", message: "Background removed" }))}>
         <WandSparklesIcon aria-hidden />
         {i18n._({ id: "ui.Remove background", message: "Remove background" })}
@@ -1331,7 +1331,7 @@ export function ImageEditor({
 
   const cropFrame = natural ? rotatedSize(natural, crop.rotate) : null;
   const cropBar = (
-    <div className={cn(pill, "max-w-full flex-wrap justify-center rounded-2xl")} data-slot="image-editor-crop-bar">
+    <div className={cn(pill, "max-w-full flex-wrap justify-center")} data-slot="image-editor-crop-bar">
       <ToggleGroup
         type="single"
         variant="outline"
@@ -1379,7 +1379,7 @@ export function ImageEditor({
   );
 
   const adjustBar = (
-    <div className={cn(pill, "max-w-full flex-wrap justify-center gap-x-3 rounded-2xl px-3 py-2")} data-slot="image-editor-adjust-bar">
+    <div className={cn(pill, "max-w-full flex-wrap justify-center gap-x-3 px-3 py-2")} data-slot="image-editor-adjust-bar">
       {ADJUST_KEYS.map((key) => (
         <div key={key} className="grid min-w-32 flex-1 gap-1">
           <div className="flex items-center justify-between gap-2 text-xs">
@@ -1421,7 +1421,7 @@ export function ImageEditor({
   const chosenLevel = chosenOperation?.levels?.find((level) => level.id === moreArgs.level) ?? null;
   const levelOff = chosenLevel !== null && !chosenLevel.enabled;
   const moreBar = (
-    <div className={cn(pill, "max-w-full flex-col items-stretch rounded-2xl px-3 py-2")} data-slot="image-editor-more-bar">
+    <div className={cn(pill, "max-w-full flex-col items-stretch px-3 py-2")} data-slot="image-editor-more-bar">
       <div className="flex flex-wrap items-center justify-center gap-1">
         {(operations ?? []).map((operation) => (
           <Tooltip key={operation.id}>
@@ -1528,7 +1528,7 @@ export function ImageEditor({
   );
 
   const pendingBar = pending ? (
-    <div className={cn(pill, "max-w-full flex-wrap justify-center rounded-2xl")} data-slot="image-editor-pending-bar">
+    <div className={cn(pill, "max-w-full flex-wrap justify-center")} data-slot="image-editor-pending-bar">
       <span className="px-2 text-sm" role="status">
         {i18n._({ id: "ui.Preview: {label}", message: "Preview: {label}", values: { label: pending.label } })}
         {pending.value.transparent ? " " + i18n._({ id: "ui.(transparent areas show as a checkerboard)", message: "(transparent areas show as a checkerboard)" }) : ""}
@@ -1645,7 +1645,7 @@ export function ImageEditor({
   const notices = (
     <div className="flex flex-col items-center gap-2 px-3 empty:hidden" data-slot="image-editor-notices">
       {busy ? (
-        <div role="status" className="bg-popover border-border flex w-full max-w-md items-center gap-3 rounded-2xl border p-3" data-slot="image-editor-busy">
+        <div role="status" className="surface-float flex w-full max-w-md items-center gap-3 p-3" data-slot="image-editor-busy">
           <div className="grid min-w-0 flex-1 gap-2">
             <p className="truncate text-sm">
               {busy.label}

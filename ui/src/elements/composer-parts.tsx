@@ -90,6 +90,8 @@ export interface ComposerModeData {
   /** Why a tool is unavailable right now (a plain line), by tool. */
   toolDisabledReasons?: Partial<Record<ComposerTool, string>>;
   primary?: ComposerPrimaryData;
+  /** A mode that can run on its chips alone ("make a sound"): the primary button is on with no words. Default off. */
+  allowEmpty?: boolean;
   /** The round "+" at the start of the top row (the attach menu). Drawn only when given. */
   onAdd?: () => void;
 }
@@ -201,7 +203,7 @@ export function ComposerModePill({ modes, mode, onModeChange, onChosen }: {
           role="listbox"
           aria-label={i18n._({ id: "ui.Composer modes", message: "Composer modes" })}
           tabIndex={-1}
-          className="absolute bottom-full left-0 z-50 mb-2 min-w-44 motion-reveal rounded-xl border border-border bg-popover/90 p-1.5 text-popover-foreground shadow-lg backdrop-blur-xl"
+          className="absolute bottom-full left-0 z-50 mb-2 min-w-44 motion-reveal surface-menu p-1.5 text-popover-foreground"
           onKeyDown={(e) => {
             if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); setHighlighted((i) => (i + (e.key === "ArrowDown" ? 1 : -1) + modes.length) % modes.length); }
             if (e.key === "Enter") { e.preventDefault(); const chosen = modes[highlighted]; if (chosen) choose(chosen.id); }
@@ -365,7 +367,7 @@ export function ComposerChipPopover({ name, chips, icon, slot = "composer-chip-g
         <Drawer open={open} onOpenChange={setOpen}>
           <DrawerContent aria-describedby={undefined}>
             <DrawerHeader><DrawerTitle>{name}</DrawerTitle></DrawerHeader>
-            <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 pb-4">{body}</div>
+            <div className="flex max-h-[70dvh] min-h-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain px-4 pb-4">{body}</div>
           </DrawerContent>
         </Drawer>
       </>
@@ -374,7 +376,7 @@ export function ComposerChipPopover({ name, chips, icon, slot = "composer-chip-g
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>{trigger}</PopoverTrigger>
-      <PopoverContent align={align} side="top" className="w-80 max-w-[calc(100vw-2rem)]">{body}</PopoverContent>
+      <PopoverContent align={align} side="top" className="max-h-[min(var(--radix-popover-content-available-height),28rem)] w-80 max-w-[calc(100vw-2rem)] overflow-y-auto overscroll-contain">{body}</PopoverContent>
     </Popover>
   );
 }

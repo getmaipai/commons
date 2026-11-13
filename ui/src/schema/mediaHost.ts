@@ -84,6 +84,8 @@ export interface MediaHost {
     current: string;
     onModeChange(id: string, draft: { text: string }): void;
     quality?: readonly string[];
+    /** The Presets pill of the current mode's page (templates, styles, formats): one popover over the chips the host lists. */
+    presets?: import("@/kit/elements/composer-parts").ComposerPresetsData;
   };
   /** VIDEO-CREATE-02: turns a package asset path (a card's `media`) into an address. Absent: `/api/plugins/<package>/assets/<path>`. */
   assetUrl?(packageId: string, path: string): string;

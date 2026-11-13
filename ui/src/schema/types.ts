@@ -617,6 +617,8 @@ export const PromptBarNodeSchema = z.object({
   suggestions: z.array(z.object({ label: z.string().min(1).max(40), text: z.string().min(1).max(300) })).max(4).optional(),
   submit_detail: z.object({ state: z.string().regex(/^[a-z][a-z0-9_]*$/).max(40), placement: z.enum(["below", "in_button"]).optional(), labels: z.record(z.string(), z.string().min(1).max(80)) }).optional(),
   starts: z.enum(["picture", "video"]).optional(),
+  /** A plain line that turns the bar's submit off and is shown under it (a coming-soon page). The host's `makingNotice` is not needed. */
+  disabled_reason: z.string().min(1).max(160).optional(),
   /** STYLES-04: up to `max` removable "suggested style" chips under the prompt, from a bound list of {id, name, kind}. */
   style_suggest: z
     .object({

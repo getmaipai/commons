@@ -1034,7 +1034,7 @@ const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
             data-unified={composerModes && composerVariant !== "pill" ? "true" : undefined}
             style={composerModes && composerVariant !== "pill" ? ({ "--composer-radius": "30px", "--composer-padding": "20px" } as CSSProperties) : undefined}
             data-multiline={multiline ? "" : undefined}
-            className={cn("border-foreground/10 focus-within:border-foreground/25 data-[dragging=true]:border-ring flex w-full cursor-text border bg-(--composer-bg) transition-[border-color]", composerVariant === "pill" ? "items-center gap-1 rounded-full p-1" : "flex-col gap-2 rounded-(--composer-radius) p-(--composer-padding)", "data-[dragging=true]:border-dashed data-[dragging=true]:bg-[color-mix(in_oklab,var(--color-accent)_50%,var(--color-background))]")}
+            className={cn(composerModes && composerVariant !== "pill" ? "surface-float [--elev-2-radius:30px] flex w-full cursor-text flex-col gap-2 p-(--composer-padding) transition-[border-color] data-[dragging=true]:border-ring" : cn("border-foreground/10 focus-within:border-foreground/25 data-[dragging=true]:border-ring flex w-full cursor-text border bg-(--composer-bg) transition-[border-color]", composerVariant === "pill" ? "items-center gap-1 rounded-full p-1" : "flex-col gap-2 rounded-(--composer-radius) p-(--composer-padding)"), "data-[dragging=true]:border-dashed data-[dragging=true]:bg-[color-mix(in_oklab,var(--color-accent)_50%,var(--color-background))]")}
           >
             {composerVariant !== "pill" ? <ComposerAttachments /> : null}
             {composerVariant !== "pill" && ComposerQuotePreview ? <ComposerQuotePreview /> : null}
@@ -1110,7 +1110,7 @@ const ComposerModeLeading: FC<{ composerModes: ThreadComposerModes }> = ({ compo
   const mode = composerModes.modes.find((m) => m.id === composerModes.mode) ?? composerModes.modes[0];
   return (
     <>
-      <ComposerModePill modes={composerModes.modes} mode={composerModes.mode} onModeChange={composerModes.onModeChange} />
+      {composerModes.modes.length > 1 ? <ComposerModePill modes={composerModes.modes} mode={composerModes.mode} onModeChange={composerModes.onModeChange} /> : null}
       <div key={mode?.id} className="motion-fade min-w-0 flex-1 sm:flex-none">
         <ComposerChips chips={mode?.chips ?? []} quality={qualityChipFor(composerModes.quality)} />
       </div>
