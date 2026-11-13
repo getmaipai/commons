@@ -1,0 +1,243 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/scene.schema.json",
+  "title": "Scene",
+  "description": "Runtime-only state for one conversation, held in memory and never stored.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "conversation_id",
+    "people",
+    "speaker",
+    "place",
+    "ambient",
+    "weather",
+    "alone",
+    "child_present",
+    "updated_at"
+  ],
+  "properties": {
+    "conversation_id": {
+      "type": "string"
+    },
+    "people": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "person_id",
+          "label",
+          "relation",
+          "band",
+          "level",
+          "basis",
+          "last_seen_at",
+          "expires_at"
+        ],
+        "properties": {
+          "person_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^person-[a-z0-9]{6,}$"
+          },
+          "label": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "relation": {
+            "type": "string",
+            "enum": [
+              "household",
+              "guest",
+              "pet",
+              "unknown"
+            ]
+          },
+          "band": {
+            "type": "string",
+            "enum": [
+              "child",
+              "teen",
+              "adult",
+              "unknown"
+            ]
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "confirmed",
+              "tentative",
+              "claimed"
+            ]
+          },
+          "basis": {
+            "type": "array",
+            "items": {
+              "$ref": "scene-observation.schema.json#/$defs/sensor"
+            },
+            "minItems": 1
+          },
+          "last_seen_at": {
+            "type": "number"
+          },
+          "expires_at": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "speaker": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "person",
+            "basis",
+            "level"
+          ],
+          "properties": {
+            "person": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^person-[a-z0-9]{6,}$"
+            },
+            "basis": {
+              "type": "string",
+              "enum": [
+                "signed_in",
+                "voice",
+                "face",
+                "voice_and_face",
+                "claimed",
+                "unknown"
+              ]
+            },
+            "level": {
+              "type": "string",
+              "enum": [
+                "confirmed",
+                "tentative",
+                "unknown"
+              ]
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "place": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "where",
+            "setting",
+            "area",
+            "precision",
+            "basis",
+            "expires_at"
+          ],
+          "properties": {
+            "where": {
+              "type": "string",
+              "enum": [
+                "home",
+                "away",
+                "unknown"
+              ]
+            },
+            "setting": {
+              "type": "string",
+              "enum": [
+                "indoor",
+                "outdoor",
+                "vehicle",
+                "unknown"
+              ]
+            },
+            "area": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "precision": {
+              "type": "string",
+              "enum": [
+                "area",
+                "room"
+              ]
+            },
+            "basis": {
+              "$ref": "scene-observation.schema.json#/$defs/sensor"
+            },
+            "expires_at": {
+              "type": "number"
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ambient": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "events"
+          ],
+          "properties": {
+            "light": {
+              "$ref": "scene-observation.schema.json#/$defs/bucket"
+            },
+            "temperature": {
+              "$ref": "scene-observation.schema.json#/$defs/bucket"
+            },
+            "noise": {
+              "$ref": "scene-observation.schema.json#/$defs/bucket"
+            },
+            "events": {
+              "type": "array",
+              "items": {
+                "$ref": "scene-observation.schema.json#/$defs/soundEvent"
+              }
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "weather": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": true
+    },
+    "alone": {
+      "type": "boolean"
+    },
+    "child_present": {
+      "type": "boolean"
+    },
+    "updated_at": {
+      "type": "number"
+    }
+  }
+}

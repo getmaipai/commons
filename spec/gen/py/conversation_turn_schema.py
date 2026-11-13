@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, constr
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, RootModel, constr
 
 from . import (
     answer_block_schema,
@@ -66,6 +66,10 @@ class Source(BaseModel):
     url: str | None = None
     site: str | None = None
     snippet: str | None = None
+
+
+class Surface(RootModel[Literal['chat', 'overlay', 'pod', 'robot', 'tv', 'phone']]):
+    root: Literal['chat', 'overlay', 'pod', 'robot', 'tv', 'phone']
 
 
 class Outcome(BaseModel):

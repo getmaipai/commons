@@ -1,3 +1,7 @@
+## [spec-v0.1.386] - 2026-11-13
+
+- SCENE-01a, additive. Adds runtime-only `SceneObservation` and `Scene` schemas for in-memory conversation context, plus generated TypeScript and Python models and validation tests.
+
 ## [spec-v0.1.385] - 2026-11-13
 
 - VIDEO-COMPOSER-03, additive. `prompt_bar` chips and their options take kit icon names (1 to 40 characters), and references take a `disabled_reason` plain line (1 to 120 characters) for the disabled slot and composer's "+" (matches ui 0.5.658). `spec/package.json` is 0.1.385.

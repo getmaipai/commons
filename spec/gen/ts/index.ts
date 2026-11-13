@@ -83,6 +83,8 @@ export * from "./robot-offer.js";
 export * from "./robot-self-test-result.js";
 export * from "./robot-state.js";
 export * from "./safety-result.js";
+export * from "./scene-observation.js";
+export * from "./scene.js";
 export * from "./scheduled-task.js";
 export * from "./search-assist-weights.js";
 export * from "./searxng-engines.js";

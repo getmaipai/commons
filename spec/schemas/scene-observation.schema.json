@@ -1,0 +1,879 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/scene-observation.schema.json",
+  "title": "SceneObservation",
+  "description": "Runtime-only scene input held in memory for one conversation; never stored as a record.",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "sensor": {
+      "type": "string",
+      "enum": [
+        "face",
+        "voice",
+        "typed",
+        "look",
+        "gps",
+        "ha_entity",
+        "robot_room",
+        "signed_in",
+        "sound",
+        "light",
+        "temperature",
+        "motion"
+      ]
+    },
+    "personRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "person_id",
+        "label",
+        "relation",
+        "band",
+        "level"
+      ],
+      "properties": {
+        "person_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^person-[a-z0-9]{6,}$"
+        },
+        "label": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "relation": {
+          "type": "string",
+          "enum": [
+            "household",
+            "guest",
+            "pet",
+            "unknown"
+          ]
+        },
+        "band": {
+          "type": "string",
+          "enum": [
+            "child",
+            "teen",
+            "adult",
+            "unknown"
+          ]
+        },
+        "level": {
+          "type": "string",
+          "enum": [
+            "confirmed",
+            "tentative",
+            "claimed"
+          ]
+        }
+      }
+    },
+    "placeValue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "where",
+        "setting",
+        "area",
+        "precision"
+      ],
+      "properties": {
+        "where": {
+          "type": "string",
+          "enum": [
+            "home",
+            "away",
+            "unknown"
+          ]
+        },
+        "setting": {
+          "type": "string",
+          "enum": [
+            "indoor",
+            "outdoor",
+            "vehicle",
+            "unknown"
+          ]
+        },
+        "area": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "precision": {
+          "type": "string",
+          "enum": [
+            "area",
+            "room"
+          ]
+        }
+      }
+    },
+    "roomValue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "room"
+      ],
+      "properties": {
+        "room": {
+          "type": "string"
+        }
+      }
+    },
+    "soundEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "class",
+        "score"
+      ],
+      "properties": {
+        "class": {
+          "type": "string"
+        },
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "motionValue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state"
+      ],
+      "properties": {
+        "state": {
+          "type": "string",
+          "enum": [
+            "still",
+            "bumped",
+            "lifted",
+            "carried",
+            "set_down",
+            "shaken",
+            "tilted",
+            "tapped",
+            "falling",
+            "rolling"
+          ]
+        },
+        "pose": {
+          "type": "string",
+          "enum": [
+            "upright",
+            "left_side",
+            "right_side",
+            "upside_down",
+            "face_down",
+            "on_back"
+          ]
+        }
+      }
+    },
+    "bucket": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bucket"
+      ],
+      "properties": {
+        "bucket": {
+          "type": "string"
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "surface",
+        "device_id",
+        "sensor"
+      ],
+      "properties": {
+        "surface": {
+          "$ref": "conversation-turn.schema.json#/properties/surface"
+        },
+        "device_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sensor": {
+          "$ref": "#/$defs/sensor"
+        }
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "source",
+        "kind",
+        "value",
+        "confidence",
+        "strength",
+        "at",
+        "expires_at"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "person_here"
+          ]
+        },
+        "value": {
+          "$ref": "#/$defs/personRef"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "strength": {
+          "type": "string",
+          "enum": [
+            "strong",
+            "weak"
+          ]
+        },
+        "at": {
+          "type": "number"
+        },
+        "expires_at": {
+          "type": "number"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "source",
+        "kind",
+        "value",
+        "confidence",
+        "strength",
+        "at",
+        "expires_at"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "person_left"
+          ]
+        },
+        "value": {
+          "$ref": "#/$defs/personRef"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "strength": {
+          "type": "string",
+          "enum": [
+            "strong",
+            "weak"
+          ]
+        },
+        "at": {
+          "type": "number"
+        },
+        "expires_at": {
+          "type": "number"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "source",
+        "kind",
+        "value",
+        "confidence",
+        "strength",
+        "at",
+        "expires_at"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "place"
+          ]
+        },
+        "value": {
+          "$ref": "#/$defs/placeValue"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "strength": {
+          "type": "string",
+          "enum": [
+            "strong",
+            "weak"
+          ]
+        },
+        "at": {
+          "type": "number"
+        },
+        "expires_at": {
+          "type": "number"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "source",
+        "kind",
+        "value",
+        "confidence",
+        "strength",
+        "at",
+        "expires_at"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "room"
+          ]
+        },
+        "value": {
+          "$ref": "#/$defs/roomValue"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "strength": {
+          "type": "string",
+          "enum": [
+            "strong",
+            "weak"
+          ]
+        },
+        "at": {
+          "type": "number"
+        },
+        "expires_at": {
+          "type": "number"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "source",
+        "kind",
+        "value",
+        "confidence",
+        "strength",
+        "at",
+        "expires_at"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "people_count"
+          ]
+        },
+        "value": {
+          "type": "number",
+          "minimum": 0
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "strength": {
+          "type": "string",
+          "enum": [
+            "strong",
+            "weak"
+          ]
+        },
+        "at": {
+          "type": "number"
+        },
+        "expires_at": {
+          "type": "number"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "source",
+        "kind",
+        "value",
+        "confidence",
+        "strength",
+        "at",
+        "expires_at"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "light"
+          ]
+        },
+        "value": {
+          "$ref": "#/$defs/bucket"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "strength": {
+          "type": "string",
+          "enum": [
+            "strong",
+            "weak"
+          ]
+        },
+        "at": {
+          "type": "number"
+        },
+        "expires_at": {
+          "type": "number"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "source",
+        "kind",
+        "value",
+        "confidence",
+        "strength",
+        "at",
+        "expires_at"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "sound_event"
+          ]
+        },
+        "value": {
+          "$ref": "#/$defs/soundEvent"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "strength": {
+          "type": "string",
+          "enum": [
+            "strong",
+            "weak"
+          ]
+        },
+        "at": {
+          "type": "number"
+        },
+        "expires_at": {
+          "type": "number"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "source",
+        "kind",
+        "value",
+        "confidence",
+        "strength",
+        "at",
+        "expires_at"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "temperature"
+          ]
+        },
+        "value": {
+          "$ref": "#/$defs/bucket"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "strength": {
+          "type": "string",
+          "enum": [
+            "strong",
+            "weak"
+          ]
+        },
+        "at": {
+          "type": "number"
+        },
+        "expires_at": {
+          "type": "number"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "source",
+        "kind",
+        "value",
+        "confidence",
+        "strength",
+        "at",
+        "expires_at"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "motion"
+          ]
+        },
+        "value": {
+          "$ref": "#/$defs/motionValue"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "strength": {
+          "type": "string",
+          "enum": [
+            "strong",
+            "weak"
+          ]
+        },
+        "at": {
+          "type": "number"
+        },
+        "expires_at": {
+          "type": "number"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "source",
+        "kind",
+        "value",
+        "confidence",
+        "strength",
+        "at",
+        "expires_at"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "door"
+          ]
+        },
+        "value": {
+          "$ref": "#/$defs/bucket"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "strength": {
+          "type": "string",
+          "enum": [
+            "strong",
+            "weak"
+          ]
+        },
+        "at": {
+          "type": "number"
+        },
+        "expires_at": {
+          "type": "number"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "source",
+        "kind",
+        "value",
+        "confidence",
+        "strength",
+        "at",
+        "expires_at"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "weather"
+          ]
+        },
+        "value": {
+          "$ref": "#/$defs/bucket"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "strength": {
+          "type": "string",
+          "enum": [
+            "strong",
+            "weak"
+          ]
+        },
+        "at": {
+          "type": "number"
+        },
+        "expires_at": {
+          "type": "number"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "source",
+        "kind",
+        "value",
+        "confidence",
+        "strength",
+        "at",
+        "expires_at"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "weather_alert"
+          ]
+        },
+        "value": {
+          "$ref": "#/$defs/bucket"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "strength": {
+          "type": "string",
+          "enum": [
+            "strong",
+            "weak"
+          ]
+        },
+        "at": {
+          "type": "number"
+        },
+        "expires_at": {
+          "type": "number"
+        }
+      }
+    }
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source": {
+      "$ref": "#/$defs/source"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "person_here",
+        "person_left",
+        "place",
+        "room",
+        "people_count",
+        "light",
+        "sound_event",
+        "temperature",
+        "motion",
+        "door",
+        "weather",
+        "weather_alert"
+      ]
+    },
+    "value": {},
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "strength": {
+      "type": "string",
+      "enum": [
+        "strong",
+        "weak"
+      ]
+    },
+    "at": {
+      "type": "number"
+    },
+    "expires_at": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "id",
+    "source",
+    "kind",
+    "value",
+    "confidence",
+    "strength",
+    "at",
+    "expires_at"
+  ]
+}
