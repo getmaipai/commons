@@ -26,6 +26,8 @@ const num = (v: unknown): number | undefined => (typeof v === "number" && Number
 const isRow = (v: unknown): v is Row => typeof v === "object" && v !== null && !Array.isArray(v);
 
 const FIT_MAX_PX = 832;
+/** Left free under the editor so its tool pill never touches a bar fixed to the bottom of the screen. */
+const FIT_GAP_PX = 8;
 
 /**
  * The height a page gives the editor: from where the editor starts to the bottom of the nearest scrolling area, less that area's (and its
@@ -47,6 +49,7 @@ export function fitHeightOf(el: HTMLElement): number | null {
   let space: number;
   if (scroller) space = scroller.clientHeight - (rect.top - scroller.getBoundingClientRect().top + scroller.scrollTop) - pad;
   else space = window.innerHeight - (rect.top + window.scrollY) - pad;
+  space -= FIT_GAP_PX;
   if (!Number.isFinite(space) || space <= 0) return null;
   return Math.floor(Math.min(FIT_MAX_PX, space));
 }

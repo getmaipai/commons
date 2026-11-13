@@ -1504,7 +1504,7 @@ msgstr ""
 #: src/elements/tier-segment.tsx:50
 #: src/primitives/Wizard.tsx:89
 #: src/schema/ClipFeedNodeView.tsx:25
-#: src/schema/ImageEditorNodeView.tsx:160
+#: src/schema/ImageEditorNodeView.tsx:163
 #: src/schema/NodeRenderer.tsx:139
 #: src/schema/NodeRenderer.tsx:140
 #: src/schema/NodeRenderer.tsx:141
@@ -1665,7 +1665,7 @@ msgid "ui.Could not open this clip."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/ImageEditorNodeView.tsx:142
+#: src/schema/ImageEditorNodeView.tsx:145
 msgid "ui.Could not open this picture."
 msgstr ""
 
@@ -2488,7 +2488,7 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/schema/ClipFeedNodeView.tsx:24
-#: src/schema/ImageEditorNodeView.tsx:160
+#: src/schema/ImageEditorNodeView.tsx:163
 #: src/schema/NodeRenderer.tsx:138
 msgid "ui.Go"
 msgstr ""
@@ -3743,7 +3743,7 @@ msgid "ui.Not helpful"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/ImageEditorNodeView.tsx:215
+#: src/schema/ImageEditorNodeView.tsx:218
 msgid "ui.Not offered here."
 msgstr ""
 
@@ -3766,11 +3766,11 @@ msgid "ui.Not set"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/ImageEditorNodeView.tsx:217
-#: src/schema/ImageEditorNodeView.tsx:236
-#: src/schema/ImageEditorNodeView.tsx:269
-#: src/schema/ImageEditorNodeView.tsx:283
-#: src/schema/ImageEditorNodeView.tsx:297
+#: src/schema/ImageEditorNodeView.tsx:220
+#: src/schema/ImageEditorNodeView.tsx:239
+#: src/schema/ImageEditorNodeView.tsx:272
+#: src/schema/ImageEditorNodeView.tsx:286
+#: src/schema/ImageEditorNodeView.tsx:300
 msgid "ui.Not set up yet."
 msgstr ""
 
@@ -4059,7 +4059,7 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/image-editor.tsx:268
-#: src/schema/ImageEditorNodeView.tsx:131
+#: src/schema/ImageEditorNodeView.tsx:134
 msgid "ui.Original"
 msgstr ""
 
@@ -4228,8 +4228,8 @@ msgid "ui.Pick a clip to open it in the Studio."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/ImageEditorNodeView.tsx:142
-#: src/schema/ImageEditorNodeView.tsx:159
+#: src/schema/ImageEditorNodeView.tsx:145
+#: src/schema/ImageEditorNodeView.tsx:162
 msgid "ui.Pick a picture to open it in the Studio."
 msgstr ""
 
@@ -4262,7 +4262,7 @@ msgid "ui.picture"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/ImageEditorNodeView.tsx:191
+#: src/schema/ImageEditorNodeView.tsx:194
 msgid "ui.Picture"
 msgstr ""
 
@@ -5104,7 +5104,7 @@ msgid "ui.Saved"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/ImageEditorNodeView.tsx:121
+#: src/schema/ImageEditorNodeView.tsx:124
 msgid "ui.Saved to your Library behind your Adult lock. Unlock it there to keep editing it."
 msgstr ""
 
@@ -5972,7 +5972,7 @@ msgid "ui.That {word} was not right. Check it and try again."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/ImageEditorNodeView.tsx:104
+#: src/schema/ImageEditorNodeView.tsx:107
 msgid "ui.That change did not come back. Try again."
 msgstr ""
 
@@ -6054,7 +6054,7 @@ msgid "ui.The name was not saved. Check your connection and try again."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/ImageEditorNodeView.tsx:113
+#: src/schema/ImageEditorNodeView.tsx:116
 msgid "ui.The new version could not be saved. Try again."
 msgstr ""
 
@@ -6064,7 +6064,7 @@ msgid "ui.The painted area could not be prepared. Try painting it again."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/ImageEditorNodeView.tsx:92
+#: src/schema/ImageEditorNodeView.tsx:95
 msgid "ui.The picture could not be prepared. Try again."
 msgstr ""
 

@@ -207,12 +207,12 @@ describe("fitHeightOf: the editor fits the room its page gives it", () => {
     Object.defineProperty(scroller, "clientHeight", { value: 756, configurable: true });
     scroller.getBoundingClientRect = () => ({ top: 56, bottom: 812, left: 0, right: 375, width: 375, height: 756, x: 0, y: 56, toJSON() {} }) as DOMRect;
     el.getBoundingClientRect = () => ({ top: 70, bottom: 70, left: 0, right: 0, width: 0, height: 0, x: 0, y: 70, toJSON() {} }) as DOMRect;
-    // 756 - (70 - 56) - 86 = 656
-    expect(fitHeightOf(el)).toBe(656);
+    // 756 - (70 - 56) - 86 - 8 (kept free under the editor) = 648
+    expect(fitHeightOf(el)).toBe(648);
     // Scrolling moves the editor up and the area's scrollTop down by the same amount: the answer does not change.
     scroller.scrollTop = 20;
     el.getBoundingClientRect = () => ({ top: 50, bottom: 50, left: 0, right: 0, width: 0, height: 0, x: 0, y: 50, toJSON() {} }) as DOMRect;
-    expect(fitHeightOf(el)).toBe(656);
+    expect(fitHeightOf(el)).toBe(648);
     // A tall screen is capped, and no room at all leaves the CSS height alone.
     Object.defineProperty(scroller, "clientHeight", { value: 2000, configurable: true });
     expect(fitHeightOf(el)).toBe(832);

@@ -1,3 +1,7 @@
+## [ui-v0.5.627] - 2026-11-13
+
+- IMG-STUDIO-03, additive. The `image_editor` node leaves 8px free under the editor when it fits its page, so the tool pill clears a fixed bottom bar by more than a few pixels.
+
 ## [ui-v0.5.626] - 2026-11-13
 
 - IMG-STUDIO-03, additive fixes found in the first real use of the picture Studio, with spec 0.1.374. The `image_editor` node fits the room its page gives it (the bottom padding a page keeps for fixed bars is left free), so the tool pill and zoom bar stay above a phone's bottom navigation; the chat editor is unchanged. Compare's before side is the newest earlier version of the same shape (never a picture stretched into another shape), and Compare is off with "Nothing the same shape to compare with yet." when there is none. A long version label is cut with an ellipsis and its time stays. `EmptyState` gains `secondaryLabel` and `onSecondary`; `empty_state` gains `secondary_action`; `image_editor` gains `empty_state`, `hide_when_empty` and `fields.empty`; an Apply or Markup reply with `locked: true` keeps the picture on screen and shows its `note` (or "Saved to your Library behind your Adult lock. Unlock it there to keep editing it.").
