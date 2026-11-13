@@ -35,6 +35,23 @@ describe("MediaShelf", () => {
     const before = container.innerHTML;
     rerender(<MediaShelf {...props} layout="rail" artShape="default" density="default" />);
     expect(container.innerHTML).toBe(before);
+    expect(container.querySelector('[data-slot="media-tile-backdrop"]')).toBeNull();
+  });
+
+  test("backdrop decorates each image and contains the sharp art with hover and focus zoom", () => {
+    const { container } = render(<MediaShelf items={tracks} getKey={(t) => t.id} renderItem={() => <img alt="Cover" src="/art.png" className="size-full object-cover" />} look="backdrop" />);
+    const decorations = container.querySelectorAll('[data-slot="media-tile-backdrop"]');
+    expect(decorations).toHaveLength(tracks.length);
+    for (const decoration of decorations) {
+      expect(decoration).toHaveAttribute("aria-hidden", "true");
+      expect(decoration).toHaveAttribute("alt", "");
+      expect(decoration).toHaveAttribute("src", "/art.png");
+    }
+    const main = [...container.querySelectorAll("img")].find((img) => img.dataset.slot !== "media-tile-backdrop")!;
+    expect(main).toHaveClass("object-contain");
+    expect(main.className).toContain("group-hover/tile:scale-[1.03]");
+    expect(main.className).toContain("group-focus-within/tile:scale-[1.03]");
+    expect(main.className).toContain("motion-safe:");
   });
 
   test("headingStyle eyebrow draws the heading as an uppercase tracked line, in a plain and a card shelf; default is unchanged (VIDEO-STUDIO-03)", () => {

@@ -11,7 +11,7 @@ import { Page } from "@/kit/primitives/Page";
 import { NodeRenderer } from "@/kit/schema/NodeRenderer";
 import { PackageScopeContext } from "@/kit/schema/packageScope";
 import { MediaHostContext, PLAY_UNAVAILABLE, type MediaHost, type MediaItemRef } from "@/kit/schema/mediaHost";
-import { PageNodeSchema, type UiNode } from "@/kit/schema/types";
+import { MediaShelfNodeSchema, PageNodeSchema, type UiNode } from "@/kit/schema/types";
 
 // The page fixtures live beside schema.json in this repo's own spec workspace (catalog.test.ts reads it the same way).
 const SPEC_DIR = process.env.MAIPAI_SPEC_DIR ?? fileURLToPath(new URL("../../../spec", import.meta.url));
@@ -70,6 +70,10 @@ const shelf = homePage.body[1]!;
 const billboard = homePage.body[0]!;
 
 describe("media_shelf", () => {
+  test("parses the optional backdrop art look", () => {
+    const node = MediaShelfNodeSchema.parse({ type: "media_shelf", bind: { source: "package", path: "clips", stream: false }, item_key_field: "id", item_label_field: "title", item_media_field: "thumbnail", look: "backdrop" });
+    expect(node.look).toBe("backdrop");
+  });
   test("a tile's on_select plays through the host with the row's id", async () => {
     const onPlay = mock((_id: string, _item: Record<string, unknown>) => {});
     const { findByRole, getByRole } = inVideos(shelf, { onPlay });

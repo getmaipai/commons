@@ -1355,6 +1355,7 @@ function MediaShelfBody({ node, state }: { node: MediaShelfNode; state: Row }) {
             isLocked={(row) => readField(row, node.locked_field ?? "locked") === true}
             isMaking={(row) => readField(row, node.making_field ?? "making") === true}
             aspect={node.aspect}
+            look={node.look}
             heading={pinnedRow ? (node.pinned_heading ?? i18n._({ id: "ui.Pinned", message: "Pinned" })) : node.heading}
             headingStyle={node.heading_style}
             variant={pinnedRow ? "plain" : node.variant}

@@ -229,6 +229,7 @@ export const MediaShelfNodeSchema = z.object({
   reorder: ReorderSchema.optional(),
   item_meta_field: z.string().optional(),
   aspect: z.enum(["wide", "square", "poster"]).default("wide"),
+  look: z.enum(["default", "backdrop"]).optional(),
   // MEDIA-POLISH-01: the frameless row, the vertical (Up next) list, hiding an empty shelf and the See all link.
   variant: z.enum(["card", "plain"]).default("card"),
   orientation: z.enum(["horizontal", "vertical"]).default("horizontal"),

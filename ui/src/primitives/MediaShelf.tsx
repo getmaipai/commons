@@ -39,6 +39,8 @@ interface MediaShelfProps<T> {
    * that wraps to two lines cannot crop the artwork. */
   renderCaption?: (item: T) => ReactNode;
   aspect?: MediaAspect;
+  /** VIDEO-LD-01: a blurred, dimmed image fills the art box behind contained art. */
+  look?: "default" | "backdrop";
   onSelect?: (item: T) => void;
   getLabel?: (item: T) => string;
   isSelected?: (item: T) => boolean;
@@ -152,6 +154,7 @@ export function MediaShelf<T>({
   renderItem,
   renderCaption,
   aspect = "wide",
+  look = "default",
   onSelect,
   getLabel,
   isSelected,
@@ -281,7 +284,7 @@ export function MediaShelf<T>({
                 )}
               >
                 <div className={cn(artClasses, density === "compact" && !circle && "rounded-[var(--media-compact-radius)]")}>
-                  {media}
+                  <TileArtwork media={media} look={look} />
                   <MediaTileOverlay
                     progress={clampProgress(getProgress?.(item))}
                     badge={renderBadge?.(item)}
@@ -392,7 +395,7 @@ export function MediaShelf<T>({
             )}
           >
             <div className={artClasses}>
-              {media}
+              <TileArtwork media={media} look={look} />
               <MediaTileOverlay
                 progress={clampProgress(getProgress?.(item))}
                 badge={renderBadge?.(item)}
@@ -465,6 +468,33 @@ export function MediaShelf<T>({
       ) : content}
     </Frame>
   );
+}
+
+function TileArtwork({ media, look }: { media: ReactNode; look: "default" | "backdrop" }) {
+  if (look !== "backdrop") return <>{media}</>;
+  const image = findTileImage(media);
+  if (!image?.src) return <>{media}</>;
+  return (
+    <>
+      <img src={image.src} alt="" aria-hidden="true" data-slot="media-tile-backdrop" className="pointer-events-none absolute inset-0 size-full scale-110 object-cover opacity-60 blur-xl" />
+      {image.safe
+        ? <SafeImage {...image.props} className={cn(image.props.className, "relative z-0 object-contain motion-safe:transition-transform motion-safe:duration-[var(--motion-pill)] motion-safe:ease-[var(--press-ease)] group-hover/tile:scale-[1.03] group-focus-within/tile:scale-[1.03]")} />
+        : <img {...image.props} src={image.src} alt={image.props.alt ?? ""} className={cn(image.props.className, "relative z-0 object-contain motion-safe:transition-transform motion-safe:duration-[var(--motion-pill)] motion-safe:ease-[var(--press-ease)] group-hover/tile:scale-[1.03] group-focus-within/tile:scale-[1.03]")} />}
+    </>
+  );
+}
+
+function findTileImage(node: ReactNode): { src: string; safe: boolean; props: Record<string, any> } | undefined {
+  if (!isValidElement(node)) return undefined;
+  if (node.type === "img") {
+    const props = node.props as Record<string, any>;
+    return typeof props.src === "string" ? { src: props.src, safe: false, props } : undefined;
+  }
+  if (node.type === SafeImage) {
+    const props = node.props as Record<string, any>;
+    return typeof props.src === "string" ? { src: props.src, safe: true, props } : undefined;
+  }
+  return findTileImage((node.props as { children?: ReactNode }).children);
 }
 
 const PRESS_CLASSES = "motion-safe:transition-[transform,opacity] motion-safe:active:scale-[var(--media-press-scale)]";

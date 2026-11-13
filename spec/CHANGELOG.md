@@ -1800,3 +1800,6 @@ Additive throughout; every existing fixture still validates unchanged.
 ## [spec-v0.1.345] - 2026-11-08
 
 - WEATHER-PRECIP-01: weather cards gain optional precipitation units, 15-minute amounts and hourly and daily rain amounts; existing cards remain valid.
+## [spec-v0.1.372] - 2026-11-13
+
+- VIDEO-LD-01, additive. `media_shelf.look` accepts `default` or `backdrop` (default `default`); backdrop draws blurred art behind the contained image.
