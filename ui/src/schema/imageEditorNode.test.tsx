@@ -1,7 +1,7 @@
 // IMG-STUDIO-01: the image_editor node. Reads one picture row (and its versions), a locked row is one tile with nothing else read, the Element's
 // requests become handler calls with the documented argument names, Apply writes a new version, and the operations list comes from a binding.
 import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
-import { cleanup, fireEvent, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, waitFor, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { renderWithQueryClient } from "../../tests/renderWithQueryClient";
 import { stubMatchMedia } from "../../tests/stubMatchMedia";
@@ -38,7 +38,7 @@ beforeEach(() => {
     calls.push({ url, body });
     const json = (value: unknown) => Promise.resolve(new Response(JSON.stringify(value), { status: 200 }));
     if (url.endsWith("/data/picture")) return json([picture]);
-    if (url.endsWith("/data/operations")) return json([{ id: "blur_background", label: "Blur background", summary: "Blur the background.", controls: [{ kind: "number", name: "radius", label: "Blur", min: 1, max: 40, default: 12 }], enabled: true }, { id: "expand", label: "Expand canvas", enabled: false, reason: "Not ready yet." }]);
+    if (url.endsWith("/data/operations")) return json([{ id: "blur_background", label: "Blur background", summary: "Blur the background.", controls: [{ kind: "number", name: "radius", label: "Blur", min: 1, max: 40, default: 12 }], enabled: true }, { id: "expand", label: "Expand canvas", enabled: false, reason: "Not ready yet." }, { id: "clearer", label: "Make clearer", summary: "Make it clearer.", controls: [{ kind: "choice", name: "level", label: "Level", options: ["quick", "best"] }], levels: [{ id: "quick", label: "Quick", summary: "Fast.", eta: "seconds", enabled: true }, { id: "best", label: "Best", summary: "Careful.", eta: "minutes", enabled: false, reason: "Needs an extra download." }], enabled: true }]);
     if (url.endsWith("/actions/run")) return json({ token: "tok-1", preview_url: "/files/preview.png", width: 600, height: 400 });
     if (url.endsWith("/actions/apply") && applyLocked) return json({ id: "lib-3", url: "/files/lib-3.png", label: body.label, width: 600, height: 400, locked: true });
     if (url.endsWith("/actions/apply")) return json({ id: "lib-3", url: "/files/lib-3.png", label: body.label, width: 600, height: 400 });
@@ -133,6 +133,20 @@ describe("image_editor node", () => {
     fireEvent.click(getByRole("button", { name: "Preview" }));
     await waitFor(() => expect(calls.some((c) => c.url.endsWith("/actions/run"))).toBe(true));
     expect(calls.find((c) => c.url.endsWith("/actions/run"))!.body).toMatchObject({ operation: "blur_background", args: { radius: 12 } });
+  });
+
+  test("a row with levels reaches the editor: each level is drawn, an off one with its reason, and the run carries the chosen level (MAKE-CLEARER-01)", async () => {
+    const { findByRole } = renderWithQueryClient(<Harness />);
+    const getByRole = within(document.body).getByRole;
+    fireEvent.click(await findByRole("radio", { name: "More" }));
+    fireEvent.click(getByRole("button", { name: "Make clearer" }));
+    expect(document.querySelector("[data-level=best]")!.getAttribute("aria-disabled")).toBe("true");
+    fireEvent.click(document.querySelector("[data-level=best]")!);
+    expect(document.querySelector("[data-slot=image-editor-level-line]")!.textContent).toBe("Needs an extra download.");
+    fireEvent.click(document.querySelector("[data-level=quick]")!);
+    fireEvent.click(getByRole("button", { name: "Preview" }));
+    await waitFor(() => expect(calls.some((c) => c.url.endsWith("/actions/run"))).toBe(true));
+    expect(calls.find((c) => c.url.endsWith("/actions/run"))!.body).toMatchObject({ operation: "clearer", args: { level: "quick" } });
   });
 
   test("a node with no operations binding draws no More tool, and tools can be limited", async () => {

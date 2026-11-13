@@ -864,4 +864,31 @@ describe("versions popover", () => {
     fireEvent.click(items[2]!);
     expect(v.props.onSelectVersion).toHaveBeenCalledWith("v3");
   });
+  test("an operation with levels draws each level, picks the first ready one, says its line and time, and keeps an off level with its reason (MAKE-CLEARER-01)", () => {
+    const v = setup({
+      operations: [{
+        id: "clearer", label: "Make clearer", enabled: true,
+        controls: [{ kind: "choice", name: "level", label: "Level", options: ["quick", "better", "best"] }],
+        levels: [
+          { id: "quick", label: "Quick", summary: "Less grain, sharper edges.", eta: "a few seconds", enabled: true },
+          { id: "better", label: "Better", summary: "Smart enlarging.", eta: "about a minute", enabled: true },
+          { id: "best", label: "Best", summary: "The most careful repair.", eta: "a few minutes", enabled: false, reason: "Best quality needs an extra download." },
+        ],
+      }],
+    });
+    fireEvent.click(v.getByRole("radio", { name: "More" }));
+    fireEvent.click(within(document.body).getByRole("button", { name: "Make clearer" }));
+    const line = () => document.querySelector("[data-slot=image-editor-level-line]")!.textContent;
+    const level = (id: string) => document.querySelector(`[data-level=${id}]`)!;
+    expect(line()).toBe("Less grain, sharper edges. Takes a few seconds.");
+    fireEvent.click(level("better"));
+    expect(line()).toBe("Smart enlarging. Takes about a minute.");
+    // Best is there, looks off, and when chosen says why and cannot be previewed.
+    expect(level("best").getAttribute("aria-disabled")).toBe("true");
+    fireEvent.click(level("best"));
+    expect(line()).toBe("Best quality needs an extra download.");
+    expect((within(document.body).getByRole("button", { name: "Preview" }) as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(level("quick"));
+    expect((within(document.body).getByRole("button", { name: "Preview" }) as HTMLButtonElement).disabled).toBe(false);
+  });
 });

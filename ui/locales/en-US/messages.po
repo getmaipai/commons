@@ -24,7 +24,7 @@ msgid "ui.(opens in a new tab)"
 msgstr "(opens in a new tab)"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1483
+#: src/elements/image-editor.tsx:1526
 msgid "ui.(transparent areas show as a checkerboard)"
 msgstr "(transparent areas show as a checkerboard)"
 
@@ -120,7 +120,7 @@ msgid "ui.{current} of {total}"
 msgstr "{current} of {total}"
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1337
+#: src/schema/NodeRenderer.tsx:1401
 msgid "ui.{day}, {count} {noun}"
 msgstr "{day}, {count} {noun}"
 
@@ -312,12 +312,12 @@ msgid "ui.{name}: {label}"
 msgstr "{name}: {label}"
 
 #. js-lingui-explicit-id
-#: src/elements/composer-parts.tsx:315
+#: src/elements/composer-parts.tsx:352
 msgid "ui.{name}: {summary}"
 msgstr "{name}: {summary}"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:395
+#: src/elements/thread.aui.tsx:396
 msgid "ui.{name}. {reason}"
 msgstr "{name}. {reason}"
 
@@ -327,7 +327,7 @@ msgid "ui.{name}'s face, {expression}"
 msgstr "{name}'s face, {expression}"
 
 #. js-lingui-explicit-id
-#: src/elements/prompt-bar.tsx:788
+#: src/elements/prompt-bar.tsx:789
 msgid "ui.{names} and {last}"
 msgstr "{names} and {last}"
 
@@ -403,6 +403,11 @@ msgid "ui.{status}, starts at {start}ms, runs {duration}ms"
 msgstr "{status}, starts at {start}ms, runs {duration}ms"
 
 #. js-lingui-explicit-id
+#: src/elements/image-editor.tsx:1483
+msgid "ui.{summary} Takes {eta}."
+msgstr "{summary} Takes {eta}."
+
+#. js-lingui-explicit-id
 #: src/elements/activity-popover.tsx:59
 #: src/elements/job-progress.tsx:274
 msgid "ui.{title} progress"
@@ -419,8 +424,8 @@ msgid "ui.{title}: {label}"
 msgstr "{title}: {label}"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1109
-#: src/elements/image-editor.tsx:1421
+#: src/elements/image-editor.tsx:1435
+#: src/elements/image-editor.tsx:1605
 msgid "ui.{tool}: {reason}"
 msgstr "{tool}: {reason}"
 
@@ -488,7 +493,7 @@ msgid "ui.{weekday}: high {high}, low {low} {unit}, {pop} percent chance of rain
 msgstr "{weekday}: high {high}, low {low} {unit}, {pop} percent chance of rain"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1349
+#: src/elements/image-editor.tsx:1361
 msgid "ui.{width} x {height}"
 msgstr "{width} x {height}"
 
@@ -599,7 +604,7 @@ msgstr "Account"
 
 #. js-lingui-explicit-id
 #: src/elements/data-table.tsx:217
-#: src/schema/NodeRenderer.tsx:2006
+#: src/schema/NodeRenderer.tsx:2070
 msgid "ui.Actions"
 msgstr "Actions"
 
@@ -620,11 +625,11 @@ msgid "ui.Activity"
 msgstr "Activity"
 
 #. js-lingui-explicit-id
-#: src/elements/composer-parts.tsx:234
+#: src/elements/composer-parts.tsx:259
 #: src/elements/prompt-bar.tsx:332
-#: src/elements/prompt-bar.tsx:530
-#: src/elements/prompt-bar.tsx:719
-#: src/elements/prompt-bar.tsx:735
+#: src/elements/prompt-bar.tsx:531
+#: src/elements/prompt-bar.tsx:720
+#: src/elements/prompt-bar.tsx:736
 msgid "ui.Add {label}"
 msgstr "Add {label}"
 
@@ -651,7 +656,7 @@ msgstr "Add a person…"
 
 #. js-lingui-explicit-id
 #: src/schema/ImageEditorNodeView.tsx:170
-#: src/schema/NodeRenderer.tsx:2046
+#: src/schema/NodeRenderer.tsx:2110
 msgid "ui.Add a picture"
 msgstr "Add a picture"
 
@@ -661,7 +666,7 @@ msgid "ui.Add a place"
 msgstr "Add a place"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1622
+#: src/elements/image-editor.tsx:1732
 msgid "ui.Add a reference picture"
 msgstr "Add a reference picture"
 
@@ -680,6 +685,11 @@ msgstr "Add attachment"
 #: src/elements/attachment.aui.tsx:330
 msgid "ui.Add Attachment"
 msgstr "Add Attachment"
+
+#. js-lingui-explicit-id
+#: src/elements/composer-parts.tsx:227
+msgid "ui.Add files"
+msgstr "Add files"
 
 #. js-lingui-explicit-id
 #: src/elements/weather-forecast-page.tsx:63
@@ -712,7 +722,7 @@ msgid "ui.Adding a picture is not available on this screen."
 msgstr "Adding a picture is not available on this screen."
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:280
+#: src/elements/image-editor.tsx:296
 msgid "ui.Adjust"
 msgstr "Adjust"
 
@@ -865,7 +875,7 @@ msgid "ui.Appearance"
 msgstr "Appearance"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1486
+#: src/elements/image-editor.tsx:1529
 msgid "ui.Apply"
 msgstr "Apply"
 
@@ -890,7 +900,7 @@ msgid "ui.Archive project"
 msgstr "Archive project"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:296
+#: src/elements/image-editor.tsx:312
 msgid "ui.Arrow"
 msgstr "Arrow"
 
@@ -930,12 +940,12 @@ msgid "ui.asking"
 msgstr "asking"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:807
+#: src/elements/thread.aui.tsx:808
 msgid "ui.Assistant is speaking"
 msgstr "Assistant is speaking"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:798
+#: src/elements/thread.aui.tsx:799
 msgid "ui.Assistant said"
 msgstr "Assistant said"
 
@@ -977,12 +987,12 @@ msgid "ui.audio"
 msgstr "audio"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1385
+#: src/elements/image-editor.tsx:1397
 msgid "ui.Auto"
 msgstr "Auto"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:764
+#: src/elements/image-editor.tsx:809
 msgid "ui.Auto tone"
 msgstr "Auto tone"
 
@@ -1017,8 +1027,8 @@ msgid "ui.Back to start"
 msgstr "Back to start"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:867
-#: src/elements/image-editor.tsx:1305
+#: src/elements/image-editor.tsx:918
+#: src/elements/image-editor.tsx:1317
 msgid "ui.Background removed"
 msgstr "Background removed"
 
@@ -1097,20 +1107,20 @@ msgid "ui.Briefcase"
 msgstr "Briefcase"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:287
+#: src/elements/image-editor.tsx:303
 #: src/elements/light-tile.tsx:18
 msgid "ui.Brightness"
 msgstr "Brightness"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1258
-#: src/elements/image-editor.tsx:1260
+#: src/elements/image-editor.tsx:1270
+#: src/elements/image-editor.tsx:1272
 msgid "ui.Brush"
 msgstr "Brush"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1212
-#: src/elements/image-editor.tsx:1268
+#: src/elements/image-editor.tsx:1224
+#: src/elements/image-editor.tsx:1280
 msgid "ui.Brush size"
 msgstr "Brush size"
 
@@ -1147,19 +1157,19 @@ msgstr "Can view"
 #. js-lingui-explicit-id
 #: src/elements/adult-lock.tsx:376
 #: src/elements/feedback-dialog.tsx:174
-#: src/elements/image-editor.tsx:1549
-#: src/elements/image-editor.tsx:1637
+#: src/elements/image-editor.tsx:1659
+#: src/elements/image-editor.tsx:1747
 #: src/elements/job-progress.tsx:194
 #: src/elements/music-edit.tsx:62
 #: src/elements/project-home-page.tsx:29
 #: src/elements/project-settings.tsx:72
 #: src/elements/thread-list.aui.tsx:182
-#: src/elements/thread.aui.tsx:1646
+#: src/elements/thread.aui.tsx:1657
 #: src/elements/tier-segment.tsx:50
 #: src/elements/video-player.tsx:109
 #: src/primitives/Player.tsx:186
 #: src/schema/ConfirmDialog.tsx:83
-#: src/schema/NodeRenderer.tsx:2050
+#: src/schema/NodeRenderer.tsx:2114
 #: src/settings/LocationField.tsx:179
 #: src/settings/SettingRow.tsx:196
 #: src/settings/SettingRow.tsx:222
@@ -1191,7 +1201,7 @@ msgid "ui.Cancelled tool"
 msgstr "Cancelled tool"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:717
+#: src/elements/image-editor.tsx:761
 msgid "ui.Cancelled. Nothing was changed."
 msgstr "Cancelled. Nothing was changed."
 
@@ -1206,7 +1216,7 @@ msgid "ui.Card size"
 msgstr "Card size"
 
 #. js-lingui-explicit-id
-#: src/elements/prompt-bar.tsx:809
+#: src/elements/prompt-bar.tsx:810
 #: src/settings/LocationField.tsx:249
 #: src/settings/SettingRow.tsx:203
 #: src/settings/SettingRow.tsx:261
@@ -1236,14 +1246,14 @@ msgid "ui.Change the song"
 msgstr "Change the song"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:830
+#: src/elements/image-editor.tsx:875
 msgid "ui.Changed as described"
 msgstr "Changed as described"
 
 #. js-lingui-explicit-id
 #: src/primitives/Player.tsx:168
-#: src/schema/NodeRenderer.tsx:1989
-#: src/schema/NodeRenderer.tsx:1996
+#: src/schema/NodeRenderer.tsx:2053
+#: src/schema/NodeRenderer.tsx:2060
 msgid "ui.Chapters"
 msgstr "Chapters"
 
@@ -1298,10 +1308,10 @@ msgid "ui.Choose who in your home can see this. Nothing is sent outside your hom
 msgstr "Choose who in your home can see this. Nothing is sent outside your home, and you can stop at any time."
 
 #. js-lingui-explicit-id
-#: src/elements/composer-parts.tsx:384
-#: src/elements/image-editor.tsx:1200
-#: src/elements/image-editor.tsx:1230
-#: src/elements/image-editor.tsx:1282
+#: src/elements/composer-parts.tsx:421
+#: src/elements/image-editor.tsx:1212
+#: src/elements/image-editor.tsx:1242
+#: src/elements/image-editor.tsx:1294
 #: src/schema/NodeRenderer.tsx:731
 #: src/settings/LocationField.tsx:252
 msgid "ui.Clear"
@@ -1323,7 +1333,7 @@ msgid "ui.Clear view"
 msgstr "Clear view"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1286
+#: src/elements/image-editor.tsx:1298
 msgid "ui.Click a spot or drag a box on the picture"
 msgstr "Click a spot or drag a box on the picture"
 
@@ -1370,7 +1380,7 @@ msgid "ui.Close compare"
 msgstr "Close compare"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:981
+#: src/elements/image-editor.tsx:1032
 msgid "ui.Close editor"
 msgstr "Close editor"
 
@@ -1410,17 +1420,17 @@ msgid "ui.Code"
 msgstr "Code"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1152
+#: src/elements/image-editor.tsx:1164
 msgid "ui.Color"
 msgstr "Color"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1143
+#: src/elements/image-editor.tsx:1155
 msgid "ui.Color: {color}"
 msgstr "Color: {color}"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1155
+#: src/elements/image-editor.tsx:1167
 msgid "ui.Colors"
 msgstr "Colors"
 
@@ -1445,30 +1455,30 @@ msgid "ui.Commands"
 msgstr "Commands"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:275
+#: src/elements/image-editor.tsx:291
 msgid "ui.Comment"
 msgstr "Comment"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1244
+#: src/elements/image-editor.tsx:1256
 msgid "ui.Comment on"
 msgstr "Comment on"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1854
+#: src/elements/image-editor.tsx:1964
 #: src/elements/track-studio-compare-bar.tsx:58
 #: src/elements/track-studio.tsx:556
 msgid "ui.Compare"
 msgstr "Compare"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1862
+#: src/elements/image-editor.tsx:1972
 #: src/elements/track-studio.tsx:562
 msgid "ui.Compare with the earlier version (C)"
 msgstr "Compare with the earlier version (C)"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1861
+#: src/elements/image-editor.tsx:1971
 msgid "ui.Compare with the original (C)"
 msgstr "Compare with the original (C)"
 
@@ -1478,7 +1488,7 @@ msgid "ui.completed"
 msgstr "completed"
 
 #. js-lingui-explicit-id
-#: src/elements/composer-parts.tsx:186
+#: src/elements/composer-parts.tsx:202
 msgid "ui.Composer modes"
 msgstr "Composer modes"
 
@@ -1580,7 +1590,7 @@ msgid "ui.Continue"
 msgstr "Continue"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:288
+#: src/elements/image-editor.tsx:304
 msgid "ui.Contrast"
 msgstr "Contrast"
 
@@ -1601,9 +1611,9 @@ msgstr "Cooling"
 
 #. js-lingui-explicit-id
 #: src/elements/markdown-text.tsx:415
-#: src/elements/thread.aui.tsx:841
-#: src/elements/thread.aui.tsx:1397
-#: src/elements/thread.aui.tsx:1615
+#: src/elements/thread.aui.tsx:842
+#: src/elements/thread.aui.tsx:1408
+#: src/elements/thread.aui.tsx:1626
 msgid "ui.Copy"
 msgstr "Copy"
 
@@ -1633,62 +1643,62 @@ msgid "ui.Could not load settings."
 msgstr "Could not load settings."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1674
+#: src/schema/NodeRenderer.tsx:1738
 msgid "ui.Could not load the featured items."
 msgstr "Could not load the featured items."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1545
+#: src/schema/NodeRenderer.tsx:1609
 msgid "ui.Could not load the top result."
 msgstr "Could not load the top result."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1942
+#: src/schema/NodeRenderer.tsx:2006
 msgid "ui.Could not load the transcript. Check that you are online, then try again."
 msgstr "Could not load the transcript. Check that you are online, then try again."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1568
+#: src/schema/NodeRenderer.tsx:1632
 msgid "ui.Could not load these categories."
 msgstr "Could not load these categories."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:2216
+#: src/schema/NodeRenderer.tsx:2280
 msgid "ui.Could not load these devices."
 msgstr "Could not load these devices."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1525
+#: src/schema/NodeRenderer.tsx:1589
 msgid "ui.Could not load these tiles."
 msgstr "Could not load these tiles."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1592
+#: src/schema/NodeRenderer.tsx:1656
 msgid "ui.Could not load these tracks."
 msgstr "Could not load these tracks."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1721
+#: src/schema/NodeRenderer.tsx:1785
 msgid "ui.Could not load this book."
 msgstr "Could not load this book."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1219
+#: src/schema/NodeRenderer.tsx:1283
 msgid "ui.Could not load this grid."
 msgstr "Could not load this grid."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1768
+#: src/schema/NodeRenderer.tsx:1832
 msgid "ui.Could not load this item."
 msgstr "Could not load this item."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1125
+#: src/schema/NodeRenderer.tsx:1189
 msgid "ui.Could not load this list."
 msgstr "Could not load this list."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1318
+#: src/schema/NodeRenderer.tsx:1382
 msgid "ui.Could not load this shelf."
 msgstr "Could not load this shelf."
 
@@ -1698,12 +1708,12 @@ msgid "ui.Could not load this. Try again."
 msgstr "Could not load this. Try again."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:2153
+#: src/schema/NodeRenderer.tsx:2217
 msgid "ui.Could not load today's cards."
 msgstr "Could not load today's cards."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:2177
+#: src/schema/NodeRenderer.tsx:2241
 msgid "ui.Could not load today's rows."
 msgstr "Could not load today's rows."
 
@@ -1718,7 +1728,7 @@ msgid "ui.Could not load your results."
 msgstr "Could not load your results."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1878
+#: src/schema/NodeRenderer.tsx:1942
 msgid "ui.Could not look for other screens. Check that you are online, then open the menu again."
 msgstr "Could not look for other screens. Check that you are online, then open the menu again."
 
@@ -1738,7 +1748,7 @@ msgid "ui.Could not open this picture."
 msgstr "Could not open this picture."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1879
+#: src/schema/NodeRenderer.tsx:1943
 msgid "ui.Could not play this on the other screen. Make sure it is on and signed in, then try again."
 msgstr "Could not play this on the other screen. Make sure it is on and signed in, then try again."
 
@@ -1758,7 +1768,7 @@ msgid "ui.Could not save the new order."
 msgstr "Could not save the new order."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1758
+#: src/schema/NodeRenderer.tsx:1822
 msgid "ui.Could not save. Check that you are online, then try again."
 msgstr "Could not save. Check that you are online, then try again."
 
@@ -1768,8 +1778,8 @@ msgid "ui.Could not share this link. Copy the address from the browser bar inste
 msgstr "Could not share this link. Copy the address from the browser bar instead."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:2045
-#: src/schema/NodeRenderer.tsx:2045
+#: src/schema/NodeRenderer.tsx:2109
+#: src/schema/NodeRenderer.tsx:2109
 msgid "ui.Cover"
 msgstr "Cover"
 
@@ -1779,7 +1789,7 @@ msgid "ui.Cover art for {title}"
 msgstr "Cover art for {title}"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:279
+#: src/elements/image-editor.tsx:295
 msgid "ui.Crop"
 msgstr "Crop"
 
@@ -1789,12 +1799,12 @@ msgid "ui.Crop frame. Arrow keys move it, Shift and arrow keys resize it."
 msgstr "Crop frame. Arrow keys move it, Shift and arrow keys resize it."
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1318
+#: src/elements/image-editor.tsx:1330
 msgid "ui.Crop shape"
 msgstr "Crop shape"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:757
+#: src/elements/image-editor.tsx:802
 msgid "ui.Cropped to {width} x {height}"
 msgstr "Cropped to {width} x {height}"
 
@@ -1916,8 +1926,8 @@ msgid "ui.Describe a song change to enable Make."
 msgstr "Describe a song change to enable Make."
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1589
-#: src/elements/image-editor.tsx:1590
+#: src/elements/image-editor.tsx:1699
+#: src/elements/image-editor.tsx:1700
 msgid "ui.Describe the change"
 msgstr "Describe the change"
 
@@ -2020,7 +2030,7 @@ msgstr "done"
 
 #. js-lingui-explicit-id
 #: src/elements/activity-feed.tsx:34
-#: src/elements/prompt-bar.tsx:856
+#: src/elements/prompt-bar.tsx:857
 #: src/elements/share-dialog.tsx:130
 #: src/primitives/BatchBar.tsx:40
 #: src/primitives/reorder.tsx:155
@@ -2033,8 +2043,8 @@ msgid "ui.down"
 msgstr "down"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1028
-#: src/elements/image-editor.tsx:1034
+#: src/elements/image-editor.tsx:1079
+#: src/elements/image-editor.tsx:1085
 #: src/elements/music-track.tsx:35
 #: src/elements/video-player.tsx:100
 msgid "ui.Download"
@@ -2103,7 +2113,7 @@ msgstr "Each side can be at most {max} pixels."
 
 #. js-lingui-explicit-id
 #: src/elements/thread-list.aui.tsx:377
-#: src/schema/NodeRenderer.tsx:1337
+#: src/schema/NodeRenderer.tsx:1401
 msgid "ui.Earlier"
 msgstr "Earlier"
 
@@ -2118,7 +2128,7 @@ msgstr "Earlier in {label}"
 #: src/elements/music-track.tsx:35
 #: src/elements/music-track.tsx:67
 #: src/elements/song-style.tsx:67
-#: src/elements/thread.aui.tsx:1610
+#: src/elements/thread.aui.tsx:1621
 #: src/elements/track-studio.tsx:397
 #: src/elements/track-studio.tsx:478
 msgid "ui.Edit"
@@ -2141,7 +2151,7 @@ msgid "ui.Edit picture"
 msgstr "Edit picture"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1824
+#: src/elements/image-editor.tsx:1934
 msgid "ui.Edit picture: {title}"
 msgstr "Edit picture: {title}"
 
@@ -2177,7 +2187,7 @@ msgid "ui.eight"
 msgstr "eight"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:298
+#: src/elements/image-editor.tsx:314
 msgid "ui.Ellipse"
 msgstr "Ellipse"
 
@@ -2245,8 +2255,8 @@ msgid "ui.EQ {band}, gain in decibels"
 msgstr "EQ {band}, gain in decibels"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:277
-#: src/elements/image-editor.tsx:1233
+#: src/elements/image-editor.tsx:293
+#: src/elements/image-editor.tsx:1245
 msgid "ui.Erase"
 msgstr "Erase"
 
@@ -2262,7 +2272,7 @@ msgid "ui.esc"
 msgstr "esc"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:981
+#: src/elements/image-editor.tsx:1032
 msgid "ui.Esc"
 msgstr "Esc"
 
@@ -2287,7 +2297,7 @@ msgid "ui.Export as a new clip"
 msgstr "Export as a new clip"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1458
+#: src/elements/thread.aui.tsx:1469
 msgid "ui.Export as Markdown"
 msgstr "Export as Markdown"
 
@@ -2341,7 +2351,7 @@ msgid "ui.Favorite"
 msgstr "Favorite"
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1343
+#: src/schema/NodeRenderer.tsx:1407
 msgid "ui.Favorite {name}"
 msgstr "Favorite {name}"
 
@@ -2351,7 +2361,7 @@ msgid "ui.Favorites"
 msgstr "Favorites"
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1684
+#: src/schema/NodeRenderer.tsx:1748
 msgid "ui.Featured"
 msgstr "Featured"
 
@@ -2434,7 +2444,7 @@ msgid "ui.Finish"
 msgstr "Finish"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:859
+#: src/elements/image-editor.tsx:909
 msgid "ui.Finish or cancel the current step first."
 msgstr "Finish or cancel the current step first."
 
@@ -2459,7 +2469,7 @@ msgid "ui.First single"
 msgstr "First single"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1674
+#: src/elements/image-editor.tsx:1784
 msgid "ui.Fit"
 msgstr "Fit"
 
@@ -2474,7 +2484,7 @@ msgid "ui.five"
 msgstr "five"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1388
+#: src/elements/image-editor.tsx:1400
 msgid "ui.Fix light and colour for me"
 msgstr "Fix light and colour for me"
 
@@ -2484,12 +2494,12 @@ msgid "ui.Flat. Move a band to shape the sound. You hear it in the preview; the 
 msgstr "Flat. Move a band to shape the sound. You hear it in the preview; the saved song changes when you apply it."
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1341
+#: src/elements/image-editor.tsx:1353
 msgid "ui.Flip horizontal"
 msgstr "Flip horizontal"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1344
+#: src/elements/image-editor.tsx:1356
 msgid "ui.Flip vertical"
 msgstr "Flip vertical"
 
@@ -2524,7 +2534,7 @@ msgid "ui.four"
 msgstr "four"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:284
+#: src/elements/image-editor.tsx:300
 #: src/primitives/StorageBar.tsx:35
 msgid "ui.Free"
 msgstr "Free"
@@ -2630,7 +2640,7 @@ msgid "ui.Heating"
 msgstr "Heating"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:419
+#: src/elements/image-editor.tsx:435
 msgid "ui.Height"
 msgstr "Height"
 
@@ -2642,7 +2652,7 @@ msgid "ui.Help"
 msgstr "Help"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1420
+#: src/elements/thread.aui.tsx:1431
 msgid "ui.Helpful"
 msgstr "Helpful"
 
@@ -2683,12 +2693,12 @@ msgid "ui.High"
 msgstr "High"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:295
+#: src/elements/image-editor.tsx:311
 msgid "ui.Highlighter"
 msgstr "Highlighter"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:969
+#: src/elements/image-editor.tsx:1020
 msgid "ui.History"
 msgstr "History"
 
@@ -2731,7 +2741,7 @@ msgid "ui.Household"
 msgstr "Household"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:868
+#: src/elements/thread.aui.tsx:869
 msgid "ui.How can I help you today?"
 msgstr "How can I help you today?"
 
@@ -2813,7 +2823,7 @@ msgid "ui.Image preview"
 msgstr "Image preview"
 
 #. js-lingui-explicit-id
-#: src/elements/composer-parts.tsx:385
+#: src/elements/composer-parts.tsx:422
 msgid "ui.Improve"
 msgstr "Improve"
 
@@ -2905,12 +2915,12 @@ msgstr "It is deleted from your places. You can add it again by searching."
 
 #. js-lingui-explicit-id
 #: src/primitives/MediaShelf.tsx:201
-#: src/schema/NodeRenderer.tsx:1328
+#: src/schema/NodeRenderer.tsx:1392
 msgid "ui.item"
 msgstr "item"
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1328
+#: src/schema/NodeRenderer.tsx:1392
 msgid "ui.items"
 msgstr "items"
 
@@ -2937,8 +2947,8 @@ msgid "ui.Keep it"
 msgstr "Keep it"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:409
-#: src/elements/image-editor.tsx:416
+#: src/elements/image-editor.tsx:425
+#: src/elements/image-editor.tsx:432
 msgid "ui.Keep proportions"
 msgstr "Keep proportions"
 
@@ -3059,7 +3069,7 @@ msgid "ui.Library folder"
 msgstr "Library folder"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:764
+#: src/elements/image-editor.tsx:809
 msgid "ui.Light and colour adjusted"
 msgstr "Light and colour adjusted"
 
@@ -3124,7 +3134,7 @@ msgid "ui.Loading article"
 msgstr "Loading article"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:420
+#: src/elements/thread.aui.tsx:421
 msgid "ui.Loading conversation"
 msgstr "Loading conversation"
 
@@ -3199,7 +3209,7 @@ msgid "ui.Looking for lyrics..."
 msgstr "Looking for lyrics..."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1917
+#: src/schema/NodeRenderer.tsx:1981
 msgid "ui.Looking for screens"
 msgstr "Looking for screens"
 
@@ -3234,7 +3244,7 @@ msgstr "Lower under speech"
 #: src/elements/lyrics-list.tsx:55
 #: src/elements/music-track.tsx:35
 #: src/primitives/Player.tsx:414
-#: src/schema/NodeRenderer.tsx:1818
+#: src/schema/NodeRenderer.tsx:1882
 msgid "ui.Lyrics"
 msgstr "Lyrics"
 
@@ -3328,12 +3338,12 @@ msgid "ui.Making your video"
 msgstr "Making your video"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:274
+#: src/elements/image-editor.tsx:290
 msgid "ui.Markup"
 msgstr "Markup"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1121
+#: src/elements/image-editor.tsx:1133
 msgid "ui.Markup tool"
 msgstr "Markup tool"
 
@@ -3369,7 +3379,7 @@ msgid "ui.Menu"
 msgstr "Menu"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:989
+#: src/elements/thread.aui.tsx:997
 msgid "ui.Message input"
 msgstr "Message input"
 
@@ -3394,7 +3404,7 @@ msgid "ui.Mixing"
 msgstr "Mixing"
 
 #. js-lingui-explicit-id
-#: src/elements/composer-parts.tsx:175
+#: src/elements/composer-parts.tsx:191
 msgid "ui.Mode: {label}"
 msgstr "Mode: {label}"
 
@@ -3423,14 +3433,14 @@ msgstr "Moon Phase"
 #: src/dashboard/components/ui/breadcrumb.tsx:113
 #: src/elements/creation-header.tsx:75
 #: src/elements/creation-header.tsx:117
-#: src/elements/image-editor.tsx:281
-#: src/elements/thread.aui.tsx:1443
+#: src/elements/image-editor.tsx:297
+#: src/elements/thread.aui.tsx:1454
 #: src/elements/video-player.tsx:111
 #: src/PhoneNav.tsx:130
 #: src/PhoneNav.tsx:137
 #: src/PhoneNav.tsx:145
 #: src/primitives/ArticleView.tsx:480
-#: src/schema/NodeRenderer.tsx:2271
+#: src/schema/NodeRenderer.tsx:2335
 #: src/ui/breadcrumb.tsx:102
 msgid "ui.More"
 msgstr "More"
@@ -3631,7 +3641,7 @@ msgstr "next"
 #: src/elements/media-viewer.tsx:113
 #: src/elements/music-track.tsx:35
 #: src/elements/question-flow.tsx:47
-#: src/elements/thread.aui.tsx:1686
+#: src/elements/thread.aui.tsx:1697
 #: src/primitives/Player.tsx:178
 #: src/primitives/Tour.tsx:46
 msgid "ui.Next"
@@ -3755,7 +3765,7 @@ msgid "ui.No one else in the household."
 msgstr "No one else in the household."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1921
+#: src/schema/NodeRenderer.tsx:1985
 msgid "ui.No other screens are on"
 msgstr "No other screens are on"
 
@@ -3846,23 +3856,23 @@ msgid "ui.Normal"
 msgstr "Normal"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1109
-#: src/elements/image-editor.tsx:1421
+#: src/elements/image-editor.tsx:1435
+#: src/elements/image-editor.tsx:1605
 msgid "ui.Not available right now."
 msgstr "Not available right now."
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1428
+#: src/elements/thread.aui.tsx:1439
 msgid "ui.Not helpful"
 msgstr "Not helpful"
 
 #. js-lingui-explicit-id
-#: src/schema/ImageEditorNodeView.tsx:286
+#: src/schema/ImageEditorNodeView.tsx:299
 msgid "ui.Not offered here."
 msgstr "Not offered here."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1281
+#: src/schema/NodeRenderer.tsx:1345
 msgid "ui.Not played yet"
 msgstr "Not played yet"
 
@@ -3880,11 +3890,11 @@ msgid "ui.Not set"
 msgstr "Not set"
 
 #. js-lingui-explicit-id
-#: src/schema/ImageEditorNodeView.tsx:288
-#: src/schema/ImageEditorNodeView.tsx:332
-#: src/schema/ImageEditorNodeView.tsx:365
-#: src/schema/ImageEditorNodeView.tsx:379
-#: src/schema/ImageEditorNodeView.tsx:393
+#: src/schema/ImageEditorNodeView.tsx:301
+#: src/schema/ImageEditorNodeView.tsx:345
+#: src/schema/ImageEditorNodeView.tsx:378
+#: src/schema/ImageEditorNodeView.tsx:392
+#: src/schema/ImageEditorNodeView.tsx:406
 msgid "ui.Not set up yet."
 msgstr "Not set up yet."
 
@@ -3900,7 +3910,7 @@ msgid "ui.Note"
 msgstr "Note"
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1677
+#: src/schema/NodeRenderer.tsx:1741
 msgid "ui.Nothing featured yet."
 msgstr "Nothing featured yet."
 
@@ -3908,12 +3918,12 @@ msgstr "Nothing featured yet."
 #: src/primitives/AsyncState.tsx:59
 #: src/primitives/WidgetCard.tsx:66
 #: src/primitives/WidgetRow.tsx:42
-#: src/schema/NodeRenderer.tsx:1128
-#: src/schema/NodeRenderer.tsx:1222
-#: src/schema/NodeRenderer.tsx:1322
-#: src/schema/NodeRenderer.tsx:1489
-#: src/schema/NodeRenderer.tsx:2141
-#: src/schema/NodeRenderer.tsx:2219
+#: src/schema/NodeRenderer.tsx:1192
+#: src/schema/NodeRenderer.tsx:1286
+#: src/schema/NodeRenderer.tsx:1386
+#: src/schema/NodeRenderer.tsx:1553
+#: src/schema/NodeRenderer.tsx:2205
+#: src/schema/NodeRenderer.tsx:2283
 #: src/schema/ResultFeedNodeView.tsx:199
 msgid "ui.Nothing here yet."
 msgstr "Nothing here yet."
@@ -3924,7 +3934,7 @@ msgid "ui.Nothing in the transcript matches."
 msgstr "Nothing in the transcript matches."
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1586
+#: src/elements/image-editor.tsx:1696
 msgid "ui.Nothing is painted, so this changes the whole picture."
 msgstr "Nothing is painted, so this changes the whole picture."
 
@@ -3949,7 +3959,7 @@ msgid "ui.Nothing selected"
 msgstr "Nothing selected"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1865
+#: src/elements/image-editor.tsx:1975
 msgid "ui.Nothing the same shape to compare with yet."
 msgstr "Nothing the same shape to compare with yet."
 
@@ -3959,7 +3969,7 @@ msgid "ui.Nothing to compare yet: this is the first version."
 msgstr "Nothing to compare yet: this is the first version."
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1864
+#: src/elements/image-editor.tsx:1974
 msgid "ui.Nothing to compare yet: this is the original picture."
 msgstr "Nothing to compare yet: this is the original picture."
 
@@ -3995,7 +4005,7 @@ msgid "ui.Now {current}{unit}"
 msgstr "Now {current}{unit}"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:748
+#: src/elements/image-editor.tsx:793
 msgid "ui.Object erased"
 msgstr "Object erased"
 
@@ -4104,8 +4114,8 @@ msgid "ui.Open image: {alt}"
 msgstr "Open image: {alt}"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1040
-#: src/elements/image-editor.tsx:1046
+#: src/elements/image-editor.tsx:1091
+#: src/elements/image-editor.tsx:1097
 msgid "ui.Open in Studio"
 msgstr "Open in Studio"
 
@@ -4188,7 +4198,7 @@ msgid "ui.Orange"
 msgstr "Orange"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:284
+#: src/elements/image-editor.tsx:300
 #: src/schema/ImageEditorNodeView.tsx:139
 msgid "ui.Original"
 msgstr "Original"
@@ -4241,12 +4251,12 @@ msgid "ui.Pages"
 msgstr "Pages"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1210
+#: src/elements/image-editor.tsx:1222
 msgid "ui.Paint over what to erase"
 msgstr "Paint over what to erase"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1266
+#: src/elements/image-editor.tsx:1278
 msgid "ui.Paint where the change goes"
 msgstr "Paint where the change goes"
 
@@ -4289,7 +4299,7 @@ msgstr "Paste the new value"
 #: src/elements/track-studio.tsx:537
 #: src/elements/track-studio.tsx:537
 #: src/primitives/Player.tsx:164
-#: src/schema/NodeRenderer.tsx:1697
+#: src/schema/NodeRenderer.tsx:1761
 msgid "ui.Pause"
 msgstr "Pause"
 
@@ -4316,7 +4326,7 @@ msgid "ui.Paw print"
 msgstr "Paw print"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:294
+#: src/elements/image-editor.tsx:310
 msgid "ui.Pen"
 msgstr "Pen"
 
@@ -4336,7 +4346,7 @@ msgid "ui.People who join later can see it too."
 msgstr "People who join later can see it too."
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:446
+#: src/elements/image-editor.tsx:462
 msgid "ui.Percent"
 msgstr "Percent"
 
@@ -4400,12 +4410,12 @@ msgid "ui.picture"
 msgstr "picture"
 
 #. js-lingui-explicit-id
-#: src/schema/ImageEditorNodeView.tsx:262
+#: src/schema/ImageEditorNodeView.tsx:275
 msgid "ui.Picture"
 msgstr "Picture"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1082
+#: src/elements/image-editor.tsx:1575
 msgid "ui.Picture editing tools"
 msgstr "Picture editing tools"
 
@@ -4415,12 +4425,12 @@ msgid "ui.Picture in picture"
 msgstr "Picture in picture"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1723
+#: src/elements/image-editor.tsx:1833
 msgid "ui.Picture stage"
 msgstr "Picture stage"
 
 #. js-lingui-explicit-id
-#: src/schema/ImageEditorNodeView.tsx:291
+#: src/schema/ImageEditorNodeView.tsx:304
 msgid "ui.Picture tools are not ready yet. Try again in a minute."
 msgstr "Picture tools are not ready yet. Try again in a minute."
 
@@ -4452,7 +4462,7 @@ msgstr "pinned"
 
 #. js-lingui-explicit-id
 #: src/elements/thread-list.aui.tsx:75
-#: src/schema/NodeRenderer.tsx:1362
+#: src/schema/NodeRenderer.tsx:1426
 msgid "ui.Pinned"
 msgstr "Pinned"
 
@@ -4462,7 +4472,7 @@ msgid "ui.Pinned apps"
 msgstr "Pinned apps"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:445
+#: src/elements/image-editor.tsx:461
 msgid "ui.Pixels"
 msgstr "Pixels"
 
@@ -4527,8 +4537,8 @@ msgstr "Play now"
 
 #. js-lingui-explicit-id
 #: src/primitives/Player.tsx:173
-#: src/schema/NodeRenderer.tsx:1910
-#: src/schema/NodeRenderer.tsx:1915
+#: src/schema/NodeRenderer.tsx:1974
+#: src/schema/NodeRenderer.tsx:1979
 msgid "ui.Play on another screen"
 msgstr "Play on another screen"
 
@@ -4549,7 +4559,7 @@ msgid "ui.Playhead"
 msgstr "Playhead"
 
 #. js-lingui-explicit-id
-#: src/schema/mediaHost.ts:92
+#: src/schema/mediaHost.ts:103
 msgid "ui.Playing is not set up on this screen. Open the item from its app."
 msgstr "Playing is not set up on this screen. Open the item from its app."
 
@@ -4565,8 +4575,8 @@ msgid "ui.Plugins"
 msgstr "Plugins"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1254
-#: src/elements/image-editor.tsx:1256
+#: src/elements/image-editor.tsx:1266
+#: src/elements/image-editor.tsx:1268
 msgid "ui.Point or box"
 msgstr "Point or box"
 
@@ -4592,7 +4602,7 @@ msgid "ui.present"
 msgstr "present"
 
 #. js-lingui-explicit-id
-#: src/elements/composer-parts.tsx:371
+#: src/elements/composer-parts.tsx:408
 msgid "ui.Presets"
 msgstr "Presets"
 
@@ -4612,9 +4622,9 @@ msgid "ui.Pressure {value} hPa"
 msgstr "Pressure {value} hPa"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1356
-#: src/elements/image-editor.tsx:1394
-#: src/elements/image-editor.tsx:1472
+#: src/elements/image-editor.tsx:1368
+#: src/elements/image-editor.tsx:1406
+#: src/elements/image-editor.tsx:1515
 #: src/elements/track-studio.tsx:222
 #: src/elements/track-studio.tsx:470
 msgid "ui.Preview"
@@ -4626,14 +4636,14 @@ msgid "ui.Preview of {title}"
 msgstr "Preview of {title}"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1482
+#: src/elements/image-editor.tsx:1525
 msgid "ui.Preview: {label}"
 msgstr "Preview: {label}"
 
 #. js-lingui-explicit-id
 #: src/elements/media-viewer.tsx:112
 #: src/elements/music-track.tsx:35
-#: src/elements/thread.aui.tsx:1678
+#: src/elements/thread.aui.tsx:1689
 #: src/primitives/Player.tsx:177
 msgid "ui.Previous"
 msgstr "Previous"
@@ -4723,7 +4733,7 @@ msgid "ui.Projects"
 msgstr "Projects"
 
 #. js-lingui-explicit-id
-#: src/elements/composer-parts.tsx:116
+#: src/elements/composer-parts.tsx:127
 #: src/elements/tier-segment.tsx:50
 msgid "ui.Quality"
 msgstr "Quality"
@@ -4765,7 +4775,7 @@ msgid "ui.Ratio"
 msgstr "Ratio"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1404
+#: src/elements/thread.aui.tsx:1415
 msgid "ui.Read aloud"
 msgstr "Read aloud"
 
@@ -4776,7 +4786,7 @@ msgstr "Read it another way"
 
 #. js-lingui-explicit-id
 #: src/primitives/Reader.tsx:36
-#: src/schema/NodeRenderer.tsx:1735
+#: src/schema/NodeRenderer.tsx:1799
 msgid "ui.Reader"
 msgstr "Reader"
 
@@ -4829,7 +4839,7 @@ msgid "ui.Reconnecting"
 msgstr "Reconnecting"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:297
+#: src/elements/image-editor.tsx:313
 msgid "ui.Rectangle"
 msgstr "Rectangle"
 
@@ -4840,14 +4850,14 @@ msgid "ui.Red"
 msgstr "Red"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:973
+#: src/elements/image-editor.tsx:1024
 #: src/elements/track-studio.tsx:481
 msgid "ui.Redo"
 msgstr "Redo"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1189
-#: src/elements/image-editor.tsx:1225
+#: src/elements/image-editor.tsx:1201
+#: src/elements/image-editor.tsx:1237
 msgid "ui.Redo stroke"
 msgstr "Redo stroke"
 
@@ -4857,12 +4867,12 @@ msgid "ui.Reference library"
 msgstr "Reference library"
 
 #. js-lingui-explicit-id
-#: src/elements/composer-parts.tsx:212
+#: src/elements/composer-parts.tsx:237
 msgid "ui.References"
 msgstr "References"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1436
+#: src/elements/thread.aui.tsx:1447
 msgid "ui.Refresh"
 msgstr "Refresh"
 
@@ -4932,9 +4942,9 @@ msgid "ui.Remove \"{text}\" from the queue"
 msgstr "Remove \"{text}\" from the queue"
 
 #. js-lingui-explicit-id
-#: src/elements/composer-parts.tsx:222
-#: src/elements/prompt-bar.tsx:714
-#: src/elements/prompt-bar.tsx:758
+#: src/elements/composer-parts.tsx:247
+#: src/elements/prompt-bar.tsx:715
+#: src/elements/prompt-bar.tsx:759
 msgid "ui.Remove {label}"
 msgstr "Remove {label}"
 
@@ -4965,13 +4975,13 @@ msgid "ui.Remove {title} from the album"
 msgstr "Remove {title} from the album"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1307
+#: src/elements/image-editor.tsx:1319
 msgid "ui.Remove background"
 msgstr "Remove background"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:276
-#: src/elements/image-editor.tsx:276
+#: src/elements/image-editor.tsx:292
+#: src/elements/image-editor.tsx:292
 msgid "ui.Remove BG"
 msgstr "Remove BG"
 
@@ -5006,7 +5016,7 @@ msgid "ui.Remove style {name}"
 msgstr "Remove style {name}"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1602
+#: src/elements/image-editor.tsx:1712
 msgid "ui.Remove the reference picture"
 msgstr "Remove the reference picture"
 
@@ -5075,8 +5085,8 @@ msgid "ui.Required"
 msgstr "Required"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1353
-#: src/elements/image-editor.tsx:1391
+#: src/elements/image-editor.tsx:1365
+#: src/elements/image-editor.tsx:1403
 #: src/elements/track-studio.tsx:629
 msgid "ui.Reset"
 msgstr "Reset"
@@ -5104,17 +5114,17 @@ msgid "ui.resets in {resetsIn}"
 msgstr "resets in {resetsIn}"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:278
+#: src/elements/image-editor.tsx:294
 msgid "ui.Resize"
 msgstr "Resize"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:456
+#: src/elements/image-editor.tsx:472
 msgid "ui.Resize (verb)"
 msgstr "Resize"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:438
+#: src/elements/image-editor.tsx:454
 msgid "ui.Resize unit"
 msgstr "Resize unit"
 
@@ -5167,7 +5177,7 @@ msgstr "Resuming from {time}"
 #: src/elements/error-state.tsx:40
 #: src/elements/job-progress.tsx:194
 #: src/elements/job-progress.tsx:267
-#: src/elements/thread.aui.tsx:1586
+#: src/elements/thread.aui.tsx:1597
 msgid "ui.Retry"
 msgstr "Retry"
 
@@ -5187,12 +5197,12 @@ msgid "ui.Roomy"
 msgstr "Roomy"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1335
+#: src/elements/image-editor.tsx:1347
 msgid "ui.Rotate left"
 msgstr "Rotate left"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1338
+#: src/elements/image-editor.tsx:1350
 msgid "ui.Rotate right"
 msgstr "Rotate right"
 
@@ -5229,7 +5239,7 @@ msgid "ui.Sans"
 msgstr "Sans"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:289
+#: src/elements/image-editor.tsx:305
 msgid "ui.Saturation"
 msgstr "Saturation"
 
@@ -5239,13 +5249,13 @@ msgid "ui.save"
 msgstr "save"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1203
+#: src/elements/image-editor.tsx:1215
 #: src/elements/music-edit.tsx:62
 #: src/elements/project-settings.tsx:71
 #: src/primitives/ArticleView.tsx:458
 #: src/primitives/ArticleView.tsx:474
 #: src/primitives/StoryFeed.tsx:90
-#: src/schema/NodeRenderer.tsx:2050
+#: src/schema/NodeRenderer.tsx:2114
 #: src/settings/LocationField.tsx:176
 #: src/settings/SettingRow.tsx:184
 #: src/settings/SettingRow.tsx:276
@@ -5281,12 +5291,12 @@ msgid "ui.Saved."
 msgstr "Saved."
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:790
+#: src/elements/image-editor.tsx:835
 msgid "ui.Saving the markup"
 msgstr "Saving the markup"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:723
+#: src/elements/image-editor.tsx:767
 msgid "ui.Saving the new version"
 msgstr "Saving the new version"
 
@@ -5301,7 +5311,7 @@ msgid "ui.Saving…"
 msgstr "Saving…"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:853
+#: src/elements/thread.aui.tsx:854
 msgid "ui.Scroll to bottom"
 msgstr "Scroll to bottom"
 
@@ -5432,7 +5442,7 @@ msgid "ui.Seek {title}"
 msgstr "Seek {title}"
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1115
+#: src/schema/NodeRenderer.tsx:1179
 #: src/schema/types.ts:184
 msgid "ui.Select"
 msgstr "Select"
@@ -5444,7 +5454,7 @@ msgstr "Select {label}"
 
 #. js-lingui-explicit-id
 #: src/primitives/CharacterTile.tsx:54
-#: src/schema/NodeRenderer.tsx:1151
+#: src/schema/NodeRenderer.tsx:1215
 msgid "ui.Select {name}"
 msgstr "Select {name}"
 
@@ -5472,14 +5482,14 @@ msgstr "Selection: {start} to {end}, {length}."
 #: src/assistant-ui/tool-fallback.aui.tsx:514
 #: src/elements/elicitation-form.tsx:167
 #: src/elements/empty-state.tsx:101
-#: src/elements/image-editor.tsx:1640
+#: src/elements/image-editor.tsx:1750
 #: src/elements/tool-fallback.aui.tsx:512
 msgid "ui.Send"
 msgstr "Send"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1051
-#: src/elements/thread.aui.tsx:1061
+#: src/elements/thread.aui.tsx:1069
+#: src/elements/thread.aui.tsx:1081
 msgid "ui.Send a message..."
 msgstr "Send a message..."
 
@@ -5490,14 +5500,14 @@ msgstr "Send feedback"
 
 #. js-lingui-explicit-id
 #: src/elements/composer.tsx:655
-#: src/elements/thread.aui.tsx:1116
-#: src/elements/thread.aui.tsx:1116
-#: src/elements/thread.aui.tsx:1116
-#: src/elements/thread.aui.tsx:1116
-#: src/elements/thread.aui.tsx:1170
-#: src/elements/thread.aui.tsx:1177
-#: src/elements/thread.aui.tsx:1185
-#: src/elements/thread.aui.tsx:1192
+#: src/elements/thread.aui.tsx:1127
+#: src/elements/thread.aui.tsx:1127
+#: src/elements/thread.aui.tsx:1127
+#: src/elements/thread.aui.tsx:1127
+#: src/elements/thread.aui.tsx:1181
+#: src/elements/thread.aui.tsx:1188
+#: src/elements/thread.aui.tsx:1196
+#: src/elements/thread.aui.tsx:1203
 msgid "ui.Send message"
 msgstr "Send message"
 
@@ -5512,7 +5522,7 @@ msgid "ui.Send to {name}"
 msgstr "Send to {name}"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:820
+#: src/elements/image-editor.tsx:865
 msgid "ui.Sending your comment"
 msgstr "Sending your comment"
 
@@ -5607,8 +5617,8 @@ msgid "ui.seven"
 msgstr "seven"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1065
-#: src/elements/image-editor.tsx:1071
+#: src/elements/image-editor.tsx:1116
+#: src/elements/image-editor.tsx:1122
 #: src/elements/music-track.tsx:35
 #: src/elements/share-dialog.tsx:125
 #: src/elements/video-player.tsx:101
@@ -5667,7 +5677,7 @@ msgstr "Show fewer"
 #: src/elements/creation-header.tsx:111
 #: src/elements/creation-header.tsx:149
 #: src/elements/thread-list.aui.tsx:184
-#: src/schema/NodeRenderer.tsx:1987
+#: src/schema/NodeRenderer.tsx:2051
 msgid "ui.Show less"
 msgstr "Show less"
 
@@ -5675,7 +5685,7 @@ msgstr "Show less"
 #: src/elements/creation-header.tsx:111
 #: src/elements/creation-header.tsx:149
 #: src/elements/thread-list.aui.tsx:183
-#: src/schema/NodeRenderer.tsx:1987
+#: src/schema/NodeRenderer.tsx:2051
 msgid "ui.Show more"
 msgstr "Show more"
 
@@ -5797,12 +5807,12 @@ msgstr "Something went wrong"
 #: src/primitives/AsyncState.tsx:57
 #: src/schema/actions.ts:231
 #: src/schema/actions.ts:254
-#: src/schema/NodeRenderer.tsx:1270
+#: src/schema/NodeRenderer.tsx:1334
 msgid "ui.Something went wrong."
 msgstr "Something went wrong."
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:303
+#: src/elements/image-editor.tsx:319
 msgid "ui.Something went wrong. Try again."
 msgstr "Something went wrong. Try again."
 
@@ -5883,8 +5893,8 @@ msgstr "Start over"
 #. js-lingui-explicit-id
 #: src/elements/composer-voice.aui.tsx:18
 #: src/elements/composer.tsx:621
-#: src/elements/thread.aui.tsx:1037
-#: src/elements/thread.aui.tsx:1141
+#: src/elements/thread.aui.tsx:1049
+#: src/elements/thread.aui.tsx:1152
 msgid "ui.Start voice input"
 msgstr "Start voice input"
 
@@ -5934,21 +5944,21 @@ msgid "ui.Stop {name}"
 msgstr "Stop {name}"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1041
-#: src/elements/thread.aui.tsx:1041
-#: src/elements/thread.aui.tsx:1151
+#: src/elements/thread.aui.tsx:1053
+#: src/elements/thread.aui.tsx:1053
+#: src/elements/thread.aui.tsx:1162
 msgid "ui.Stop dictation"
 msgstr "Stop dictation"
 
 #. js-lingui-explicit-id
 #: src/elements/composer.tsx:655
-#: src/elements/thread.aui.tsx:1119
-#: src/elements/thread.aui.tsx:1208
+#: src/elements/thread.aui.tsx:1130
+#: src/elements/thread.aui.tsx:1219
 msgid "ui.Stop generating"
 msgstr "Stop generating"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1411
+#: src/elements/thread.aui.tsx:1422
 msgid "ui.Stop reading"
 msgstr "Stop reading"
 
@@ -5959,7 +5969,7 @@ msgstr "Stop recording"
 
 #. js-lingui-explicit-id
 #: src/elements/composer-voice.aui.tsx:19
-#: src/elements/thread.aui.tsx:1157
+#: src/elements/thread.aui.tsx:1168
 msgid "ui.Stop voice input"
 msgstr "Stop voice input"
 
@@ -5995,7 +6005,7 @@ msgid "ui.Strict"
 msgstr "Strict"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1177
+#: src/elements/image-editor.tsx:1189
 msgid "ui.Stroke size"
 msgstr "Stroke size"
 
@@ -6034,7 +6044,7 @@ msgstr "Style: {name}"
 #. js-lingui-explicit-id
 #: src/elements/elicitation-form.tsx:167
 #: src/elements/question-flow.tsx:46
-#: src/schema/NodeRenderer.tsx:2340
+#: src/schema/NodeRenderer.tsx:2404
 msgid "ui.Submit"
 msgstr "Submit"
 
@@ -6090,7 +6100,7 @@ msgid "ui.Table of contents"
 msgstr "Table of contents"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:588
+#: src/elements/thread.aui.tsx:589
 msgid "ui.Talk..."
 msgstr "Talk..."
 
@@ -6125,7 +6135,7 @@ msgid "ui.ten"
 msgstr "ten"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:299
+#: src/elements/image-editor.tsx:315
 msgid "ui.Text"
 msgstr "Text"
 
@@ -6135,7 +6145,7 @@ msgid "ui.Text size"
 msgstr "Text size"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1793
+#: src/elements/image-editor.tsx:1903
 msgid "ui.Text to add"
 msgstr "Text to add"
 
@@ -6167,12 +6177,13 @@ msgid "ui.That is {length} characters and each phrase can have {max}. Shorten it
 msgstr "That is {length} characters and each phrase can have {max}. Shorten it."
 
 #. js-lingui-explicit-id
-#: src/schema/ImageEditorNodeView.tsx:321
+#: src/schema/ImageEditorNodeView.tsx:334
 msgid "ui.That is not available on this screen."
 msgstr "That is not available on this screen."
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:770
+#: src/elements/image-editor.tsx:815
+#: src/elements/image-editor.tsx:1485
 msgid "ui.That is not available right now."
 msgstr "That is not available right now."
 
@@ -6197,7 +6208,7 @@ msgid "ui.That place was not saved. Try again in a moment."
 msgstr "That place was not saved. Try again in a moment."
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:855
+#: src/elements/image-editor.tsx:905
 msgid "ui.That tool is not available right now."
 msgstr "That tool is not available right now."
 
@@ -6207,7 +6218,7 @@ msgid "ui.The air feels humid"
 msgstr "The air feels humid"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:745
+#: src/elements/image-editor.tsx:790
 msgid "ui.The area to erase could not be prepared. Try drawing it again."
 msgstr "The area to erase could not be prepared. Try drawing it again."
 
@@ -6237,7 +6248,7 @@ msgid "ui.The list holds {max} at most. Remove one to add another."
 msgstr "The list holds {max} at most. Remove one to add another."
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:793
+#: src/elements/image-editor.tsx:838
 msgid "ui.The markup could not be saved on this picture. Try again."
 msgstr "The markup could not be saved on this picture. Try again."
 
@@ -6257,7 +6268,7 @@ msgid "ui.The new version could not be saved. Try again."
 msgstr "The new version could not be saved. Try again."
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:810
+#: src/elements/image-editor.tsx:855
 msgid "ui.The painted area could not be prepared. Try painting it again."
 msgstr "The painted area could not be prepared. Try painting it again."
 
@@ -6322,12 +6333,12 @@ msgid "ui.Thinking"
 msgstr "Thinking"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1362
+#: src/elements/thread.aui.tsx:1373
 msgid "ui.Thinking…"
 msgstr "Thinking…"
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1726
+#: src/schema/NodeRenderer.tsx:1790
 msgid "ui.This book is not available."
 msgstr "This book is not available."
 
@@ -6352,7 +6363,7 @@ msgid "ui.This file cannot be previewed here."
 msgstr "This file cannot be previewed here."
 
 #. js-lingui-explicit-id
-#: src/schema/NodeRenderer.tsx:1771
+#: src/schema/NodeRenderer.tsx:1835
 msgid "ui.This item is not available."
 msgstr "This item is not available."
 
@@ -6508,7 +6519,7 @@ msgstr "Transcribing"
 #. js-lingui-explicit-id
 #: src/primitives/Player.tsx:452
 #: src/primitives/TranscriptPanel.tsx:75
-#: src/schema/NodeRenderer.tsx:1949
+#: src/schema/NodeRenderer.tsx:2013
 msgid "ui.Transcript"
 msgstr "Transcript"
 
@@ -6523,7 +6534,7 @@ msgid "ui.Trim start of {label}"
 msgstr "Trim start of {label}"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1570
+#: src/elements/image-editor.tsx:1680
 #: src/elements/media-viewer.tsx:123
 #: src/elements/music-track.tsx:35
 #: src/elements/video-player.tsx:103
@@ -6591,7 +6602,7 @@ msgid "ui.Type your answer"
 msgstr "Type your answer"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1794
+#: src/elements/image-editor.tsx:1904
 msgid "ui.Type, then press Enter"
 msgstr "Type, then press Enter"
 
@@ -6606,26 +6617,26 @@ msgid "ui.typically replies in a minute"
 msgstr "typically replies in a minute"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:953
+#: src/elements/thread.aui.tsx:954
 msgid "ui.Unavailable"
 msgstr "Unavailable"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:970
-#: src/elements/image-editor.tsx:1489
+#: src/elements/image-editor.tsx:1021
+#: src/elements/image-editor.tsx:1532
 #: src/elements/track-studio.tsx:480
 msgid "ui.Undo"
 msgstr "Undo"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1488
+#: src/elements/image-editor.tsx:1531
 msgid "ui.Undo preview"
 msgstr "Undo preview"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1186
-#: src/elements/image-editor.tsx:1222
-#: src/elements/image-editor.tsx:1277
+#: src/elements/image-editor.tsx:1198
+#: src/elements/image-editor.tsx:1234
+#: src/elements/image-editor.tsx:1289
 msgid "ui.Undo stroke"
 msgstr "Undo stroke"
 
@@ -6694,7 +6705,7 @@ msgid "ui.Up next in {seconds}"
 msgstr "Up next in {seconds}"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1655
+#: src/elements/thread.aui.tsx:1666
 msgid "ui.Update"
 msgstr "Update"
 
@@ -6713,22 +6724,22 @@ msgid "ui.Upload failed"
 msgstr "Upload failed"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:461
+#: src/elements/image-editor.tsx:477
 msgid "ui.Upscale 2x"
 msgstr "Upscale 2x"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:464
+#: src/elements/image-editor.tsx:480
 msgid "ui.Upscale 4x"
 msgstr "Upscale 4x"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1518
+#: src/elements/image-editor.tsx:1561
 msgid "ui.Upscaled {factor}x"
 msgstr "Upscaled {factor}x"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:468
+#: src/elements/image-editor.tsx:484
 msgid "ui.Upscaling adds detail the picture did not have; faces may change."
 msgstr "Upscaling adds detail the picture did not have; faces may change."
 
@@ -6795,10 +6806,10 @@ msgid "ui.Version to hear"
 msgstr "Version to hear"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:990
-#: src/elements/image-editor.tsx:992
-#: src/elements/image-editor.tsx:996
-#: src/elements/image-editor.tsx:999
+#: src/elements/image-editor.tsx:1041
+#: src/elements/image-editor.tsx:1043
+#: src/elements/image-editor.tsx:1047
+#: src/elements/image-editor.tsx:1050
 msgid "ui.Versions"
 msgstr "Versions"
 
@@ -6853,13 +6864,13 @@ msgid "ui.Voice"
 msgstr "Voice"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:783
+#: src/elements/thread.aui.tsx:784
 msgid "ui.Voice conversation"
 msgstr "Voice conversation"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1037
-#: src/elements/thread.aui.tsx:1135
+#: src/elements/thread.aui.tsx:1049
+#: src/elements/thread.aui.tsx:1146
 msgid "ui.Voice input"
 msgstr "Voice input"
 
@@ -6900,7 +6911,7 @@ msgid "ui.Waning Gibbous"
 msgstr "Waning Gibbous"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:290
+#: src/elements/image-editor.tsx:306
 msgid "ui.Warmth"
 msgstr "Warmth"
 
@@ -6976,12 +6987,12 @@ msgid "ui.Who can see this?"
 msgstr "Who can see this?"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1298
+#: src/elements/image-editor.tsx:1310
 msgid "ui.Whole picture"
 msgstr "Whole picture"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:389
+#: src/elements/image-editor.tsx:405
 msgid "ui.Width"
 msgstr "Width"
 
@@ -7018,7 +7029,7 @@ msgid "ui.Working"
 msgstr "Working"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:692
+#: src/elements/image-editor.tsx:736
 #: src/elements/voice-conversation.tsx:23
 msgid "ui.Working on it"
 msgstr "Working on it"
@@ -7026,7 +7037,7 @@ msgstr "Working on it"
 #. js-lingui-explicit-id
 #: src/primitives/Wizard.tsx:354
 #: src/schema/ConfirmDialog.tsx:86
-#: src/schema/NodeRenderer.tsx:2340
+#: src/schema/NodeRenderer.tsx:2404
 msgid "ui.Working…"
 msgstr "Working…"
 
@@ -7036,7 +7047,7 @@ msgid "ui.Wrench"
 msgstr "Wrench"
 
 #. js-lingui-explicit-id
-#: src/elements/composer-parts.tsx:386
+#: src/elements/composer-parts.tsx:423
 msgid "ui.Write lyrics"
 msgstr "Write lyrics"
 
@@ -7082,7 +7093,7 @@ msgid "ui.You hear this in the preview. The saved song changes when you apply it
 msgstr "You hear this in the preview. The saved song changes when you apply it."
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:798
+#: src/elements/thread.aui.tsx:799
 msgid "ui.You said"
 msgstr "You said"
 
@@ -7092,26 +7103,26 @@ msgid "ui.zero"
 msgstr "zero"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1662
+#: src/elements/image-editor.tsx:1772
 #: src/elements/track-studio.tsx:605
 #: src/elements/track-studio.tsx:606
 msgid "ui.Zoom"
 msgstr "Zoom"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1666
+#: src/elements/image-editor.tsx:1776
 msgid "ui.Zoom {zoom} percent"
 msgstr "Zoom {zoom} percent"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1669
+#: src/elements/image-editor.tsx:1779
 #: src/elements/media-viewer.tsx:114
 #: src/elements/mermaid-diagram.tsx:211
 msgid "ui.Zoom in"
 msgstr "Zoom in"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1663
+#: src/elements/image-editor.tsx:1773
 #: src/elements/media-viewer.tsx:115
 #: src/elements/mermaid-diagram.tsx:219
 msgid "ui.Zoom out"

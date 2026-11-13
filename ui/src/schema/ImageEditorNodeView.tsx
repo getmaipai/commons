@@ -232,6 +232,19 @@ const ROW_TOOLS = ["markup", "comment", "remove_background", "erase", "resize", 
 type RowTool = (typeof ROW_TOOLS)[number];
 const isRowTool = (v: unknown): v is RowTool => typeof v === "string" && (ROW_TOOLS as readonly string[]).includes(v);
 
+/** The levels of an operation row (MAKE-CLEARER-01): only well-formed entries are kept. */
+function levelsOf(list: unknown[]): ImageEditorExtraOperation["levels"] {
+  const out: NonNullable<ImageEditorExtraOperation["levels"]>[number][] = [];
+  for (const entry of list) {
+    if (!isRow(entry)) continue;
+    const id = str(entry.id);
+    const label = str(entry.label);
+    if (!id || !label) continue;
+    out.push({ id, label, summary: str(entry.summary), eta: str(entry.eta), enabled: entry.enabled !== false, reason: str(entry.reason) });
+  }
+  return out.length > 0 ? out : undefined;
+}
+
 function WithOperations({ node, state, row }: { node: ImageEditorNode; state: Row; row: Row }) {
   const query = useBinding<Row[]>(node.operations!.bind, state);
   const { operations, toolStates } = useMemo(() => {
@@ -247,7 +260,7 @@ function WithOperations({ node, state, row }: { node: ImageEditorNode; state: Ro
       const id = str(r.id);
       const label = str(r.label);
       if (!id || !label) continue;
-      extra.push({ id, label, summary: str(r.summary), controls: Array.isArray(r.controls) ? (r.controls as ImageEditorExtraOperation["controls"]) : undefined, enabled: r.enabled !== false, reason: str(r.reason) });
+      extra.push({ id, label, summary: str(r.summary), controls: Array.isArray(r.controls) ? (r.controls as ImageEditorExtraOperation["controls"]) : undefined, levels: Array.isArray(r.levels) ? levelsOf(r.levels) : undefined, enabled: r.enabled !== false, reason: str(r.reason) });
     }
     return { operations: extra, toolStates: states };
   }, [query.data]);

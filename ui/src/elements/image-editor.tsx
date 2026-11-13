@@ -163,6 +163,19 @@ export type ImageEditorStudioToolKey = "crop" | "adjust";
 /** One value of a host-listed operation's controls. */
 export type ImageEditorOperationValue = number | string | boolean;
 
+/** MAKE-CLEARER-01: one named level of an operation (for example Quick, Better, Best): its one-line description, a time estimate, and whether it can run now. */
+export interface ImageEditorOperationLevel {
+  /** The value the operation's `level` choice control takes when this level is picked. */
+  id: string;
+  label: string;
+  summary?: string;
+  /** How long it takes, in plain words ("a few seconds"). */
+  eta?: string;
+  enabled: boolean;
+  /** Why this level is off, one line. A disabled level stays in the row with this as its tooltip and its status line. */
+  reason?: string;
+}
+
 /** IMG-STUDIO-01: a one-click operation the host lists (from the backend registry); the kit names none of them. */
 export interface ImageEditorExtraOperation {
   id: string;
@@ -174,6 +187,8 @@ export interface ImageEditorExtraOperation {
     | { kind: "number"; name: string; label: string; min: number; max: number; step?: number; default?: number }
     | { kind: "choice"; name: string; label: string; options: readonly string[]; default?: string }
   >;
+  /** MAKE-CLEARER-01: when set, the choice control named `level` is drawn as these levels (each with its line and time; an off one stays, disabled, with its reason). */
+  levels?: readonly ImageEditorOperationLevel[];
   enabled: boolean;
   /** Why it is disabled, one line. Shown as its tooltip and in the status line; a disabled operation stays in the list. */
   reason?: string;
@@ -803,7 +818,7 @@ export function ImageEditor({
     setNotice(null);
     const defaults: Record<string, ImageEditorOperationValue> = {};
     for (const control of operation.controls ?? []) {
-      defaults[control.name] = control.kind === "number" ? control.default ?? control.min : control.default ?? control.options[0] ?? "";
+      defaults[control.name] = control.kind === "number" ? control.default ?? control.min : control.name === "level" && operation.levels ? operation.levels.find((level) => level.enabled)?.id ?? control.options[0] ?? "" : control.default ?? control.options[0] ?? "";
     }
     setMoreArgs(defaults);
     if (!operation.controls || operation.controls.length === 0) {
@@ -1395,6 +1410,8 @@ export function ImageEditor({
   );
 
   const chosenOperation = operations?.find((operation) => operation.id === moreChoice) ?? null;
+  const chosenLevel = chosenOperation?.levels?.find((level) => level.id === moreArgs.level) ?? null;
+  const levelOff = chosenLevel !== null && !chosenLevel.enabled;
   const moreBar = (
     <div className={cn(pill, "max-w-full flex-col items-stretch rounded-2xl px-3 py-2")} data-slot="image-editor-more-bar">
       <div className="flex flex-wrap items-center justify-center gap-1">
@@ -1440,6 +1457,35 @@ export function ImageEditor({
                   onValueChange={([value]) => setMoreArgs((args) => ({ ...args, [control.name]: value ?? control.min }))}
                 />
               </div>
+            ) : control.name === "level" && chosenOperation.levels ? (
+              <div key={control.name} className="grid w-full gap-1" data-slot="image-editor-levels">
+                <ToggleGroup
+                  type="single"
+                  variant="outline"
+                  spacing={0}
+                  className="justify-center"
+                  aria-label={control.label}
+                  value={String(moreArgs[control.name] ?? "")}
+                  onValueChange={(value) => {
+                    if (value) setMoreArgs((args) => ({ ...args, [control.name]: value }));
+                  }}
+                >
+                  {chosenOperation.levels.map((level) => (
+                    <ToggleGroupItem key={level.id} value={level.id} disabled={locked} aria-disabled={level.enabled ? undefined : true} data-level={level.id} className={level.enabled ? "" : "opacity-50"}>
+                      {level.label}
+                    </ToggleGroupItem>
+                  ))}
+                </ToggleGroup>
+                {chosenLevel ? (
+                  <p className="text-muted-foreground text-center text-xs" role="status" data-slot="image-editor-level-line">
+                    {chosenLevel.enabled
+                      ? chosenLevel.eta
+                        ? i18n._({ id: "ui.{summary} Takes {eta}.", message: "{summary} Takes {eta}.", values: { summary: chosenLevel.summary ?? chosenLevel.label, eta: chosenLevel.eta } })
+                        : chosenLevel.summary ?? chosenLevel.label
+                      : chosenLevel.reason ?? i18n._({ id: "ui.That is not available right now.", message: "That is not available right now." })}
+                  </p>
+                ) : null}
+              </div>
             ) : (
               <ToggleGroup
                 key={control.name}
@@ -1463,7 +1509,7 @@ export function ImageEditor({
           <Button
             type="button"
             size="sm"
-            disabled={locked}
+            disabled={locked || levelOff}
             onClick={() => void run({ operation: "custom", id: chosenOperation.id, args: moreArgs }, chosenOperation.label)}
           >
             {i18n._({ id: "ui.Preview", message: "Preview" })}
