@@ -39,6 +39,7 @@ export function scanPictureSource(file: string, source: string, allow: PictureAl
 export const PICTURE_ALLOWLIST: PictureAllowEntry[] = [
   { file: "src/dashboard/layouts/full/shared/logo/FullLogo.tsx", match: /^<img\b/, reason: "The two imported SVG brand marks switch for the active theme and are decorative navigation logos." },
   { file: "src/dashboard/layouts/full/shared/logo/Logo.tsx", match: /^<img\b/, reason: "The imported SVG brand mark is a decorative navigation logo with its accessible name on the link." },
+  { file: "src/primitives/MediaShelf.tsx", match: /^<img\b/, reason: "The blurred backdrop behind contained art is decorative (aria-hidden) and the second img is the unsafe-source fallback of the SafeImage branch beside it." },
   { file: "src/dashboard/layouts/full/vertical/rail/AppRail.tsx", match: /^<img\b/, reason: "The imported SVG brand marks are decorative navigation logos that switch for the active theme." },
   { file: "src/dashboard/views/auth/authforms/auth-register.tsx", match: /^<img\b/, reason: "The imported SVG brand marks are decorative authentication logos that switch for the active theme." },
   { file: "src/dashboard/views/auth/authforms/auth-login.tsx", match: /^<img\b/, reason: "The imported SVG brand marks are decorative authentication logos that switch for the active theme." },
