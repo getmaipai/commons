@@ -3,7 +3,8 @@
 // Nothing is rendered: the preview cuts where the export dissolves. The engine owns every media element it makes and `dispose()` leaves
 // none with a `src` (the relock path, K4).
 
-import { LANE_IDS, gainAt, laneGain, laneOf, layoutLane, pieceEnvelope, previewEnd, type LaneId, type StudioPiece, type StudioState } from "./track-studio-model";
+import { EQ_BANDS_HZ, defaultEffects, effectsAreNeutral, type StudioEffects } from "./track-studio-fx";
+import { audioLaneIds, gainAt, laneGain, laneOf, layoutLane, pieceEnvelope, previewEnd, type LaneId, type StudioPiece, type StudioState } from "./track-studio-model";
 import { i18n } from "@/kit/i18n";
 
 /** An audio element is corrected when it drifts from the clock by more than this (the design's proposal, measured in VIDEO-STUDIO-04). */
@@ -37,6 +38,8 @@ export interface EngineOptions {
   /** Returns null when Web Audio is unavailable; the engine then sets `element.volume` instead. */
   audioContext?: () => AudioContext | null;
   now?: () => number;
+  /** How many audio elements may play at once (default `MAX_AUDIO_ELEMENTS`). An audio studio with four stems and a song needs more. */
+  maxAudio?: number;
 }
 
 interface AudioSlot {
@@ -83,6 +86,10 @@ export class PreviewEngine {
   private ctxTried = false;
   private master: GainNode | null = null;
   private laneNodes = new Map<LaneId, GainNode>();
+  private effects: StudioEffects = defaultEffects();
+  private eqNodes: BiquadFilterNode[] = [];
+  private comp: DynamicsCompressorNode | null = null;
+  private makeup: GainNode | null = null;
   private vNode: MediaElementAudioSourceNode | null = null;
   private vPieceGain: GainNode | null = null;
 
@@ -127,6 +134,8 @@ export class PreviewEngine {
   }
   setSolo(solo: LaneId | null): void { this.solo = solo; this.applyLaneGains(); }
   setLoop(loop: boolean): void { this.loop = loop; }
+  /** MP-03: the six-band EQ and the compressor, heard in the preview only (the host applies them for real). Flat and neutral settings pass the sound through. */
+  setEffects(fx: StudioEffects): void { this.effects = fx; this.applyEffects(); }
 
   async play(): Promise<void> {
     if (this.disposed || this.playing) return;
@@ -185,10 +194,10 @@ export class PreviewEngine {
     const v = this.video;
     if (v) { try { v.pause(); } catch { /* already gone */ } v.removeAttribute("src"); v.removeAttribute("poster"); try { v.load(); } catch { /* jsdom */ } v.remove(); }
     this.video = null;
-    try { this.vNode?.disconnect(); this.vPieceGain?.disconnect(); this.master?.disconnect(); for (const n of this.laneNodes.values()) n.disconnect(); } catch { /* graph already closed */ }
+    try { this.vNode?.disconnect(); this.vPieceGain?.disconnect(); this.master?.disconnect(); for (const n of this.laneNodes.values()) n.disconnect(); for (const n of this.eqNodes) n.disconnect(); this.comp?.disconnect(); this.makeup?.disconnect(); } catch { /* graph already closed */ }
     void this.ctx?.close().catch(() => undefined);
     this.ctx = null;
-    this.vNode = null; this.vPieceGain = null; this.master = null; this.laneNodes.clear();
+    this.vNode = null; this.vPieceGain = null; this.master = null; this.laneNodes.clear(); this.eqNodes = []; this.comp = null; this.makeup = null;
     this.vSrc = ""; this.vIndex = -1;
   }
 
@@ -198,7 +207,7 @@ export class PreviewEngine {
   private videoLane() { return laneOf(this.state, "video"); }
   private filmEnd(): number {
     let end = 0;
-    for (const id of LANE_IDS) for (const p of layoutLane(laneOf(this.state, id))) end = Math.max(end, p.end);
+    for (const l of this.state.lanes) for (const p of layoutLane(l)) end = Math.max(end, p.end);
     const v = layoutLane(this.videoLane());
     return v.length > 0 ? v[v.length - 1]!.end : end;
   }
@@ -336,19 +345,66 @@ export class PreviewEngine {
     if (!ctx) return;
     this.ctx = ctx;
     this.master = ctx.createGain();
-    this.master.connect(ctx.destination);
-    for (const id of LANE_IDS) { const g = ctx.createGain(); g.connect(this.master); this.laneNodes.set(id, g); }
+    for (const l of this.state.lanes) this.laneNode(l.id);
+    this.buildChain(ctx);
     const v = this.video;
     if (v) {
       try {
         this.vNode = ctx.createMediaElementSource(v);
         this.vPieceGain = ctx.createGain();
         this.vNode.connect(this.vPieceGain);
-        this.vPieceGain.connect(this.laneNodes.get("video")!);
+        this.vPieceGain.connect(this.laneNode("video")!);
       } catch { this.vNode = null; this.vPieceGain = null; }
     }
     for (const s of this.slots.values()) this.wireSlot(s);
     this.applyLaneGains();
+  }
+
+  /** master -> six peaking filters -> compressor -> make-up gain -> speakers. Missing nodes (an old or fake context) leave a plain master -> speakers. */
+  private buildChain(ctx: AudioContext): void {
+    const master = this.master!;
+    if (typeof ctx.createBiquadFilter !== "function" || typeof ctx.createDynamicsCompressor !== "function") { master.connect(ctx.destination); return; }
+    let last: AudioNode = master;
+    this.eqNodes = EQ_BANDS_HZ.map((hz) => {
+      const f = ctx.createBiquadFilter();
+      f.type = "peaking";
+      f.frequency.value = hz;
+      f.Q.value = 1;
+      f.gain.value = 0;
+      last.connect(f);
+      last = f;
+      return f;
+    });
+    this.comp = ctx.createDynamicsCompressor();
+    last.connect(this.comp);
+    this.makeup = ctx.createGain();
+    this.comp.connect(this.makeup);
+    this.makeup.connect(ctx.destination);
+    this.applyEffects();
+  }
+
+  private applyEffects(): void {
+    if (!this.ctx || !this.comp || !this.makeup) return;
+    const now = this.ctx.currentTime;
+    const fx = this.effects;
+    const neutral = effectsAreNeutral(fx);
+    try {
+      this.eqNodes.forEach((f, i) => f.gain.setTargetAtTime(fx.eq[i] ?? 0, now, 0.01));
+      // A neutral compressor is a transparent one: threshold 0 dB, ratio 1.
+      this.comp.threshold.setTargetAtTime(neutral ? 0 : fx.compressor.threshold_db, now, 0.01);
+      this.comp.ratio.setTargetAtTime(Math.max(1, fx.compressor.ratio), now, 0.01);
+      this.comp.attack.setTargetAtTime(fx.compressor.attack_ms / 1000, now, 0.01);
+      this.comp.release.setTargetAtTime(fx.compressor.release_ms / 1000, now, 0.01);
+      this.makeup.gain.setTargetAtTime(10 ** (fx.compressor.makeup_db / 20), now, 0.01);
+    } catch { /* closed */ }
+  }
+
+  /** The gain node a lane's sound goes through, made on first use (a stem lane may appear after the graph is built). */
+  private laneNode(id: LaneId): GainNode | null {
+    if (!this.ctx || !this.master) return null;
+    let g = this.laneNodes.get(id);
+    if (!g) { g = this.ctx.createGain(); g.connect(this.master); this.laneNodes.set(id, g); }
+    return g;
   }
 
   private wireSlot(s: AudioSlot): void {
@@ -357,7 +413,7 @@ export class PreviewEngine {
       s.node = this.ctx.createMediaElementSource(s.el);
       s.gain = this.ctx.createGain();
       s.node.connect(s.gain);
-      s.gain.connect(this.laneNodes.get(s.lane)!);
+      s.gain.connect(this.laneNode(s.lane)!);
     } catch { s.node = undefined; s.gain = undefined; }
   }
 
@@ -371,13 +427,14 @@ export class PreviewEngine {
 
   private reconcileSlots(): void {
     const wanted = new Map<string, { piece: StudioPiece; lane: LaneId }>();
-    for (const id of ["voice", "music"] as const) for (const p of laneOf(this.state, id).pieces) wanted.set(p.id, { piece: p, lane: id });
+    for (const id of audioLaneIds(this.state)) for (const p of laneOf(this.state, id).pieces) wanted.set(p.id, { piece: p, lane: id });
+    const cap = this.o.maxAudio ?? MAX_AUDIO_ELEMENTS;
     for (const [id, slot] of [...this.slots]) {
       const w = wanted.get(id);
       if (!w || w.piece.src !== slot.src) { this.destroySlot(slot); this.slots.delete(id); }
     }
     for (const [id, w] of wanted) {
-      if (this.slots.has(id) || this.slots.size >= MAX_AUDIO_ELEMENTS) continue;
+      if (this.slots.has(id) || this.slots.size >= cap) continue;
       const el = this.o.createAudio ? this.o.createAudio() : document.createElement("audio");
       el.preload = "auto";
       el.disableRemotePlayback = true;
@@ -396,7 +453,7 @@ export class PreviewEngine {
   /** Which audio pieces should sound at timeline time `t`, start or stop their elements, and correct drift. */
   private syncAudio(t: number, measure: boolean): void {
     this.reconcileSlots();
-    for (const id of ["voice", "music"] as const) {
+    for (const id of audioLaneIds(this.state)) {
       const lane = laneOf(this.state, id);
       const placed = layoutLane(lane);
       lane.pieces.forEach((piece, i) => {
@@ -454,10 +511,10 @@ export class PreviewEngine {
   private applyLaneGains(): void {
     if (!this.ctx) return;
     const now = this.ctx.currentTime;
-    for (const id of LANE_IDS) {
-      const node = this.laneNodes.get(id);
+    for (const l of this.state.lanes) {
+      const node = this.laneNode(l.id);
       if (!node) continue;
-      try { node.gain.setTargetAtTime(laneGain(laneOf(this.state, id), this.solo), now, 0.01); } catch { /* closed */ }
+      try { node.gain.setTargetAtTime(laneGain(l, this.solo), now, 0.01); } catch { /* closed */ }
     }
   }
 
@@ -483,7 +540,7 @@ export class PreviewEngine {
       const placed = layoutLane(vl)[this.vIndex]!;
       this.video.volume = vol("video", pieceEnvelope(vl, this.vIndex), t - placed.start);
     }
-    for (const id of ["voice", "music"] as const) {
+    for (const id of audioLaneIds(this.state)) {
       const lane = laneOf(this.state, id);
       const placed = layoutLane(lane);
       lane.pieces.forEach((piece, i) => {

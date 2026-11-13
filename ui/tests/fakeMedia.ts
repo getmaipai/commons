@@ -11,6 +11,9 @@ export class FakeParam {
   setTargetAtTime(value: number, at: number) { this.value = value; this.calls.push({ type: "target", value, at }); return this; }
 }
 export class FakeGain { gain = new FakeParam(); connected: unknown[] = []; connect(n: unknown) { this.connected.push(n); return n; } disconnect() { this.connected = []; } }
+export class FakeNode { connected: unknown[] = []; connect(n: unknown) { this.connected.push(n); return n; } disconnect() { this.connected = []; } }
+export class FakeFilter extends FakeNode { type = ""; frequency = new FakeParam(); Q = new FakeParam(); gain = new FakeParam(); }
+export class FakeCompressor extends FakeNode { threshold = new FakeParam(); ratio = new FakeParam(); attack = new FakeParam(); release = new FakeParam(); }
 export class FakeSource { connected: unknown[] = []; constructor(public el: HTMLMediaElement) {} connect(n: unknown) { this.connected.push(n); return n; } disconnect() { this.connected = []; } }
 export class FakeAudioContext {
   currentTime = 0;
@@ -20,6 +23,10 @@ export class FakeAudioContext {
   sources: FakeSource[] = [];
   closed = false;
   resumed = 0;
+  filters: FakeFilter[] = [];
+  compressors: FakeCompressor[] = [];
+  createBiquadFilter() { const f = new FakeFilter(); this.filters.push(f); return f as unknown as BiquadFilterNode; }
+  createDynamicsCompressor() { const c = new FakeCompressor(); this.compressors.push(c); return c as unknown as DynamicsCompressorNode; }
   createGain() { const g = new FakeGain(); this.gains.push(g); return g as unknown as GainNode; }
   createMediaElementSource(el: HTMLMediaElement) {
     if (this.sources.some((s) => s.el === el)) throw new Error("InvalidStateError");

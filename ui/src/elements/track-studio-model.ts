@@ -4,8 +4,17 @@
 import { i18n } from "@/kit/i18n"
 
 
-export type LaneId = "video" | "voice" | "music";
+export type StemId = "vocals" | "drums" | "bass" | "other";
+export type StemLaneId = `stem-${StemId}`;
+export type LaneId = "video" | "voice" | "music" | StemLaneId;
+/** The three lanes every studio has. */
 export const LANE_IDS: readonly LaneId[] = ["video", "voice", "music"];
+/** MP-03: the stem lane kind of an audio studio, one lane per stem. A host lists the ones it has; a lane that is not listed does not exist. */
+export const STEM_IDS: readonly StemId[] = ["vocals", "drums", "bass", "other"];
+export const STEM_LANE_IDS: readonly LaneId[] = STEM_IDS.map((s) => `stem-${s}` as StemLaneId);
+export const isStemLane = (id: LaneId): id is StemLaneId => id.startsWith("stem-");
+/** The lanes that carry sound pieces played by audio elements (voice, music and every stem), as this state has them. */
+export const audioLaneIds = (state: StudioState): LaneId[] => state.lanes.map((l) => l.id).filter((id) => id !== "video");
 
 /** The shortest a piece may be, in seconds: a trim or a split never leaves less than this. */
 export const MIN_PIECE_S = 0.2;
@@ -55,6 +64,10 @@ export interface StudioState {
 }
 
 export const laneDefaults = (): Record<LaneId, { label: string; hue: string }> => ({
+  "stem-vocals": { label: i18n._({ id: "ui.Vocals", message: "Vocals" }), hue: "pink" },
+  "stem-drums": { label: i18n._({ id: "ui.Drums", message: "Drums" }), hue: "orange" },
+  "stem-bass": { label: i18n._({ id: "ui.Bass", message: "Bass" }), hue: "blue" },
+  "stem-other": { label: i18n._({ id: "ui.Other", message: "Other" }), hue: "teal" },
   video: { label: i18n._({ id: "ui.1. Video", message: "1. Video" }), hue: "blue" },
   voice: { label: i18n._({ id: "ui.2. Voice", message: "2. Voice" }), hue: "pink" },
   music: { label: i18n._({ id: "ui.3. Music", message: "3. Music" }), hue: "orange" },
@@ -106,10 +119,12 @@ export function readPiece(raw: RawPiece, fallbackId: string): StudioPiece | null
   };
 }
 
-/** A state with all three lanes, from the host's `lanes` array (missing lanes are empty; unknown lane ids are ignored). */
+/** A state with all three lanes, from the host's `lanes` array (missing lanes are empty; unknown lane ids are ignored), then each stem lane
+ * the host listed (`stem-vocals`, `stem-drums`, `stem-bass`, `stem-other`), in that order. */
 export function readState(rawLanes: unknown): StudioState {
   const list = Array.isArray(rawLanes) ? (rawLanes as RawLane[]) : [];
-  const lanes = LANE_IDS.map((id): StudioLane => {
+  const stems = STEM_LANE_IDS.filter((id) => list.some((l) => l && l.id === id));
+  const lanes = [...LANE_IDS, ...stems].map((id): StudioLane => {
     const raw = list.find((l) => l && l.id === id);
     const rawPieces = Array.isArray(raw?.pieces) ? (raw!.pieces as RawPiece[]) : [];
     const pieces: StudioPiece[] = [];
@@ -167,7 +182,7 @@ export const laneEnd = (lane: StudioLane): number => layoutLane(lane).reduce((m,
 export function filmLength(state: StudioState): number {
   const video = laneEnd(laneOf(state, "video"));
   if (video > 0) return video;
-  return Math.max(laneEnd(laneOf(state, "voice")), laneEnd(laneOf(state, "music")));
+  return audioLaneIds(state).reduce((m, id) => Math.max(m, laneEnd(laneOf(state, id))), 0);
 }
 
 export function findPiece(state: StudioState, id: string | null | undefined): { lane: StudioLane; index: number; piece: StudioPiece; placed: Placed } | null {

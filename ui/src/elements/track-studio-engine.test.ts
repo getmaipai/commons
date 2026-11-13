@@ -289,3 +289,69 @@ describe("gains carry level, mute, solo, fades and the crossfade", () => {
     e.dispose();
   });
 });
+
+describe("MP-03: effects and stems", () => {
+  const stems = () => readState([
+    { id: "stem-vocals", pieces: [piece("sv", { src: "/f/sv.wav" })] },
+    { id: "stem-drums", pieces: [piece("sd", { src: "/f/sd.wav" })] },
+    { id: "stem-bass", pieces: [piece("sb", { src: "/f/sb.wav" })] },
+    { id: "stem-other", pieces: [piece("so", { src: "/f/so.wav" })] },
+    { id: "music", pieces: [piece("sm", { src: "/f/sm.wav" })] },
+  ]);
+  const makeAudio = (state: StudioState, maxAudio?: number) =>
+    new PreviewEngine(state, { videoHost: null, host, audioContext: () => ctx as unknown as AudioContext, onTime: (x) => t.push(x), onPlaying: (p) => playing.push(p), onError: (e) => errors.push(e), now: () => clockMs, maxAudio });
+
+  test("each stem gets its own audio element, and the cap can be raised for an audio studio", () => {
+    const e = makeAudio(stems(), 8);
+    e.setState(stems());
+    expect(host.querySelectorAll("audio")).toHaveLength(5);
+    expect(host.querySelector("[data-studio-media='stem-drums']")).toBeTruthy();
+    e.dispose();
+    const capped = makeAudio(stems());
+    capped.setState(stems());
+    expect(host.querySelectorAll("audio")).toHaveLength(MAX_AUDIO_ELEMENTS);
+    capped.dispose();
+  });
+  test("mute and solo apply to a stem lane", async () => {
+    const e = makeAudio(setLaneMuted(stems(), "stem-bass", true), 8);
+    await e.play();
+    // ctx.gains: the master, then one gain per lane in the state's order (video, voice, music, vocals, drums, bass, other).
+    const lane = (i: number) => ctx.gains[1 + i]!.gain.value;
+    expect([lane(3), lane(4), lane(5), lane(6)]).toEqual([1, 1, 0, 1]);
+    e.setSolo("stem-vocals");
+    expect([lane(3), lane(4), lane(5), lane(6)]).toEqual([1, 0, 0, 0]);
+    e.dispose();
+  });
+  test("the audio chain runs master, six peaking filters at the band centres, a compressor and a make-up gain to the speakers", async () => {
+    const e = makeAudio(stems(), 8);
+    await e.play();
+    expect(ctx.filters).toHaveLength(6);
+    expect(ctx.filters.map((f) => f.frequency.value)).toEqual([60, 170, 500, 1500, 5000, 12000]);
+    expect(ctx.filters.every((f) => f.type === "peaking")).toBe(true);
+    expect(ctx.compressors).toHaveLength(1);
+    e.dispose();
+  });
+  test("setEffects moves the band gains and the compressor settings; neutral is transparent", async () => {
+    const e = makeAudio(stems(), 8);
+    await e.play();
+    e.setEffects({ eq: [3, 0, -6, 0, 0, 12], compressor: { threshold_db: -24, ratio: 4, attack_ms: 20, release_ms: 250, makeup_db: 6 } });
+    expect(ctx.filters.map((f) => f.gain.value)).toEqual([3, 0, -6, 0, 0, 12]);
+    const c = ctx.compressors[0]!;
+    expect(c.threshold.value).toBe(-24);
+    expect(c.ratio.value).toBe(4);
+    expect(c.attack.value).toBeCloseTo(0.02);
+    expect(c.release.value).toBeCloseTo(0.25);
+    e.setEffects({ eq: [0, 0, 0, 0, 0, 0], compressor: { threshold_db: -24, ratio: 1, attack_ms: 20, release_ms: 250, makeup_db: 0 } });
+    expect(ctx.filters.every((f) => f.gain.value === 0)).toBe(true);
+    expect(c.threshold.value).toBe(0);
+    expect(c.ratio.value).toBe(1);
+    e.dispose();
+  });
+  test("effects set before the first play are applied when the graph is built", async () => {
+    const e = makeAudio(stems(), 8);
+    e.setEffects({ eq: [0, 5, 0, 0, 0, 0], compressor: { threshold_db: 0, ratio: 1, attack_ms: 10, release_ms: 100, makeup_db: 0 } });
+    await e.play();
+    expect(ctx.filters[1]!.gain.value).toBe(5);
+    e.dispose();
+  });
+});

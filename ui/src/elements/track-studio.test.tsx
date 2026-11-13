@@ -504,3 +504,201 @@ describe("reduced motion and layout", () => {
     expect(container.innerHTML).not.toMatch(/#[0-9a-f]{3,8}\b(?![\w-])|rgb\(|hsl\(|oklch\(|(bg|text|border|ring|fill|stroke)-(black|white|red|blue|green|lime|orange|pink|violet|teal)\b/i);
   });
 });
+
+// ---------------------------------------------------------------------------------------------------------------------
+// MP-03: the audio studio (kind="audio"): EQ and compressor panels, stem lanes, a range selection.
+
+const stemLanes = () => [
+  { id: "stem-vocals", pieces: [{ id: "sv", ref: "v", src: "/f/vocals.wav", label: "Vocals", in_s: 0, out_s: 20, at_s: 0, source_s: 20 }] },
+  { id: "stem-drums", pieces: [{ id: "sd", ref: "d", src: "/f/drums.wav", label: "Drums", in_s: 0, out_s: 20, at_s: 0, source_s: 20 }] },
+  { id: "stem-bass", pieces: [{ id: "sb", ref: "b", src: "/f/bass.wav", label: "Bass", in_s: 0, out_s: 20, at_s: 0, source_s: 20 }] },
+  { id: "stem-other", pieces: [{ id: "so", ref: "o", src: "/f/other.wav", label: "Other", in_s: 0, out_s: 20, at_s: 0, source_s: 20 }] },
+];
+function openAudio(extra: Partial<TrackStudioProps> = {}) {
+  const ctx = new FakeAudioContext();
+  const utils = render(<TrackStudio kind="audio" lanes={stemLanes()} resetKey="s" title="A song" audioContext={() => ctx as unknown as AudioContext} {...extra} />);
+  return { ...utils, ctx };
+}
+const slider = (c: HTMLElement, name: string) => within(c).getByRole("slider", { name });
+const press = (el: Element, k: string, init: Partial<KeyboardEventInit> = {}) => fireEvent.keyDown(el, { key: k, ...init });
+
+describe("MP-03 stem lanes", () => {
+  test("an audio studio draws one lane per stem with its own name, no video lane and no empty voice or music lane", () => {
+    const { container, getAllByText, queryByText } = openAudio();
+    expect([...container.querySelectorAll("[data-lane]")].map((l) => l.getAttribute("data-lane"))).toEqual(["stem-vocals", "stem-drums", "stem-bass", "stem-other"]);
+    expect(getAllByText("Vocals").length).toBeGreaterThan(0);
+    expect(queryByText("No clip.")).toBeNull();
+    expect(pieces(container, "stem-drums")).toHaveLength(1);
+  });
+  test("Mute, Solo and Level work on a stem and are named for it", () => {
+    const { getByRole, container } = openAudio();
+    fireEvent.click(getByRole("button", { name: "Mute Drums" }));
+    expect(getByRole("button", { name: "Mute Drums" }).getAttribute("aria-pressed")).toBe("true");
+    fireEvent.click(getByRole("button", { name: "Solo Bass" }));
+    expect(getByRole("button", { name: "Solo Bass" }).getAttribute("aria-pressed")).toBe("true");
+    expect(slider(container, "Vocals level, decibels")).toBeTruthy();
+  });
+  test("the plan carries the stems with their mute and level", () => {
+    const onPlanChange = mock((_p: StudioPlan, _c: boolean) => undefined);
+    const { getByRole } = openAudio({ onPlanChange });
+    fireEvent.click(getByRole("button", { name: "Mute Drums" }));
+    const [plan, changed] = onPlanChange.mock.calls.at(-1)!;
+    expect(changed).toBe(true);
+    expect(plan.stems?.find((s) => s.id === "stem-drums")?.muted).toBe(true);
+    expect(plan.stems?.find((s) => s.id === "stem-vocals")?.muted).toBe(false);
+  });
+  test("a video studio is unchanged: the same three lanes, no EQ or Compressor panel, no selection row", () => {
+    const { container, queryByRole } = open();
+    expect([...container.querySelectorAll("[data-lane]")].map((l) => l.getAttribute("data-lane"))).toEqual(["video", "voice", "music"]);
+    expect(queryByRole("radio", { name: "EQ" })).toBeNull();
+    expect(queryByRole("radio", { name: "Compressor" })).toBeNull();
+    expect(container.querySelector("[data-slot='track-studio-selection']")).toBeNull();
+  });
+});
+
+describe("MP-03 EQ and compressor panels", () => {
+  test("an audio studio offers Volume, Fades, EQ and Compressor; EQ has six named bands at 0 dB", () => {
+    const { getByRole, container } = openAudio();
+    for (const n of ["Volume", "Fades", "EQ", "Compressor"]) expect(getByRole("radio", { name: n })).toBeTruthy();
+    fireEvent.click(getByRole("radio", { name: "EQ" }));
+    for (const hz of ["60 Hz", "170 Hz", "500 Hz", "1.5 kHz", "5 kHz", "12 kHz"]) {
+      const s = slider(container, `EQ ${hz}, gain in decibels`);
+      expect(s.getAttribute("aria-valuemin")).toBe("-12");
+      expect(s.getAttribute("aria-valuemax")).toBe("12");
+      expect(s.getAttribute("aria-valuenow")).toBe("0");
+    }
+  });
+  test("moving a band by keyboard reports the effects; Reset puts the band back and says nothing is left to apply", () => {
+    const onEffectsChange = mock((_fx: unknown, _changed: boolean) => undefined);
+    const { getByRole, container } = openAudio({ onEffectsChange });
+    fireEvent.click(getByRole("radio", { name: "EQ" }));
+    const band = slider(container, "EQ 500 Hz, gain in decibels");
+    press(band, "ArrowRight");
+    let [fx, changed] = onEffectsChange.mock.calls.at(-1)! as [{ eq: number[] }, boolean];
+    expect(fx.eq[2]).toBe(0.5);
+    expect(changed).toBe(true);
+    fireEvent.click(getByRole("button", { name: /^Reset/ }));
+    [fx, changed] = onEffectsChange.mock.calls.at(-1)! as [{ eq: number[] }, boolean];
+    expect(fx.eq).toEqual([0, 0, 0, 0, 0, 0]);
+    expect(changed).toBe(false);
+  });
+  test("the compressor has threshold, ratio, attack, release and makeup, each named, and Reset restores them", () => {
+    const onEffectsChange = mock((_fx: unknown, _changed: boolean) => undefined);
+    const { getByRole, container, getByText } = openAudio({ onEffectsChange });
+    fireEvent.click(getByRole("radio", { name: "Compressor" }));
+    for (const n of ["Compressor threshold, decibels", "Compressor ratio", "Compressor attack, milliseconds", "Compressor release, milliseconds", "Compressor makeup gain, decibels"]) expect(slider(container, n)).toBeTruthy();
+    expect(getByText(/^Off\./)).toBeTruthy();
+    press(slider(container, "Compressor ratio"), "ArrowRight");
+    const [fx, changed] = onEffectsChange.mock.calls.at(-1)! as [{ compressor: { ratio: number } }, boolean];
+    expect(fx.compressor.ratio).toBe(1.5);
+    expect(changed).toBe(true);
+    fireEvent.click(getByRole("button", { name: /^Reset/ }));
+    expect((onEffectsChange.mock.calls.at(-1)![0] as { compressor: { ratio: number } }).compressor.ratio).toBe(1);
+  });
+  test("the effects prop sets the controls, and a disabled reason disables them and says why", () => {
+    const { getByRole, container, getByText } = openAudio({ effects: { eq: [0, 0, 4, 0, 0, 0], compressor: { threshold_db: -20, ratio: 3, attack_ms: 10, release_ms: 100, makeup_db: 0 } }, effectsDisabledReason: "Wait for the stems to finish." });
+    fireEvent.click(getByRole("radio", { name: "EQ" }));
+    const band = slider(container, "EQ 500 Hz, gain in decibels");
+    expect(band.getAttribute("aria-valuenow")).toBe("4");
+    expect(band.hasAttribute("data-disabled") || band.getAttribute("aria-disabled") === "true").toBe(true);
+    expect(getByText("Wait for the stems to finish.")).toBeTruthy();
+  });
+  test("choosing a panel tells the host", () => {
+    const onPanelChange = mock((_p: string) => undefined);
+    const { getByRole } = openAudio({ onPanelChange });
+    fireEvent.click(getByRole("radio", { name: "Compressor" }));
+    expect(onPanelChange).toHaveBeenCalledWith("compressor");
+  });
+  test("the preview chain gets the settings: six filters and a compressor", async () => {
+    const { getByRole, container, ctx } = openAudio();
+    fireEvent.click(getByRole("radio", { name: "EQ" }));
+    press(slider(container, "EQ 60 Hz, gain in decibels"), "ArrowRight");
+    await act(async () => { fireEvent.click(getByRole("button", { name: "Play" })); await flush(); });
+    expect(ctx.filters).toHaveLength(6);
+    expect(ctx.filters[0]!.gain.value).toBe(0.5);
+    expect(ctx.compressors).toHaveLength(1);
+  });
+});
+
+describe("MP-03 range selection", () => {
+  const rect = { left: 0, top: 0, right: 2000, bottom: 32, width: 2000, height: 32, x: 0, y: 0, toJSON: () => ({}) } as DOMRect;
+  const dragRuler = (c: HTMLElement, from: number, to: number) => {
+    const ruler = c.querySelector("[data-slot='track-studio-ruler'] > div:last-child") as HTMLElement;
+    ruler.getBoundingClientRect = () => rect;
+    ruler.setPointerCapture = () => undefined;
+    fireEvent.pointerDown(ruler, { clientX: from, pointerId: 1 });
+    fireEvent.pointerMove(ruler, { clientX: to, pointerId: 1 });
+    fireEvent.pointerUp(ruler, { clientX: to, pointerId: 1 });
+  };
+  test("dragging on the ruler selects a range, shows the readout and tells the host in seconds", async () => {
+    const onSelectionChange = mock((_s: unknown) => undefined);
+    const { container } = openAudio({ onSelectionChange });
+    await flush();
+    expect(container.querySelector("[data-slot='track-studio-selection-readout']")!.textContent).toContain("No selection");
+    // 36 px per second at the default scale before layout is measured.
+    dragRuler(container, 72, 360);
+    const sel = onSelectionChange.mock.calls.at(-1)![0] as { start_s: number; end_s: number };
+    expect(sel.end_s).toBeGreaterThan(sel.start_s);
+    expect(container.querySelector("[data-slot='track-studio-selection-band']")).toBeTruthy();
+    expect(container.querySelector("[data-slot='track-studio-selection-readout']")!.textContent).toMatch(/^Selection: 0:0\d\.\d to 0:\d+\.\d, /);
+  });
+  test("a plain press on the ruler still moves the playhead and selects nothing", async () => {
+    const onSelectionChange = mock((_s: unknown) => undefined);
+    const { container } = openAudio({ onSelectionChange });
+    await flush();
+    const ruler = container.querySelector("[data-slot='track-studio-ruler'] > div:last-child") as HTMLElement;
+    ruler.getBoundingClientRect = () => rect;
+    ruler.setPointerCapture = () => undefined;
+    fireEvent.pointerDown(ruler, { clientX: 180, pointerId: 1 });
+    fireEvent.pointerUp(ruler, { clientX: 180, pointerId: 1 });
+    expect(onSelectionChange).not.toHaveBeenCalled();
+    expect(container.querySelector("[data-slot='track-studio-selection-band']")).toBeNull();
+  });
+  test("dragging on an empty part of a lane selects a range too", async () => {
+    const onSelectionChange = mock((_s: unknown) => undefined);
+    const { container } = openAudio({ onSelectionChange, lanes: [{ id: "stem-vocals", pieces: [{ id: "sv", ref: "v", src: "/f/vocals.wav", in_s: 0, out_s: 2, at_s: 0, source_s: 2 }] }, ...stemLanes().slice(1, 2).map((l) => ({ ...l, pieces: [{ ...l.pieces[0]!, out_s: 30, source_s: 30 }] }))] });
+    await flush();
+    const body = container.querySelector("[data-lane='stem-vocals'] [role='group']") as HTMLElement;
+    body.getBoundingClientRect = () => rect;
+    body.setPointerCapture = () => undefined;
+    fireEvent.pointerDown(body, { clientX: 400, pointerId: 1 });
+    fireEvent.pointerMove(body, { clientX: 700, pointerId: 1 });
+    fireEvent.pointerUp(body, { clientX: 700, pointerId: 1 });
+    expect(onSelectionChange).toHaveBeenCalled();
+  });
+  test("[ and ] set the start and end at the playhead, Esc and Clear selection clear it", async () => {
+    const onSelectionChange = mock((_s: unknown) => undefined);
+    const { container, getByRole } = openAudio({ onSelectionChange });
+    await flush();
+    const section = container.querySelector("section")!;
+    const head = playhead(container);
+    key(head, "ArrowRight", { shiftKey: true });
+    key(head, "ArrowRight", { shiftKey: true });
+    await flush();
+    press(section, "[");
+    expect(onSelectionChange.mock.calls.at(-1)![0]).toMatchObject({ end_s: 20 });
+    key(head, "ArrowRight", { shiftKey: true });
+    await flush();
+    press(section, "]");
+    const sel = onSelectionChange.mock.calls.at(-1)![0] as { start_s: number; end_s: number };
+    expect(sel.start_s).toBeGreaterThan(0);
+    expect(sel.end_s).toBeGreaterThan(sel.start_s);
+    press(section, "Escape");
+    expect(onSelectionChange.mock.calls.at(-1)![0]).toBeNull();
+    expect(container.querySelector("[data-slot='track-studio-selection-band']")).toBeNull();
+    expect((getByRole("button", { name: "Clear selection" }) as HTMLButtonElement).disabled).toBe(true);
+    expect(getByRole("button", { name: "Clear selection" }).getAttribute("title")).toBe("There is no selection to clear.");
+  });
+  test("the selection prop draws a range, clamps it to the studio and the Clear button calls back with null", () => {
+    const onSelectionChange = mock((_s: unknown) => undefined);
+    const { container, getByRole } = openAudio({ selection: { start_s: 5, end_s: 9 }, onSelectionChange });
+    expect(container.querySelector("[data-slot='track-studio-selection-readout']")!.textContent).toContain("Selection: 0:05.0 to 0:09.0, 4 seconds.");
+    fireEvent.click(getByRole("button", { name: "Clear selection" }));
+    expect(onSelectionChange).toHaveBeenCalledWith(null);
+  });
+  test("a video studio ignores [ and ] and draws no selection", () => {
+    const { container } = open();
+    press(container.querySelector("section")!, "[");
+    expect(container.querySelector("[data-slot='track-studio-selection-band']")).toBeNull();
+  });
+});

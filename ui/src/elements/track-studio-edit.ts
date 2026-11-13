@@ -4,7 +4,7 @@
 import { i18n } from "@/kit/i18n"
 import {
   FADE_MAX_S, LEVEL_DB_MAX, LEVEL_DB_MIN, MIN_PIECE_S, clamp, effectiveCrossfade, filmLength, findPiece, laneOf, layoutLane, mapLane, mapPiece, normalizeCrossfade,
-  pieceAt, pieceDuration, round, type LaneId, type StudioPiece, type StudioState,
+  pieceAt, pieceDuration, round, isStemLane, type LaneId, type StemLaneId, type StudioPiece, type StudioState,
 } from "./track-studio-model";
 
 export interface StudioLimits {
@@ -227,11 +227,14 @@ export interface StudioPlan {
   video: { level_db: number; muted: boolean; pieces: PlanPiece[]; transitions: { kind: "cut" | "crossfade"; seconds: number }[] };
   voice: { level_db: number; muted: boolean; pieces: PlanLanePiece[] };
   music: { level_db: number; muted: boolean; pieces: PlanLanePiece[] };
+  /** MP-03: an audio studio's stem lanes, present only when the studio has any (a video plan is unchanged). */
+  stems?: { id: StemLaneId; level_db: number; muted: boolean; pieces: PlanLanePiece[] }[];
 }
 
 export function toPlan(state: StudioState): StudioPlan {
   const video = laneOf(state, "video");
-  const audio = (id: "voice" | "music") => {
+  const stemIds = state.lanes.map((l) => l.id).filter(isStemLane);
+  const audio = (id: "voice" | "music" | StemLaneId) => {
     const lane = laneOf(state, id);
     return {
       level_db: lane.level_db,
@@ -253,6 +256,7 @@ export function toPlan(state: StudioState): StudioPlan {
     },
     voice: audio("voice"),
     music: audio("music"),
+    ...(stemIds.length > 0 ? { stems: stemIds.map((id) => ({ id, ...audio(id) })) } : {}),
   };
 }
 

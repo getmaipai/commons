@@ -7,7 +7,7 @@
 // the thumbnails and every media element live in this component's own state and are gone when it unmounts or the clip relocks (K4).
 
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
-import { PauseIcon, PlayIcon, PlusIcon, Redo2Icon, RepeatIcon, ScissorsIcon, SkipBackIcon, Trash2Icon, Undo2Icon } from "lucide-react";
+import { XIcon, PauseIcon, PlayIcon, PlusIcon, Redo2Icon, RepeatIcon, ScissorsIcon, SkipBackIcon, Trash2Icon, Undo2Icon } from "lucide-react";
 import { cn, FOCUS_RING, hueTintBackground } from "@/kit/utils";
 import { useIsPhoneLayout } from "@/kit/hooks/useIsPhoneLayout";
 import { Button } from "@/kit/ui/button";
@@ -16,11 +16,15 @@ import { Switch } from "@/kit/ui/switch";
 import { SafeImage } from "@/kit/primitives/SafeImage";
 import { eyebrow } from "./surfaces";
 import { LockTile } from "./adult-lock";
-import { PreviewEngine, type EngineStats } from "./track-studio-engine";
+import { MAX_AUDIO_ELEMENTS, PreviewEngine, type EngineStats } from "./track-studio-engine";
+import {
+  COMPRESSOR_LIMITS, EQ_BANDS_HZ, EQ_GAIN_MAX_DB, EQ_GAIN_MIN_DB, bandText, compressorIsNeutral, effectsAreNeutral, eqIsFlat, makeSelection, readEffects, readSelection, resetCompressor, resetEq,
+  setCompressor, setEqBand, type CompressorSettings, type StudioEffects, type StudioSelection,
+} from "./track-studio-fx";
 import { THUMB_STEP_S, decodePeaks, makeThumbnails, sliceBars } from "./track-studio-media";
 import {
-  CROSSFADE_MAX_S, FADE_MAX_S, LANE_IDS, LEVEL_DB_MAX, LEVEL_DB_MIN, MIN_PIECE_S, effectiveCrossfade, filmLength, findPiece, formatTime, laneOf, layoutLane, pieceDuration, pieceEnvelope, readState, rulerTicks,
-  setDuck, setLaneLevel, setLaneMuted, setPieceLevel, spokenTime, type LaneId, type StudioLane, type StudioPiece, type StudioState,
+  CROSSFADE_MAX_S, FADE_MAX_S, LEVEL_DB_MAX, LEVEL_DB_MIN, MIN_PIECE_S, effectiveCrossfade, filmLength, findPiece, formatTime, laneOf, layoutLane, pieceDuration, pieceEnvelope, readState, rulerTicks,
+  isStemLane, setDuck, setLaneLevel, setLaneMuted, setPieceLevel, spokenTime, type LaneId, type StudioLane, type StudioPiece, type StudioState,
 } from "./track-studio-model";
 import {
   DEFAULT_LEVEL_STEPS, DEFAULT_LIMITS, addPiece, applyBalance, canRedo, canUndo, crossfadeAfter, currentBalance, deletePiece, movePiece, planChanged, pushHistory,
@@ -32,12 +36,15 @@ import { i18n, kitLocaleTag } from "@/kit/i18n";
 export type { StudioPiece, StudioLane, StudioState } from "./track-studio-model";
 export type { StudioPlan, LevelStep, StudioLimits } from "./track-studio-edit";
 export { toPlan } from "./track-studio-edit";
-export { readState } from "./track-studio-model";
+export { readState, STEM_IDS, STEM_LANE_IDS, isStemLane, type StemId, type StemLaneId, type LaneId } from "./track-studio-model";
+export { EQ_BANDS_HZ, defaultEffects, readEffects, makeSelection, type StudioEffects, type CompressorSettings, type StudioSelection } from "./track-studio-fx";
 
 export type StudioTool = "split" | "delete" | "add_clip" | "add_voice" | "add_music";
-export type StudioPanel = "volume" | "fades" | "crossfade" | "level";
+export type StudioPanel = "volume" | "fades" | "crossfade" | "level" | "eq" | "compressor";
 export const ALL_TOOLS: readonly StudioTool[] = ["split", "delete", "add_clip", "add_voice", "add_music"];
 export const ALL_PANELS: readonly StudioPanel[] = ["volume", "fades", "crossfade", "level"];
+/** MP-03: what an audio studio (`kind="audio"`) shows when the host passes no `panels`. */
+export const AUDIO_PANELS: readonly StudioPanel[] = ["volume", "fades", "eq", "compressor"];
 
 /** What the host answers when the person adds a clip, a voice or a song. */
 export interface StudioAdded { ref: string; src: string; label?: string; duration_s: number; poster?: string }
@@ -71,6 +78,18 @@ export interface TrackStudioProps {
   /** The export job's card, drawn in the monitor's place with Keep editing. */
   exportCard?: ReactNode;
   onKeepEditing?: () => void;
+  /** MP-03 (audio): the EQ and compressor the preview plays. Controlled when given; otherwise the Element keeps them and starts from flat. The preview is
+   * listening only: the host persists them when the person applies. */
+  effects?: StudioEffects;
+  /** Every change to the EQ or the compressor, and whether the result differs from flat (nothing to apply when false). */
+  onEffectsChange?: (effects: StudioEffects, changed: boolean) => void;
+  /** The EQ and compressor controls are drawn disabled with this reason (for example while a job runs). */
+  effectsDisabledReason?: string;
+  /** The panel the person opened. */
+  onPanelChange?: (panel: StudioPanel) => void;
+  /** MP-03 (audio): a time range in seconds, so the host can run an effect on a region. Controlled when given (null is no selection). */
+  selection?: StudioSelection | null;
+  onSelectionChange?: (selection: StudioSelection | null) => void;
   /** Called with the plan after every change, and whether it differs from the clip as opened. */
   onPlanChange?: (plan: StudioPlan, changed: boolean) => void;
   /** Measurements for the build: `thumbs_ms` (a strip), `peaks_ms` (a waveform), `seam_ms` (a cut between video pieces). */
@@ -79,7 +98,7 @@ export interface TrackStudioProps {
   audioContext?: () => AudioContext | null;
 }
 
-const laneWord = (): Record<LaneId, string> => ({ video: i18n._({ id: "ui.Video", message: "Video" }), voice: i18n._({ id: "ui.Voice", message: "Voice" }), music: i18n._({ id: "ui.Music", message: "Music" }) });
+const laneWord = (): Record<LaneId, string> => ({ "stem-vocals": i18n._({ id: "ui.Vocals", message: "Vocals" }), "stem-drums": i18n._({ id: "ui.Drums", message: "Drums" }), "stem-bass": i18n._({ id: "ui.Bass", message: "Bass" }), "stem-other": i18n._({ id: "ui.Other", message: "Other" }), video: i18n._({ id: "ui.Video", message: "Video" }), voice: i18n._({ id: "ui.Voice", message: "Voice" }), music: i18n._({ id: "ui.Music", message: "Music" }) });
 const helpLine = (): string => i18n._({ id: "ui.Drag the handles at each end to trim. Press S to cut at the playhead.", message: "Drag the handles at each end to trim. Press S to cut at the playhead." });
 const previewLine = (): string => i18n._({ id: "ui.The preview is what you hear in the Studio. It cuts where the export dissolves, and the final loudness is set at export. Export makes a new clip and keeps the old one.", message: "The preview is what you hear in the Studio. It cuts where the export dissolves, and the final loudness is set at export. Export makes a new clip and keeps the old one." });
 const splitLabel = (): string => i18n._({ id: "ui.Split at playhead", message: "Split at playhead" });
@@ -123,7 +142,8 @@ export function TrackStudio(props: TrackStudioProps) {
 function StudioBody(props: TrackStudioProps) {
   const { onPlanChange, onMetric } = props;
   const tools = props.tools ?? ALL_TOOLS;
-  const panels = props.panels ?? ALL_PANELS;
+  const audioKind = (props.kind ?? "video") === "audio";
+  const panels = props.panels ?? (audioKind ? AUDIO_PANELS : ALL_PANELS);
   const limits: StudioLimits = useMemo(() => ({ ...DEFAULT_LIMITS, ...props.limits }), [props.limits]);
   const steps = props.levelSteps ?? DEFAULT_LEVEL_STEPS;
   const isPhone = useIsPhoneLayout();
@@ -139,6 +159,8 @@ function StudioBody(props: TrackStudioProps) {
   const [busy, setBusy] = useState<string | null>(null);
   const [panelTab, setPanelTab] = useState<StudioPanel>(panels[0] ?? "volume");
   const [zoom, setZoom] = useState<number | null>(null);
+  const [fxLocal, setFxLocal] = useState<StudioEffects>(() => readEffects(props.effects));
+  const [selLocal, setSelLocal] = useState<StudioSelection | null>(null);
   const [showCard, setShowCard] = useState(false);
   const timeStore = useMemo(createTimeStore, []);
   const monitorRef = useRef<HTMLDivElement>(null);
@@ -153,6 +175,13 @@ function StudioBody(props: TrackStudioProps) {
   const [viewW, setViewW] = useState(0);
 
   const film = filmLength(state);
+  const fx = useMemo(() => (props.effects !== undefined ? readEffects(props.effects) : fxLocal), [props.effects, fxLocal]);
+  const { onEffectsChange, onSelectionChange, onPanelChange } = props;
+  const changeFx = useCallback((next: StudioEffects) => { setFxLocal(next); onEffectsChange?.(next, !effectsAreNeutral(next)); }, [onEffectsChange]);
+  const selection = useMemo(() => readSelection(props.selection !== undefined ? props.selection : selLocal, film), [props.selection, selLocal, film]);
+  const setSelection = useCallback((next: StudioSelection | null) => { setSelLocal(next); onSelectionChange?.(next); }, [onSelectionChange]);
+  const selectionRef = useRef(selection);
+  selectionRef.current = selection;
   const labelW = isPhone ? LABEL_W_PHONE : LABEL_W;
   const fitPps = Math.min(80, Math.max(12, Math.floor((viewW - labelW - 16) / (Math.max(film, 10) + 2))));
   const pps = zoom ?? (viewW > 0 ? fitPps : 36);
@@ -189,6 +218,7 @@ function StudioBody(props: TrackStudioProps) {
       videoClass: "size-full object-contain",
       host: hostRef.current,
       audioContext: props.audioContext,
+      maxAudio: audioKind ? Math.max(MAX_AUDIO_ELEMENTS, 8) : undefined,
       onTime: (t) => timeStore.set(t),
       onPlaying: setPlaying,
       onError: (l) => setLine(l),
@@ -205,6 +235,7 @@ function StudioBody(props: TrackStudioProps) {
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps -- one engine per clip
   useEffect(() => { engineRef.current?.setState(state); }, [state]);
+  useEffect(() => { engineRef.current?.setEffects(fx); }, [fx]);
   useEffect(() => {
     const want = pendingFocus.current;
     if (!want) return;
@@ -257,7 +288,8 @@ function StudioBody(props: TrackStudioProps) {
     const t = playhead();
     const s = sel;
     // Split the selected piece when the playhead is on it, else the video piece (or the first audio piece) under the playhead.
-    const lanes: LaneId[] = s ? [s.lane.id, ...LANE_IDS.filter((l) => l !== s.lane.id)] : [...LANE_IDS];
+    const all = state.lanes.map((l) => l.id);
+    const lanes: LaneId[] = s ? [s.lane.id, ...all.filter((l) => l !== s.lane.id)] : all;
     let last = "";
     for (const id of lanes) {
       const r = splitAt(state, id, t, limits);
@@ -295,6 +327,26 @@ function StudioBody(props: TrackStudioProps) {
     props.onExport(plan);
   };
 
+  // -- the range selection (audio): a drag on the ruler or a lane; a plain press still moves the playhead ----------------------------------
+  const dragRange = useRef<{ anchor: number; x: number; moved: boolean } | null>(null);
+  const range: RangeHandlers | null = audioKind
+    ? {
+        start: (clientX, t) => { dragRange.current = { anchor: t, x: clientX, moved: false }; },
+        move: (clientX, t) => {
+          const d = dragRange.current;
+          if (!d) return false;
+          if (!d.moved && Math.abs(clientX - d.x) < 4) return false;
+          d.moved = true;
+          setSelection(makeSelection(d.anchor, t, film));
+          return true;
+        },
+        end: () => { dragRange.current = null; },
+      }
+    : null;
+  // An audio studio with stems shows the stems, not three empty lanes; the video lane is never drawn without a picture.
+  const hasStems = state.lanes.some((l) => isStemLane(l.id));
+  const visibleLanes = audioKind ? state.lanes.filter((l) => l.id !== "video" && !(hasStems && !isStemLane(l.id) && l.pieces.length === 0)) : state.lanes;
+
   // -- keyboard --------------------------------------------------------------------------------------------------------
   const onKeyDown = (e: ReactKeyboardEvent<HTMLElement>) => {
     const target = e.target as HTMLElement;
@@ -303,10 +355,19 @@ function StudioBody(props: TrackStudioProps) {
     }
     const onButton = target.closest("button") && !target.closest("[data-piece]");
     const mod = e.metaKey || e.ctrlKey;
+    if (e.key === "Escape" && selectionRef.current && !mod) { e.preventDefault(); setSelection(null); return; }
     if (mod && e.key.toLowerCase() === "z") { e.preventDefault(); if (e.shiftKey) redo(); else undo(); return; }
     if (mod || e.altKey) return;
     if (e.key === " " && !onButton) { e.preventDefault(); togglePlay(); return; }
     if (onButton) return;
+    if (audioKind && (e.key === "[" || e.key === "]")) {
+      e.preventDefault();
+      const p = playhead();
+      const cur = selectionRef.current;
+      if (e.key === "[") setSelection(makeSelection(p, cur && cur.end_s > p ? cur.end_s : film, film));
+      else setSelection(makeSelection(cur && cur.start_s < p ? cur.start_s : 0, p, film));
+      return;
+    }
     const step = e.shiftKey ? NUDGE_BIG_S : NUDGE_S;
     if (e.key === "ArrowLeft") { e.preventDefault(); void seekTo(Math.max(0, playhead() - step)); }
     else if (e.key === "ArrowRight") { e.preventDefault(); void seekTo(Math.min(film, playhead() + step)); }
@@ -328,6 +389,7 @@ function StudioBody(props: TrackStudioProps) {
   );
   const reasons = (["add_clip", "add_voice", "add_music"] as const).map((k) => (props.onAdd && tools.includes(k) ? props.toolReasons?.[k] : undefined)).find(Boolean);
 
+  const fxReason = props.effectsDisabledReason;
   const panelBodies: Record<StudioPanel, { title: string; reset: () => void; body: ReactNode }> = {
     volume: {
       title: i18n._({ id: "ui.Volume", message: "Volume" }),
@@ -348,6 +410,16 @@ function StudioBody(props: TrackStudioProps) {
       title: i18n._({ id: "ui.Level", message: "Level" }),
       reset: () => commit(applyBalance(state, steps.find((s) => s.id === "balanced") ?? steps[Math.floor(steps.length / 2)]!)),
       body: <LevelPanel state={state} steps={steps} commit={commit} />,
+    },
+    eq: {
+      title: i18n._({ id: "ui.EQ", message: "EQ" }),
+      reset: () => changeFx(resetEq(fx)),
+      body: <EqPanel fx={fx} change={changeFx} reason={fxReason} />,
+    },
+    compressor: {
+      title: i18n._({ id: "ui.Compressor", message: "Compressor" }),
+      reset: () => changeFx(resetCompressor(fx)),
+      body: <CompressorPanel fx={fx} change={changeFx} reason={fxReason} />,
     },
   };
 
@@ -419,8 +491,8 @@ function StudioBody(props: TrackStudioProps) {
         {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
         <div ref={scrollRef} className="relative overflow-x-auto overflow-y-hidden pb-2" role="group" aria-label={i18n._({ id: "ui.Tracks. Left and right arrows move the playhead. Space plays.", message: "Tracks. Left and right arrows move the playhead. Space plays." })} tabIndex={0}>
           <div className="relative" style={{ width: labelW + timeW }}>
-            <Ruler store={timeStore} film={film} pps={pps} labelW={labelW} timeW={timeW} seek={(t) => void seekTo(t)} engine={engineRef} />
-            {state.lanes.map((lane) => (
+            <Ruler store={timeStore} film={film} pps={pps} labelW={labelW} timeW={timeW} seek={(t) => void seekTo(t)} engine={engineRef} range={range} />
+            {visibleLanes.map((lane) => (
               <LaneRow
                 key={lane.id}
                 lane={lane}
@@ -437,8 +509,10 @@ function StudioBody(props: TrackStudioProps) {
                 seek={(t) => void seekTo(t)}
                 playhead={playhead}
                 setLine={setLine}
+                range={range}
               />
             ))}
+            {selection ? <SelectionBand selection={selection} pps={pps} labelW={labelW} /> : null}
             <Playhead store={timeStore} pps={pps} labelW={labelW} />
           </div>
         </div>
@@ -459,13 +533,25 @@ function StudioBody(props: TrackStudioProps) {
         {isPhone ? null : <ZoomControl pps={pps} setZoom={setZoom} />}
         <TimeText store={timeStore} film={film} />
       </div>
+      {audioKind ? (
+        <div className="bg-card flex min-w-0 flex-wrap items-center gap-3 rounded-2xl p-3" data-slot="track-studio-selection">
+          <p role="status" aria-live="polite" className="text-sm" data-slot="track-studio-selection-readout">
+            {selection
+              ? i18n._({ id: "ui.Selection: {start} to {end}, {length}.", message: "Selection: {start} to {end}, {length}.", values: { start: formatClock(selection.start_s), end: formatClock(selection.end_s), length: spokenTime(selection.end_s - selection.start_s) } })
+              : <span className="text-muted-foreground">{i18n._({ id: "ui.No selection. Drag on the ruler or a track to pick a range, or press [ and ] at the playhead.", message: "No selection. Drag on the ruler or a track to pick a range, or press [ and ] at the playhead." })}</span>}
+          </p>
+          <Button variant="secondary" size="sm" className="ml-auto rounded-full" onClick={() => setSelection(null)} disabled={!selection} title={selection ? undefined : i18n._({ id: "ui.There is no selection to clear.", message: "There is no selection to clear." })}>
+            <XIcon />{i18n._({ id: "ui.Clear selection", message: "Clear selection" })}
+          </Button>
+        </div>
+      ) : null}
       </div>
 
       <div className="min-w-0 lg:col-start-2 lg:row-start-2" data-slot="track-studio-panels">
         <div className="bg-card flex flex-col gap-3 rounded-2xl p-4">
           <div role="radiogroup" aria-label={i18n._({ id: "ui.Panel", message: "Panel" })} className="grid grid-cols-2 gap-2">
             {panels.map((p) => (
-              <Button key={p} variant={panelTab === p ? "default" : "secondary"} size={isPhone ? "sm" : "default"} role="radio" aria-checked={panelTab === p} className="rounded-full px-2" onClick={() => setPanelTab(p)}>{panelBodies[p].title}</Button>
+              <Button key={p} variant={panelTab === p ? "default" : "secondary"} size={isPhone ? "sm" : "default"} role="radio" aria-checked={panelTab === p} className="rounded-full px-2" onClick={() => { setPanelTab(p); onPanelChange?.(p); }}>{panelBodies[p].title}</Button>
             ))}
           </div>
           <section aria-label={panelBodies[panelTab]?.title ?? panelBodies[panels[0]!]!.title}>
@@ -591,6 +677,45 @@ function LevelPanel({ state, steps, commit }: { state: StudioState; steps: reado
   );
 }
 
+function EqPanel({ fx, change, reason }: { fx: StudioEffects; change: (fx: StudioEffects) => void; reason?: string }) {
+  const off = !!reason;
+  return (
+    <>
+      <div className="grid grid-cols-6 gap-1" role="group" aria-label={i18n._({ id: "ui.Six-band equalizer", message: "Six-band equalizer" })} data-slot="track-studio-eq">
+        {EQ_BANDS_HZ.map((hz, i) => (
+          <div key={hz} className="flex min-w-0 flex-col items-center gap-2">
+            <span className="text-xs tabular-nums" data-eq-value={i}>{dbText(fx.eq[i] ?? 0)}</span>
+            <Slider orientation="vertical" min={EQ_GAIN_MIN_DB} max={EQ_GAIN_MAX_DB} step={0.5} value={[fx.eq[i] ?? 0]} disabled={off} aria-label={i18n._({ id: "ui.EQ {band}, gain in decibels", message: "EQ {band}, gain in decibels", values: { band: bandText(hz) } })} onValueChange={([v]) => change(setEqBand(fx, i, v ?? 0))} />
+            <span className={cn(eyebrow, "text-[10px]")}>{bandText(hz)}</span>
+          </div>
+        ))}
+      </div>
+      <p className="text-muted-foreground text-sm">{reason ?? (eqIsFlat(fx.eq) ? i18n._({ id: "ui.Flat. Move a band to shape the sound. You hear it in the preview; the saved song changes when you apply it.", message: "Flat. Move a band to shape the sound. You hear it in the preview; the saved song changes when you apply it." }) : i18n._({ id: "ui.You hear this in the preview. The saved song changes when you apply it.", message: "You hear this in the preview. The saved song changes when you apply it." }))}</p>
+    </>
+  );
+}
+
+function CompressorPanel({ fx, change, reason }: { fx: StudioEffects; change: (fx: StudioEffects) => void; reason?: string }) {
+  const c = fx.compressor;
+  const L = COMPRESSOR_LIMITS;
+  const off = !!reason;
+  const row = (key: keyof CompressorSettings, label: string, aria: string, value: string) => (
+    <Field label={label} value={value} key={key}>
+      <Slider min={L[key].min} max={L[key].max} step={L[key].step} value={[c[key]]} disabled={off} aria-label={aria} onValueChange={([v]) => change(setCompressor(fx, { [key]: v ?? c[key] }))} />
+    </Field>
+  );
+  return (
+    <>
+      {row("threshold_db", i18n._({ id: "ui.Threshold", message: "Threshold" }), i18n._({ id: "ui.Compressor threshold, decibels", message: "Compressor threshold, decibels" }), dbText(c.threshold_db))}
+      {row("ratio", i18n._({ id: "ui.Ratio", message: "Ratio" }), i18n._({ id: "ui.Compressor ratio", message: "Compressor ratio" }), `${formatFixed(c.ratio, 1)}:1`)}
+      {row("attack_ms", i18n._({ id: "ui.Attack", message: "Attack" }), i18n._({ id: "ui.Compressor attack, milliseconds", message: "Compressor attack, milliseconds" }), `${formatFixed(c.attack_ms, 0)} ms`)}
+      {row("release_ms", i18n._({ id: "ui.Release", message: "Release" }), i18n._({ id: "ui.Compressor release, milliseconds", message: "Compressor release, milliseconds" }), `${formatFixed(c.release_ms, 0)} ms`)}
+      {row("makeup_db", i18n._({ id: "ui.Makeup", message: "Makeup" }), i18n._({ id: "ui.Compressor makeup gain, decibels", message: "Compressor makeup gain, decibels" }), dbText(c.makeup_db))}
+      <p className="text-muted-foreground text-sm">{reason ?? (compressorIsNeutral(c) ? i18n._({ id: "ui.Off. Raise the ratio above 1 to turn it on. You hear it in the preview; the saved song changes when you apply it.", message: "Off. Raise the ratio above 1 to turn it on. You hear it in the preview; the saved song changes when you apply it." }) : i18n._({ id: "ui.You hear this in the preview. The saved song changes when you apply it.", message: "You hear this in the preview. The saved song changes when you apply it." }))}</p>
+    </>
+  );
+}
+
 function TimeChip({ store, film }: { store: TimeStore; film: number }) {
   const t = useTime(store, 0.25);
   return <span className="bg-background/70 text-foreground absolute bottom-2 left-2 rounded-full px-2 py-0.5 font-mono text-xs tabular-nums" aria-hidden="true">{formatTime(t)} / {formatTime(film)}</span>;
@@ -605,7 +730,16 @@ function Playhead({ store, pps, labelW }: { store: TimeStore; pps: number; label
   return <div aria-hidden="true" data-slot="track-studio-playhead" className="bg-foreground pointer-events-none absolute top-0 bottom-0 z-20 w-px" style={{ left: labelW + t * pps }} />;
 }
 
-function Ruler({ store, film, pps, labelW, timeW, seek, engine }: { store: TimeStore; film: number; pps: number; labelW: number; timeW: number; seek: (t: number) => void; engine: React.RefObject<PreviewEngine | null> }) {
+/** The press, move and release of a range drag (audio studios). `move` answers true while it is drawing a range, so the caller does not also seek. */
+interface RangeHandlers { start: (clientX: number, t: number) => void; move: (clientX: number, t: number) => boolean; end: () => void }
+
+const formatClock = (t: number): string => `${formatTime(t)}.${String(Math.floor((t % 1) * 10 + 1e-6))}`;
+
+function SelectionBand({ selection, pps, labelW }: { selection: StudioSelection; pps: number; labelW: number }) {
+  return <div aria-hidden="true" data-slot="track-studio-selection-band" className="bg-primary/15 border-primary pointer-events-none absolute top-0 bottom-0 z-10 border-x" style={{ left: labelW + selection.start_s * pps, width: Math.max(2, (selection.end_s - selection.start_s) * pps) }} />;
+}
+
+function Ruler({ store, film, pps, labelW, timeW, seek, engine, range }: { store: TimeStore; film: number; pps: number; labelW: number; timeW: number; seek: (t: number) => void; engine: React.RefObject<PreviewEngine | null>; range: RangeHandlers | null }) {
   const t = useTime(store, 0.05);
   const ticks = rulerTicks(Math.max(film, timeW / pps), pps);
   const rowRef = useRef<HTMLDivElement>(null);
@@ -625,11 +759,12 @@ function Ruler({ store, film, pps, labelW, timeW, seek, engine }: { store: TimeS
           (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
           drag.current = { wasPlaying: engine.current?.isPlaying ?? false };
           if (drag.current.wasPlaying) engine.current?.pause();
+          range?.start(e.clientX, at(e));
           seek(at(e));
         }}
-        onPointerMove={(e) => { if (drag.current) seek(at(e)); }}
-        onPointerUp={() => { const d = drag.current; drag.current = null; if (d?.wasPlaying) void engine.current?.play(); }}
-        onPointerCancel={() => { drag.current = null; }}
+        onPointerMove={(e) => { if (range?.move(e.clientX, at(e))) return; if (drag.current) seek(at(e)); }}
+        onPointerUp={() => { const d = drag.current; drag.current = null; range?.end(); if (d?.wasPlaying) void engine.current?.play(); }}
+        onPointerCancel={() => { drag.current = null; range?.end(); }}
       >
         {ticks.map((tick) => (
           <span key={tick} aria-hidden="true" className="text-muted-foreground border-border absolute top-0 h-full border-l pl-1 font-mono text-[11px] leading-8 select-none" style={{ left: tick * pps }}>{formatTime(tick)}</span>
@@ -680,9 +815,10 @@ interface LaneRowProps {
   seek: (t: number) => void;
   playhead: () => number;
   setLine: (l: string) => void;
+  range: RangeHandlers | null;
 }
 
-function LaneRow({ lane, state, pps, labelW, timeW, selected, solo, media, select, commit, setSolo, seek, playhead, setLine }: LaneRowProps) {
+function LaneRow({ lane, state, pps, labelW, timeW, selected, solo, media, select, commit, setSolo, seek, playhead, setLine, range }: LaneRowProps) {
   const placed = layoutLane(lane);
   const hue = `--hue-${lane.hue}`;
   const name = laneWord()[lane.id];
@@ -705,9 +841,19 @@ function LaneRow({ lane, state, pps, labelW, timeW, selected, solo, media, selec
         aria-label={i18n._({ id: "ui.{lane} pieces", message: "{lane} pieces", values: { lane: name } })}
         className={cn("relative", lane.muted && "opacity-50")}
         style={{ width: timeW, height: LANE_H }}
-        onPointerDown={(e) => { if (e.target === e.currentTarget) { select(null); const r = e.currentTarget.getBoundingClientRect(); seek(Math.max(0, (e.clientX - r.left) / pps)); } }}
+        onPointerDown={(e) => {
+          if (e.target !== e.currentTarget) return;
+          select(null);
+          const r = e.currentTarget.getBoundingClientRect();
+          const t = Math.max(0, (e.clientX - r.left) / pps);
+          if (range) { e.currentTarget.setPointerCapture?.(e.pointerId); range.start(e.clientX, t); }
+          seek(t);
+        }}
+        onPointerMove={range ? (e) => { const r = e.currentTarget.getBoundingClientRect(); range.move(e.clientX, Math.max(0, (e.clientX - r.left) / pps)); } : undefined}
+        onPointerUp={range ? () => range.end() : undefined}
+        onPointerCancel={range ? () => range.end() : undefined}
       >
-        {placed.length === 0 ? <span className="text-muted-foreground pointer-events-none absolute inset-y-0 left-3 flex items-center text-xs">{lane.id === "voice" ? i18n._({ id: "ui.No voice yet.", message: "No voice yet." }) : lane.id === "music" ? i18n._({ id: "ui.No music yet.", message: "No music yet." }) : i18n._({ id: "ui.No clip.", message: "No clip." })}</span> : null}
+        {placed.length === 0 ? <span className="text-muted-foreground pointer-events-none absolute inset-y-0 left-3 flex items-center text-xs">{isStemLane(lane.id) ? i18n._({ id: "ui.No {lane} yet.", message: "No {lane} yet.", values: { lane: name.toLowerCase() } }) : lane.id === "voice" ? i18n._({ id: "ui.No voice yet.", message: "No voice yet." }) : lane.id === "music" ? i18n._({ id: "ui.No music yet.", message: "No music yet." }) : i18n._({ id: "ui.No clip.", message: "No clip." })}</span> : null}
         {placed.map((pl, i) => (
           <PieceView key={pl.piece.id} lane={lane} state={state} index={i} start={pl.start} piece={pl.piece} pps={pps} hue={hue} selected={selected === pl.piece.id} count={placed.length} media={media} select={select} commit={commit} playhead={playhead} setLine={setLine} />
         ))}
@@ -923,7 +1069,7 @@ function useSourceMedia(state: StudioState, onMetric: TrackStudioProps["onMetric
     return () => { ctl.abort(); setMedia({ peaks: {}, thumbs: {} }); };
   }, []);
 
-  const key = useMemo(() => LANE_IDS.flatMap((id) => laneOf(state, id).pieces.map((p) => `${id}|${p.src}`)).join("\n"), [state]);
+  const key = useMemo(() => state.lanes.flatMap((l) => l.pieces.map((p) => `${l.id}|${p.src}`)).join("\n"), [state]);
   useEffect(() => {
     const ctl = controller.current;
     if (!generation || !ctl || ctl.signal.aborted) return;
