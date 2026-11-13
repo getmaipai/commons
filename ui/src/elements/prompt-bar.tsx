@@ -482,7 +482,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
             {errorRow}
             <div data-slot="prompt-bar-composer" data-chat-input="true" data-unified="true" className="flex min-w-0 flex-col gap-3 rounded-[30px] border border-[var(--hairline)] bg-[var(--surface-2)] p-4 transition-colors focus-within:border-ring/60 focus-within:ring-3 focus-within:ring-ring/20 sm:p-6">
               <ComposerModeZone modeId={currentMode.id} open={topRowOpen}>
-                <div data-slot="prompt-bar-mode-attachments" className="flex min-w-0 flex-nowrap items-center gap-2 pb-3 sm:flex-wrap">
+                <div data-slot="prompt-bar-mode-attachments" className="flex min-w-0 touch-pan-x flex-nowrap items-center gap-2 overflow-x-auto pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:flex-wrap sm:overflow-visible">
                   {currentMode.onAdd ? <ComposerAddButton onAdd={currentMode.onAdd} /> : null}
                   <ComposerSlots slots={slots} />
                   {currentMode.presets ? <div className="ml-auto shrink-0"><ComposerPresetsButton presets={currentMode.presets} /></div> : null}
@@ -509,7 +509,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
                   </div>;
                 })}
                 {primaryDetail ? <span id={detailId} className="sr-only">{primaryDetail}</span> : null}
-                <Button type="submit" size="lg" shape="pill" disabled={!ready} className={cn("ml-auto h-14 shrink-0 gap-2 px-6", hitArea(1))} aria-label={primary} aria-describedby={primaryDetail ? detailId : undefined} title={primaryDetail ? `${primary} · ${primaryDetail}` : primary}><span>{primary}</span><ArrowUp className="size-5" aria-hidden="true" /></Button>
+                <Button type="submit" size="lg" shape="pill" disabled={!ready} className={cn("ml-auto size-14 shrink-0 gap-2 px-0 sm:h-14 sm:w-auto sm:px-6", hitArea(1))} aria-label={primary} aria-describedby={primaryDetail ? detailId : undefined} title={primaryDetail ? `${primary} · ${primaryDetail}` : primary}><span className="hidden sm:inline">{primary}</span><ArrowUp className="size-5" aria-hidden="true" /></Button>
               </div>
             </div>
             {disabledNote}

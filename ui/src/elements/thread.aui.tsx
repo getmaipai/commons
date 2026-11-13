@@ -456,7 +456,7 @@ export const Thread: FC<ThreadProps> = ({
   const isEmpty = useAuiState(isNewChatView);
 
   return (
-    <ThreadComponentsContext.Provider value={{ ...components, composerTourId, sendButtonTourId }}>
+    <ThreadComponentsContext.Provider value={{ ...components, composerTourId, sendButtonTourId, ...(components.composerModes ? { composerDensity: undefined } : {}) }}>
       <ThreadRoot isEmpty={isEmpty} autoFocus={autoFocus} temporary={temporary} scrollToBottomOffset={scrollToBottomOffset} tourId={tourId} />
     </ThreadComponentsContext.Provider>
   );

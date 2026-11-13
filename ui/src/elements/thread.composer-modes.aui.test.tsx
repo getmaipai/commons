@@ -16,13 +16,13 @@ const modes: ComposerModeData[] = [
 
 const quality = (band: ComposerQualityData["band"]): ComposerQualityData => ({ value: "standard", band, onValueChange: () => {}, options: [{ value: "standard", label: "Standard" }, { value: "max", label: "Max" }, { value: "thinking", label: "Thinking", kind: "thinking" }] });
 
-function Harness({ band, withModes = true }: { band?: ComposerQualityData["band"]; withModes?: boolean }) {
+function Harness({ band, withModes = true, compact = false }: { band?: ComposerQualityData["band"]; withModes?: boolean; compact?: boolean }) {
   const runtime = useLocalRuntime(adapter);
   const [mode, setMode] = useState("chat");
   const composerModes: ThreadComposerModes | undefined = withModes ? { modes, mode, onModeChange: setMode, quality: quality(band) } : undefined;
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <Thread components={{ composerModes }} />
+      <Thread components={{ composerModes, ...(compact ? { composerDensity: "compact" as const } : {}) }} />
     </AssistantRuntimeProvider>
   );
 }
@@ -53,6 +53,14 @@ describe("Thread composerModes (COMPOSER-02)", () => {
     const chip = view.getByRole("button", { name: "Settings: Landscape" });
     expect(chip.className).not.toMatch(/\bborder\b/);
     expect(chip.closest(".aui-composer-action-wrapper")).not.toBeNull();
+  });
+
+  test("the unified panel replaces the compact density when modes are set", () => {
+    const view = render(<Harness compact />);
+    expect((view.container.querySelector('[data-slot="aui_composer-shell"]') as HTMLElement).getAttribute("data-density")).toBeNull();
+    cleanup();
+    const plain = render(<Harness compact withModes={false} />);
+    expect((plain.container.querySelector('[data-slot="aui_composer-shell"]') as HTMLElement).getAttribute("data-density")).toBe("compact");
   });
 
   test("picking Image shows its slots, chips and tools inside the Thread and changes the placeholder", () => {

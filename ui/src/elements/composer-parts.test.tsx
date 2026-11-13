@@ -124,7 +124,7 @@ describe("unified panel look", () => {
     expect(chip.textContent).toBe("Landscape");
     const primary = view.getByRole("button", { name: "Generate" });
     expect(primary.textContent).toBe("Generate");
-    expect(primary.className).toContain("h-14");
+    expect(primary.className).toContain("size-14");
     expect(primary.className).toContain("bg-primary");
   });
   test("several settings of a group read joined with a slash in one chip", () => {

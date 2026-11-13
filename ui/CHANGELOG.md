@@ -1,3 +1,7 @@
+## [ui-v0.5.642] - 2026-11-13
+
+- ONE-COMPOSER visual pass fixes from the 0.5.640 preview. On a phone the `PromptBar` modes primary is a 56 px round button (the label shows from sm up), the top row of slots and Presets scrolls sideways and nothing wraps; chips, slots and Presets never wrap their words. A `Thread` with `composerModes` replaces `composerDensity: "compact"` with the unified panel (the compact row squeezed the mode pill into the field). `ui/package.json` is 0.5.642.
+
 ## [ui-v0.5.641] - 2026-11-13
 
 - ONE-COMPOSER (COMPOSER-03), additive. `MediaHost.composer` (`modes`, `current`, `onModeChange(id, { text })`, optional `quality`): when a host lists the composer's modes, a `prompt_bar` with `layout: "chat"` draws the kit composer (the 0.5.640 panel) for its page: this page's mode carries the node's placeholder, slots, Quality and chips, one combined chip per `group` (the Shape, Length and Pictures of a Create page read "Landscape / 5 seconds"), the other modes are a name and an icon that hand the typed words to the host. Nothing is a dropdown in a box; every chip stays reachable. `ComposerChipData` gains `variant: "cards"` with `cardOptions` (picture cards inside the group's one popover, with the one Adult lock tile), `quietValue` (an "Auto" choice adds nothing to the trigger's words) and `note`. The host's `quality` list narrows the node's tiers (a minor never sees Max). `ui/package.json` is 0.5.641.

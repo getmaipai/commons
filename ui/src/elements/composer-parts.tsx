@@ -149,9 +149,9 @@ const SLOT_ICON = { picture: ImageIcon, character: User, place: MapPin, audio: M
 
 // One look for every control in the panel: plain text-and-icon buttons with a small chevron, no box, no select border. Only the mode pill
 // (a raised surface) and the Presets pill (a soft fill) are drawn as shapes.
-const CHIP = `flex min-h-12 shrink-0 items-center gap-1.5 rounded-full px-3 text-base text-foreground transition-colors hover:bg-foreground/5 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-expanded:bg-foreground/5 disabled:opacity-50 ${hitArea(1)}`;
+const CHIP = `flex min-h-12 shrink-0 whitespace-nowrap items-center gap-1.5 rounded-full px-3 text-base text-foreground transition-colors hover:bg-foreground/5 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-expanded:bg-foreground/5 disabled:opacity-50 ${hitArea(1)}`;
 const RAISED = `flex min-h-12 shrink-0 items-center gap-2 rounded-full bg-[var(--surface-1)] px-4 text-base font-medium text-foreground shadow-sm ring-1 ring-inset ring-[var(--hairline)] transition-colors hover:bg-foreground/5 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 ${hitArea(1)}`;
-const SOFT = `flex min-h-12 shrink-0 items-center gap-2 rounded-full bg-foreground/5 px-4 text-base text-foreground transition-colors hover:bg-foreground/10 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 ${hitArea(1)}`;
+const SOFT = `flex min-h-12 shrink-0 whitespace-nowrap items-center gap-2 rounded-full bg-foreground/5 px-4 text-base text-foreground transition-colors hover:bg-foreground/10 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 ${hitArea(1)}`;
 
 function chosenLabel(chip: ComposerChipData): string {
   if (chip.quietValue !== undefined && String(chip.quietValue) === String(chip.value)) return "";
@@ -260,7 +260,7 @@ export function ComposerSlots({ slots }: { slots: readonly ComposerSlotData[] })
             title={reason}
             aria-disabled={reason ? true : undefined}
             onClick={() => { if (!reason) slot.onPick?.(); }}
-            className={cn("flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-foreground/5 px-4 text-base text-muted-foreground outline-none transition-colors hover:bg-foreground/10 hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50", reason && "opacity-60", hitArea(1))}
+            className={cn("flex min-h-12 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-2xl bg-foreground/5 px-4 text-base text-muted-foreground outline-none transition-colors hover:bg-foreground/10 hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50", reason && "opacity-60", hitArea(1))}
           >
             <Icon className="size-5" aria-hidden="true" /><span>{slot.label}</span>
           </button>
