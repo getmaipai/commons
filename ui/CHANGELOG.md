@@ -1,3 +1,7 @@
+## [ui-v0.5.634] - 2026-11-13
+
+- MOTION-01 phase 2. Sonner toasts and the vaul Drawer use the slide and fade tokens; tool disclosures and reasoning use the collapse token and slide curve; a plain Dialog is a bottom sheet below sm (slide-up, handle, safe-area padding, both dialog sets; call, flow, command and AlertDialog unchanged); `FullLayout` fades the page body on a route change (opacity only, no remount); `useInsertedKeys` and `motion-list` animate rows added to RunningNow, ActivityFeed, ResultFeed and MediaShelf; `MediaViewer` grows from the thumbnail that opened it and returns to it. Additive: no prop changed.
+
 ## [ui-v0.5.633] - 2026-11-13
 
 - MOTION-01 one motion system. New `--motion-*` tokens (enter and exit easing, slide curve, reveal, rise, slide, collapse, fade and list durations, distances and scales) and four Tailwind utilities, `motion-reveal`, `motion-rise`, `motion-fade`, `motion-list`, defined once in `tokens.css`. Every menu, dropdown, submenu, context menu, menubar, select, combobox, popover, tooltip and hover card (Radix `ui/` and Base UI `dashboard/` copies), the mention popover and the composer menus now reveal the same way (140 ms in, 100 ms out, fade plus scale 0.96 plus 6 px from the trigger side). Dialog and AlertDialog rise; backdrops and tab content fade; Sheet, the sidebars, the rail, section columns and collapsible panels run on the slide and collapse tokens. Reduced motion and calm drop distance and scale. Additive: no prop changed.

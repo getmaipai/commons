@@ -69,3 +69,39 @@ describe("primitives use the shared reveal", () => {
     }
   })
 })
+
+describe("motion phase 2", () => {
+  test("sheet, viewer, loaded utilities and the third-party overrides exist", () => {
+    for (const t of ["@utility motion-sheet-bottom", "@utility motion-viewer-in", "@utility motion-viewer-out", "@utility motion-loaded", "[data-sonner-toaster] [data-sonner-toast]"]) expect(css, t).toContain(t)
+    expect(css).toMatch(/\[data-sonner-toast\]\[data-removed="true"\] \{[^}]*--motion-slide-out/)
+  })
+  test("disclosures run on the collapse token and the slide curve, not a hard-coded duration", () => {
+    for (const f of ["assistant-ui/tool-fallback.aui", "elements/tool-fallback.aui", "elements/tool-group.aui", "elements/reasoning"]) {
+      const src = read(`./${f}.tsx`)
+      expect(src, f).toContain('"var(--motion-collapse-in)"')
+      expect(src, f).not.toContain("cubic-bezier(0.32,0.72,0,1)")
+    }
+  })
+  test("the vaul drawer takes the slide durations", () => {
+    expect(read("./ui/drawer.tsx")).toContain("--motion-slide-in")
+  })
+  test("a plain dialog is a bottom sheet below sm, in both dialog sets", () => {
+    for (const f of ["ui/dialog", "dashboard/components/ui/dialog"]) {
+      const src = read(`./${f}.tsx`)
+      expect(src, f).toContain("max-sm:motion-sheet-bottom")
+      expect(src, f).toContain("max-sm:bottom-0")
+    }
+  })
+  test("the media viewer grows from its thumbnail", () => {
+    const src = read("./elements/media-viewer.tsx")
+    expect(src).toContain("--viewer-from")
+    expect(src).toContain("data-[state=open]:motion-viewer-in")
+  })
+  test("live lists flag inserted rows", () => {
+    for (const f of ["primitives/RunningNow", "elements/activity-feed", "elements/result-feed", "primitives/MediaShelf"]) {
+      const src = read(`./${f}.tsx`)
+      expect(src, f).toContain("useInsertedKeys")
+      expect(src, f).toContain("motion-list")
+    }
+  })
+})
