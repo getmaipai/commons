@@ -1,9 +1,10 @@
 """SCENE-01a runtime shape validation."""
 
 import pytest
+from pydantic import ValidationError
+
 from gen.py.scene_observation_schema import SceneObservation
 from gen.py.scene_schema import Scene
-from pydantic import ValidationError
 
 SOURCE = {"surface": "robot", "device_id": None, "sensor": "face"}
 PERSON = {
