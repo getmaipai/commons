@@ -24,7 +24,7 @@ test("collapsePanel animates on data-state, not a transition with nothing to int
 });
 
 test("collapsePanel's closing animation keeps its end state (forwards), so it doesn't snap back to auto before Radix hides it", () => {
-  expect(collapsePanel).toContain("collapsible-up_200ms_cubic-bezier(0.32,0.72,0,1)_forwards");
+  expect(collapsePanel).toContain("collapsible-up_var(--motion-collapse-out)_var(--motion-ease-in)_forwards");
 });
 
 test("collapsePanel respects prefers-reduced-motion", () => {

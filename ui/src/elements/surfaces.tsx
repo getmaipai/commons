@@ -74,7 +74,7 @@ export const labelSwapOut =
 // snapping back to `auto` the instant the animation finishes, before
 // Radix's own Presence detection gets a chance to add `hidden`.
 export const collapsePanel =
-  "overflow-hidden data-[state=open]:animate-[collapsible-down_200ms_cubic-bezier(0.32,0.72,0,1)_forwards] data-[state=closed]:animate-[collapsible-up_200ms_cubic-bezier(0.32,0.72,0,1)_forwards] motion-reduce:animate-none";
+  "overflow-hidden data-[state=open]:animate-[collapsible-down_var(--motion-collapse-in)_var(--motion-ease-slide)_forwards] data-[state=closed]:animate-[collapsible-up_var(--motion-collapse-out)_var(--motion-ease-in)_forwards] motion-reduce:animate-none";
 
 export const live = "text-primary-ink";
 
