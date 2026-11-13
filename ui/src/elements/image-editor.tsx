@@ -69,6 +69,7 @@ import { Label } from "@/kit/ui/label";
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from "@/kit/ui/popover";
 import { Progress } from "@/kit/ui/progress";
 import { Slider } from "@/kit/ui/slider";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/kit/ui/select";
 import { Toggle } from "@/kit/ui/toggle";
 import { ToggleGroup, ToggleGroupItem } from "@/kit/ui/toggle-group";
 import { Input } from "@/elements/ui/input";
@@ -1432,8 +1433,8 @@ export function ImageEditor({
     return Number(option) === 1 ? i18n._({ id: "ui.Same size", message: "Same size" }) : i18n._({ id: "ui.{factor}x", message: "{factor}x", values: { factor: option } });
   };
   const moreBar = (
-    <div className={cn(panelColumn, "w-[28rem] max-w-full")} data-slot="image-editor-more-bar">
-      <div className="flex flex-wrap items-center gap-1" role="group" aria-label={i18n._({ id: "ui.Operation", message: "Operation" })} data-slot="image-editor-operations">
+    <div className={cn(panelColumn, "w-[28rem] max-w-full min-w-0 overflow-x-hidden")} data-slot="image-editor-more-bar">
+      <div className="flex w-full min-w-0 flex-wrap items-center gap-1" role="group" aria-label={i18n._({ id: "ui.Operation", message: "Operation" })} data-slot="image-editor-operations">
         {(operations ?? []).map((operation) => (
           <Tooltip key={operation.id}>
             <TooltipTrigger asChild>
@@ -1457,7 +1458,7 @@ export function ImageEditor({
         ))}
       </div>
       {chosenOperation ? (
-        <div className="grid w-full gap-3" data-slot="image-editor-more-controls">
+        <div className="grid w-full min-w-0 gap-3" data-slot="image-editor-more-controls">
           {/* An operation that lists levels says its line per level; one with none says its own line. */}
           {chosenOperation.summary && !chosenOperation.levels ? <p className="text-muted-foreground text-xs">{chosenOperation.summary}</p> : null}
           {(chosenOperation.controls ?? []).map((control) =>
@@ -1516,9 +1517,18 @@ export function ImageEditor({
                 ) : null}
               </div>
             ) : (
-              <div key={control.name} className="flex flex-wrap items-center gap-x-3 gap-y-1" data-slot="image-editor-choice" data-control={control.name}>
-                <span className="text-xs" aria-hidden>{control.label}</span>
-                <ToggleGroup
+              <div key={control.name} className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1" data-slot="image-editor-choice" data-control={control.name}>
+                <span className="text-xs">{control.label}</span>
+                {control.options.length > 4 ? (
+                  <Select value={String(moreArgs[control.name] ?? control.options[0] ?? "")} disabled={locked} onValueChange={(value) => setMoreArgs((args) => ({ ...args, [control.name]: value }))}>
+                    <SelectTrigger aria-label={control.label} className="min-w-0 max-w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {control.options.map((option) => <SelectItem key={option} value={option}>{choiceOptionText(control.name, control.options, option)}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                ) : <ToggleGroup
                   type="single"
                   variant="outline"
                   spacing={0}
@@ -1533,11 +1543,11 @@ export function ImageEditor({
                       {choiceOptionText(control.name, control.options, option)}
                     </ToggleGroupItem>
                   ))}
-                </ToggleGroup>
+                </ToggleGroup>}
               </div>
             ),
           )}
-          <div className="flex justify-end" data-slot="image-editor-panel-actions">
+          <div className="flex flex-wrap justify-end" data-slot="image-editor-panel-actions">
             <Button
               type="button"
               size="sm"

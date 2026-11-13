@@ -1,3 +1,7 @@
+## [ui-v0.5.661] - 2026-11-13
+
+- Image Editor More panel. A `choice` with more than four options is one labelled Select instead of a wide toggle row; the operation tabs, the controls and the Preview button wrap inside the panel (no sideways scroll), so Preview is always reachable at desktop and phone widths. Four or fewer options are unchanged.
+
 ## [ui-v0.5.660] - 2026-11-13
 
 - ONE-COMPOSER, additive. A combined group chip honours `icon_only`: when any chip of the group sets it the trigger is the icon alone (no words) and its tooltip and accessible name read "Shape · Length: Landscape · 5 s"; the popover still lists every family. The `prompt_bar` `chips` cap is 16 (was 10; spec-v0.1.388). `ui/package.json` is 0.5.660.

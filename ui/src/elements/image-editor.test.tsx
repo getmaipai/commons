@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
 import { act, cleanup, fireEvent, render, waitFor, within } from "@testing-library/react";
+import { SelectContent } from "@/kit/ui/select";
 import {
   ImageEditor,
   type ImageEditorOperation,
@@ -946,6 +947,28 @@ describe("versions popover", () => {
       const size = bar.querySelector("[data-slot=image-editor-choice]")!;
       expect(size.textContent).toContain("Size");
       expect(Array.from(size.querySelectorAll("[role=radio]")).map((el) => el.textContent)).toEqual(["Same size", "1.5x", "2x"]);
+    });
+
+    test("choices over four options use a labelled select and the More bar wraps within its width", async () => {
+      const angle = { id: "angle", label: "Change the angle", enabled: true, controls: [{ kind: "choice" as const, name: "angle", label: "Angle", options: ["Three-quarter left", "Three-quarter right", "Profile", "From behind", "High angle", "Low angle", "Wide shot", "Close-up"] }] };
+      const v = setup({ operations: [angle] });
+      fireEvent.click(v.getByRole("radio", { name: "More" }));
+      const bar = document.querySelector<HTMLElement>("[data-slot=image-editor-more-bar]")!;
+      fireEvent.click(within(bar).getByRole("button", { name: "Change the angle" }));
+      const choice = bar.querySelector<HTMLElement>("[data-slot=image-editor-choice]")!;
+      expect(choice.querySelector("[role=radio]")).toBeNull();
+      const select = within(choice).getByRole("combobox", { name: "Angle" });
+      expect(select.textContent).toContain("Three-quarter left");
+      fireEvent.click(select);
+      expect(await within(document.body).findByRole("option", { name: "Close-up" })).toBeTruthy();
+      fireEvent.click(within(document.body).getByRole("option", { name: "High angle" }));
+      expect(select.textContent).toContain("High angle");
+      expect(bar.className).toMatch(/max-w-full/);
+      expect(bar.className).toMatch(/overflow-x-hidden/);
+      expect(bar.querySelector("[data-slot=image-editor-operations]")!.className).toContain("flex-wrap");
+      expect(bar.querySelector("[data-slot=image-editor-more-controls]")!.className).toContain("min-w-0");
+      expect(bar.querySelector("[data-slot=image-editor-panel-actions]")!.className).toContain("flex-wrap");
+      expect(SelectContent).toBeDefined();
     });
 
     test("Resize, Crop, Adjust, Erase, Comment and Markup use the same panel box (no second pill surface, left-aligned)", () => {
