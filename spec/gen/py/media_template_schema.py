@@ -37,11 +37,15 @@ class MediaTemplate(BaseModel):
             'film_stock',
             'look',
             'grade',
+            'picture_look',
+            'relight',
+            'angle',
+            'format',
         ]
         | None
     ) = Field(
         None,
-        description='CREATOR-01. Which shot-card vocabulary a fragment belongs to. Required when kind is fragment; absent otherwise.',
+        description='CREATOR-01. Which vocabulary a fragment belongs to: the shot-card groups, or the picture presets picture_look, relight, angle and format (CREATOR-13). Required when kind is fragment; absent otherwise.',
     )
     title: constr(min_length=1, max_length=120)
     summary: constr(max_length=500) = ''

@@ -9,7 +9,7 @@
   "properties": {
     "id": {"type":"string","pattern":"^mtpl-[a-z0-9]{6,}$"},
     "kind": {"type":"string","enum":["picture","video","fragment"]},
-    "group": {"type":"string","enum":["camera","lens","focal","aperture","framing","light","film_stock","look","grade"],"description":"CREATOR-01. Which shot-card vocabulary a fragment belongs to. Required when kind is fragment; absent otherwise."},
+    "group": {"type":"string","enum":["camera","lens","focal","aperture","framing","light","film_stock","look","grade","picture_look","relight","angle","format"],"description":"CREATOR-01. Which vocabulary a fragment belongs to: the shot-card groups, or the picture presets picture_look, relight, angle and format (CREATOR-13). Required when kind is fragment; absent otherwise."},
     "title": {"type":"string","minLength":1,"maxLength":120},
     "summary": {"type":"string","maxLength":500,"default":""},
     "category": {"type":"string","minLength":1,"maxLength":60,"description":"A category id from vocab/media-template-categories.json."},

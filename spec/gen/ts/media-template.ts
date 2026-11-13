@@ -9,7 +9,7 @@ export const MediaTemplate = z
   .object({
     id: z.string().regex(new RegExp("^mtpl-[a-z0-9]{6,}$")),
     kind: z.enum(["picture", "video", "fragment"]),
-    /**CREATOR-01. Which shot-card vocabulary a fragment belongs to. Required when kind is fragment; absent otherwise.*/
+    /**CREATOR-01. Which vocabulary a fragment belongs to: the shot-card groups, or the picture presets picture_look, relight, angle and format (CREATOR-13). Required when kind is fragment; absent otherwise.*/
     group: z
       .enum([
         "camera",
@@ -21,9 +21,13 @@ export const MediaTemplate = z
         "film_stock",
         "look",
         "grade",
+        "picture_look",
+        "relight",
+        "angle",
+        "format",
       ])
       .describe(
-        "CREATOR-01. Which shot-card vocabulary a fragment belongs to. Required when kind is fragment; absent otherwise.",
+        "CREATOR-01. Which vocabulary a fragment belongs to: the shot-card groups, or the picture presets picture_look, relight, angle and format (CREATOR-13). Required when kind is fragment; absent otherwise.",
       )
       .optional(),
     title: z.string().min(1).max(120),

@@ -1,3 +1,7 @@
+## [spec-v0.1.382] - 2026-11-13
+
+- CREATOR-13 (CREATOR-PORT-2026-11-13), additive. `media-template` fragment `group` gains `picture_look`, `relight`, `angle` and `format`, the picture preset families, so they never share a group with the shot-card `look` and `light` words.
+
 ## [spec-v0.1.381] - 2026-11-13
 
 - ONE-COMPOSER-2026-11-13 (COMPOSER-04), additive. New record `turn-composer` (`TurnComposer`): the chat composer's mode and chip values sent beside the words of one written chat turn (`mode`, optional `settings` keyed by chip id, optional `cast` of up to six ids). A hint the model reads, never a route: it has no tool name and no unknown keys. The hub honours it on written chat turns only and checks every entry against the person's own band.
