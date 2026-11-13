@@ -1,6 +1,9 @@
-## [ui-v0.5.632] - 2026-11-13
+## [ui-v0.5.633] - 2026-11-13
 
 - MOTION-01 one motion system. New `--motion-*` tokens (enter and exit easing, slide curve, reveal, rise, slide, collapse, fade and list durations, distances and scales) and four Tailwind utilities, `motion-reveal`, `motion-rise`, `motion-fade`, `motion-list`, defined once in `tokens.css`. Every menu, dropdown, submenu, context menu, menubar, select, combobox, popover, tooltip and hover card (Radix `ui/` and Base UI `dashboard/` copies), the mention popover and the composer menus now reveal the same way (140 ms in, 100 ms out, fade plus scale 0.96 plus 6 px from the trigger side). Dialog and AlertDialog rise; backdrops and tab content fade; Sheet, the sidebars, the rail, section columns and collapsible panels run on the slide and collapse tokens. Reduced motion and calm drop distance and scale. Additive: no prop changed.
+
+## [ui-v0.5.632] - 2026-11-13
+
 - EDITOR-OVERLAY and EDITOR-FIT, owner bug fixes. In `ImageEditor` the tool option bars (Comment, Erase, Crop, Adjust, Resize, More, Markup, the preview Apply bar) and the busy and error messages now open as an overlay on top of the stage (at the top on a wide layout, at the bottom on a phone) instead of in the column beside it, so the picture never moves when one opens or closes; a press outside the More menu closes it (Esc already did). Fit is the largest size that fits the visible stage on both axes (a small picture is enlarged to fill it, up to 400%), measured from the stage's visible box and re-measured when the stage resizes. The status line keeps its row so the stage height is steady.
 
 ## [ui-v0.5.631] - 2026-11-13
