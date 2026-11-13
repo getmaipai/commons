@@ -1,3 +1,7 @@
+## [ui-v0.5.631] - 2026-11-13
+
+- EDITOR-HANDOFF fix, additive. On a phone layout an `ImageEditor` hand-off with an `icon` is an icon button named by its label (the long label no longer runs off the header); `ImageEditorAction` gains `icon`; the `image_editor` node gives the Video hand-off a film icon. Choosing a reference picture clears an earlier error line.
+
 ## [ui-v0.5.630] - 2026-11-13
 
 - EDITOR-HANDOFF, additive, with spec 0.1.377. `MediaHost` gains `handOff(to, { file })`; an `image_editor` `actions` entry may use `hand_off: "video_create"`. With no host hand-off the button is drawn disabled and says so. `ImageEditorAction` gains `disabledReason`.

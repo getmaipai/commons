@@ -1,3 +1,4 @@
+import { FilmIcon } from "lucide-react";
 import { useCallback, useContext, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { i18n } from "@/kit/i18n";
 import { AsyncState } from "@/kit/primitives/AsyncState";
@@ -313,6 +314,7 @@ function EditorOpen({ node, row, operations, toolStates }: { node: ImageEditorNo
   const handoffs = useMemo(() => (node.actions ?? []).map((a, i) => ({
     key: `action-${i}`,
     label: a.label,
+    ...(a.hand_off === "video_create" ? { icon: <FilmIcon aria-hidden /> } : {}),
     // A hand-off to another app goes through the host (a package page cannot navigate out of its package); without one the button says why it is off.
     ...(a.hand_off && !host?.handOff ? { disabledReason: i18n._({ id: "ui.That is not available on this screen.", message: "That is not available on this screen." }) } : {}),
     onSelect: (version: ImageEditorVersion) => {

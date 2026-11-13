@@ -196,6 +196,8 @@ export interface ImageEditorAction {
   key: string;
   label: string;
   onSelect: (version: ImageEditorVersion) => void;
+  /** On a phone (compact) a hand-off with an icon is an icon button with its label as the tooltip, so the header never overflows. */
+  icon?: ReactNode;
   /** Set when the hand-off cannot be used now: the button stays, looks off, and tapping it says this in one line. */
   disabledReason?: string;
 }
@@ -1031,11 +1033,19 @@ export function ImageEditor({
           </Button>
         )
       ) : null}
-      {current ? (actions ?? []).map((action) => (
-        <Button key={action.key} type="button" variant="ghost" size="sm" data-slot="image-editor-action" aria-disabled={action.disabledReason ? true : undefined} title={action.disabledReason} className={action.disabledReason ? "opacity-50" : undefined} onClick={() => (action.disabledReason ? setNotice(action.disabledReason) : action.onSelect(current))}>
-          {action.label}
-        </Button>
-      )) : null}
+      {current ? (actions ?? []).map((action) => {
+        const off = action.disabledReason;
+        const press = () => (off ? setNotice(off) : action.onSelect(current));
+        return compact && action.icon ? (
+          <ToolButton key={action.key} label={off ? `${action.label}: ${off}` : action.label} side="bottom" data-slot="image-editor-action" aria-disabled={off ? true : undefined} className={off ? "opacity-50" : undefined} onClick={press}>
+            {action.icon}
+          </ToolButton>
+        ) : (
+          <Button key={action.key} type="button" variant="ghost" size="sm" data-slot="image-editor-action" aria-disabled={off ? true : undefined} title={off} className={off ? "opacity-50" : undefined} onClick={press}>
+            {action.label}
+          </Button>
+        );
+      }) : null}
       {onShare && current ? (
         compact ? (
           <ToolButton label={i18n._({ id: "ui.Share", message: "Share" })} side="bottom" onClick={() => onShare(current)}>
@@ -1587,7 +1597,10 @@ export function ImageEditor({
                     disabled={locked}
                     onClick={() => {
                       void onPickReference().then((picked) => {
-                        if (picked) setReference(picked);
+                        if (picked) {
+                          setReference(picked);
+                          setError(null);
+                        }
                       }).catch((err) => failWith(err));
                     }}
                   >

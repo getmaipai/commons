@@ -176,6 +176,16 @@ describe("layout and names", () => {
     expect(v.getByText("Video is not ready yet. Try again in a minute.")).toBeTruthy();
   });
 
+  test("on a phone layout a hand-off with an icon is an icon button named by its label, so the header does not overflow (EDITOR-HANDOFF)", () => {
+    const onSelect = mock((_v: ImageEditorVersion) => {});
+    const v = setup({ variant: "screen", actions: [{ key: "video", label: "Make a video from this", icon: <svg data-testid="film" />, onSelect }] });
+    const button = v.getByRole("button", { name: "Make a video from this" });
+    expect(button.textContent).toBe("");
+    expect(v.getByTestId("film")).toBeTruthy();
+    fireEvent.click(button);
+    expect(onSelect).toHaveBeenCalledTimes(1);
+  });
+
   test("Download triggers an anchor download of the current version", () => {
     const v = setup({ downloadName: "sunset.png" });
     fireEvent.click(v.getByRole("button", { name: "Download" }));
