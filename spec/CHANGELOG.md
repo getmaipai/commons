@@ -1,3 +1,7 @@
+## [spec-v0.1.389] - 2026-11-13
+
+- MUSIC-ID-01, additive. New household setting `music.identify.online` (`on` default, `ask`, `off`): whether Home may look a song up on AcoustID by fingerprint when its own library has no match. `spec/package.json` is 0.1.389.
+
 ## [spec-v0.1.388] - 2026-11-13
 
 - ONE-COMPOSER, additive. The `prompt_bar` `chips` array takes up to 16 chips (was 10), so one Create page can hold a combined chip with many groups; the visual limit stays one row, enforced by the kit's overflow rule. `spec/package.json` is 0.1.388.
