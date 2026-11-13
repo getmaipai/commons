@@ -1,3 +1,7 @@
+## [spec-v0.1.373] - 2026-11-13
+
+- IMG-STUDIO-01, additive. `ui/schema.json` gains the `image_editor` node (the picture Studio): `bind` (one picture row, chosen by a Library file id from page state), `fields`, `initial_tool`, `tools`, `tool_reasons`, `compare`, `comment_brush`, `operations.bind` (the host's one-click operation rows `{ id, label, summary, controls, enabled, reason }`), `handlers` (`run`, `apply`, `markup`, `comment`, `pick_reference`) and `on_close`. It is allowed on a package page (`app-check.ts`).
+
 ## [spec-v0.1.371] - 2026-11-12
 
 - TALK-OVER-01, additive. `voice.talk_over` now defaults to `gentle` (owner decision 2026-11-12).

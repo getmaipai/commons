@@ -495,6 +495,37 @@ describe("UI schema, package apps", () => {
     expect(validate({ ...feed, fields: { ...feed.fields, locked: 1 } })).toBe(false);
   });
 
+  test("IMG-STUDIO-01: the image_editor node (the picture Studio) is additive and strict", () => {
+    const editor = { type: "image_editor", bind: { source: "package", path: "picture", params: { id: "$state.file" } } };
+    expect(validate(editor)).toBe(true);
+    const full = {
+      ...editor,
+      fields: { key: "id", title: "title", url: "url", width: "width", height: "height", versions: "versions", locked: "locked" },
+      initial_tool: "crop",
+      tools: ["markup", "comment", "remove_background", "erase", "resize", "crop", "adjust", "more"],
+      tool_reasons: { crop: "Crop is not ready yet.", adjust: "Adjust is not ready yet." },
+      compare: true,
+      comment_brush: true,
+      operations: { bind: { source: "package", path: "operations" } },
+      handlers: {
+        run: { call: { target: "/x", args: { file: "{file}", operation: "{operation}", args: "{args}" } } },
+        apply: { call: { target: "/y" } },
+        markup: { call: { target: "/y" } },
+        comment: { call: { target: "/y" } },
+        pick_reference: { call: { target: "/y" } },
+      },
+      on_close: { navigate: { to: "/apps/images" } },
+    };
+    expect(validate(full)).toBe(true);
+    const bad: Record<string, unknown>[] = [
+      { initial_tool: "draw" }, { tools: ["crop", "crop"] }, { tools: ["blur"] }, { tool_reasons: { more: "no" } }, { tool_reasons: { crop: "" } },
+      { fields: { nope: "x" } }, { operations: {} }, { operations: { bind: { source: "package", path: "o" }, extra: 1 } }, { handlers: { delete: { call: { target: "/x" } } } },
+      { handlers: { run: { call: { target: "/x" }, navigate: { to: "/a" } } } }, { compare: "yes" }, { extra: true },
+    ];
+    for (const patch of bad) expect(validate({ ...full, ...patch })).toBe(false);
+    expect(validate({ ...editor, bind: undefined })).toBe(false);
+  });
+
   test("VIDEO-STUDIO-04: the studio node (TrackStudio) is additive and strict", () => {
     const studio = { type: "studio", bind: { source: "package", path: "studio" } };
     expect(validate(studio)).toBe(true);

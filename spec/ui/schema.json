@@ -35,7 +35,8 @@
     { "$ref": "#/$defs/category_tiles" },
     { "$ref": "#/$defs/track_rows" },
     { "$ref": "#/$defs/result_feed" },
-    { "$ref": "#/$defs/studio" }
+    { "$ref": "#/$defs/studio" },
+    { "$ref": "#/$defs/image_editor" }
   ],
   "$defs": {
     "binding": {
@@ -757,6 +758,77 @@
           }
         },
         "empty_state": { "$ref": "#/$defs/empty_state" }
+      }
+    },
+    "image_editor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "bind"],
+      "description": "IMG-STUDIO-01: the kit's ImageEditor as a page block, the picture Studio. `bind` reads ONE picture row, chosen from the page state by a Library file id (for example `bind.params: { id: \"$state.file\" }`): `{ id, title, url, width, height, locked, versions: [{ id, url, label, created_at, width, height }] }`, versions oldest first with the original first; without `versions` the row's own `url` is the one version. The Element draws the tools Markup, Comment, Remove BG, Erase, Resize, Crop (drag handles, Free, Original, 1:1, 4:5, 16:9 and 9:16, rotate left and right, flip horizontal and vertical), Adjust (brightness, contrast, saturation, warmth, Auto) and Compare (before and after the first version), and a More tool listing `operations`. Every result is a preview the person Applies (a NEW version) or Undoes; nothing is overwritten. A row whose `fields.locked` path is true draws ONE lock tile and reads no other field. All I/O goes through `handlers`; each is a `call` whose own `args` name the placeholders it wants from the values listed here (a whole placeholder such as `{args}` or `{region}` keeps its JSON type, as in `studio`); a handler with no entry disables its tool with its `tool_reasons` line (a tool never disappears). `handlers.run` is a `call` run with `{ file, operation, args }` where `operation` is `crop` (args `x`, `y`, `width`, `height` as fractions of the rotated and flipped picture, `aspect`, `rotate` 0, 90, 180 or 270, `flip_horizontal`, `flip_vertical`), `adjust` (args `brightness`, `contrast`, `saturation`, `warmth` each -100 to 100, `auto`), `remove_background`, `erase` (args `mask`, a PNG data URL), `upscale` (args `scale`), `resize` (args `width`, `height`) or the `id` of one of `operations` (args the values of its controls); its JSON reply is the preview `{ token, preview_url, width, height, transparent }`. `handlers.apply` is a `call` run with `{ file, token, label }` whose reply is the new version `{ id, url, label, width, height }`. `handlers.markup` is a `call` run with `{ file, png }` (a PNG data URL) with the same reply. `handlers.comment` is a `call` run with `{ file, prompt, region, mask, reference }` (`region` `{ x, y, width, height }` fractions or null; `mask` a PNG data URL or null; `reference` `{ id, label }` or null) whose reply is `{ message, preview }` where `preview` is optional and shaped like the run reply. `handlers.pick_reference` is a `call` whose reply is `{ id, label }` or null (the host's Library picker). The page state is not written; after Apply the bound row is read again and the new version is shown.",
+      "properties": {
+        "type": { "const": "image_editor" },
+        "bind": { "$ref": "#/$defs/binding" },
+        "fields": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Dotted paths into the bound row. Defaults are the names in the node description.",
+          "properties": {
+            "key": { "type": "string" },
+            "title": { "type": "string" },
+            "url": { "type": "string" },
+            "width": { "type": "string" },
+            "height": { "type": "string" },
+            "versions": { "type": "string" },
+            "locked": { "type": "string", "description": "Dotted path to a boolean (default `locked`). True draws the one lock tile and reads no other field." }
+          }
+        },
+        "initial_tool": {
+          "type": "string",
+          "enum": ["markup", "comment", "remove_background", "erase", "resize", "crop", "adjust", "more"],
+          "description": "The tool open at first (for example `crop` from a Crop button). A tool that is not listed, or is disabled, is ignored."
+        },
+        "tools": {
+          "type": "array",
+          "maxItems": 8,
+          "uniqueItems": true,
+          "items": { "type": "string", "enum": ["markup", "comment", "remove_background", "erase", "resize", "crop", "adjust", "more"] },
+          "description": "Which tools are on. A tool of the five chat tools (markup, comment, remove_background, erase, resize) that is not listed is drawn disabled (\"Not offered here.\"), never removed; `crop`, `adjust` and `more` are drawn only when listed. Default: all of them (`more` only when `operations` has rows)."
+        },
+        "tool_reasons": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "A plain line that disables a tool and is shown as its tooltip and in the status line (for example while the picture engine is not ready). A tool with no reason is enabled when its handler exists.",
+          "properties": {
+            "markup": { "type": "string", "minLength": 1, "maxLength": 120 },
+            "comment": { "type": "string", "minLength": 1, "maxLength": 120 },
+            "remove_background": { "type": "string", "minLength": 1, "maxLength": 120 },
+            "erase": { "type": "string", "minLength": 1, "maxLength": 120 },
+            "resize": { "type": "string", "minLength": 1, "maxLength": 120 },
+            "crop": { "type": "string", "minLength": 1, "maxLength": 120 },
+            "adjust": { "type": "string", "minLength": 1, "maxLength": 120 }
+          }
+        },
+        "compare": { "type": "boolean", "default": true, "description": "Draw Compare. Disabled, with its reason, while the current picture is the original." },
+        "comment_brush": { "type": "boolean", "default": true, "description": "Comment gains Brush (a painted area sent as `mask`)." },
+        "operations": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["bind"],
+          "description": "The extra one-click operations, read from the host's registry, drawn under More. The Element names none of them. Each row: `{ id, label, summary, controls, enabled, reason }`; `controls` is a list of `{ kind: \"number\", name, label, min, max, step, default }` or `{ kind: \"choice\", name, label, options, default }`. A row with `enabled` false is drawn disabled with its `reason` as the tooltip.",
+          "properties": { "bind": { "$ref": "#/$defs/binding" } }
+        },
+        "handlers": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "run": { "$ref": "#/$defs/feed_handler" },
+            "apply": { "$ref": "#/$defs/feed_handler" },
+            "markup": { "$ref": "#/$defs/feed_handler" },
+            "comment": { "$ref": "#/$defs/feed_handler" },
+            "pick_reference": { "$ref": "#/$defs/feed_handler" }
+          }
+        },
+        "on_close": { "$ref": "#/$defs/action", "description": "What the editor's Close does (usually a navigate back to the Library)." }
       }
     },
     "studio": {

@@ -285,3 +285,157 @@ export function validateResize(widthText: string, heightText: string, unit: Resi
 
 export const resizeLabel = (width: number, height: number) => i18n._({ id: "ui.Resized to {width} x {height}", message: "Resized to {width} x {height}", values: { width, height } });
 
+
+// ------------------------------------------------------------- crop (IMG-STUDIO-01)
+
+export type CropAspect = "free" | "original" | "1:1" | "4:5" | "16:9" | "9:16";
+export const CROP_ASPECTS: readonly CropAspect[] = ["free", "original", "1:1", "4:5", "16:9", "9:16"];
+export type CropRotation = 0 | 90 | 180 | 270;
+export type CropHandle = "nw" | "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "move";
+
+/** The crop rectangle is normalised (0..1) in the frame AFTER rotate and flip. */
+export interface CropState {
+  rect: Region;
+  aspect: CropAspect;
+  rotate: CropRotation;
+  flipHorizontal: boolean;
+  flipVertical: boolean;
+}
+
+export const FULL_RECT: Region = { x: 0, y: 0, width: 1, height: 1 };
+export const initialCrop: CropState = { rect: FULL_RECT, aspect: "free", rotate: 0, flipHorizontal: false, flipVertical: false };
+const CROP_MIN = 0.05;
+
+/** The frame size after rotating a picture (a quarter turn swaps the sides). */
+export const rotatedSize = (natural: Size, rotate: CropRotation): Size =>
+  rotate === 90 || rotate === 270 ? { width: natural.height, height: natural.width } : natural;
+
+/** Width over height in picture pixels for a preset, or null for Free. */
+export function aspectRatioOf(aspect: CropAspect, frame: Size): number | null {
+  switch (aspect) {
+    case "free":
+      return null;
+    case "original":
+      return frame.width / Math.max(1, frame.height);
+    case "1:1":
+      return 1;
+    case "4:5":
+      return 4 / 5;
+    case "16:9":
+      return 16 / 9;
+    case "9:16":
+      return 9 / 16;
+  }
+}
+
+/** The largest centred rectangle of `ratio` (pixels, width over height) that fits the frame. */
+export function rectForAspect(ratio: number, frame: Size): Region {
+  const frameRatio = frame.width / Math.max(1, frame.height);
+  if (ratio >= frameRatio) {
+    const height = frameRatio / ratio;
+    return { x: 0, y: (1 - height) / 2, width: 1, height };
+  }
+  const width = ratio / frameRatio;
+  return { x: (1 - width) / 2, y: 0, width, height: 1 };
+}
+
+const sameRect = (a: Region, b: Region) =>
+  Math.abs(a.x - b.x) < 1e-6 && Math.abs(a.y - b.y) < 1e-6 && Math.abs(a.width - b.width) < 1e-6 && Math.abs(a.height - b.height) < 1e-6;
+
+export const cropChanged = (crop: CropState) =>
+  !sameRect(crop.rect, FULL_RECT) || crop.rotate !== 0 || crop.flipHorizontal || crop.flipVertical;
+
+/** A quarter turn. The shape the person chose is kept and re-fitted to the new frame; Free resets to the whole frame. */
+export function turnCrop(crop: CropState, direction: 1 | -1, natural: Size): CropState {
+  const rotate = ((crop.rotate + (direction === 1 ? 90 : 270)) % 360) as CropRotation;
+  const ratio = aspectRatioOf(crop.aspect, rotatedSize(natural, rotate));
+  const frame = rotatedSize(natural, rotate);
+  return { ...crop, rotate, rect: ratio === null ? FULL_RECT : rectForAspect(ratio, frame) };
+}
+
+/** Move or resize `rect` by a normalised drag `(dx, dy)`. `ratio` (pixels, width over height) locks the shape. */
+export function dragCrop(rect: Region, handle: CropHandle, dx: number, dy: number, ratio: number | null, frame: Size): Region {
+  const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
+  if (handle === "move") {
+    return {
+      ...rect,
+      x: clamp(rect.x + dx, 0, 1 - rect.width),
+      y: clamp(rect.y + dy, 0, 1 - rect.height),
+    };
+  }
+  let l = rect.x;
+  let t = rect.y;
+  let r = rect.x + rect.width;
+  let b = rect.y + rect.height;
+  if (handle.includes("w")) l = clamp(l + dx, 0, r - CROP_MIN);
+  if (handle.includes("e")) r = clamp(r + dx, l + CROP_MIN, 1);
+  if (handle.includes("n")) t = clamp(t + dy, 0, b - CROP_MIN);
+  if (handle.includes("s")) b = clamp(b + dy, t + CROP_MIN, 1);
+  if (ratio === null) return { x: l, y: t, width: r - l, height: b - t };
+  // Locked shape. In frame fractions, width_px / height_px = ratio means (w * W) / (h * H) = ratio.
+  const k = ratio * (frame.height / Math.max(1, frame.width)); // w = k * h
+  const corner = handle.length === 2;
+  if (corner) {
+    const anchorX = handle.includes("w") ? r : l;
+    const anchorY = handle.includes("n") ? b : t;
+    const spanX = handle.includes("w") ? anchorX : 1 - anchorX;
+    const spanY = handle.includes("n") ? anchorY : 1 - anchorY;
+    let w = Math.max(r - l, (b - t) * k);
+    let h = w / k;
+    if (w > spanX) { w = spanX; h = w / k; }
+    if (h > spanY) { h = spanY; w = h * k; }
+    w = Math.max(w, CROP_MIN);
+    h = w / k;
+    return { x: handle.includes("w") ? anchorX - w : anchorX, y: handle.includes("n") ? anchorY - h : anchorY, width: w, height: h };
+  }
+  if (handle === "e" || handle === "w") {
+    const centreY = rect.y + rect.height / 2;
+    let w = r - l;
+    let h = w / k;
+    if (h > 1) { h = 1; w = h * k; }
+    const y = clamp(centreY - h / 2, 0, 1 - h);
+    const x = handle === "w" ? r - w : l;
+    return { x: clamp(x, 0, 1 - w), y, width: w, height: h };
+  }
+  const centreX = rect.x + rect.width / 2;
+  let h = b - t;
+  let w = h * k;
+  if (w > 1) { w = 1; h = w / k; }
+  const x = clamp(centreX - w / 2, 0, 1 - w);
+  const y = handle === "n" ? b - h : t;
+  return { x, y: clamp(y, 0, 1 - h), width: w, height: h };
+}
+
+/** Pixel size the crop produces from a picture of `natural` size. */
+export function croppedPixels(crop: CropState, natural: Size): Size {
+  const frame = rotatedSize(natural, crop.rotate);
+  return { width: Math.max(1, Math.round(frame.width * crop.rect.width)), height: Math.max(1, Math.round(frame.height * crop.rect.height)) };
+}
+
+// ------------------------------------------------------------ adjust (IMG-STUDIO-01)
+
+/** The four sliders the Home `picture.adjust` operation takes, each -100..100 (0 = unchanged). */
+export interface AdjustValues {
+  brightness: number;
+  contrast: number;
+  saturation: number;
+  warmth: number;
+}
+export const ADJUST_KEYS = ["brightness", "contrast", "saturation", "warmth"] as const satisfies readonly (keyof AdjustValues)[];
+export const NO_ADJUST: AdjustValues = { brightness: 0, contrast: 0, saturation: 0, warmth: 0 };
+export const adjustChanged = (v: AdjustValues) => ADJUST_KEYS.some((key) => v[key] !== 0);
+
+/** A CSS filter that approximates the adjustment for a live preview (the applied result is the host's). */
+export function adjustFilter(v: AdjustValues): string {
+  const parts = [`brightness(${(1 + v.brightness / 100).toFixed(3)})`, `contrast(${(1 + v.contrast / 100).toFixed(3)})`, `saturate(${Math.max(0, 1 + v.saturation / 100).toFixed(3)})`];
+  if (v.warmth > 0) parts.push(`sepia(${(v.warmth / 250).toFixed(3)})`);
+  else if (v.warmth < 0) parts.push(`hue-rotate(${(-v.warmth * 0.12).toFixed(1)}deg)`);
+  return parts.join(" ");
+}
+
+/** The CSS transform for the rotated and flipped preview of a picture. */
+export function pictureTransform(crop: CropState): string {
+  const fx = crop.flipHorizontal ? -1 : 1;
+  const fy = crop.flipVertical ? -1 : 1;
+  return `translate(-50%, -50%) scale(${fx}, ${fy}) rotate(${crop.rotate}deg)`;
+}

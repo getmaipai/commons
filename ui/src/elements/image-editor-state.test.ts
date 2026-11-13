@@ -1,6 +1,19 @@
 import { describe, expect, test } from "bun:test";
 import {
+  FULL_RECT,
+  NO_ADJUST,
   PALETTE,
+  adjustChanged,
+  adjustFilter,
+  aspectRatioOf,
+  cropChanged,
+  croppedPixels,
+  dragCrop,
+  initialCrop,
+  pictureTransform,
+  rectForAspect,
+  rotatedSize,
+  turnCrop,
   arrowHeadPoints,
   canRedoStroke,
   canUndoStroke,
@@ -203,5 +216,104 @@ describe("palette", () => {
     expect(PALETTE).toHaveLength(8);
     expect(new Set(PALETTE.map((c) => c.key)).size).toBe(8);
     for (const c of PALETTE) expect(c.cssVar.startsWith("--")).toBe(true);
+  });
+});
+
+describe("crop math (IMG-STUDIO-01)", () => {
+  const frame = { width: 1200, height: 800 };
+  test("aspect presets give the right pixel ratio and Free gives none", () => {
+    expect(aspectRatioOf("free", frame)).toBeNull();
+    expect(aspectRatioOf("original", frame)).toBeCloseTo(1.5);
+    expect(aspectRatioOf("1:1", frame)).toBe(1);
+    expect(aspectRatioOf("4:5", frame)).toBeCloseTo(0.8);
+    expect(aspectRatioOf("16:9", frame)).toBeCloseTo(16 / 9);
+    expect(aspectRatioOf("9:16", frame)).toBeCloseTo(9 / 16);
+  });
+  test("a preset rectangle is the largest centred one and has exactly that ratio in pixels", () => {
+    for (const ratio of [1, 0.8, 16 / 9, 9 / 16]) {
+      const r = rectForAspect(ratio, frame);
+      expect((r.width * frame.width) / (r.height * frame.height)).toBeCloseTo(ratio, 5);
+      expect(r.x).toBeGreaterThanOrEqual(0);
+      expect(r.x + r.width).toBeLessThanOrEqual(1 + 1e-9);
+      expect(r.y + r.height).toBeLessThanOrEqual(1 + 1e-9);
+      expect(Math.max(r.width, r.height)).toBeCloseTo(1, 5);
+    }
+  });
+  test("a quarter turn swaps the frame, keeps the chosen shape re-fitted, and Free resets to the whole frame", () => {
+    expect(rotatedSize(frame, 90)).toEqual({ width: 800, height: 1200 });
+    expect(rotatedSize(frame, 180)).toEqual(frame);
+    const free = turnCrop({ ...initialCrop, rect: { x: 0.1, y: 0.1, width: 0.5, height: 0.5 } }, 1, frame);
+    expect(free.rotate).toBe(90);
+    expect(free.rect).toEqual(FULL_RECT);
+    const square = turnCrop({ ...initialCrop, aspect: "1:1", rect: rectForAspect(1, frame) }, 1, frame);
+    expect((square.rect.width * 800) / (square.rect.height * 1200)).toBeCloseTo(1, 5);
+    const original = turnCrop({ ...initialCrop, aspect: "original" }, 1, frame);
+    expect(original.rect).toEqual(FULL_RECT);
+    expect(turnCrop(initialCrop, -1, frame).rotate).toBe(270);
+    expect(turnCrop(turnCrop(initialCrop, 1, frame), 1, frame).rotate).toBe(180);
+  });
+  test("a change is only reported when something moved", () => {
+    expect(cropChanged(initialCrop)).toBe(false);
+    expect(cropChanged({ ...initialCrop, flipHorizontal: true })).toBe(true);
+    expect(cropChanged({ ...initialCrop, rect: { x: 0.1, y: 0, width: 0.9, height: 1 } })).toBe(true);
+    expect(croppedPixels({ ...initialCrop, rect: { x: 0, y: 0, width: 0.5, height: 0.5 } }, frame)).toEqual({ width: 600, height: 400 });
+    expect(croppedPixels({ ...initialCrop, rotate: 90 }, frame)).toEqual({ width: 800, height: 1200 });
+  });
+  test("moving keeps the rectangle inside the picture", () => {
+    const r = { x: 0.2, y: 0.2, width: 0.5, height: 0.5 };
+    expect(dragCrop(r, "move", 0.9, -0.9, null, frame)).toEqual({ x: 0.5, y: 0, width: 0.5, height: 0.5 });
+  });
+  test("a free edge drag changes one side and is clamped to the picture and a minimum size", () => {
+    const r = { x: 0.2, y: 0.2, width: 0.5, height: 0.5 };
+    const wider = dragCrop(r, "e", 0.1, 0.4, null, frame);
+    expect(wider.width).toBeCloseTo(0.6);
+    expect(wider.height).toBeCloseTo(0.5);
+    expect(wider.x).toBeCloseTo(0.2);
+    expect(dragCrop(r, "w", -0.9, 0, null, frame).x).toBe(0);
+    const tiny = dragCrop(r, "e", -0.9, 0, null, frame);
+    expect(tiny.width).toBeCloseTo(0.05);
+  });
+  test("a locked corner drag keeps the ratio and stays in the picture", () => {
+    const ratio = 1;
+    const start = rectForAspect(ratio, frame);
+    const smaller = dragCrop(start, "se", -0.1, -0.1, ratio, frame);
+    expect((smaller.width * frame.width) / (smaller.height * frame.height)).toBeCloseTo(ratio, 5);
+    expect(smaller.x).toBeCloseTo(start.x);
+    expect(smaller.y).toBeCloseTo(start.y);
+    const bigger = dragCrop({ x: 0.3, y: 0.3, width: 0.2, height: 0.3 }, "se", 0.9, 0.9, ratio, frame);
+    expect((bigger.width * frame.width) / (bigger.height * frame.height)).toBeCloseTo(ratio, 5);
+    expect(bigger.x + bigger.width).toBeLessThanOrEqual(1 + 1e-9);
+    expect(bigger.y + bigger.height).toBeLessThanOrEqual(1 + 1e-9);
+  });
+  test("a locked edge drag keeps the ratio too", () => {
+    const ratio = 16 / 9;
+    const start = rectForAspect(ratio, frame);
+    for (const handle of ["n", "s", "e", "w"] as const) {
+      const r = dragCrop({ ...start, x: 0.2, width: 0.5, height: 0.5 * (frame.width / frame.height) / ratio, y: 0.2 }, handle, 0.05, 0.05, ratio, frame);
+      expect((r.width * frame.width) / (r.height * frame.height)).toBeCloseTo(ratio, 4);
+      expect(r.x).toBeGreaterThanOrEqual(-1e-9);
+      expect(r.y).toBeGreaterThanOrEqual(-1e-9);
+      expect(r.x + r.width).toBeLessThanOrEqual(1 + 1e-9);
+      expect(r.y + r.height).toBeLessThanOrEqual(1 + 1e-9);
+    }
+  });
+});
+
+describe("adjust math (IMG-STUDIO-01)", () => {
+  test("no change is not a change, any slider is", () => {
+    expect(adjustChanged(NO_ADJUST)).toBe(false);
+    expect(adjustChanged({ ...NO_ADJUST, warmth: -5 })).toBe(true);
+  });
+  test("the preview filter follows the sliders", () => {
+    expect(adjustFilter(NO_ADJUST)).toBe("brightness(1.000) contrast(1.000) saturate(1.000)");
+    const f = adjustFilter({ brightness: 50, contrast: -50, saturation: -100, warmth: 100 });
+    expect(f).toContain("brightness(1.500)");
+    expect(f).toContain("contrast(0.500)");
+    expect(f).toContain("saturate(0.000)");
+    expect(f).toContain("sepia(0.400)");
+    expect(adjustFilter({ ...NO_ADJUST, warmth: -50 })).toContain("hue-rotate(6.0deg)");
+  });
+  test("the picture transform turns then flips, centred", () => {
+    expect(pictureTransform({ ...initialCrop, rotate: 90, flipHorizontal: true })).toBe("translate(-50%, -50%) scale(-1, 1) rotate(90deg)");
   });
 });

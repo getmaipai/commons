@@ -22,12 +22,19 @@ import {
 } from "react";
 import {
   AlertCircleIcon,
+  BrushIcon,
   CheckIcon,
   CircleIcon,
+  ContrastIcon,
+  CropIcon,
   DownloadIcon,
+  EllipsisIcon,
   EraserIcon,
+  FlipHorizontal2Icon,
+  FlipVertical2Icon,
   HighlighterIcon,
   HistoryIcon,
+  ImagePlusIcon,
   InfoIcon,
   LockIcon,
   LockOpenIcon,
@@ -38,8 +45,11 @@ import {
   PenLineIcon,
   PlusIcon,
   Redo2Icon,
+  RotateCcwIcon,
+  RotateCwIcon,
   ScalingIcon,
   Share2Icon,
+  SlidersHorizontalIcon,
   SquareIcon,
   Trash2Icon,
   TypeIcon,
@@ -66,36 +76,55 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/elem
 import { formatRelative } from "../relativeTime";
 import { i18n } from "@/kit/i18n";
 import {
+  ADJUST_KEYS,
   BRUSH_MAX,
+  CROP_ASPECTS,
   BRUSH_MIN,
   MARKUP_SIZE_MAX,
   MARKUP_SIZE_MIN,
+  NO_ADJUST,
   PALETTE,
   RESIZE_MAX,
+  adjustChanged,
+  adjustFilter,
+  aspectRatioOf,
   canRedoStroke,
   canUndoStroke,
   clampBrush,
   clampZoom,
+  cropChanged,
+  croppedPixels,
   emptyStrokes,
   fitZoom,
   fromPixels,
+  initialCrop,
   linkedSide,
   markupStrokePx,
   parseWhole,
+  pictureTransform,
+  rectForAspect,
   resizeLabel,
+  rotatedSize,
   stepBrush,
   stepVersion,
   stepZoom,
   strokesReducer,
   toPixels,
+  turnCrop,
   validateResize,
   wheelZoom,
+  type AdjustValues,
+  type CropAspect,
+  type CropRotation,
+  type CropState,
   type MarkupTool,
   type Point,
   type Region,
   type ResizeUnit,
   type Size,
 } from "./image-editor-state";
+import { ImageEditorCompare } from "./image-editor-compare";
+import { ImageEditorCrop } from "./image-editor-crop";
 import { ImageEditorSurface, renderMarkupPng, renderMaskPng, resolveColor } from "./image-editor-surface";
 
 // ------------------------------------------------------------------- types
@@ -125,11 +154,55 @@ export interface ImageEditorPending {
   transparent?: boolean;
 }
 
+/** IMG-STUDIO-01: the tools the Studio adds. A host that does not pass them in `tools` never sees them. */
+export type ImageEditorStudioToolKey = "crop" | "adjust";
+
+/** One value of a host-listed operation's controls. */
+export type ImageEditorOperationValue = number | string | boolean;
+
+/** IMG-STUDIO-01: a one-click operation the host lists (from the backend registry); the kit names none of them. */
+export interface ImageEditorExtraOperation {
+  id: string;
+  label: string;
+  /** One plain line shown under the operation when it is chosen. */
+  summary?: string;
+  /** Optional inputs drawn before Run: a number is a slider, a choice is a row of buttons. */
+  controls?: ReadonlyArray<
+    | { kind: "number"; name: string; label: string; min: number; max: number; step?: number; default?: number }
+    | { kind: "choice"; name: string; label: string; options: readonly string[]; default?: string }
+  >;
+  enabled: boolean;
+  /** Why it is disabled, one line. Shown as its tooltip and in the status line; a disabled operation stays in the list. */
+  reason?: string;
+}
+
 export type ImageEditorOperation =
   | { operation: "remove_background" }
   | { operation: "erase"; mask: Blob }
   | { operation: "upscale"; scale: 2 | 4 }
-  | { operation: "resize"; width: number; height: number };
+  | { operation: "resize"; width: number; height: number }
+  /** Crop, rotate and flip. Rotate and flip apply first (rotate, then flip); `x`, `y`, `width`, `height` are fractions (0..1)
+   * of the rotated and flipped picture. `aspect` is the preset the person chose (a hint; the rectangle is the truth). */
+  | { operation: "crop"; x: number; y: number; width: number; height: number; aspect: CropAspect; rotate: CropRotation; flipHorizontal: boolean; flipVertical: boolean }
+  /** Light and colour, each -100..100 (0 unchanged), the `picture.adjust` argument names. `auto` asks for auto tone (the four values are then 0). */
+  | { operation: "adjust"; brightness: number; contrast: number; saturation: number; warmth: number; auto: boolean }
+  /** One of the host's `operations`, by id, with the values of its controls. */
+  | { operation: "custom"; id: string; args: Record<string, ImageEditorOperationValue> };
+
+/** A picture the person chose as a reference for a Comment. */
+export interface ImageEditorReference {
+  id: string;
+  label: string;
+}
+
+/** What Comment sends: the words, a point or box (`region`) or a painted area (`mask`), and an optional reference picture. */
+export interface ImageEditorCommentRequest {
+  prompt: string;
+  region: Region | null;
+  /** A PNG the size of the picture, white where the change goes (Brush mode only). */
+  mask?: Blob;
+  reference?: ImageEditorReference;
+}
 
 export interface ImageEditorRunControl {
   signal: AbortSignal;
@@ -144,7 +217,19 @@ export interface ImageEditorProps {
   versions: ImageEditorVersion[];
   currentVersionId: string;
   onSelectVersion: (id: string) => void;
-  tools: Record<ImageEditorToolKey, ImageEditorToolState>;
+  /** The five chat tools are required; `crop` and `adjust` (IMG-STUDIO-01) are drawn only when listed. */
+  tools: Record<ImageEditorToolKey, ImageEditorToolState> & Partial<Record<ImageEditorStudioToolKey, ImageEditorToolState>>;
+  /** IMG-STUDIO-01: extra one-click operations, listed by the host under a More tool. They run through `onRunOperation`
+   * as `{ operation: "custom", id, args }` and come back as a preview like every other tool. Default none. */
+  operations?: readonly ImageEditorExtraOperation[];
+  /** IMG-STUDIO-01: which tool is open at first. A tool that is disabled or not listed is ignored. */
+  initialTool?: ImageEditorToolKey | ImageEditorStudioToolKey;
+  /** IMG-STUDIO-01: draw Compare (before and after the first version). Default false. */
+  compare?: boolean;
+  /** IMG-STUDIO-01: Comment gains a Brush mode that sends `mask`. Default false. */
+  commentBrush?: boolean;
+  /** IMG-STUDIO-01: the host's picker for a Comment's reference picture; Comment shows "Add a reference picture" when set. */
+  onPickReference?: () => Promise<ImageEditorReference | null>;
   statusNote?: string | null;
   onRunOperation: (op: ImageEditorOperation, ctl: ImageEditorRunControl) => Promise<ImageEditorPending>;
   onApplyPending: (pending: ImageEditorPending, label: string) => Promise<ImageEditorVersion>;
@@ -152,7 +237,7 @@ export interface ImageEditorProps {
   /** Sends the comment. The second argument carries the same cancel signal and progress callback a tool run gets.
    * A reply may also return `pending`, the picture the comment produced: the editor then shows it as a preview with
    * Apply and Discard, exactly as it does for Erase (additive; a reply with only `message` behaves as before). */
-  onComment: (request: { prompt: string; region: Region | null }, ctl: ImageEditorRunControl) => Promise<{ message: string; pending?: ImageEditorPending }>;
+  onComment: (request: ImageEditorCommentRequest, ctl: ImageEditorRunControl) => Promise<{ message: string; pending?: ImageEditorPending }>;
   onShare?: (version: ImageEditorVersion) => void;
   downloadName?: string;
   onClose: () => void;
@@ -166,13 +251,27 @@ const DEFAULT_COLOR = "red";
 const DEFAULT_MARKUP_SIZE = 4;
 const DEFAULT_BRUSH = 40;
 
-const toolMeta = (): ReadonlyArray<{ key: ImageEditorToolKey; label: string; icon: ReactNode; text?: string }> => [
+type Mode = ImageEditorToolKey | ImageEditorStudioToolKey | "more";
+
+const toolMeta = (): ReadonlyArray<{ key: Mode; label: string; icon: ReactNode; text?: string }> => [
   { key: "markup", label: i18n._({ id: "ui.Markup", message: "Markup" }), icon: <PenLineIcon aria-hidden /> },
   { key: "comment", label: i18n._({ id: "ui.Comment", message: "Comment" }), icon: <MessageSquareIcon aria-hidden /> },
   { key: "remove_background", label: i18n._({ id: "ui.Remove BG", message: "Remove BG" }), icon: <WandSparklesIcon aria-hidden />, text: i18n._({ id: "ui.Remove BG", message: "Remove BG" }) },
   { key: "erase", label: i18n._({ id: "ui.Erase", message: "Erase" }), icon: <EraserIcon aria-hidden /> },
   { key: "resize", label: i18n._({ id: "ui.Resize", message: "Resize" }), icon: <ScalingIcon aria-hidden /> },
+  { key: "crop", label: i18n._({ id: "ui.Crop", message: "Crop" }), icon: <CropIcon aria-hidden /> },
+  { key: "adjust", label: i18n._({ id: "ui.Adjust", message: "Adjust" }), icon: <SlidersHorizontalIcon aria-hidden /> },
+  { key: "more", label: i18n._({ id: "ui.More", message: "More" }), icon: <EllipsisIcon aria-hidden /> },
 ];
+
+const ASPECT_LABEL = (aspect: CropAspect) => (aspect === "free" ? i18n._({ id: "ui.Free", message: "Free" }) : aspect === "original" ? i18n._({ id: "ui.Original", message: "Original" }) : aspect);
+const ADJUST_LABEL = (key: keyof AdjustValues) =>
+  ({
+    brightness: i18n._({ id: "ui.Brightness", message: "Brightness" }),
+    contrast: i18n._({ id: "ui.Contrast", message: "Contrast" }),
+    saturation: i18n._({ id: "ui.Saturation", message: "Saturation" }),
+    warmth: i18n._({ id: "ui.Warmth", message: "Warmth" }),
+  })[key];
 
 const markupTools = (): ReadonlyArray<{ key: MarkupTool; label: string; icon: ReactNode }> => [
   { key: "pen", label: i18n._({ id: "ui.Pen", message: "Pen" }), icon: <PenLineIcon aria-hidden /> },
@@ -199,15 +298,16 @@ const checkerboard = {
   backgroundSize: "16px 16px",
 } as const;
 
-function ToolButton({ label, children, side = "top", ...rest }: ComponentProps<typeof Button> & { label: string; side?: "top" | "bottom" }) {
+/** `hint` is the key that does the same thing, named in the tooltip (the accessible name stays the label). */
+function ToolButton({ label, children, side = "top", hint, ...rest }: ComponentProps<typeof Button> & { label: string; side?: "top" | "bottom"; hint?: string }) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button type="button" variant="ghost" size="icon-sm" aria-label={label} {...rest}>
+        <Button type="button" variant="ghost" size="icon-sm" aria-label={label} aria-keyshortcuts={hint ? hint.replace(/^Ctrl\+/, "Control+") : undefined} {...rest}>
           {children}
         </Button>
       </TooltipTrigger>
-      <TooltipContent side={side}>{label}</TooltipContent>
+      <TooltipContent side={side}>{hint ? `${label} (${hint})` : label}</TooltipContent>
     </Tooltip>
   );
 }
@@ -368,6 +468,11 @@ export function ImageEditor({
   currentVersionId,
   onSelectVersion,
   tools,
+  operations,
+  initialTool,
+  compare = false,
+  commentBrush = false,
+  onPickReference,
   statusNote,
   onRunOperation,
   onApplyPending,
@@ -384,7 +489,18 @@ export function ImageEditor({
   const keyHandlerRef = useRef<(event: KeyboardEvent) => void>(() => {});
   const zoomRef = useRef(100);
 
-  const [mode, setMode] = useState<ImageEditorToolKey | null>(null);
+  const [mode, setMode] = useState<Mode | null>(() => {
+    if (!initialTool || initialTool === "remove_background") return null;
+    const state = tools[initialTool];
+    return state?.enabled ? initialTool : null;
+  });
+  const [crop, setCrop] = useState<CropState>(initialCrop);
+  const [adjust, setAdjust] = useState<AdjustValues>(NO_ADJUST);
+  const [comparing, setComparing] = useState(false);
+  const [moreChoice, setMoreChoice] = useState<string | null>(null);
+  const [moreArgs, setMoreArgs] = useState<Record<string, ImageEditorOperationValue>>({});
+  const [commentTool, setCommentTool] = useState<"point" | "brush">("point");
+  const [reference, setReference] = useState<ImageEditorReference | null>(null);
   const [markupTool, setMarkupTool] = useState<MarkupTool>("pen");
   const [colorKey, setColorKey] = useState(DEFAULT_COLOR);
   const [colorOpen, setColorOpen] = useState(false);
@@ -423,6 +539,9 @@ export function ImageEditor({
     setComment(null);
     setPins([]);
     setReply(null);
+    setCrop(initialCrop);
+    setAdjust(NO_ADJUST);
+    setComparing(false);
     dispatchMarkup({ type: "clear" });
     dispatchMask({ type: "clear" });
   }
@@ -436,11 +555,17 @@ export function ImageEditor({
       : current?.width && current?.height
         ? { width: current.width, height: current.height }
         : null);
-  const zoom = fit && natural && stageSize ? fitZoom(stageSize, natural) : fit ? 100 : zoomState;
+  // While the crop frame is up, the picture is shown turned and flipped, so the box and Fit follow the turned frame.
+  const cropping = mode === "crop" && busy === null && pending === null;
+  const frameNatural: Size | null = natural && cropping ? rotatedSize(natural, crop.rotate) : natural;
+  const zoom = fit && frameNatural && stageSize ? fitZoom(stageSize, frameNatural) : fit ? 100 : zoomState;
   const scale = zoom / 100;
   const locked = busy !== null;
   const interactive = !locked && !pending;
-  const layer = mode === "markup" ? markup : mode === "erase" ? mask : null;
+  const brushing = mode === "erase" || (mode === "comment" && commentBrush && commentTool === "brush");
+  const layer = mode === "markup" ? markup : brushing ? mask : null;
+  const original = versions[0];
+  const canCompare = compare && !!original && !!current && (current.id !== original.id || pending !== null);
   const strokePx = natural ? markupStrokePx(markupSize, natural) : 4;
   const selectedColor = PALETTE.find((color) => color.key === colorKey) ?? PALETTE[0]!;
 
@@ -519,6 +644,11 @@ export function ImageEditor({
     setTextDraft(null);
     setComment(null);
     setReply(null);
+    setCrop(initialCrop);
+    setAdjust(NO_ADJUST);
+    setReference(null);
+    setMoreChoice(null);
+    setMoreArgs({});
   };
 
   async function run(op: ImageEditorOperation, label: string) {
@@ -585,6 +715,42 @@ export function ImageEditor({
     await run({ operation: "erase", mask: blob }, i18n._({ id: "ui.Object erased", message: "Object erased" }));
   }
 
+  /** Crop, rotate and flip: the request carries the rectangle of the rotated and flipped picture; the host returns a preview. */
+  async function runCrop() {
+    if (!natural || !cropChanged(crop)) return;
+    const size = croppedPixels(crop, natural);
+    await run(
+      { operation: "crop", x: crop.rect.x, y: crop.rect.y, width: crop.rect.width, height: crop.rect.height, aspect: crop.aspect, rotate: crop.rotate, flipHorizontal: crop.flipHorizontal, flipVertical: crop.flipVertical },
+      i18n._({ id: "ui.Cropped to {width} x {height}", message: "Cropped to {width} x {height}", values: { width: size.width, height: size.height } }),
+    );
+  }
+
+  async function runAdjust(auto: boolean) {
+    await run(
+      { operation: "adjust", ...(auto ? NO_ADJUST : adjust), auto },
+      auto ? i18n._({ id: "ui.Auto tone", message: "Auto tone" }) : i18n._({ id: "ui.Light and colour adjusted", message: "Light and colour adjusted" }),
+    );
+  }
+
+  function chooseOperation(operation: ImageEditorExtraOperation) {
+    if (!operation.enabled) {
+      setNotice(operation.reason ?? i18n._({ id: "ui.That is not available right now.", message: "That is not available right now." }));
+      return;
+    }
+    setNotice(null);
+    const defaults: Record<string, ImageEditorOperationValue> = {};
+    for (const control of operation.controls ?? []) {
+      defaults[control.name] = control.kind === "number" ? control.default ?? control.min : control.default ?? control.options[0] ?? "";
+    }
+    setMoreArgs(defaults);
+    if (!operation.controls || operation.controls.length === 0) {
+      setMoreChoice(null);
+      void run({ operation: "custom", id: operation.id, args: {} }, operation.label);
+    } else {
+      setMoreChoice(operation.id);
+    }
+  }
+
   async function saveMarkup() {
     if (!natural || !current || markup.strokes.length === 0) return;
     setError(null);
@@ -604,7 +770,17 @@ export function ImageEditor({
 
   async function sendComment() {
     if (!comment || comment.prompt.trim().length === 0) return;
-    const request = { prompt: comment.prompt.trim(), region: comment.region };
+    const request: ImageEditorCommentRequest = { prompt: comment.prompt.trim(), region: comment.region };
+    if (commentBrush && commentTool === "brush" && natural && mask.strokes.length > 0) {
+      const png = await renderMaskPng(mask.strokes, natural);
+      if (!png) {
+        failWith(new Error(i18n._({ id: "ui.The painted area could not be prepared. Try painting it again.", message: "The painted area could not be prepared. Try painting it again." })));
+        return;
+      }
+      request.mask = png;
+      request.region = null;
+    }
+    if (reference) request.reference = reference;
     setError(null);
     const controller = new AbortController();
     abortRef.current = controller;
@@ -620,6 +796,7 @@ export function ImageEditor({
       setReply(answer.message);
       if (answer.pending) setPending({ value: answer.pending, label: i18n._({ id: "ui.Changed as described", message: "Changed as described" }) });
       if (request.region) setPins((existing) => [...existing, request.region as Region]);
+      setReference(null);
       setComment({ region: request.region, prompt: "" });
     } catch (err) {
       if (!controller.signal.aborted) failWith(err, () => void sendComment());
@@ -639,10 +816,10 @@ export function ImageEditor({
       }
       return;
     }
-    const key = value as ImageEditorToolKey;
-    const state = tools[key];
-    if (!state.enabled) {
-      setNotice(state.reason ?? i18n._({ id: "ui.That tool is not available right now.", message: "That tool is not available right now." }));
+    const key = value as Mode;
+    const state: ImageEditorToolState | undefined = key === "more" ? { enabled: true } : tools[key];
+    if (!state || !state.enabled) {
+      setNotice(state?.reason ?? i18n._({ id: "ui.That tool is not available right now.", message: "That tool is not available right now." }));
       return;
     }
     if (!interactive) {
@@ -652,6 +829,7 @@ export function ImageEditor({
     setNotice(null);
     setError(null);
     clearLayers();
+    setComparing(false);
     setMode(key);
     if (key === "remove_background") void run({ operation: "remove_background" }, i18n._({ id: "ui.Background removed", message: "Background removed" }));
   }
@@ -673,6 +851,7 @@ export function ImageEditor({
     if (busy?.cancelable) cancelRun();
     else if (locked) return;
     else if (textDraft) setTextDraft(null);
+    else if (comparing) setComparing(false);
     else if (comment) {
       setComment(null);
       setReply(null);
@@ -719,7 +898,12 @@ export function ImageEditor({
         return;
       }
       if (editable || modifier || event.altKey) return;
-      if (mode === "erase" && (event.key === "[" || event.key === "]")) {
+      if (mode === "crop" && interactive && (event.key === "[" || event.key === "]")) {
+        event.preventDefault();
+        if (natural) setCrop((state) => turnCrop(state, event.key === "]" ? 1 : -1, natural));
+        return;
+      }
+      if (brushing && (event.key === "[" || event.key === "]")) {
         event.preventDefault();
         setBrush((size) => stepBrush(size, event.key === "]" ? 1 : -1));
         return;
@@ -734,6 +918,9 @@ export function ImageEditor({
         } else if (event.key === "0") {
           event.preventDefault();
           setFit(true);
+        } else if ((event.key === "c" || event.key === "C") && canCompare && !locked) {
+          event.preventDefault();
+          setComparing((on) => !on);
         }
       }
     };
@@ -747,10 +934,10 @@ export function ImageEditor({
 
   const undoRedo = (
     <div className={pill} role="group" aria-label={i18n._({ id: "ui.History", message: "History" })}>
-      <ToolButton label={i18n._({ id: "ui.Undo", message: "Undo" })} disabled={!canUndo} onClick={undo}>
+      <ToolButton label={i18n._({ id: "ui.Undo", message: "Undo" })} hint="Ctrl+Z" disabled={!canUndo} onClick={undo}>
         <Undo2Icon aria-hidden />
       </ToolButton>
-      <ToolButton label={i18n._({ id: "ui.Redo", message: "Redo" })} disabled={!canRedo} onClick={redo}>
+      <ToolButton label={i18n._({ id: "ui.Redo", message: "Redo" })} hint="Ctrl+Shift+Z" disabled={!canRedo} onClick={redo}>
         <Redo2Icon aria-hidden />
       </ToolButton>
     </div>
@@ -758,7 +945,7 @@ export function ImageEditor({
 
   const header = (
     <header className="flex items-center gap-2 px-2 py-1" data-slot="image-editor-header">
-      <ToolButton label={i18n._({ id: "ui.Close editor", message: "Close editor" })} side="bottom" onClick={onClose}>
+      <ToolButton label={i18n._({ id: "ui.Close editor", message: "Close editor" })} hint={i18n._({ id: "ui.Esc", message: "Esc" })} side="bottom" onClick={onClose}>
         <XIcon aria-hidden />
       </ToolButton>
       <h2 className="min-w-0 flex-1 truncate text-sm font-medium">{title}</h2>
@@ -842,7 +1029,10 @@ export function ImageEditor({
       className={cn(pill, "max-w-full overflow-x-auto")}
     >
       {toolMeta().map((tool) => {
-        const state = tools[tool.key];
+        // Crop and Adjust are drawn only when the host lists them; More only when it lists operations.
+        if ((tool.key === "crop" || tool.key === "adjust") && !tools[tool.key]) return null;
+        if (tool.key === "more" && !(operations && operations.length > 0)) return null;
+        const state: ImageEditorToolState = tool.key === "more" ? { enabled: true } : tools[tool.key]!;
         return (
           <Tooltip key={tool.key}>
             <TooltipTrigger asChild>
@@ -854,7 +1044,7 @@ export function ImageEditor({
                 className={cn("rounded-full", state.enabled ? "" : "opacity-50")}
               >
                 {tool.icon}
-                {tool.text ? <span>{tool.text}</span> : null}
+                {tool.text && !(compact && (tools.crop || tools.adjust)) ? <span>{tool.text}</span> : null}
               </ToggleGroupItem>
             </TooltipTrigger>
             <TooltipContent side={compact ? "top" : "bottom"}>
@@ -989,7 +1179,54 @@ export function ImageEditor({
 
   const commentBar = (
     <div className={cn(pill, "max-w-full flex-wrap justify-center rounded-2xl")} data-slot="image-editor-comment-bar">
-      <span className="text-muted-foreground px-2 text-xs">{i18n._({ id: "ui.Click a spot or drag a box on the picture", message: "Click a spot or drag a box on the picture" })}</span>
+      {commentBrush ? (
+        <ToggleGroup
+          type="single"
+          variant="outline"
+          aria-label={i18n._({ id: "ui.Comment on", message: "Comment on" })}
+          value={commentTool}
+          spacing={0}
+          onValueChange={(value) => {
+            if (value !== "point" && value !== "brush") return;
+            setCommentTool(value);
+            setComment(null);
+            setReply(null);
+          }}
+        >
+          <ToggleGroupItem value="point" disabled={locked} aria-label={i18n._({ id: "ui.Point or box", message: "Point or box" })}>
+            <MessageSquareIcon aria-hidden />
+            {i18n._({ id: "ui.Point or box", message: "Point or box" })}
+          </ToggleGroupItem>
+          <ToggleGroupItem value="brush" disabled={locked} aria-label={i18n._({ id: "ui.Brush", message: "Brush" })}>
+            <BrushIcon aria-hidden />
+            {i18n._({ id: "ui.Brush", message: "Brush" })}
+          </ToggleGroupItem>
+        </ToggleGroup>
+      ) : null}
+      {brushing ? (
+        <>
+          <span className="text-muted-foreground px-2 text-xs">{i18n._({ id: "ui.Paint where the change goes", message: "Paint where the change goes" })}</span>
+          <Slider
+            aria-label={i18n._({ id: "ui.Brush size", message: "Brush size" })}
+            min={BRUSH_MIN}
+            max={BRUSH_MAX}
+            step={1}
+            value={[brush]}
+            disabled={locked}
+            onValueChange={([value]) => setBrush(clampBrush(value ?? DEFAULT_BRUSH))}
+            className="mx-2 w-28 shrink-0"
+          />
+          <ToolButton label={i18n._({ id: "ui.Undo stroke", message: "Undo stroke" })} disabled={locked || !canUndoStroke(mask)} onClick={() => dispatchMask({ type: "undo" })}>
+            <Undo2Icon aria-hidden />
+          </ToolButton>
+          <Button type="button" variant="ghost" size="sm" disabled={locked || mask.strokes.length === 0} onClick={() => dispatchMask({ type: "clear" })}>
+            <Trash2Icon aria-hidden />
+            {i18n._({ id: "ui.Clear", message: "Clear" })}
+          </Button>
+        </>
+      ) : (
+        <span className="text-muted-foreground px-2 text-xs">{i18n._({ id: "ui.Click a spot or drag a box on the picture", message: "Click a spot or drag a box on the picture" })}</span>
+      )}
       <Button
         type="button"
         variant="outline"
@@ -1011,6 +1248,173 @@ export function ImageEditor({
         <WandSparklesIcon aria-hidden />
         {i18n._({ id: "ui.Remove background", message: "Remove background" })}
       </Button>
+    </div>
+  );
+
+  const cropFrame = natural ? rotatedSize(natural, crop.rotate) : null;
+  const cropBar = (
+    <div className={cn(pill, "max-w-full flex-wrap justify-center rounded-2xl")} data-slot="image-editor-crop-bar">
+      <ToggleGroup
+        type="single"
+        variant="outline"
+        aria-label={i18n._({ id: "ui.Crop shape", message: "Crop shape" })}
+        value={crop.aspect}
+        spacing={0}
+        onValueChange={(value) => {
+          if (!value || !cropFrame) return;
+          const aspect = value as CropAspect;
+          const ratio = aspectRatioOf(aspect, cropFrame);
+          setCrop((state) => ({ ...state, aspect, rect: ratio === null ? state.rect : rectForAspect(ratio, cropFrame) }));
+        }}
+      >
+        {CROP_ASPECTS.map((aspect) => (
+          <ToggleGroupItem key={aspect} value={aspect} disabled={locked} aria-label={ASPECT_LABEL(aspect)} data-aspect={aspect} className="px-2.5 text-xs">
+            {ASPECT_LABEL(aspect)}
+          </ToggleGroupItem>
+        ))}
+      </ToggleGroup>
+      <Separator orientation="vertical" className="hidden h-6 sm:block" />
+      <ToolButton label={i18n._({ id: "ui.Rotate left", message: "Rotate left" })} hint="[" disabled={locked} onClick={() => natural && setCrop((state) => turnCrop(state, -1, natural))}>
+        <RotateCcwIcon aria-hidden />
+      </ToolButton>
+      <ToolButton label={i18n._({ id: "ui.Rotate right", message: "Rotate right" })} hint="]" disabled={locked} onClick={() => natural && setCrop((state) => turnCrop(state, 1, natural))}>
+        <RotateCwIcon aria-hidden />
+      </ToolButton>
+      <ToolButton label={i18n._({ id: "ui.Flip horizontal", message: "Flip horizontal" })} disabled={locked} aria-pressed={crop.flipHorizontal} onClick={() => setCrop((state) => ({ ...state, flipHorizontal: !state.flipHorizontal }))}>
+        <FlipHorizontal2Icon aria-hidden />
+      </ToolButton>
+      <ToolButton label={i18n._({ id: "ui.Flip vertical", message: "Flip vertical" })} disabled={locked} aria-pressed={crop.flipVertical} onClick={() => setCrop((state) => ({ ...state, flipVertical: !state.flipVertical }))}>
+        <FlipVertical2Icon aria-hidden />
+      </ToolButton>
+      {natural && cropChanged(crop) ? (
+        <span className="text-muted-foreground px-1 text-xs tabular-nums" data-slot="image-editor-crop-size">
+          {i18n._({ id: "ui.{width} x {height}", message: "{width} x {height}", values: { width: croppedPixels(crop, natural).width, height: croppedPixels(crop, natural).height } })}
+        </span>
+      ) : null}
+      <Button type="button" variant="ghost" size="sm" disabled={locked || !cropChanged(crop)} onClick={() => setCrop(initialCrop)}>
+        {i18n._({ id: "ui.Reset", message: "Reset" })}
+      </Button>
+      <Button type="button" size="sm" disabled={locked || !cropChanged(crop)} onClick={() => void runCrop()}>
+        {i18n._({ id: "ui.Preview", message: "Preview" })}
+      </Button>
+    </div>
+  );
+
+  const adjustBar = (
+    <div className={cn(pill, "max-w-full flex-wrap justify-center gap-x-3 rounded-2xl px-3 py-2")} data-slot="image-editor-adjust-bar">
+      {ADJUST_KEYS.map((key) => (
+        <div key={key} className="grid min-w-32 flex-1 gap-1">
+          <div className="flex items-center justify-between gap-2 text-xs">
+            <span>{ADJUST_LABEL(key)}</span>
+            <span className="text-muted-foreground tabular-nums" data-slot={`image-editor-adjust-${key}`}>{adjust[key]}</span>
+          </div>
+          <Slider
+            aria-label={ADJUST_LABEL(key)}
+            min={-100}
+            max={100}
+            step={1}
+            value={[adjust[key]]}
+            disabled={locked}
+            onValueChange={([value]) => setAdjust((state) => ({ ...state, [key]: value ?? 0 }))}
+          />
+        </div>
+      ))}
+      <div className="flex items-center gap-2">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button type="button" size="sm" variant="outline" disabled={locked} onClick={() => void runAdjust(true)}>
+              <WandSparklesIcon aria-hidden />
+              {i18n._({ id: "ui.Auto", message: "Auto" })}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side={compact ? "top" : "bottom"}>{i18n._({ id: "ui.Fix light and colour for me", message: "Fix light and colour for me" })}</TooltipContent>
+        </Tooltip>
+        <Button type="button" variant="ghost" size="sm" disabled={locked || !adjustChanged(adjust)} onClick={() => setAdjust(NO_ADJUST)}>
+          {i18n._({ id: "ui.Reset", message: "Reset" })}
+        </Button>
+        <Button type="button" size="sm" disabled={locked || !adjustChanged(adjust)} onClick={() => void runAdjust(false)}>
+          {i18n._({ id: "ui.Preview", message: "Preview" })}
+        </Button>
+      </div>
+    </div>
+  );
+
+  const chosenOperation = operations?.find((operation) => operation.id === moreChoice) ?? null;
+  const moreBar = (
+    <div className={cn(pill, "max-w-full flex-col items-stretch rounded-2xl px-3 py-2")} data-slot="image-editor-more-bar">
+      <div className="flex flex-wrap items-center justify-center gap-1">
+        {(operations ?? []).map((operation) => (
+          <Tooltip key={operation.id}>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                size="sm"
+                variant={moreChoice === operation.id ? "default" : "outline"}
+                aria-disabled={operation.enabled ? undefined : true}
+                data-operation={operation.id}
+                className={operation.enabled ? "" : "opacity-50"}
+                disabled={locked}
+                onClick={() => chooseOperation(operation)}
+              >
+                {operation.label}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side={compact ? "top" : "bottom"}>
+              {operation.enabled ? operation.summary ?? operation.label : i18n._({ id: "ui.{tool}: {reason}", message: "{tool}: {reason}", values: { tool: operation.label, reason: operation.reason ?? i18n._({ id: "ui.Not available right now.", message: "Not available right now." }) } })}
+            </TooltipContent>
+          </Tooltip>
+        ))}
+      </div>
+      {chosenOperation ? (
+        <div className="flex flex-wrap items-end justify-center gap-x-3 gap-y-2" data-slot="image-editor-more-controls">
+          {chosenOperation.summary ? <p className="text-muted-foreground w-full text-center text-xs">{chosenOperation.summary}</p> : null}
+          {(chosenOperation.controls ?? []).map((control) =>
+            control.kind === "number" ? (
+              <div key={control.name} className="grid min-w-32 flex-1 gap-1">
+                <div className="flex items-center justify-between gap-2 text-xs">
+                  <span>{control.label}</span>
+                  <span className="text-muted-foreground tabular-nums">{String(moreArgs[control.name] ?? control.min)}</span>
+                </div>
+                <Slider
+                  aria-label={control.label}
+                  min={control.min}
+                  max={control.max}
+                  step={control.step ?? 1}
+                  value={[Number(moreArgs[control.name] ?? control.min)]}
+                  disabled={locked}
+                  onValueChange={([value]) => setMoreArgs((args) => ({ ...args, [control.name]: value ?? control.min }))}
+                />
+              </div>
+            ) : (
+              <ToggleGroup
+                key={control.name}
+                type="single"
+                variant="outline"
+                spacing={0}
+                aria-label={control.label}
+                value={String(moreArgs[control.name] ?? control.options[0] ?? "")}
+                onValueChange={(value) => {
+                  if (value) setMoreArgs((args) => ({ ...args, [control.name]: value }));
+                }}
+              >
+                {control.options.map((option) => (
+                  <ToggleGroupItem key={option} value={option} disabled={locked} aria-label={option}>
+                    {option}
+                  </ToggleGroupItem>
+                ))}
+              </ToggleGroup>
+            ),
+          )}
+          <Button
+            type="button"
+            size="sm"
+            disabled={locked}
+            onClick={() => void run({ operation: "custom", id: chosenOperation.id, args: moreArgs }, chosenOperation.label)}
+          >
+            {i18n._({ id: "ui.Preview", message: "Preview" })}
+          </Button>
+        </div>
+      ) : null}
     </div>
   );
 
@@ -1039,6 +1443,12 @@ export function ImageEditor({
         return commentBar;
       case "remove_background":
         return removeBar;
+      case "crop":
+        return tools.crop ? cropBar : null;
+      case "adjust":
+        return tools.adjust ? adjustBar : null;
+      case "more":
+        return operations && operations.length > 0 ? moreBar : null;
       case "resize":
         return natural && current ? (
           <div className={cn(pill, "max-w-full rounded-2xl px-3 py-2")}>
@@ -1114,6 +1524,9 @@ export function ImageEditor({
       {mode === "comment" && comment ? (
         <Card className="w-full max-w-md py-3" data-slot="image-editor-comment-card">
           <CardContent className="grid gap-2 px-3">
+            {commentBrush && commentTool === "brush" && comment.region === null && mask.strokes.length === 0 ? (
+              <p className="text-muted-foreground text-xs">{i18n._({ id: "ui.Nothing is painted, so this changes the whole picture.", message: "Nothing is painted, so this changes the whole picture." })}</p>
+            ) : null}
             <Textarea
               aria-label={i18n._({ id: "ui.Describe the change", message: "Describe the change" })}
               placeholder={i18n._({ id: "ui.Describe the change", message: "Describe the change" })}
@@ -1122,6 +1535,34 @@ export function ImageEditor({
               autoFocus
               onChange={(event) => setComment({ ...comment, prompt: event.target.value })}
             />
+            {onPickReference ? (
+              <div className="flex flex-wrap items-center gap-2" data-slot="image-editor-reference">
+                {reference ? (
+                  <Badge variant="secondary" className="gap-1">
+                    <ImagePlusIcon aria-hidden />
+                    <span className="max-w-40 truncate">{reference.label}</span>
+                    <button type="button" aria-label={i18n._({ id: "ui.Remove the reference picture", message: "Remove the reference picture" })} className="rounded-full" disabled={locked} onClick={() => setReference(null)}>
+                      <XIcon aria-hidden className="size-3" />
+                    </button>
+                  </Badge>
+                ) : (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    disabled={locked}
+                    onClick={() => {
+                      void onPickReference().then((picked) => {
+                        if (picked) setReference(picked);
+                      }).catch((err) => failWith(err));
+                    }}
+                  >
+                    <ImagePlusIcon aria-hidden />
+                    {i18n._({ id: "ui.Add a reference picture", message: "Add a reference picture" })}
+                  </Button>
+                )}
+              </div>
+            ) : null}
             <div className="flex justify-end gap-2">
               <Button
                 type="button"
@@ -1158,13 +1599,13 @@ export function ImageEditor({
 
   const zoomControl = (
     <div className={pill} role="group" aria-label={i18n._({ id: "ui.Zoom", message: "Zoom" })}>
-      <ToolButton label={i18n._({ id: "ui.Zoom out", message: "Zoom out" })} disabled={zoom <= 10} onClick={() => setZoom(stepZoom(zoom, -1))}>
+      <ToolButton label={i18n._({ id: "ui.Zoom out", message: "Zoom out" })} hint="-" disabled={zoom <= 10} onClick={() => setZoom(stepZoom(zoom, -1))}>
         <MinusIcon aria-hidden />
       </ToolButton>
       <span className="min-w-12 text-center text-sm tabular-nums" data-slot="image-editor-zoom" aria-label={i18n._({ id: "ui.Zoom {zoom} percent", message: "Zoom {zoom} percent", values: { zoom } })}>
         {zoom}%
       </span>
-      <ToolButton label={i18n._({ id: "ui.Zoom in", message: "Zoom in" })} disabled={zoom >= 400} onClick={() => setZoom(stepZoom(zoom, 1))}>
+      <ToolButton label={i18n._({ id: "ui.Zoom in", message: "Zoom in" })} hint="+" disabled={zoom >= 400} onClick={() => setZoom(stepZoom(zoom, 1))}>
         <PlusIcon aria-hidden />
       </ToolButton>
       <Button type="button" variant="ghost" size="sm" aria-pressed={fit} onClick={() => setFit(true)}>
@@ -1174,8 +1615,15 @@ export function ImageEditor({
     </div>
   );
 
-  const boxW = natural ? Math.max(1, Math.round(natural.width * scale)) : undefined;
-  const boxH = natural ? Math.max(1, Math.round(natural.height * scale)) : undefined;
+  const boxW = frameNatural ? Math.max(1, Math.round(frameNatural.width * scale)) : undefined;
+  const boxH = frameNatural ? Math.max(1, Math.round(frameNatural.height * scale)) : undefined;
+  const adjusting = mode === "adjust" && busy === null && pending === null && adjustChanged(adjust);
+  const imageStyle =
+    cropping && natural
+      ? { position: "absolute" as const, left: "50%", top: "50%", width: natural.width * scale, height: natural.height * scale, maxWidth: "none", transform: pictureTransform(crop) }
+      : adjusting
+        ? { filter: adjustFilter(adjust) }
+        : undefined;
 
   const regionBox = (region: Region, number: number, key: string) => (
     <div
@@ -1220,7 +1668,8 @@ export function ImageEditor({
                 src={displayUrl}
                 alt={title}
                 draggable={false}
-                className="absolute inset-0 size-full select-none"
+                className={cn("select-none", cropping ? "" : "absolute inset-0 size-full")}
+                style={imageStyle}
                 onLoad={(event) => {
                   const { naturalWidth, naturalHeight } = event.currentTarget;
                   if (naturalWidth > 0 && naturalHeight > 0) {
@@ -1237,7 +1686,7 @@ export function ImageEditor({
               <ImageEditorSurface
                 natural={natural}
                 scale={scale}
-                mode={interactive && (mode === "markup" || mode === "erase" || mode === "comment") ? mode : "none"}
+                mode={interactive && !comparing ? (brushing ? "erase" : mode === "markup" || mode === "comment" ? mode : "none") : "none"}
                 markupTool={markupTool}
                 color={colorKey}
                 strokePx={strokePx}
@@ -1245,7 +1694,14 @@ export function ImageEditor({
                 // While a preview waits for Apply or Undo, the painted area is not drawn: the picture shown is the result, and the
                 // paint over it made an erased object look still there. Undo brings the strokes back for another go.
                 strokes={layer && !pending ? layer.strokes : []}
-                onStroke={(stroke) => strokeLayerDispatch({ type: "add", stroke })}
+                onStroke={(stroke) => {
+                  strokeLayerDispatch({ type: "add", stroke });
+                  // A painted comment area opens the same words box a point or box does.
+                  if (mode === "comment") {
+                    setReply(null);
+                    setComment((existing) => existing ?? { region: null, prompt: "" });
+                  }
+                }}
                 onTextAt={(at) => setTextDraft({ at, value: "" })}
                 onRegion={(region) => {
                   setReply(null);
@@ -1253,6 +1709,10 @@ export function ImageEditor({
                 }}
               />
             ) : null}
+            {cropping && cropFrame ? (
+              <ImageEditorCrop rect={crop.rect} ratio={aspectRatioOf(crop.aspect, cropFrame)} frame={cropFrame} onChange={(rect) => setCrop((state) => ({ ...state, rect }))} />
+            ) : null}
+            {comparing && canCompare && original ? <ImageEditorCompare beforeUrl={original.url} afterUrl={displayUrl} alt={title} /> : null}
             {pins.map((region, index) => regionBox(region, index + 1, `pin-${index}`))}
             {mode === "comment" && comment?.region ? regionBox(comment.region, pins.length + 1, "active-region") : null}
             {textDraft && natural ? (
@@ -1309,6 +1769,33 @@ export function ImageEditor({
         {stage}
         <div className="flex items-center justify-between gap-2 px-2 py-2" data-slot="image-editor-footer">
           {zoomControl}
+          {compare ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                {/* A span carries the tooltip when the button is disabled (a disabled button gets no pointer events). */}
+                <span tabIndex={canCompare ? undefined : 0}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    aria-pressed={comparing}
+                    aria-keyshortcuts="C"
+                    disabled={!canCompare || locked}
+                    data-slot="image-editor-compare-toggle"
+                    onClick={() => setComparing((on) => !on)}
+                  >
+                    <ContrastIcon aria-hidden />
+                    {i18n._({ id: "ui.Compare", message: "Compare" })}
+                  </Button>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent side="top">
+                {canCompare
+                  ? i18n._({ id: "ui.Compare with the original (C)", message: "Compare with the original (C)" })
+                  : i18n._({ id: "ui.Nothing to compare yet: this is the original picture.", message: "Nothing to compare yet: this is the original picture." })}
+              </TooltipContent>
+            </Tooltip>
+          ) : null}
           {compact ? null : undoRedo}
         </div>
         {compact ? toolArea : null}

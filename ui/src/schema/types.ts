@@ -824,6 +824,33 @@ export const ClipFeedNodeSchema = z.object({
 });
 export type ClipFeedNode = z.infer<typeof ClipFeedNodeSchema>;
 
+/** IMG-STUDIO-01: the picture Studio (ImageEditor). Mirrors spec/ui/schema.json `image_editor`. */
+export const IMAGE_EDITOR_TOOLS = ["markup", "comment", "remove_background", "erase", "resize", "crop", "adjust", "more"] as const;
+const ImageEditorReason = z.string().min(1).max(120);
+export const ImageEditorNodeSchema = z.object({
+  type: z.literal("image_editor"),
+  bind: BindingSchema,
+  fields: z
+    .object({ key: z.string().optional(), title: z.string().optional(), url: z.string().optional(), width: z.string().optional(), height: z.string().optional(), versions: z.string().optional(), locked: z.string().optional() })
+    .strict()
+    .optional(),
+  initial_tool: z.enum(IMAGE_EDITOR_TOOLS).optional(),
+  tools: z.array(z.enum(IMAGE_EDITOR_TOOLS)).max(8).refine((a) => new Set(a).size === a.length, "tools are unique").optional(),
+  tool_reasons: z
+    .object({ markup: ImageEditorReason.optional(), comment: ImageEditorReason.optional(), remove_background: ImageEditorReason.optional(), erase: ImageEditorReason.optional(), resize: ImageEditorReason.optional(), crop: ImageEditorReason.optional(), adjust: ImageEditorReason.optional() })
+    .strict()
+    .optional(),
+  compare: z.boolean().default(true),
+  comment_brush: z.boolean().default(true),
+  operations: z.object({ bind: BindingSchema }).strict().optional(),
+  handlers: z
+    .object({ run: FeedHandlerSchema.optional(), apply: FeedHandlerSchema.optional(), markup: FeedHandlerSchema.optional(), comment: FeedHandlerSchema.optional(), pick_reference: FeedHandlerSchema.optional() })
+    .strict()
+    .optional(),
+  on_close: ActionSchema.optional(),
+});
+export type ImageEditorNode = z.infer<typeof ImageEditorNodeSchema>;
+
 /** VIDEO-STUDIO-04 and -05 (K3, K4): the studio (TrackStudio). Mirrors spec/ui/schema.json `studio`. */
 export const STUDIO_TOOLS = ["split", "delete", "add_clip", "add_voice", "add_music"] as const;
 export const STUDIO_PANELS = ["volume", "fades", "crossfade", "level"] as const;
@@ -983,6 +1010,7 @@ export type UiNode =
   | ResultFeedNode
   | ClipFeedNode
   | StudioNode
+  | ImageEditorNode
   | TabsNode;
 
 export const UiNodeSchema: z.ZodType<UiNode> = z.lazy(() =>
@@ -1017,6 +1045,7 @@ export const UiNodeSchema: z.ZodType<UiNode> = z.lazy(() =>
     ResultFeedNodeSchema,
     ClipFeedNodeSchema,
     StudioNodeSchema,
+    ImageEditorNodeSchema,
     TabsNodeSchema,
   ]),
 );
@@ -1055,4 +1084,5 @@ export const NODE_TYPES = [
   "result_feed",
   "clip_feed",
   "studio",
+  "image_editor",
 ] as const;

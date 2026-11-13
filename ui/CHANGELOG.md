@@ -1,3 +1,7 @@
+## [ui-v0.5.625] - 2026-11-13
+
+- IMG-STUDIO-01, additive. `ImageEditor` gains Crop (drag handles, Free, Original, 1:1, 4:5, 16:9, 9:16, rotate left and right, flip horizontal and vertical), Adjust (brightness, contrast, saturation, warmth, Auto, live CSS preview), Compare (before and after the first version), a Comment Brush mode with an optional PNG `mask` and an optional reference picture, a host-listed `operations` list drawn under More, key hints in tooltips, and `initialTool`. New props: `operations`, `initialTool`, `compare`, `commentBrush`, `onPickReference`; `tools` may carry `crop` and `adjust`; `ImageEditorOperation` gains `crop`, `adjust` and `custom`; the Comment request gains `mask` and `reference`. Every new control is off unless the host passes its prop, so the chat editor is unchanged. New schema node `image_editor` (`ImageEditorNodeView`), with spec 0.1.373.
+
 ## [ui-v0.5.601] - 2026-11-11
 
 - PACK-GESTURE-01, additive. Add the standalone `synth-motion` module for pitch accent analysis and gesture clip selection; the ordinary clip sequencer skips gesture clips.

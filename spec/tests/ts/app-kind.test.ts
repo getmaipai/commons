@@ -208,6 +208,17 @@ describe("the News pages (NEWS-00)", () => {
     expect(run({ ...base, fields: { words: "https://x.test/a", status: "s", src: "https://x.test/a.mp4" } })).toContain("result_feed.fields: src must be a field path");
     expect(run({ ...base, filters: [{ kind: "toggle", state: "a", label: "A" }, { kind: "toggle", state: "a", label: "B" }] })).toContain('filter state key "a" is used twice');
   });
+  test("IMG-STUDIO-01: an image_editor binds a package row, its operations list is a data entry of the package and its handlers stay under it", () => {
+    const page = (node: unknown) => ({ type: "page", id: "x", title: "X", body: [node] });
+    const run = (node: unknown) => checkAppPackage("news", newsContributes, (m) => (m === "today" ? page(node) : news(m)), "child").join("\n");
+    const base = { type: "image_editor", bind: { source: "package", path: "topics" }, operations: { bind: { source: "package", path: "topics" } }, handlers: { run: { call: { target: "/api/plugins/news/run" } } } };
+    expect(run(base)).toBe("");
+    expect(run({ ...base, bind: { source: "package", path: "nope" } })).toContain("image_editor: bind.path");
+    expect(run({ ...base, operations: { bind: { source: "package", path: "nope" } } })).toContain("image_editor.operations: bind.path");
+    expect(run({ ...base, handlers: { run: { call: { target: "/api/plugins/other/x" } } } })).toContain("image_editor.handlers.run: call.target");
+    expect(run({ ...base, on_close: { navigate: { to: "/apps/other" } } })).toContain("image_editor.on_close: navigate.to");
+    expect(run({ ...base, fields: { url: "https://x.test/a.png" } })).toContain("image_editor.fields: url must be a field path");
+  });
   test("VIDEO-STUDIO-04: a studio binds a package row, keeps its handlers under the package and polls a data entry of its own", () => {
     const page = (node: unknown) => ({ type: "page", id: "x", title: "X", body: [node] });
     const run = (node: unknown) => checkAppPackage("news", newsContributes, (m) => (m === "today" ? page(node) : news(m)), "child").join("\n");

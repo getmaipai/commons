@@ -59,6 +59,7 @@ import { ConfirmDialog } from "@/kit/schema/ConfirmDialog";
 import { ReorderFailure, type ReorderConfig } from "@/kit/primitives/reorder";
 import { DeviceTiles, type DeviceCommand } from "@/kit/elements/device-tiles";
 import { StudioNodeView } from "@/kit/schema/StudioNodeView";
+import { ImageEditorNodeView } from "@/kit/schema/ImageEditorNodeView";
 import { ResultFeedNodeView } from "@/kit/schema/ResultFeedNodeView";
 import { ClipFeedNodeView } from "@/kit/schema/ClipFeedNodeView";
 import { isOwnBlobUrl, localPicture } from "@/kit/schema/mediaPath";
@@ -2417,6 +2418,8 @@ export function NodeRenderer({ node, state = {} }: { node: UiNode; state?: Row }
       return <ClipFeedNodeView node={node} state={state} />;
     case "studio":
       return <StudioNodeView node={node} state={state} />;
+    case "image_editor":
+      return <ImageEditorNodeView node={node} state={state} />;
     case "tabs":
       return <TabsNodeView node={node} state={state} />;
     case "form":
