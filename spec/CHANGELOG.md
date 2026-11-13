@@ -1,3 +1,7 @@
+## [spec-v0.1.384] - 2026-11-13
+
+- MAKE-CLEARER-02 (MAKE-CLEARER-2026-11-13), additive. The `image_editor` node takes `resize_upscale` (boolean, default true); false hides the Resize bar's own Upscale 2x and 4x buttons (matches ui 0.5.650). `spec/package.json` is 0.1.384.
+
 ## [spec-v0.1.383] - 2026-11-13
 
 - STACKCHAN-VOICE-01, additive. `device-command` gains the kinds `timer_set` (`seconds` 1 to 86400, optional `label`), `alarm_set` (`hour`, `minute`, optional `label`), `timer_list`, `timer_cancel` (optional `id`; none cancels all), `timer_stop` and `timer_snooze` (optional `seconds`, at most 3600) for the robot's own timers. The robot's answer rides in the ack state as `{ok: true, ...}` or `{ok: false, error}`.

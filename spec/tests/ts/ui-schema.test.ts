@@ -506,6 +506,7 @@ describe("UI schema, package apps", () => {
       tool_reasons: { crop: "Crop is not ready yet.", adjust: "Adjust is not ready yet." },
       compare: true,
       comment_brush: true,
+      resize_upscale: false,
       operations: { bind: { source: "package", path: "operations" } },
       handlers: {
         run: { call: { target: "/x", args: { file: "{file}", operation: "{operation}", args: "{args}" } } },

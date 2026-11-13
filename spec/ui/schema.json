@@ -815,6 +815,7 @@
         },
         "compare": { "type": "boolean", "default": true, "description": "Draw Compare. Disabled, with its reason, while the current picture is the original." },
         "comment_brush": { "type": "boolean", "default": true, "description": "Comment gains Brush (a painted area sent as `mask`)." },
+        "resize_upscale": { "type": "boolean", "default": true, "description": "Draw the Resize bar's own Upscale 2x and 4x buttons. False when the host offers Make clearer instead." },
         "operations": {
           "type": "object",
           "additionalProperties": false,
