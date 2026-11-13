@@ -1,3 +1,7 @@
+## [ui-v0.5.659] - 2026-11-13
+
+- ONE-COMPOSER label fix. A single chip group over the three-chip cap is drawn as itself (its own name, icon and words, for example Shot); the "More" chip appears only when two or more groups overflow. Ledger note: the `prompt_bar` `chips` cap of 10 stays (the composer folds chips into groups, so it only bounds page data). `ui/package.json` is 0.5.659.
+
 ## [ui-v0.5.658] - 2026-11-13
 
 - A prompt bar chip can set `icon_only` to show its selected option icon in the modes composer. The option name remains in the chip's accessible name and hover title, and the popover keeps full option names and icons. The Quality and Presets triggers also show only their icon and chevron, with their full accessible names and hover titles. A disabled chip keeps its reason as the tooltip.

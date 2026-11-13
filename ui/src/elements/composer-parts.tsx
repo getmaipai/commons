@@ -484,8 +484,10 @@ function useOverflowFade() {
 export function ComposerChips({ chips, quality }: { chips: readonly ComposerChipData[]; quality?: ComposerChipData | null }) {
   const row = useOverflowFade();
   const groups = groupComposerChips(chips);
-  const shown = groups.slice(0, MAX_VISIBLE_GROUPS);
-  const rest = groups.slice(MAX_VISIBLE_GROUPS).flatMap((g) => g.chips);
+  // A single group over the cap is drawn as itself (its own name, icon and words); "More" is only for two or more extra groups.
+  const overflow = groups.length - MAX_VISIBLE_GROUPS;
+  const shown = overflow === 1 ? groups : groups.slice(0, MAX_VISIBLE_GROUPS);
+  const rest = overflow >= 2 ? groups.slice(MAX_VISIBLE_GROUPS).flatMap((g) => g.chips) : [];
   if (groups.length === 0 && !quality) return null;
   return (
     <div ref={row} data-slot="composer-chips" className="flex min-w-0 touch-pan-x flex-nowrap items-center gap-1.5 overflow-x-auto [scrollbar-width:none] data-[overflow=true]:[mask-image:linear-gradient(to_right,black_calc(100%-28px),transparent)] [&::-webkit-scrollbar]:hidden">

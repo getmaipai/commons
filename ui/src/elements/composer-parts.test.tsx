@@ -233,6 +233,21 @@ describe("combined chips", () => {
   });
 });
 
+describe("overflow label", () => {
+  const g = (n: string): ComposerChipData => ({ id: n, label: n, group: n, value: "a", onValueChange: () => {}, options: [{ value: "a", label: n + " A" }, { value: "b", label: n + " B" }] });
+  test("one group over the cap keeps its own name; More appears only for two or more", () => {
+    const list = modes();
+    list[0] = { ...list[0]!, chips: [g("Settings"), g("Style"), g("Camera"), g("Shot")] };
+    const one = render(<Harness list={list} />);
+    expect(one.getByRole("button", { name: "Shot: Shot A" })).not.toBeNull();
+    expect(one.queryByRole("button", { name: "More" })).toBeNull();
+    cleanup();
+    list[0] = { ...list[0]!, chips: [g("Settings"), g("Style"), g("Camera"), g("Shot"), g("Sound")] };
+    const two = render(<Harness list={list} />);
+    expect(two.getByRole("button", { name: "More" })).not.toBeNull();
+  });
+});
+
 describe("single mode", () => {
   test("a composer with one mode draws no mode pill, and still shows its slots and chips", () => {
     const view = render(<Harness list={[modes()[0]!]} />);
