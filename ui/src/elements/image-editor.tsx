@@ -14,6 +14,7 @@
 import {
   useEffect,
   useId,
+  useLayoutEffect,
   useReducer,
   useRef,
   useState,
@@ -65,7 +66,7 @@ import { Badge } from "@/kit/ui/badge";
 import { Button } from "@/kit/ui/button";
 import { Card, CardContent } from "@/kit/ui/card";
 import { Label } from "@/kit/ui/label";
-import { Popover, PopoverContent, PopoverTrigger } from "@/kit/ui/popover";
+import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from "@/kit/ui/popover";
 import { Progress } from "@/kit/ui/progress";
 import { Separator } from "@/kit/ui/separator";
 import { Slider } from "@/kit/ui/slider";
@@ -508,6 +509,9 @@ export function ImageEditor({
   const keyHandlerRef = useRef<(event: KeyboardEvent) => void>(() => {});
   const zoomRef = useRef(100);
 
+  // The tool panel (the More menu, the markup tools, the crop ratios...) is a popover anchored to the tool button that opened it. The tool
+  // stays chosen when the panel is dismissed by a press on the picture (so drawing and cropping go on); the More menu is only a menu and ends.
+  const [panelOpen, setPanelOpen] = useState(true);
   const [mode, setMode] = useState<Mode | null>(() => {
     if (!initialTool || initialTool === "remove_background") return null;
     const state = tools[initialTool];
@@ -625,17 +629,40 @@ export function ImageEditor({
     return () => window.removeEventListener("resize", measure);
   }, []);
 
-  // The More menu is a menu: a press outside it (and outside the tool bar that opened it) closes it. Esc closes it through escape().
+  // A press outside the panel closes it, decided in the capture phase: the crop frame and other handlers stop the event from reaching the
+  // document in the bubble phase (a synthetic stopPropagation stops the native one at the React root), which swallowed some outside presses.
+  // A press on a tool button is left to that button (it opens, switches or ends the tool).
+  const closePanelRef = useRef<() => void>(() => {});
+  closePanelRef.current = () => {
+    if (mode === "more") setMode(null);
+    else setPanelOpen(false);
+  };
+  const panelShown = panelOpen && !pending && !busy && mode !== null;
+  // More and Resize are menus: any press outside, the picture included, and a scroll close them. The working tools (markup, erase, comment,
+  // crop, adjust) keep their panel while the person works on the picture; a press anywhere else closes it and the tool stays chosen.
+  const menuLike = mode === "more" || mode === "resize";
+  const workingOnPicture = (target: EventTarget | null, menu: boolean) => !menu && target instanceof Element && target.closest("[data-slot=image-editor-stage]") !== null;
   useEffect(() => {
-    if (mode !== "more" || pending || busy) return;
+    if (!panelShown) return;
     const onDown = (event: PointerEvent) => {
       const target = event.target;
-      if (target instanceof Element && target.closest("[data-slot=image-editor-more-bar],[data-slot=image-editor-tools]")) return;
-      setMode(null);
+      if (target instanceof Element && target.closest("[data-slot=image-editor-panel],[data-tool]")) return;
+      if (workingOnPicture(target, menuLike)) return;
+      closePanelRef.current();
     };
-    document.addEventListener("pointerdown", onDown);
-    return () => document.removeEventListener("pointerdown", onDown);
-  }, [mode, pending, busy]);
+    const onScroll = (event: Event) => {
+      if (!menuLike) return;
+      const target = event.target;
+      if (target instanceof Element && target.closest("[data-slot=image-editor-panel]")) return;
+      closePanelRef.current();
+    };
+    document.addEventListener("pointerdown", onDown, true);
+    window.addEventListener("scroll", onScroll, true);
+    return () => {
+      document.removeEventListener("pointerdown", onDown, true);
+      window.removeEventListener("scroll", onScroll, true);
+    };
+  }, [panelShown, menuLike]);
 
   // Ctrl/Cmd + wheel zooms; a plain wheel scrolls the stage.
   useEffect(() => {
@@ -685,6 +712,8 @@ export function ImageEditor({
   };
 
   async function run(op: ImageEditorOperation, label: string) {
+    setPanelOpen(false);
+    if (mode === "more") setMode(null);
     setError(null);
     setNotice(null);
     const controller = new AbortController();
@@ -735,6 +764,7 @@ export function ImageEditor({
 
   function discardPending() {
     setPending(null);
+    setPanelOpen(true);
     setError(null);
   }
 
@@ -843,6 +873,11 @@ export function ImageEditor({
 
   function chooseMode(value: string) {
     if (value === "") {
+      // A chosen tool whose panel was dismissed opens its panel again; pressing it with the panel open ends the tool.
+      if (interactive && mode && !panelOpen && !pending) {
+        setPanelOpen(true);
+        return;
+      }
       if (interactive) {
         setMode(null);
         clearLayers();
@@ -864,6 +899,7 @@ export function ImageEditor({
     clearLayers();
     setComparing(false);
     setMode(key);
+    setPanelOpen(true);
     if (key === "remove_background") void run({ operation: "remove_background" }, i18n._({ id: "ui.Background removed", message: "Background removed" }));
   }
 
@@ -907,8 +943,8 @@ export function ImageEditor({
     setTextDraft(null);
   }
 
-  // Latest-render key handler (the native listener above calls through the ref).
-  useEffect(() => {
+  // Latest-render key handler (the native listener above calls through the ref). A layout effect, so a press right after a render sees that render.
+  useLayoutEffect(() => {
     keyHandlerRef.current = (event: KeyboardEvent) => {
       const editable = isEditable(event.target);
       const modifier = event.metaKey || event.ctrlKey;
@@ -1073,45 +1109,6 @@ export function ImageEditor({
         )
       ) : null}
     </header>
-  );
-
-  const toolbar = (
-    <ToggleGroup
-      type="single"
-      role="toolbar"
-      aria-label={i18n._({ id: "ui.Picture editing tools", message: "Picture editing tools" })}
-      variant="default"
-      spacing={1}
-      value={mode ?? ""}
-      onValueChange={chooseMode}
-      className={cn(pill, "max-w-full overflow-x-auto")}
-    >
-      {toolMeta().map((tool) => {
-        // Crop and Adjust are drawn only when the host lists them; More only when it lists operations.
-        if ((tool.key === "crop" || tool.key === "adjust") && !tools[tool.key]) return null;
-        if (tool.key === "more" && !(operations && operations.length > 0)) return null;
-        const state: ImageEditorToolState = tool.key === "more" ? { enabled: true } : tools[tool.key]!;
-        return (
-          <Tooltip key={tool.key}>
-            <TooltipTrigger asChild>
-              <ToggleGroupItem
-                value={tool.key}
-                aria-label={tool.label}
-                aria-disabled={state.enabled ? undefined : true}
-                data-tool={tool.key}
-                className={cn("rounded-full", state.enabled ? "" : "opacity-50")}
-              >
-                {tool.icon}
-                {tool.text && !(compact && (tools.crop || tools.adjust)) ? <span>{tool.text}</span> : null}
-              </ToggleGroupItem>
-            </TooltipTrigger>
-            <TooltipContent side={compact ? "top" : "bottom"}>
-              {state.enabled ? tool.label : i18n._({ id: "ui.{tool}: {reason}", message: "{tool}: {reason}", values: { tool: tool.label, reason: state.reason ?? i18n._({ id: "ui.Not available right now.", message: "Not available right now." }) } })}
-            </TooltipContent>
-          </Tooltip>
-        );
-      })}
-    </ToggleGroup>
   );
 
   const markupBar = (
@@ -1491,7 +1488,7 @@ export function ImageEditor({
     </div>
   ) : null;
 
-  const subBar = pendingBar ?? (() => {
+  const panelBar = (() => {
     switch (mode) {
       case "markup":
         return markupBar;
@@ -1523,6 +1520,73 @@ export function ImageEditor({
         return null;
     }
   })();
+  const subBar = pendingBar;
+
+  const toolbar = (
+    <ToggleGroup
+      type="single"
+      role="toolbar"
+      aria-label={i18n._({ id: "ui.Picture editing tools", message: "Picture editing tools" })}
+      variant="default"
+      spacing={1}
+      value={mode ?? ""}
+      onValueChange={chooseMode}
+      className={cn(pill, "max-w-full overflow-x-auto")}
+    >
+      {toolMeta().map((tool) => {
+        // Crop and Adjust are drawn only when the host lists them; More only when it lists operations.
+        if ((tool.key === "crop" || tool.key === "adjust") && !tools[tool.key]) return null;
+        if (tool.key === "more" && !(operations && operations.length > 0)) return null;
+        const state: ImageEditorToolState = tool.key === "more" ? { enabled: true } : tools[tool.key]!;
+        return (
+          <Popover key={tool.key} open={panelShown && mode === tool.key && panelBar !== null} onOpenChange={(open) => { if (!open) closePanelRef.current(); }}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <PopoverAnchor asChild>
+              <ToggleGroupItem
+                value={tool.key}
+                aria-label={tool.label}
+                aria-disabled={state.enabled ? undefined : true}
+                data-tool={tool.key}
+                className={cn("rounded-full", state.enabled ? "" : "opacity-50")}
+              >
+                {tool.icon}
+                {tool.text && !(compact && (tools.crop || tools.adjust)) ? <span>{tool.text}</span> : null}
+              </ToggleGroupItem>
+              </PopoverAnchor>
+            </TooltipTrigger>
+            <TooltipContent side={compact ? "top" : "bottom"}>
+              {state.enabled ? tool.label : i18n._({ id: "ui.{tool}: {reason}", message: "{tool}: {reason}", values: { tool: tool.label, reason: state.reason ?? i18n._({ id: "ui.Not available right now.", message: "Not available right now." }) } })}
+            </TooltipContent>
+          </Tooltip>
+          <PopoverContent
+            side={compact ? "top" : "bottom"}
+            align="center"
+            sideOffset={8}
+            collisionPadding={8}
+            padding="none"
+            width="auto"
+            data-slot="image-editor-panel"
+            onOpenAutoFocus={(event) => event.preventDefault()}
+            // Esc does what it does everywhere in the editor (it leaves the tool, then closes), whether focus is in the panel or not.
+            onEscapeKeyDown={(event) => {
+              event.preventDefault();
+              escape();
+            }}
+            onCloseAutoFocus={(event) => event.preventDefault()}
+            onInteractOutside={(event) => {
+              const target = event.target;
+              if ((target instanceof Element && target.closest("[data-tool]")) || workingOnPicture(target, menuLike)) event.preventDefault();
+            }}
+            className="max-h-(--radix-popover-content-available-height) max-w-[calc(100vw-1rem)] overflow-y-auto rounded-2xl border-0 bg-transparent shadow-none"
+          >
+            {panelBar}
+          </PopoverContent>
+        </Popover>
+        );
+      })}
+    </ToggleGroup>
+  );
 
   const notices = (
     <div className="flex flex-col items-center gap-2 px-3 empty:hidden" data-slot="image-editor-notices">

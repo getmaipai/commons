@@ -34,7 +34,7 @@ function setup(overrides: Partial<ImageEditorProps> = {}) {
     ...overrides,
   } as ImageEditorProps & { onRunOperation: ReturnType<typeof mock>; onComment: ReturnType<typeof mock>; onApplyPending: ReturnType<typeof mock> };
   const view = render(<ImageEditor {...props} />);
-  return { props, container: view.container, ...within(view.container) };
+  return { props, container: view.container, ...within(document.body) };
 }
 
 const original = {
@@ -206,7 +206,7 @@ describe("adjust", () => {
     expect(v.getByRole("button", { name: "Preview" })).toBeDisabled();
     const brightness = v.getByRole("slider", { name: "Brightness" });
     for (let i = 0; i < 5; i += 1) fireEvent.keyDown(brightness, { key: "ArrowRight" });
-    expect(v.container.querySelector("[data-slot=image-editor-adjust-brightness]")!.textContent).toBe("5");
+    expect(document.querySelector("[data-slot=image-editor-adjust-brightness]")!.textContent).toBe("5");
     const picture = v.container.querySelector("[data-slot=image-editor-picture] img") as HTMLImageElement;
     expect(picture.style.filter).toContain("brightness(1.05");
     fireEvent.click(v.getByRole("button", { name: "Preview" }));
@@ -216,7 +216,7 @@ describe("adjust", () => {
     fireEvent.click(v.getByRole("button", { name: "Undo preview" }));
     // Discarding the preview brings the sliders' preview back; Reset zeroes them.
     fireEvent.click(v.getByRole("button", { name: "Reset" }));
-    expect(v.container.querySelector("[data-slot=image-editor-adjust-brightness]")!.textContent).toBe("0");
+    expect(document.querySelector("[data-slot=image-editor-adjust-brightness]")!.textContent).toBe("0");
   });
 
   test("the four sliders are brightness, contrast, saturation and warmth", () => {

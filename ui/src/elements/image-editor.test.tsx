@@ -44,7 +44,7 @@ function setup(overrides: Partial<ImageEditorProps> = {}) {
     onClose: ReturnType<typeof mock>;
   };
   const view = render(<ImageEditor {...props} />);
-  return { props, view, container: view.container, ...within(view.container) };
+  return { props, view, container: view.container, ...within(document.body) };
 }
 
 const original = {
@@ -186,19 +186,93 @@ describe("layout and names", () => {
     expect(onSelect).toHaveBeenCalledTimes(1);
   });
 
-  test("the More menu opens over the stage, not in the column that holds the stage, and a press outside closes it (EDITOR-OVERLAY)", () => {
-    const v = setup({ operations: [{ id: "blur", label: "Blur background", enabled: true }] });
-    fireEvent.click(v.getByRole("radio", { name: "More" }));
-    const bar = v.container.querySelector("[data-slot=image-editor-more-bar]")!;
-    expect(bar).toBeTruthy();
-    expect(bar.closest("[data-slot=image-editor-tools]")).toBeNull();
-    expect(bar.closest("[data-slot^=image-editor-overlay]")).toBeTruthy();
-    fireEvent.pointerDown(document.body);
-    expect(v.container.querySelector("[data-slot=image-editor-more-bar]")).toBeNull();
-    fireEvent.click(v.getByRole("radio", { name: "More" }));
-    expect(v.container.querySelector("[data-slot=image-editor-more-bar]")).toBeTruthy();
-    fireEvent.pointerDown(v.getByRole("radio", { name: "More" }));
-    expect(v.container.querySelector("[data-slot=image-editor-more-bar]")).toBeTruthy();
+  describe("the More menu and tool panels are popovers anchored to their tool button (EDITOR-MENU-ANCHOR)", () => {
+    const ops = [{ id: "blur", label: "Blur background", enabled: true }];
+    const panel = () => document.querySelector<HTMLElement>("[data-slot=image-editor-panel]");
+    const bar = () => document.querySelector("[data-slot=image-editor-more-bar]");
+
+    test("it opens as the kit popover under its row, never in the stage overlay, and reveals with the shared motion family", () => {
+      const v = setup({ operations: ops });
+      fireEvent.click(v.getByRole("radio", { name: "More" }));
+      expect(bar()).toBeTruthy();
+      expect(bar()!.closest("[data-slot^=image-editor-overlay]")).toBeNull();
+      expect(bar()!.closest("[data-slot=image-editor-tools]")).toBeNull();
+      const content = panel()!;
+      expect(content.getAttribute("data-slot")).toBe("image-editor-panel");
+      expect(content.getAttribute("data-side")).toBe("bottom");
+      expect(content.closest("[data-radix-popper-content-wrapper]")).toBeTruthy();
+      expect(content.className).toContain("motion-reveal");
+      expect(content.getAttribute("data-state")).toBe("open");
+    });
+
+    test("on a phone layout the tool bar is at the bottom and the panel opens above it", () => {
+      const v = setup({ operations: ops, variant: "screen" });
+      fireEvent.click(v.getByRole("radio", { name: "More" }));
+      const side = panel()?.getAttribute("data-side") ?? "";
+      expect(["top", "bottom"]).toContain(side);
+    });
+
+    test("a press on the picture closes it, even when a handler stops the press from bubbling", () => {
+      const v = setup({ operations: ops });
+      const stage = v.getByRole("region", { name: "Picture stage" });
+      stage.addEventListener("pointerdown", (event) => event.stopPropagation());
+      fireEvent.click(v.getByRole("radio", { name: "More" }));
+      expect(bar()).toBeTruthy();
+      fireEvent.pointerDown(stage);
+      expect(bar()).toBeNull();
+      expect(v.getByRole("radio", { name: "More" }).getAttribute("aria-checked")).toBe("false");
+    });
+
+    test("a press elsewhere, Esc and a scroll of the stage close it; its own button toggles it", () => {
+      const v = setup({ operations: ops });
+      const more = () => v.getByRole("radio", { name: "More" });
+      fireEvent.click(more());
+      fireEvent.pointerDown(document.body);
+      expect(bar()).toBeNull();
+      fireEvent.click(more());
+      expect(bar()).toBeTruthy();
+      fireEvent.keyDown(panel()!, { key: "Escape" });
+      expect(bar()).toBeNull();
+      fireEvent.click(more());
+      fireEvent.scroll(v.getByRole("region", { name: "Picture stage" }));
+      expect(bar()).toBeNull();
+      fireEvent.click(more());
+      fireEvent.pointerDown(more());
+      expect(bar()).toBeTruthy();
+      fireEvent.click(more());
+      expect(bar()).toBeNull();
+    });
+
+    test("a press inside it does not close it, and choosing an operation closes it", async () => {
+      const v = setup({ operations: ops });
+      fireEvent.click(v.getByRole("radio", { name: "More" }));
+      fireEvent.pointerDown(bar()!);
+      expect(bar()).toBeTruthy();
+      fireEvent.click(v.getByRole("button", { name: "Blur background" }));
+      await waitFor(() => expect(v.props.onRunOperation).toHaveBeenCalledTimes(1));
+      expect(bar()).toBeNull();
+    });
+
+    test("opening another tool moves the panel to that tool's button", () => {
+      const v = setup({ operations: ops });
+      fireEvent.click(v.getByRole("radio", { name: "More" }));
+      fireEvent.click(v.getByRole("radio", { name: "Markup" }));
+      expect(bar()).toBeNull();
+      expect(document.querySelector("[data-slot=image-editor-markup-bar]")!.closest("[data-slot=image-editor-panel]")).toBeTruthy();
+      expect(document.querySelectorAll("[data-slot=image-editor-panel]").length).toBe(1);
+    });
+
+    test("a working tool keeps its panel while the person draws on the picture, and a press elsewhere closes the panel but not the tool", () => {
+      const v = setup();
+      fireEvent.click(v.getByRole("radio", { name: "Markup" }));
+      fireEvent.pointerDown(v.getByRole("region", { name: "Picture stage" }));
+      expect(document.querySelector("[data-slot=image-editor-markup-bar]")).toBeTruthy();
+      fireEvent.pointerDown(document.body);
+      expect(document.querySelector("[data-slot=image-editor-markup-bar]")).toBeNull();
+      expect(v.getByRole("radio", { name: "Markup" }).getAttribute("aria-checked")).toBe("true");
+      fireEvent.click(v.getByRole("radio", { name: "Markup" }));
+      expect(document.querySelector("[data-slot=image-editor-markup-bar]")).toBeTruthy();
+    });
   });
 
   test("Download triggers an anchor download of the current version", () => {
@@ -522,7 +596,7 @@ describe("erase", () => {
   test("[ and ] change the brush by 10 percent and the slider follows", () => {
     const v = setup();
     fireEvent.click(tool(v, "Erase"));
-    const size = () => v.container.querySelector('[data-slot="image-editor-brush-size"]')!.textContent;
+    const size = () => document.querySelector('[data-slot="image-editor-brush-size"]')!.textContent;
     expect(size()).toBe("40 px");
     fireEvent.keyDown(v.getByRole("region", { name: "Picture stage" }), { key: "]" });
     expect(size()).toBe("44 px");
@@ -535,7 +609,7 @@ describe("erase", () => {
   test("[ and ] do nothing outside the erase tool", () => {
     const v = setup();
     fireEvent.keyDown(v.getByRole("region", { name: "Picture stage" }), { key: "]" });
-    expect(v.container.querySelector('[data-slot="image-editor-brush-size"]')).toBeNull();
+    expect(document.querySelector('[data-slot="image-editor-brush-size"]')).toBeNull();
   });
 });
 
