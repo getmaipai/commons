@@ -1,3 +1,7 @@
+## [ui-v0.5.646] - 2026-11-13
+
+- ONE-COMPOSER phone fix: the reference tiles no longer shrink under the Presets pill in the top row (they keep their width and the row scrolls sideways). `ui/package.json` is 0.5.646.
+
 ## [ui-v0.5.645] - 2026-11-13
 
 - MAKE-CLEARER-01, additive. A host operation row (the `image_editor` node's `operations` binding, `ImageEditorExtraOperation`) may carry `levels` (`{ id, label, summary, eta, enabled, reason }`). The choice control named `level` is then drawn as those levels: each is a button, the chosen one shows its one-line description and "Takes {time}.", and a level that is off stays in the row, looks off, and says its reason when chosen (Preview is disabled for it). The first ready level is chosen to start. A row with no `levels` draws as before. `ui/package.json` is 0.5.645.
