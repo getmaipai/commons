@@ -47,6 +47,9 @@ export interface StudioPiece {
   crossfade_s: number;
   /** A music piece: lower it under speech. */
   duck: boolean;
+  /** Sound pieces: the host's own waveform of the whole source (0 to 1, about 400 to 800 values), so the browser need not decode it; or a JSON file of them. */
+  peaks?: number[];
+  peaks_url?: string;
 }
 
 export interface StudioLane {
@@ -87,7 +90,7 @@ export const pieceDuration = (p: Pick<StudioPiece, "in_s" | "out_s">): number =>
 
 export interface RawPiece {
   id?: unknown; ref?: unknown; src?: unknown; label?: unknown; poster?: unknown; in_s?: unknown; out_s?: unknown; source_s?: unknown; at_s?: unknown;
-  level_db?: unknown; fade_in_s?: unknown; fade_out_s?: unknown; crossfade_s?: unknown; duck?: unknown;
+  level_db?: unknown; fade_in_s?: unknown; fade_out_s?: unknown; crossfade_s?: unknown; duck?: unknown; peaks?: unknown; peaks_url?: unknown;
 }
 export interface RawLane { id?: unknown; label?: unknown; hue?: unknown; level_db?: unknown; muted?: unknown; pieces?: unknown }
 
@@ -116,7 +119,15 @@ export function readPiece(raw: RawPiece, fallbackId: string): StudioPiece | null
     fade_out_s: clamp(finite(raw.fade_out_s, 0), 0, Math.min(FADE_MAX_S, dur)),
     crossfade_s: normalizeCrossfade(finite(raw.crossfade_s, 0)),
     duck: raw.duck === true,
+    ...givenPeaks(raw),
   };
+}
+
+function givenPeaks(raw: RawPiece): Pick<StudioPiece, "peaks" | "peaks_url"> {
+  const out: Pick<StudioPiece, "peaks" | "peaks_url"> = {};
+  if (Array.isArray(raw.peaks) && raw.peaks.length >= 2) out.peaks = raw.peaks.slice(0, 4000).map((v) => (typeof v === "number" && Number.isFinite(v) ? clamp(v, 0, 1) : 0));
+  if (typeof raw.peaks_url === "string" && raw.peaks_url) out.peaks_url = raw.peaks_url;
+  return out;
 }
 
 /** A state with all three lanes, from the host's `lanes` array (missing lanes are empty; unknown lane ids are ignored), then each stem lane

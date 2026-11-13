@@ -1,5 +1,5 @@
-import { describe, expect, test } from "bun:test";
-import { computePeaks, sliceBars } from "./track-studio-media";
+import { afterEach, describe, expect, mock, test } from "bun:test";
+import { PEAKS_DECODE_RATE, computePeaks, decodePeaks, fetchGivenPeaks, readGivenPeaks, sliceBars } from "./track-studio-media";
 
 describe("peaks", () => {
   test("the loudest sample of each slice, scaled so the loudest bar is 1", () => {
@@ -25,5 +25,45 @@ describe("peaks", () => {
     expect(s[4]!).toBeGreaterThan(s[0]!);
     expect(sliceBars(peaks, 10, 0, 10, 0)).toEqual([]);
     expect(sliceBars([], 10, 0, 1, 3)).toEqual([0, 0, 0]);
+  });
+});
+
+describe("decodePeaks", () => {
+  const realFetch = globalThis.fetch;
+  const realOffline = (globalThis as { OfflineAudioContext?: unknown }).OfflineAudioContext;
+  afterEach(() => { globalThis.fetch = realFetch; (globalThis as { OfflineAudioContext?: unknown }).OfflineAudioContext = realOffline; });
+  const stub = (decode: (bytes: ArrayBuffer) => unknown) => {
+    const made: number[][] = [];
+    class Fake { constructor(...a: number[]) { made.push(a); } decodeAudioData(bytes: ArrayBuffer, ok?: (b: unknown) => void, bad?: (e: unknown) => void) { try { const b = decode(bytes); ok?.(b); return Promise.resolve(b); } catch (e) { bad?.(e); return Promise.reject(e); } } }
+    (globalThis as { OfflineAudioContext?: unknown }).OfflineAudioContext = Fake;
+    globalThis.fetch = mock(async () => new Response(new Uint8Array(8))) as unknown as typeof fetch;
+    return made;
+  };
+  test("decodes at a low rate, one channel context, and folds a stereo song to bars", async () => {
+    const made = stub(() => ({ duration: 2, length: 4, numberOfChannels: 2, getChannelData: (c: number) => (c === 0 ? new Float32Array([0, 0.5, 0, 0]) : new Float32Array([0, 0, -1, 0])) }));
+    const got = await decodePeaks("/f/song.m4a", new AbortController().signal);
+    expect(made[0]).toEqual([1, PEAKS_DECODE_RATE, PEAKS_DECODE_RATE]);
+    expect(got.duration).toBe(2);
+    expect(Math.max(...got.peaks)).toBe(1);
+  });
+  test("a decode that fails rejects, so the lane draws its plain bar", async () => {
+    stub(() => { throw new Error("EncodingError"); });
+    await expect(decodePeaks("/f/song.m4a", new AbortController().signal)).rejects.toThrow();
+  });
+});
+
+describe("the host's own peaks", () => {
+  test("a plain array or { peaks, duration } is read, clamped to 0..1; fewer than two values is not peaks", () => {
+    expect(readGivenPeaks([0, 2, -1, 0.5], 10)).toEqual({ peaks: [0, 1, 0, 0.5], duration: 10 });
+    expect(readGivenPeaks({ peaks: [0.1, 0.2], duration: 3 }, 10)).toEqual({ peaks: [0.1, 0.2], duration: 3 });
+    expect(readGivenPeaks([0.5], 10)).toBeNull();
+    expect(readGivenPeaks("x", 10)).toBeNull();
+    expect(readGivenPeaks([0.1, 0.2], 0)).toBeNull();
+  });
+  test("fetchGivenPeaks rejects on a bad status so the caller can decode instead", async () => {
+    const real = globalThis.fetch;
+    globalThis.fetch = mock(async () => new Response("no", { status: 404 })) as unknown as typeof fetch;
+    await expect(fetchGivenPeaks("/x.json", 5, new AbortController().signal)).rejects.toThrow();
+    globalThis.fetch = real;
   });
 });

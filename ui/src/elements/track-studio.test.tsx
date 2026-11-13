@@ -169,10 +169,16 @@ describe("what is drawn", () => {
     expect(container.querySelector("[data-slot='track-studio-monitor']")).toBeNull();
     expect(document.querySelectorAll("video")).toHaveLength(0);
   });
-  test("a piece that cannot be decoded says so in its lane and still plays", async () => {
+  test("a piece that cannot be decoded draws a plain neutral bar, no error text, and still plays", async () => {
     globalThis.fetch = mock(async () => { throw new Error("nope"); }) as unknown as typeof fetch;
-    const { findAllByText } = open();
-    expect((await findAllByText("This audio could not be drawn. It still plays.")).length).toBeGreaterThan(0);
+    const { container, queryByText } = open();
+    await flush();
+    await flush();
+    expect(queryByText(/could not be drawn/)).toBeNull();
+    const bar = container.querySelector(`[data-lane="music"] [data-piece] svg rect`);
+    expect(bar).toBeTruthy();
+    expect(container.querySelector(`[data-lane="music"] [data-piece] svg path`)).toBeNull();
+    expect(document.querySelectorAll("audio").length).toBeGreaterThan(0);
   });
 });
 
@@ -700,5 +706,113 @@ describe("MP-03 range selection", () => {
     const { container } = open();
     press(container.querySelector("section")!, "[");
     expect(container.querySelector("[data-slot='track-studio-selection-band']")).toBeNull();
+  });
+});
+
+// MP-04 follow-ups: lanes with content only, Compare, the host's own peaks.
+const songLanes = () => [{ id: "music", pieces: [{ id: "m1", ref: "f2", src: "/f/song.m4a", label: "Song", in_s: 0, out_s: 20, at_s: 0, source_s: 20 }] }];
+const openSong = (extra: Partial<TrackStudioProps> = {}) => {
+  const ctx = new FakeAudioContext();
+  const utils = render(<TrackStudio kind="audio" lanes={songLanes()} resetKey="song" title="A song" audioContext={() => ctx as unknown as AudioContext} {...extra} />);
+  return { ...utils, ctx };
+};
+
+describe("audio lanes with content only", () => {
+  test("a song with no stems draws the song lane alone: no empty Voice, Music or Video lane", async () => {
+    const { container, queryByText } = openSong();
+    await flush();
+    expect([...container.querySelectorAll("[data-lane]")].map((l) => l.getAttribute("data-lane"))).toEqual(["music"]);
+    expect(queryByText("No voice yet.")).toBeNull();
+  });
+  test("the lanes the host offers an Add for are drawn even when empty; without a handler they are not", async () => {
+    const onAdd = mock(async () => null);
+    const withAdd = openSong({ onAdd });
+    await flush();
+    expect([...withAdd.container.querySelectorAll("[data-lane]")].map((l) => l.getAttribute("data-lane"))).toEqual(["voice", "music"]);
+    cleanup();
+    const stems = openSong({ lanes: [{ id: "stem-vocals", pieces: [] }, ...songLanes()] });
+    await flush();
+    expect([...stems.container.querySelectorAll("[data-lane]")].map((l) => l.getAttribute("data-lane"))).toEqual(["music", "stem-vocals"]);
+  });
+  test("the video studio is unchanged", async () => {
+    const { container } = open({ lanes: [{ id: "video", pieces: lanes()[0]!.pieces }] });
+    expect([...container.querySelectorAll("[data-lane]")].map((l) => l.getAttribute("data-lane"))).toEqual(["video", "voice", "music"]);
+  });
+});
+
+describe("the transport does not float over the Tracks card in an audio studio", () => {
+  test("sticky only for video", async () => {
+    const song = openSong();
+    expect(song.container.querySelector("[data-slot='track-studio-transport']")!.className).not.toContain("sticky");
+    cleanup();
+    const video = open();
+    expect(video.container.querySelector("[data-slot='track-studio-transport']")!.className).toContain("max-sm:sticky");
+  });
+});
+
+describe("Compare (audio)", () => {
+  const toggle = (c: HTMLElement) => c.querySelector<HTMLButtonElement>("[data-slot='track-studio-compare-toggle']")!;
+  test("no compare prop, no control; the video studio never draws it", async () => {
+    const { container } = openSong();
+    expect(toggle(container)).toBeNull();
+    cleanup();
+    const v = open({ compare: { before_url: "/a", after_url: "/b" } });
+    expect(toggle(v.container)).toBeNull();
+  });
+  test("one version only: disabled, with the reason, and C does nothing", async () => {
+    const { container, getByText } = openSong({ compare: { versions: [{ id: "v1", url: "/v1.m4a" }], current_id: "v1" } });
+    expect(toggle(container).disabled).toBe(true);
+    expect(toggle(container).getAttribute("aria-keyshortcuts")).toBe("C");
+    fireEvent.focus(toggle(container).parentElement!);
+    await waitFor(() => expect(document.body.textContent).toContain("Nothing to compare yet: this is the first version."));
+    key(container.querySelector("section")!, "c");
+    expect(container.querySelector("[data-slot='track-studio-compare']")).toBeNull();
+    void getByText;
+  });
+  test("two versions: Compare (or C) opens the A/B player; Before and After swap the source at the same second; closing removes it", async () => {
+    const { container, getByRole } = openSong({ compare: { before_url: "/v1.m4a", after_url: "/v2.m4a", label: "Before the EQ" } });
+    expect(toggle(container).disabled).toBe(false);
+    fireEvent.click(toggle(container));
+    const el = () => container.querySelector<HTMLAudioElement>("[data-slot='track-studio-compare-audio']")!;
+    await waitFor(() => expect(el()).toBeTruthy());
+    expect(el().getAttribute("src")).toBe("/v2.m4a");
+    expect(toggle(container).getAttribute("aria-pressed")).toBe("true");
+    fireEvent.click(getByRole("radio", { name: "Before" }));
+    await waitFor(() => expect(el().getAttribute("src")).toBe("/v1.m4a"));
+    expect(container.textContent).toContain("Before the EQ");
+    fireEvent.click(getByRole("radio", { name: "After" }));
+    await waitFor(() => expect(el().getAttribute("src")).toBe("/v2.m4a"));
+    key(container.querySelector("section")!, "C");
+    await waitFor(() => expect(container.querySelector("[data-slot='track-studio-compare']")).toBeNull());
+    key(container.querySelector("section")!, "C");
+    await waitFor(() => expect(container.querySelector("[data-slot='track-studio-compare']")).toBeTruthy());
+    cleanup();
+    expect(document.querySelectorAll("audio, [src]")).toHaveLength(0);
+  });
+});
+
+describe("the host's own peaks", () => {
+  const given = [0.1, 0.5, 1, 0.5, 0.2, 0.8, 0.3, 0.6];
+  const song = (piece: Record<string, unknown>) => [{ id: "music", pieces: [{ id: "m1", ref: "f", src: "/f/song.m4a", in_s: 0, out_s: 20, at_s: 0, source_s: 20, ...piece }] }];
+  test("peaks given: the waveform is drawn from them and the song is never fetched to be decoded", async () => {
+    const { container } = openSong({ lanes: song({ peaks: given }) });
+    await flush();
+    expect(container.querySelector(`[data-lane="music"] [data-piece] svg path`)).toBeTruthy();
+    expect(fetchSpy.mock.calls.filter((c) => String(c[0]).includes("song.m4a"))).toHaveLength(0);
+  });
+  test("peaks_url: that JSON is fetched and drawn, and the song is not decoded", async () => {
+    globalThis.fetch = mock(async (url: string) => (String(url) === "/f/song.peaks.json" ? new Response(JSON.stringify({ peaks: given })) : new Promise<Response>(() => undefined))) as unknown as typeof fetch;
+    const { container } = openSong({ lanes: song({ peaks_url: "/f/song.peaks.json" }) });
+    await waitFor(() => expect(container.querySelector(`[data-lane="music"] [data-piece] svg path`)).toBeTruthy());
+    const urls = (globalThis.fetch as unknown as ReturnType<typeof mock>).mock.calls.map((c) => String(c[0]));
+    expect(urls).not.toContain("/f/song.m4a");
+  });
+  test("a peaks file that cannot be read falls back to decoding the audio", async () => {
+    const seen: string[] = [];
+    globalThis.fetch = mock(async (url: string) => { seen.push(String(url)); throw new Error("nope"); }) as unknown as typeof fetch;
+    const { container } = openSong({ lanes: song({ peaks_url: "/f/missing.json" }) });
+    await waitFor(() => expect(seen).toContain("/f/song.m4a"));
+    await flush();
+    expect(container.querySelector(`[data-lane="music"] [data-piece] svg rect`)).toBeTruthy();
   });
 });

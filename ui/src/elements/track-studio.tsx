@@ -7,11 +7,12 @@
 // the thumbnails and every media element live in this component's own state and are gone when it unmounts or the clip relocks (K4).
 
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
-import { XIcon, PauseIcon, PlayIcon, PlusIcon, Redo2Icon, RepeatIcon, ScissorsIcon, SkipBackIcon, Trash2Icon, Undo2Icon } from "lucide-react";
+import { ContrastIcon, XIcon, PauseIcon, PlayIcon, PlusIcon, Redo2Icon, RepeatIcon, ScissorsIcon, SkipBackIcon, Trash2Icon, Undo2Icon } from "lucide-react";
 import { cn, FOCUS_RING, hueTintBackground } from "@/kit/utils";
 import { useIsPhoneLayout } from "@/kit/hooks/useIsPhoneLayout";
 import { Button } from "@/kit/ui/button";
 import { Slider } from "@/kit/ui/slider";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/kit/ui/tooltip";
 import { Switch } from "@/kit/ui/switch";
 import { SafeImage } from "@/kit/primitives/SafeImage";
 import { eyebrow } from "./surfaces";
@@ -21,7 +22,9 @@ import {
   COMPRESSOR_LIMITS, EQ_BANDS_HZ, EQ_GAIN_MAX_DB, EQ_GAIN_MIN_DB, bandText, compressorIsNeutral, effectsAreNeutral, eqIsFlat, makeSelection, readEffects, readSelection, resetCompressor, resetEq,
   setCompressor, setEqBand, type CompressorSettings, type StudioEffects, type StudioSelection,
 } from "./track-studio-fx";
-import { THUMB_STEP_S, decodePeaks, makeThumbnails, sliceBars } from "./track-studio-media";
+import { THUMB_STEP_S, decodePeaks, fetchGivenPeaks, makeThumbnails, sliceBars } from "./track-studio-media";
+import { resolveCompare, type StudioCompare } from "./track-studio-compare";
+import { StudioCompareBar } from "./track-studio-compare-bar";
 import {
   CROSSFADE_MAX_S, FADE_MAX_S, LEVEL_DB_MAX, LEVEL_DB_MIN, MIN_PIECE_S, effectiveCrossfade, filmLength, findPiece, formatTime, laneOf, layoutLane, pieceDuration, pieceEnvelope, readState, rulerTicks,
   isStemLane, setDuck, setLaneLevel, setLaneMuted, setPieceLevel, spokenTime, type LaneId, type StudioLane, type StudioPiece, type StudioState,
@@ -59,6 +62,8 @@ export interface TrackStudioProps {
   poster?: string;
   /** `video` draws the monitor; `audio` draws no monitor and a clock from the wall. */
   kind?: "video" | "audio";
+  /** Audio: what Compare plays against the song. Two sources, or the versions with the current one named (the newest earlier version is used). Absent: no Compare control. */
+  compare?: StudioCompare;
   /** A locked clip: draws ONE lock tile and nothing else. No element, request, peak, thumbnail or plan. */
   locked?: boolean;
   lockedMaking?: boolean;
@@ -344,8 +349,17 @@ function StudioBody(props: TrackStudioProps) {
       }
     : null;
   // An audio studio with stems shows the stems, not three empty lanes; the video lane is never drawn without a picture.
-  const hasStems = state.lanes.some((l) => isStemLane(l.id));
-  const visibleLanes = audioKind ? state.lanes.filter((l) => l.id !== "video" && !(hasStems && !isStemLane(l.id) && l.pieces.length === 0)) : state.lanes;
+  // An audio studio draws only lanes that have content, the stem lanes the host listed, and the lanes the host offers an Add for.
+  const offers = (id: LaneId) => !!props.onAdd && tools.includes(id === "voice" ? "add_voice" : "add_music");
+  const visibleLanes = audioKind ? state.lanes.filter((l) => l.id !== "video" && (isStemLane(l.id) || l.pieces.length > 0 || ((l.id === "voice" || l.id === "music") && offers(l.id)))) : state.lanes;
+  // Compare (audio): the earlier version against the current one, the same rule as the ImageEditor's.
+  const comparePair = useMemo(() => (audioKind ? resolveCompare(props.compare) : null), [audioKind, props.compare]);
+  const [comparing, setComparing] = useState(false);
+  const canCompare = !!comparePair;
+  const toggleCompare = () => {
+    if (!comparePair) return;
+    setComparing((on) => { if (!on) engineRef.current?.pause(); return !on; });
+  };
 
   // -- keyboard --------------------------------------------------------------------------------------------------------
   const onKeyDown = (e: ReactKeyboardEvent<HTMLElement>) => {
@@ -358,6 +372,7 @@ function StudioBody(props: TrackStudioProps) {
     if (e.key === "Escape" && selectionRef.current && !mod) { e.preventDefault(); setSelection(null); return; }
     if (mod && e.key.toLowerCase() === "z") { e.preventDefault(); if (e.shiftKey) redo(); else undo(); return; }
     if (mod || e.altKey) return;
+    if ((e.key === "c" || e.key === "C") && audioKind && props.compare) { e.preventDefault(); toggleCompare(); return; }
     if (e.key === " " && !onButton) { e.preventDefault(); togglePlay(); return; }
     if (onButton) return;
     if (audioKind && (e.key === "[" || e.key === "]")) {
@@ -518,7 +533,7 @@ function StudioBody(props: TrackStudioProps) {
         </div>
       </div>
 
-      <div className={cn("bg-card flex min-w-0 flex-wrap items-center gap-3 rounded-2xl p-3", "z-10 max-sm:sticky max-sm:shadow-lg")} data-slot="track-studio-transport">
+      <div className={cn("bg-card flex min-w-0 flex-wrap items-center gap-3 rounded-2xl p-3", !audioKind && "z-10 max-sm:sticky max-sm:shadow-lg")} data-slot="track-studio-transport">
         <Button size={isPhone ? "default" : "lg"} className="rounded-full" onClick={togglePlay} aria-label={playing ? i18n._({ id: "ui.Pause", message: "Pause" }) : i18n._({ id: "ui.Play", message: "Play" })}>{playing ? <PauseIcon /> : <PlayIcon />}{playing ? i18n._({ id: "ui.Pause", message: "Pause" }) : i18n._({ id: "ui.Play", message: "Play" })}</Button>
         {isPhone ? (
           <Button variant="secondary" size="icon" className="rounded-full" aria-label={i18n._({ id: "ui.Back to start", message: "Back to start" })} onClick={() => void seekTo(0)}><SkipBackIcon /></Button>
@@ -531,8 +546,28 @@ function StudioBody(props: TrackStudioProps) {
           <Button variant="outline" size="lg" className="rounded-full" aria-pressed={loop} onClick={() => setLoop((v) => !v)}><RepeatIcon />{i18n._({ id: "ui.Loop", message: "Loop" })}</Button>
         )}
         {isPhone ? null : <ZoomControl pps={pps} setZoom={setZoom} />}
+        {audioKind && props.compare ? (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                {/* A span carries the tooltip when the button is disabled (a disabled button gets no pointer events). */}
+                <span tabIndex={canCompare ? undefined : 0}>
+                  <Button type="button" variant="outline" size={isPhone ? "default" : "lg"} className="rounded-full" aria-pressed={comparing} aria-keyshortcuts="C" disabled={!canCompare} data-slot="track-studio-compare-toggle" onClick={toggleCompare}>
+                    <ContrastIcon aria-hidden />{i18n._({ id: "ui.Compare", message: "Compare" })}
+                  </Button>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent side="top">
+                {canCompare
+                  ? i18n._({ id: "ui.Compare with the earlier version (C)", message: "Compare with the earlier version (C)" })
+                  : i18n._({ id: "ui.Nothing to compare yet: this is the first version.", message: "Nothing to compare yet: this is the first version." })}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        ) : null}
         <TimeText store={timeStore} film={film} />
       </div>
+      {comparing && comparePair ? <StudioCompareBar pair={comparePair} startAt={playhead()} onClose={() => setComparing(false)} /> : null}
       {audioKind ? (
         <div className="bg-card flex min-w-0 flex-wrap items-center gap-3 rounded-2xl p-3" data-slot="track-studio-selection">
           <p role="status" aria-live="polite" className="text-sm" data-slot="track-studio-selection-readout">
@@ -1017,9 +1052,11 @@ function Thumbs({ piece, pps, thumbs }: { piece: StudioPiece; pps: number; thumb
   );
 }
 
-function Wave({ piece, pps, width, peaks }: { piece: StudioPiece; pps: number; width: number; peaks: { peaks: number[]; duration: number } | "failed" | undefined }) {
+function Wave({ piece, pps, width, peaks: peaksIn }: { piece: StudioPiece; pps: number; width: number; peaks: { peaks: number[]; duration: number } | "failed" | undefined }) {
   const H = LANE_H - 8;
-  if (peaks === "failed") return <span className="text-muted-foreground absolute inset-0 flex items-center justify-center px-2 text-center text-[11px] leading-tight">{i18n._({ id: "ui.This audio could not be drawn. It still plays.", message: "This audio could not be drawn. It still plays." })}</span>;
+  let peaks = peaksIn;
+  // Not decoded yet, or it could not be: a plain neutral bar, no error text (the audio still plays).
+  if (peaks === "failed") peaks = undefined;
   const bars = Math.max(1, Math.min(600, Math.floor(width / 3)));
   const data = peaks ? sliceBars(peaks.peaks, peaks.duration, piece.in_s, piece.out_s, bars) : [];
   const step = width / bars;
@@ -1070,6 +1107,9 @@ function useSourceMedia(state: StudioState, onMetric: TrackStudioProps["onMetric
   }, []);
 
   const key = useMemo(() => state.lanes.flatMap((l) => l.pieces.map((p) => `${l.id}|${p.src}`)).join("\n"), [state]);
+  // What the host handed over per source (its own peaks, or a file of them): used before any decode.
+  const given = useRef(new Map<string, { peaks?: number[]; peaks_url?: string; duration: number }>());
+  for (const l of state.lanes) for (const p of l.pieces) if (l.id !== "video" && !given.current.has(p.src)) given.current.set(p.src, { peaks: p.peaks, peaks_url: p.peaks_url, duration: p.source_s ?? p.out_s });
   useEffect(() => {
     const ctl = controller.current;
     if (!generation || !ctl || ctl.signal.aborted) return;
@@ -1099,10 +1139,16 @@ function useSourceMedia(state: StudioState, onMetric: TrackStudioProps["onMetric
         });
       } else {
         const t0 = performance.now();
-        decodePeaks(src, ctl.signal).then(
-          (p) => { if (ctl.signal.aborted) return; setMedia((m) => ({ ...m, peaks: { ...m.peaks, [src]: p } })); metric.current?.("peaks_ms", Math.round(performance.now() - t0), `${src}|${p.peaks.length} bars|${p.duration.toFixed(2)} s`); },
+        const own = given.current.get(src);
+        const put = (p: { peaks: number[]; duration: number }, how: string) => { if (ctl.signal.aborted) return; setMedia((m) => ({ ...m, peaks: { ...m.peaks, [src]: p } })); metric.current?.("peaks_ms", Math.round(performance.now() - t0), `${src}|${p.peaks.length} bars|${p.duration.toFixed(2)} s|${how}`); };
+        const decode = () => decodePeaks(src, ctl.signal).then(
+          (p) => put(p, "decoded"),
           () => { if (!ctl.signal.aborted) setMedia((m) => ({ ...m, peaks: { ...m.peaks, [src]: "failed" } })); },
         );
+        // The host's own peaks first: with them the browser never decodes the song. Its low-rate decode is the fallback, then a plain bar.
+        if (own?.peaks && own.peaks.length >= 2 && own.duration > 0) put({ peaks: own.peaks, duration: own.duration }, "given");
+        else if (own?.peaks_url && own.duration > 0) fetchGivenPeaks(own.peaks_url, own.duration, ctl.signal).then((p) => put(p, "given"), () => { if (!ctl.signal.aborted) void decode(); });
+        else void decode();
       }
     }
   }, [key, generation]);

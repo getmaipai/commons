@@ -49,7 +49,32 @@ export function sliceBars(peaks: readonly number[], sourceS: number, inS: number
 
 export interface DecodedPeaks { peaks: number[]; duration: number }
 
-/** Fetch a source and cut its sound to peaks. Rejects when the file cannot be fetched or decoded (the lane then says so; it still plays). */
+/** The rate a source is decoded at to draw its bars: a bar covers 50 ms, so 8000 Hz is plenty, and a four-minute stereo song stays near 15 MB. */
+export const PEAKS_DECODE_RATE = 8000;
+/** The host's own peaks: how many values at most are kept. */
+export const PEAKS_GIVEN_MAX = 4000;
+
+/** Host-made peaks (0 to 1) from a JSON body: a plain array, or `{ peaks, duration? }`. Null when it is not usable. */
+export function readGivenPeaks(raw: unknown, fallbackDuration: number): DecodedPeaks | null {
+  const list = Array.isArray(raw) ? raw : raw && typeof raw === "object" && Array.isArray((raw as { peaks?: unknown }).peaks) ? (raw as { peaks: unknown[] }).peaks : null;
+  if (!list || list.length < 2) return null;
+  const peaks = list.slice(0, PEAKS_GIVEN_MAX).map((v) => (typeof v === "number" && Number.isFinite(v) ? Math.min(1, Math.max(0, v)) : 0));
+  const d = raw && typeof raw === "object" && !Array.isArray(raw) ? (raw as { duration?: unknown }).duration : undefined;
+  const duration = typeof d === "number" && d > 0 ? d : fallbackDuration;
+  return duration > 0 ? { peaks, duration } : null;
+}
+
+/** Fetch the host's peaks file. Rejects when it cannot be fetched or read (the caller then decodes the audio itself). */
+export async function fetchGivenPeaks(url: string, fallbackDuration: number, signal: AbortSignal): Promise<DecodedPeaks> {
+  const reply = await fetch(url, { signal, credentials: "same-origin" });
+  if (!reply.ok) throw new Error(`peaks: ${reply.status}`);
+  const got = readGivenPeaks(await reply.json(), fallbackDuration);
+  if (!got) throw new Error("peaks: unreadable");
+  return got;
+}
+
+/** Fetch a source and cut its sound to peaks. It decodes at a low rate, mixed to one channel at a time, so a long song stays small in memory.
+ * Rejects when the file cannot be fetched or decoded (the lane then draws a plain bar; it still plays). */
 export async function decodePeaks(src: string, signal: AbortSignal): Promise<DecodedPeaks> {
   const reply = await fetch(src, { signal, credentials: "same-origin" });
   if (!reply.ok) throw new Error(`peaks: ${reply.status}`);
@@ -57,8 +82,12 @@ export async function decodePeaks(src: string, signal: AbortSignal): Promise<Dec
   if (signal.aborted) throw new DOMException("aborted", "AbortError");
   const Offline = typeof OfflineAudioContext !== "undefined" ? OfflineAudioContext : (globalThis as { webkitOfflineAudioContext?: typeof OfflineAudioContext }).webkitOfflineAudioContext;
   if (!Offline) throw new Error("peaks: no audio decoder");
-  const ctx = new Offline(1, 1, 44100);
-  const buffer = await ctx.decodeAudioData(bytes);
+  const ctx = new Offline(1, PEAKS_DECODE_RATE, PEAKS_DECODE_RATE);
+  // The callback form works in every browser (older Safari has no promise form); a browser that has both calls both, and the first wins.
+  const buffer = await new Promise<AudioBuffer>((resolve, reject) => {
+    const done = ctx.decodeAudioData(bytes, resolve, reject) as Promise<AudioBuffer> | undefined;
+    if (done && typeof done.then === "function") done.then(resolve, reject);
+  });
   if (signal.aborted) throw new DOMException("aborted", "AbortError");
   const bars = Math.min(PEAKS_MAX, Math.max(8, Math.ceil(buffer.duration * PEAKS_PER_SECOND)));
   // Fold every channel into one by taking the loudest sample at each position.
