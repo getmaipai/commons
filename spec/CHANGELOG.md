@@ -1,3 +1,7 @@
+## [spec-v0.1.385] - 2026-11-13
+
+- VIDEO-COMPOSER-03, additive. `prompt_bar` chips and their options take kit icon names (1 to 40 characters), and references take a `disabled_reason` plain line (1 to 120 characters) for the disabled slot and composer's "+" (matches ui 0.5.658). `spec/package.json` is 0.1.385.
+
 ## [spec-v0.1.384] - 2026-11-13
 
 - MAKE-CLEARER-02 (MAKE-CLEARER-2026-11-13), additive. The `image_editor` node takes `resize_upscale` (boolean, default true); false hides the Resize bar's own Upscale 2x and 4x buttons (matches ui 0.5.650). `spec/package.json` is 0.1.384.

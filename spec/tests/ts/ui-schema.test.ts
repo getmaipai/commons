@@ -419,6 +419,13 @@ describe("UI schema, package apps", () => {
     expect(validate({ ...ok, layout: "columns" })).toBe(false);
   });
 
+  test("VIDEO-COMPOSER-03: prompt_bar chip and option icons and reference disabled_reason", () => {
+    const ok = { type: "prompt_bar", label: "Describe", submit: { call: { target: "/api/plugins/videos/make" } } };
+    const chip = { state: "style", label: "Style", icon: "sparkles", options: [{ value: "a", label: "A", icon: "brush" }] };
+    expect(validate({ ...ok, chips: [chip], references: [{ state: "start_frame", label: "Start frame", kind: "picture", disabled_reason: "Start frames are not available yet." }] })).toBe(true);
+    expect(validate({ ...ok, chips: [{ ...chip, icon: "x".repeat(41) }] })).toBe(false);
+  });
+
   test("VIDEO-UI-03: split_view takes aside_side start or end", () => {
     const view = { type: "split_view", main: [{ type: "empty_state", icon: "x", text: "t" }], aside: [{ type: "empty_state", icon: "x", text: "t" }] };
     expect(validate({ ...view, aside_side: "start" })).toBe(true);

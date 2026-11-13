@@ -1512,7 +1512,7 @@
                       "maxLength": 300,
                       "description": "VIDEO-LORA-09: one plain line shown under the chip's cards while this option is chosen (what it does, and what it adds to the person's words). Plain text, never markup."
                     },
-                    "icon": { "type": "string", "description": "VIDEO-COMPOSER-03: optional compact Lucide icon name shown with this dropdown choice." }
+                    "icon": { "type": "string", "minLength": 1, "maxLength": 40, "description": "VIDEO-COMPOSER-03: optional compact Lucide icon name shown with this dropdown choice." }
                   }
                 }
               },
@@ -1584,6 +1584,7 @@
                 "description": "VIDEO-LORA-09: while this value is chosen the chip adds nothing to the group's summary words and thumbnail row (a \"No style\" or \"Normal\" default). Default unchanged."
               },
               "align": { "type": "string", "enum": ["start", "end"], "description": "VIDEO-COMPOSER-03: place this control at the leading or trailing side of a distributed chat toolbar." },
+              "icon": { "type": "string", "minLength": 1, "maxLength": 40, "description": "VIDEO-COMPOSER-03: optional kit icon name; the first icon set by a chip in a group is the group's trigger icon in the modes composer." },
               "icon_only": { "type": "boolean", "description": "VIDEO-COMPOSER-03: show the selected icon in the closed control without its text label; the accessible name and open choices keep their words." }
             }
           }
@@ -1614,7 +1615,8 @@
               "label": { "type": "string", "minLength": 1, "maxLength": 40 },
               "kind": { "type": "string", "enum": ["picture", "character", "place", "audio", "video"], "description": "VIDEO-UI-03 (K4): `audio` and `video` slots take a voice clip or a source clip through the host's media picker." },
               "placement": { "type": "string", "enum": ["row", "in_field", "tile"], "default": "row", "description": "VIDEO-UI-03 (K3c): `in_field` shows the chosen file inside the prompt box as a named thumbnail with a remove control. At most one slot, a `picture`, `character` or `place`. VIDEO-UI-12: `tile` draws a full-width dashed tile (an icon, the label and a one-line hint) in the box; once a file is chosen it shows as the named thumbnail with a remove control, as `in_field` does. At most one `in_field` or `tile` slot between them, a `picture`, `character` or `place`." },
-              "hint": { "type": "string", "minLength": 1, "maxLength": 80, "description": "VIDEO-UI-12: the one line under the label on a `tile` slot (\"Optional. Begin from a picture.\"). Ignored by the other placements." }
+              "hint": { "type": "string", "minLength": 1, "maxLength": 80, "description": "VIDEO-UI-12: the one line under the label on a `tile` slot (\"Optional. Begin from a picture.\"). Ignored by the other placements." },
+              "disabled_reason": { "type": "string", "minLength": 1, "maxLength": 120, "description": "VIDEO-COMPOSER-03: the one plain line shown while this reference slot and the composer's \"+\" are disabled." }
             }
           }
         },
