@@ -26,7 +26,7 @@ msgid "ui.(opens in a new tab)"
 msgstr "(se abre en una nueva pestaña)"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1469
+#: src/elements/image-editor.tsx:1483
 #, needs-review
 msgid "ui.(transparent areas show as a checkerboard)"
 msgstr "(las áreas transparentes se muestran como un tablero de ajedrez)"
@@ -490,8 +490,8 @@ msgid "ui.{title}: {label}"
 msgstr "{title}: {label}"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1095
-#: src/elements/image-editor.tsx:1407
+#: src/elements/image-editor.tsx:1109
+#: src/elements/image-editor.tsx:1421
 #, needs-review
 msgid "ui.{tool}: {reason}"
 msgstr "{tool}: {reason}"
@@ -572,7 +572,7 @@ msgid "ui.{weekday}: high {high}, low {low} {unit}, {pop} percent chance of rain
 msgstr "{weekday}: máx. {high}, mín. {low} {unit}, {pop} por ciento de probabilidad de lluvia"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1335
+#: src/elements/image-editor.tsx:1349
 msgid "ui.{width} x {height}"
 msgstr ""
 
@@ -762,7 +762,7 @@ msgid "ui.Add a person…"
 msgstr "Añade una persona…"
 
 #. js-lingui-explicit-id
-#: src/schema/ImageEditorNodeView.tsx:168
+#: src/schema/ImageEditorNodeView.tsx:170
 #: src/schema/NodeRenderer.tsx:2046
 #, needs-review
 msgid "ui.Add a picture"
@@ -775,7 +775,7 @@ msgid "ui.Add a place"
 msgstr "Añadir un lugar"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1608
+#: src/elements/image-editor.tsx:1622
 msgid "ui.Add a reference picture"
 msgstr ""
 
@@ -829,7 +829,7 @@ msgid "ui.Added {added} phrases. {count} in the list."
 msgstr "Añadidas {added} frases. Hay {count} en la lista."
 
 #. js-lingui-explicit-id
-#: src/schema/ImageEditorNodeView.tsx:169
+#: src/schema/ImageEditorNodeView.tsx:171
 msgid "ui.Adding a picture is not available on this screen."
 msgstr ""
 
@@ -1011,7 +1011,7 @@ msgid "ui.Appearance"
 msgstr "Apariencia"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1472
+#: src/elements/image-editor.tsx:1486
 #, needs-review
 msgid "ui.Apply"
 msgstr "Aplicar"
@@ -1138,12 +1138,12 @@ msgid "ui.audio"
 msgstr "audio"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1371
+#: src/elements/image-editor.tsx:1385
 msgid "ui.Auto"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:750
+#: src/elements/image-editor.tsx:764
 msgid "ui.Auto tone"
 msgstr ""
 
@@ -1182,8 +1182,8 @@ msgid "ui.Back to start"
 msgstr "Volver al inicio"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:853
-#: src/elements/image-editor.tsx:1291
+#: src/elements/image-editor.tsx:867
+#: src/elements/image-editor.tsx:1305
 #, needs-review
 msgid "ui.Background removed"
 msgstr "Fondo eliminado"
@@ -1217,7 +1217,7 @@ msgid "ui.Before and after divider"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor-state.ts:156
+#: src/elements/image-editor-state.ts:157
 #, needs-review
 msgid "ui.Black or white"
 msgstr "Negro o blanco"
@@ -1235,7 +1235,7 @@ msgid "ui.Blocked sites"
 msgstr "Sitios bloqueados"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor-state.ts:153
+#: src/elements/image-editor-state.ts:154
 #: src/elements/project-mark.tsx:75
 #, needs-review
 msgid "ui.Blue"
@@ -1274,14 +1274,14 @@ msgid "ui.Brightness"
 msgstr "Brillo"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1244
-#: src/elements/image-editor.tsx:1246
+#: src/elements/image-editor.tsx:1258
+#: src/elements/image-editor.tsx:1260
 msgid "ui.Brush"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1198
-#: src/elements/image-editor.tsx:1254
+#: src/elements/image-editor.tsx:1212
+#: src/elements/image-editor.tsx:1268
 #, needs-review
 msgid "ui.Brush size"
 msgstr "Tamaño del pincel"
@@ -1325,8 +1325,8 @@ msgstr "Puede ver"
 #. js-lingui-explicit-id
 #: src/elements/adult-lock.tsx:376
 #: src/elements/feedback-dialog.tsx:174
-#: src/elements/image-editor.tsx:1535
-#: src/elements/image-editor.tsx:1623
+#: src/elements/image-editor.tsx:1549
+#: src/elements/image-editor.tsx:1637
 #: src/elements/job-progress.tsx:194
 #: src/elements/music-edit.tsx:62
 #: src/elements/project-home-page.tsx:29
@@ -1374,7 +1374,7 @@ msgid "ui.Cancelled tool"
 msgstr "Herramienta cancelada"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:703
+#: src/elements/image-editor.tsx:717
 #, needs-review
 msgid "ui.Cancelled. Nothing was changed."
 msgstr "Cancelado. No se cambió nada."
@@ -1427,7 +1427,7 @@ msgid "ui.Change the song"
 msgstr "Cambia la canción"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:816
+#: src/elements/image-editor.tsx:830
 #, needs-review
 msgid "ui.Changed as described"
 msgstr "Cambiado como se describió"
@@ -1500,9 +1500,9 @@ msgid "ui.Choose who in your home can see this. Nothing is sent outside your hom
 msgstr "Elige quién en tu hogar puede ver esto. Nada se envía fuera de tu hogar y puedes detenerlo cuando quieras."
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1186
-#: src/elements/image-editor.tsx:1216
-#: src/elements/image-editor.tsx:1268
+#: src/elements/image-editor.tsx:1200
+#: src/elements/image-editor.tsx:1230
+#: src/elements/image-editor.tsx:1282
 #: src/schema/NodeRenderer.tsx:731
 #: src/settings/LocationField.tsx:252
 #, needs-review
@@ -1522,7 +1522,7 @@ msgid "ui.Clear view"
 msgstr "Visibilidad clara"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1272
+#: src/elements/image-editor.tsx:1286
 #, needs-review
 msgid "ui.Click a spot or drag a box on the picture"
 msgstr "Haz clic en un punto o arrastra un cuadro sobre la imagen"
@@ -1568,7 +1568,7 @@ msgid "ui.Close {name}"
 msgstr "Cerrar {name}"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:967
+#: src/elements/image-editor.tsx:981
 #, needs-review
 msgid "ui.Close editor"
 msgstr "Cerrar editor"
@@ -1615,19 +1615,19 @@ msgid "ui.Code"
 msgstr "Código"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1138
+#: src/elements/image-editor.tsx:1152
 #, needs-review
 msgid "ui.Color"
 msgstr "Color"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1129
+#: src/elements/image-editor.tsx:1143
 #, needs-review
 msgid "ui.Color: {color}"
 msgstr "Color: {color}"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1141
+#: src/elements/image-editor.tsx:1155
 #, needs-review
 msgid "ui.Colors"
 msgstr "Colores"
@@ -1663,22 +1663,22 @@ msgid "ui.Comment"
 msgstr "Comentario"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1230
+#: src/elements/image-editor.tsx:1244
 msgid "ui.Comment on"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1835
+#: src/elements/image-editor.tsx:1854
 msgid "ui.Compare"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1843
+#: src/elements/image-editor.tsx:1862
 msgid "ui.Compare with the earlier version (C)"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1842
+#: src/elements/image-editor.tsx:1861
 msgid "ui.Compare with the original (C)"
 msgstr ""
 
@@ -1761,7 +1761,7 @@ msgstr "Uso de contexto"
 #: src/elements/tier-segment.tsx:50
 #: src/primitives/Wizard.tsx:89
 #: src/schema/ClipFeedNodeView.tsx:25
-#: src/schema/ImageEditorNodeView.tsx:199
+#: src/schema/ImageEditorNodeView.tsx:201
 #: src/schema/NodeRenderer.tsx:139
 #: src/schema/NodeRenderer.tsx:140
 #: src/schema/NodeRenderer.tsx:141
@@ -1950,7 +1950,7 @@ msgid "ui.Could not open this clip."
 msgstr "No se pudo abrir este clip."
 
 #. js-lingui-explicit-id
-#: src/schema/ImageEditorNodeView.tsx:148
+#: src/schema/ImageEditorNodeView.tsx:150
 msgid "ui.Could not open this picture."
 msgstr ""
 
@@ -2013,12 +2013,12 @@ msgid "ui.Crop frame. Arrow keys move it, Shift and arrow keys resize it."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1304
+#: src/elements/image-editor.tsx:1318
 msgid "ui.Crop shape"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:743
+#: src/elements/image-editor.tsx:757
 msgid "ui.Cropped to {width} x {height}"
 msgstr ""
 
@@ -2161,8 +2161,8 @@ msgid "ui.Describe a song change to enable Make."
 msgstr "Describe un cambio en la canción para activar Make."
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1575
-#: src/elements/image-editor.tsx:1576
+#: src/elements/image-editor.tsx:1589
+#: src/elements/image-editor.tsx:1590
 #, needs-review
 msgid "ui.Describe the change"
 msgstr "Describe el cambio"
@@ -2298,8 +2298,8 @@ msgid "ui.down"
 msgstr "caído"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1014
-#: src/elements/image-editor.tsx:1020
+#: src/elements/image-editor.tsx:1028
+#: src/elements/image-editor.tsx:1034
 #: src/elements/music-track.tsx:35
 #: src/elements/video-player.tsx:100
 #, needs-review
@@ -2367,7 +2367,7 @@ msgid "ui.e.g. “Respond in Spanish. Keep answers short and focused.”"
 msgstr "p. ej. «Responde en español. Mantén las respuestas cortas y al grano»."
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor-state.ts:317
+#: src/elements/image-editor-state.ts:318
 #, needs-review
 msgid "ui.Each side can be at most {max} pixels."
 msgstr "Cada lado puede medir como máximo {max} píxeles."
@@ -2418,7 +2418,7 @@ msgid "ui.Edit picture"
 msgstr "Editar imagen"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1804
+#: src/elements/image-editor.tsx:1824
 #, needs-review
 msgid "ui.Edit picture: {title}"
 msgstr "Editar imagen: {title}"
@@ -2530,7 +2530,7 @@ msgstr "Introduce tu {word}"
 
 #. js-lingui-explicit-id
 #: src/elements/image-editor.tsx:277
-#: src/elements/image-editor.tsx:1219
+#: src/elements/image-editor.tsx:1233
 #, needs-review
 msgid "ui.Erase"
 msgstr "Borrar"
@@ -2549,7 +2549,7 @@ msgid "ui.esc"
 msgstr "esc"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:967
+#: src/elements/image-editor.tsx:981
 msgid "ui.Esc"
 msgstr ""
 
@@ -2752,7 +2752,7 @@ msgid "ui.Finish"
 msgstr "Terminar"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:845
+#: src/elements/image-editor.tsx:859
 #, needs-review
 msgid "ui.Finish or cancel the current step first."
 msgstr "Termina o cancela el paso actual primero."
@@ -2782,7 +2782,7 @@ msgid "ui.First single"
 msgstr "Primer sencillo"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1660
+#: src/elements/image-editor.tsx:1674
 #, needs-review
 msgid "ui.Fit"
 msgstr "Ajustar"
@@ -2800,17 +2800,17 @@ msgid "ui.five"
 msgstr "cinco"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1374
+#: src/elements/image-editor.tsx:1388
 msgid "ui.Fix light and colour for me"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1327
+#: src/elements/image-editor.tsx:1341
 msgid "ui.Flip horizontal"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1330
+#: src/elements/image-editor.tsx:1344
 msgid "ui.Flip vertical"
 msgstr ""
 
@@ -2914,7 +2914,7 @@ msgstr "Globo"
 
 #. js-lingui-explicit-id
 #: src/schema/ClipFeedNodeView.tsx:24
-#: src/schema/ImageEditorNodeView.tsx:199
+#: src/schema/ImageEditorNodeView.tsx:201
 #: src/schema/NodeRenderer.tsx:138
 #, needs-review
 msgid "ui.Go"
@@ -2933,7 +2933,7 @@ msgid "ui.Graduation cap"
 msgstr "Birrete"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor-state.ts:152
+#: src/elements/image-editor-state.ts:153
 #: src/elements/project-mark.tsx:81
 #, needs-review
 msgid "ui.Green"
@@ -3046,7 +3046,7 @@ msgid "ui.Highlighter"
 msgstr "Resaltador"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:955
+#: src/elements/image-editor.tsx:969
 #, needs-review
 msgid "ui.History"
 msgstr "Historial"
@@ -3479,7 +3479,7 @@ msgid "ui.Library folder"
 msgstr "Carpeta de Biblioteca"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:750
+#: src/elements/image-editor.tsx:764
 msgid "ui.Light and colour adjusted"
 msgstr ""
 
@@ -3793,7 +3793,7 @@ msgid "ui.Markup"
 msgstr "Marcas"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1107
+#: src/elements/image-editor.tsx:1121
 #, needs-review
 msgid "ui.Markup tool"
 msgstr "Herramienta de marcas"
@@ -4383,8 +4383,8 @@ msgid "ui.Normal"
 msgstr "Normal"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1095
-#: src/elements/image-editor.tsx:1407
+#: src/elements/image-editor.tsx:1109
+#: src/elements/image-editor.tsx:1421
 #, needs-review
 msgid "ui.Not available right now."
 msgstr "No disponible ahora mismo."
@@ -4396,7 +4396,7 @@ msgid "ui.Not helpful"
 msgstr "No útil"
 
 #. js-lingui-explicit-id
-#: src/schema/ImageEditorNodeView.tsx:284
+#: src/schema/ImageEditorNodeView.tsx:286
 msgid "ui.Not offered here."
 msgstr ""
 
@@ -4422,11 +4422,11 @@ msgid "ui.Not set"
 msgstr "Sin configurar"
 
 #. js-lingui-explicit-id
-#: src/schema/ImageEditorNodeView.tsx:286
-#: src/schema/ImageEditorNodeView.tsx:330
-#: src/schema/ImageEditorNodeView.tsx:363
-#: src/schema/ImageEditorNodeView.tsx:377
-#: src/schema/ImageEditorNodeView.tsx:391
+#: src/schema/ImageEditorNodeView.tsx:288
+#: src/schema/ImageEditorNodeView.tsx:332
+#: src/schema/ImageEditorNodeView.tsx:365
+#: src/schema/ImageEditorNodeView.tsx:379
+#: src/schema/ImageEditorNodeView.tsx:393
 msgid "ui.Not set up yet."
 msgstr ""
 
@@ -4470,7 +4470,7 @@ msgid "ui.Nothing in the transcript matches."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1572
+#: src/elements/image-editor.tsx:1586
 msgid "ui.Nothing is painted, so this changes the whole picture."
 msgstr ""
 
@@ -4499,12 +4499,12 @@ msgid "ui.Nothing selected"
 msgstr "Nada seleccionado"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1846
+#: src/elements/image-editor.tsx:1865
 msgid "ui.Nothing the same shape to compare with yet."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1845
+#: src/elements/image-editor.tsx:1864
 msgid "ui.Nothing to compare yet: this is the original picture."
 msgstr ""
 
@@ -4545,7 +4545,7 @@ msgid "ui.Now {current}{unit}"
 msgstr "Ahora {current}{unit}"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:734
+#: src/elements/image-editor.tsx:748
 #, needs-review
 msgid "ui.Object erased"
 msgstr "Objeto borrado"
@@ -4666,8 +4666,8 @@ msgid "ui.Open image: {alt}"
 msgstr "Abrir imagen: {alt}"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1026
-#: src/elements/image-editor.tsx:1032
+#: src/elements/image-editor.tsx:1040
+#: src/elements/image-editor.tsx:1046
 msgid "ui.Open in Studio"
 msgstr ""
 
@@ -4758,7 +4758,7 @@ msgid "ui.Or pick a saved place instead."
 msgstr "O elige un lugar guardado."
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor-state.ts:150
+#: src/elements/image-editor-state.ts:151
 #: src/elements/project-mark.tsx:78
 #, needs-review
 msgid "ui.Orange"
@@ -4766,7 +4766,7 @@ msgstr "Naranja"
 
 #. js-lingui-explicit-id
 #: src/elements/image-editor.tsx:284
-#: src/schema/ImageEditorNodeView.tsx:137
+#: src/schema/ImageEditorNodeView.tsx:139
 msgid "ui.Original"
 msgstr ""
 
@@ -4819,13 +4819,13 @@ msgid "ui.Pages"
 msgstr "Páginas"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1196
+#: src/elements/image-editor.tsx:1210
 #, needs-review
 msgid "ui.Paint over what to erase"
 msgstr "Pinta sobre lo que quieres borrar"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1252
+#: src/elements/image-editor.tsx:1266
 msgid "ui.Paint where the change goes"
 msgstr ""
 
@@ -4964,8 +4964,8 @@ msgid "ui.Pick a clip to open it in the Studio."
 msgstr "Elige un clip para abrirlo en el Studio."
 
 #. js-lingui-explicit-id
-#: src/schema/ImageEditorNodeView.tsx:148
-#: src/schema/ImageEditorNodeView.tsx:198
+#: src/schema/ImageEditorNodeView.tsx:150
+#: src/schema/ImageEditorNodeView.tsx:200
 msgid "ui.Pick a picture to open it in the Studio."
 msgstr ""
 
@@ -5003,12 +5003,12 @@ msgid "ui.picture"
 msgstr "imagen"
 
 #. js-lingui-explicit-id
-#: src/schema/ImageEditorNodeView.tsx:260
+#: src/schema/ImageEditorNodeView.tsx:262
 msgid "ui.Picture"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1068
+#: src/elements/image-editor.tsx:1082
 #, needs-review
 msgid "ui.Picture editing tools"
 msgstr "Herramientas para editar imágenes"
@@ -5020,13 +5020,13 @@ msgid "ui.Picture in picture"
 msgstr "Imagen en imagen"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1702
+#: src/elements/image-editor.tsx:1723
 #, needs-review
 msgid "ui.Picture stage"
 msgstr "Área de la imagen"
 
 #. js-lingui-explicit-id
-#: src/schema/ImageEditorNodeView.tsx:289
+#: src/schema/ImageEditorNodeView.tsx:291
 msgid "ui.Picture tools are not ready yet. Try again in a minute."
 msgstr ""
 
@@ -5049,7 +5049,7 @@ msgid "ui.Pin project"
 msgstr "Fijar proyecto"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor-state.ts:155
+#: src/elements/image-editor-state.ts:156
 #: src/elements/project-mark.tsx:79
 #, needs-review
 msgid "ui.Pink"
@@ -5193,8 +5193,8 @@ msgid "ui.Plugins"
 msgstr "Complementos"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1240
-#: src/elements/image-editor.tsx:1242
+#: src/elements/image-editor.tsx:1254
+#: src/elements/image-editor.tsx:1256
 msgid "ui.Point or box"
 msgstr ""
 
@@ -5241,9 +5241,9 @@ msgid "ui.Pressure {value} hPa"
 msgstr "Presión {value} hPa"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1342
-#: src/elements/image-editor.tsx:1380
-#: src/elements/image-editor.tsx:1458
+#: src/elements/image-editor.tsx:1356
+#: src/elements/image-editor.tsx:1394
+#: src/elements/image-editor.tsx:1472
 #: src/elements/track-studio.tsx:188
 #: src/elements/track-studio.tsx:383
 #, needs-review
@@ -5257,7 +5257,7 @@ msgid "ui.Preview of {title}"
 msgstr "Vista previa de {title}"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1468
+#: src/elements/image-editor.tsx:1482
 #, needs-review
 msgid "ui.Preview: {label}"
 msgstr "Vista previa: {label}"
@@ -5497,22 +5497,22 @@ msgid "ui.Rectangle"
 msgstr "Rectángulo"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor-state.ts:149
+#: src/elements/image-editor-state.ts:150
 #: src/elements/project-mark.tsx:80
 #, needs-review
 msgid "ui.Red"
 msgstr "Rojo"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:959
+#: src/elements/image-editor.tsx:973
 #: src/elements/track-studio.tsx:394
 #, needs-review
 msgid "ui.Redo"
 msgstr "Rehacer"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1175
-#: src/elements/image-editor.tsx:1211
+#: src/elements/image-editor.tsx:1189
+#: src/elements/image-editor.tsx:1225
 #, needs-review
 msgid "ui.Redo stroke"
 msgstr "Rehacer trazo"
@@ -5639,7 +5639,7 @@ msgid "ui.Remove {title} from the album"
 msgstr "Quitar {title} del álbum"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1293
+#: src/elements/image-editor.tsx:1307
 #, needs-review
 msgid "ui.Remove background"
 msgstr "Quitar fondo"
@@ -5688,7 +5688,7 @@ msgid "ui.Remove style {name}"
 msgstr "Quitar el estilo {name}"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1588
+#: src/elements/image-editor.tsx:1602
 msgid "ui.Remove the reference picture"
 msgstr ""
 
@@ -5766,8 +5766,8 @@ msgid "ui.Required"
 msgstr "Obligatorio"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1339
-#: src/elements/image-editor.tsx:1377
+#: src/elements/image-editor.tsx:1353
+#: src/elements/image-editor.tsx:1391
 #: src/elements/track-studio.tsx:508
 #, needs-review
 msgid "ui.Reset"
@@ -5818,7 +5818,7 @@ msgid "ui.Resize unit"
 msgstr "Unidad de redimensionado"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor-state.ts:322
+#: src/elements/image-editor-state.ts:323
 #, needs-review
 msgid "ui.Resized to {width} x {height}"
 msgstr "Redimensionado a {width} x {height}"
@@ -5898,12 +5898,12 @@ msgid "ui.Roomy"
 msgstr "Amplio"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1321
+#: src/elements/image-editor.tsx:1335
 msgid "ui.Rotate left"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1324
+#: src/elements/image-editor.tsx:1338
 msgid "ui.Rotate right"
 msgstr ""
 
@@ -5957,7 +5957,7 @@ msgid "ui.save"
 msgstr "guardar"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1189
+#: src/elements/image-editor.tsx:1203
 #: src/elements/music-edit.tsx:62
 #: src/elements/project-settings.tsx:71
 #: src/primitives/ArticleView.tsx:458
@@ -5993,7 +5993,7 @@ msgid "ui.Saved"
 msgstr "Guardado"
 
 #. js-lingui-explicit-id
-#: src/schema/ImageEditorNodeView.tsx:127
+#: src/schema/ImageEditorNodeView.tsx:129
 msgid "ui.Saved to your Library behind your Adult lock. Unlock it there to keep editing it."
 msgstr ""
 
@@ -6004,13 +6004,13 @@ msgid "ui.Saved."
 msgstr "Guardado."
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:776
+#: src/elements/image-editor.tsx:790
 #, needs-review
 msgid "ui.Saving the markup"
 msgstr "Guardando las marcas"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:709
+#: src/elements/image-editor.tsx:723
 #, needs-review
 msgid "ui.Saving the new version"
 msgstr "Guardando la nueva versión"
@@ -6221,7 +6221,7 @@ msgstr "Seleccionado: {name}"
 #: src/assistant-ui/tool-fallback.aui.tsx:514
 #: src/elements/elicitation-form.tsx:167
 #: src/elements/empty-state.tsx:101
-#: src/elements/image-editor.tsx:1626
+#: src/elements/image-editor.tsx:1640
 #: src/elements/tool-fallback.aui.tsx:512
 #, needs-review
 msgid "ui.Send"
@@ -6266,7 +6266,7 @@ msgid "ui.Send to {name}"
 msgstr "Enviar a {name}"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:806
+#: src/elements/image-editor.tsx:820
 #, needs-review
 msgid "ui.Sending your comment"
 msgstr "Enviando tu comentario"
@@ -6378,8 +6378,8 @@ msgid "ui.seven"
 msgstr "siete"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1051
-#: src/elements/image-editor.tsx:1057
+#: src/elements/image-editor.tsx:1065
+#: src/elements/image-editor.tsx:1071
 #: src/elements/music-track.tsx:35
 #: src/elements/share-dialog.tsx:125
 #: src/elements/video-player.tsx:101
@@ -6826,7 +6826,7 @@ msgid "ui.Strict"
 msgstr "Estricto"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1163
+#: src/elements/image-editor.tsx:1177
 #, needs-review
 msgid "ui.Stroke size"
 msgstr "Grosor del trazo"
@@ -6993,7 +6993,7 @@ msgid "ui.Text size"
 msgstr "Tamaño del texto"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1772
+#: src/elements/image-editor.tsx:1793
 #, needs-review
 msgid "ui.Text to add"
 msgstr "Texto para añadir"
@@ -7011,7 +7011,7 @@ msgid "ui.That {word} was not right. Check it and try again."
 msgstr "Ese {word} no era correcto. Revísalo e inténtalo de nuevo."
 
 #. js-lingui-explicit-id
-#: src/schema/ImageEditorNodeView.tsx:110
+#: src/schema/ImageEditorNodeView.tsx:112
 msgid "ui.That change did not come back. Try again."
 msgstr ""
 
@@ -7030,12 +7030,12 @@ msgid "ui.That is {length} characters and each phrase can have {max}. Shorten it
 msgstr "Son {length} caracteres y cada frase puede tener {max}. Acórtala."
 
 #. js-lingui-explicit-id
-#: src/schema/ImageEditorNodeView.tsx:319
+#: src/schema/ImageEditorNodeView.tsx:321
 msgid "ui.That is not available on this screen."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:756
+#: src/elements/image-editor.tsx:770
 msgid "ui.That is not available right now."
 msgstr ""
 
@@ -7046,7 +7046,7 @@ msgid "ui.That one is too short to add."
 msgstr "Ese es demasiado corto para añadirlo."
 
 #. js-lingui-explicit-id
-#: src/schema/ImageEditorNodeView.tsx:175
+#: src/schema/ImageEditorNodeView.tsx:177
 msgid "ui.That picture could not be added. Try again."
 msgstr ""
 
@@ -7063,7 +7063,7 @@ msgid "ui.That place was not saved. Try again in a moment."
 msgstr "Ese lugar no se guardó. Inténtalo de nuevo en un momento."
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:841
+#: src/elements/image-editor.tsx:855
 #, needs-review
 msgid "ui.That tool is not available right now."
 msgstr "Esa herramienta no está disponible ahora mismo."
@@ -7075,7 +7075,7 @@ msgid "ui.The air feels humid"
 msgstr "El aire se siente húmedo"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:731
+#: src/elements/image-editor.tsx:745
 #, needs-review
 msgid "ui.The area to erase could not be prepared. Try drawing it again."
 msgstr "No se pudo preparar el área para borrar. Intenta dibujarla de nuevo."
@@ -7099,7 +7099,7 @@ msgid "ui.The list holds {max} at most. Remove one to add another."
 msgstr "La lista admite {max} como máximo. Quita una para añadir otra."
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:779
+#: src/elements/image-editor.tsx:793
 #, needs-review
 msgid "ui.The markup could not be saved on this picture. Try again."
 msgstr "No se pudieron guardar las marcas en esta imagen. Inténtalo de nuevo."
@@ -7117,17 +7117,17 @@ msgid "ui.The name was not saved. Check your connection and try again."
 msgstr "El nombre no se guardó. Revisa tu conexión e inténtalo de nuevo."
 
 #. js-lingui-explicit-id
-#: src/schema/ImageEditorNodeView.tsx:119
+#: src/schema/ImageEditorNodeView.tsx:121
 msgid "ui.The new version could not be saved. Try again."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:796
+#: src/elements/image-editor.tsx:810
 msgid "ui.The painted area could not be prepared. Try painting it again."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/schema/ImageEditorNodeView.tsx:98
+#: src/schema/ImageEditorNodeView.tsx:100
 msgid "ui.The picture could not be prepared. Try again."
 msgstr ""
 
@@ -7428,7 +7428,7 @@ msgid "ui.Trim start of {label}"
 msgstr "Recortar inicio de {label}"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1556
+#: src/elements/image-editor.tsx:1570
 #: src/elements/media-viewer.tsx:123
 #: src/elements/music-track.tsx:35
 #: src/elements/video-player.tsx:103
@@ -7508,7 +7508,7 @@ msgid "ui.Type your answer"
 msgstr "Escribe tu respuesta"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1773
+#: src/elements/image-editor.tsx:1794
 #, needs-review
 msgid "ui.Type, then press Enter"
 msgstr "Escribe y luego pulsa Enter"
@@ -7532,23 +7532,23 @@ msgid "ui.Unavailable"
 msgstr "No disponible"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:956
-#: src/elements/image-editor.tsx:1475
+#: src/elements/image-editor.tsx:970
+#: src/elements/image-editor.tsx:1489
 #: src/elements/track-studio.tsx:393
 #, needs-review
 msgid "ui.Undo"
 msgstr "Deshacer"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1474
+#: src/elements/image-editor.tsx:1488
 #, needs-review
 msgid "ui.Undo preview"
 msgstr "Vista previa de deshacer"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1172
-#: src/elements/image-editor.tsx:1208
-#: src/elements/image-editor.tsx:1263
+#: src/elements/image-editor.tsx:1186
+#: src/elements/image-editor.tsx:1222
+#: src/elements/image-editor.tsx:1277
 #, needs-review
 msgid "ui.Undo stroke"
 msgstr "Deshacer trazo"
@@ -7667,7 +7667,7 @@ msgid "ui.Upscale 4x"
 msgstr "Ampliar 4x"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1504
+#: src/elements/image-editor.tsx:1518
 #, needs-review
 msgid "ui.Upscaled {factor}x"
 msgstr "Ampliado {factor}x"
@@ -7747,10 +7747,10 @@ msgid "ui.Version {n} of {total}"
 msgstr "Versión {n} de {total}"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:976
-#: src/elements/image-editor.tsx:978
-#: src/elements/image-editor.tsx:982
-#: src/elements/image-editor.tsx:985
+#: src/elements/image-editor.tsx:990
+#: src/elements/image-editor.tsx:992
+#: src/elements/image-editor.tsx:996
+#: src/elements/image-editor.tsx:999
 #, needs-review
 msgid "ui.Versions"
 msgstr "Versiones"
@@ -7788,7 +7788,7 @@ msgid "ui.View"
 msgstr "Ver"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor-state.ts:154
+#: src/elements/image-editor-state.ts:155
 #: src/elements/project-mark.tsx:76
 #, needs-review
 msgid "ui.Violet"
@@ -7954,7 +7954,7 @@ msgid "ui.Who can see this?"
 msgstr "¿Quién puede ver esto?"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1284
+#: src/elements/image-editor.tsx:1298
 #, needs-review
 msgid "ui.Whole picture"
 msgstr "Imagen completa"
@@ -7966,7 +7966,7 @@ msgid "ui.Width"
 msgstr "Ancho"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor-state.ts:313
+#: src/elements/image-editor-state.ts:314
 #, needs-review
 msgid "ui.Width and height must be whole numbers above zero."
 msgstr "El ancho y la altura deben ser números enteros mayores que cero."
@@ -8003,7 +8003,7 @@ msgid "ui.Working"
 msgstr "Trabajando"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:678
+#: src/elements/image-editor.tsx:692
 #: src/elements/voice-conversation.tsx:23
 #, needs-review
 msgid "ui.Working on it"
@@ -8036,7 +8036,7 @@ msgid "ui.Writing the key points…"
 msgstr "Escribiendo los puntos clave…"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor-state.ts:151
+#: src/elements/image-editor-state.ts:152
 #: src/elements/project-mark.tsx:82
 #, needs-review
 msgid "ui.Yellow"
@@ -8077,7 +8077,7 @@ msgid "ui.zero"
 msgstr "cero"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1648
+#: src/elements/image-editor.tsx:1662
 #: src/elements/track-studio.tsx:484
 #: src/elements/track-studio.tsx:485
 #, needs-review
@@ -8085,13 +8085,13 @@ msgid "ui.Zoom"
 msgstr "Zoom"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1652
+#: src/elements/image-editor.tsx:1666
 #, needs-review
 msgid "ui.Zoom {zoom} percent"
 msgstr "Zoom al {zoom} por ciento"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1655
+#: src/elements/image-editor.tsx:1669
 #: src/elements/media-viewer.tsx:114
 #: src/elements/mermaid-diagram.tsx:211
 #, needs-review
@@ -8099,7 +8099,7 @@ msgid "ui.Zoom in"
 msgstr "Acercar"
 
 #. js-lingui-explicit-id
-#: src/elements/image-editor.tsx:1649
+#: src/elements/image-editor.tsx:1663
 #: src/elements/media-viewer.tsx:115
 #: src/elements/mermaid-diagram.tsx:219
 #, needs-review

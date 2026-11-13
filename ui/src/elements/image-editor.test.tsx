@@ -186,6 +186,21 @@ describe("layout and names", () => {
     expect(onSelect).toHaveBeenCalledTimes(1);
   });
 
+  test("the More menu opens over the stage, not in the column that holds the stage, and a press outside closes it (EDITOR-OVERLAY)", () => {
+    const v = setup({ operations: [{ id: "blur", label: "Blur background", enabled: true }] });
+    fireEvent.click(v.getByRole("radio", { name: "More" }));
+    const bar = v.container.querySelector("[data-slot=image-editor-more-bar]")!;
+    expect(bar).toBeTruthy();
+    expect(bar.closest("[data-slot=image-editor-tools]")).toBeNull();
+    expect(bar.closest("[data-slot^=image-editor-overlay]")).toBeTruthy();
+    fireEvent.pointerDown(document.body);
+    expect(v.container.querySelector("[data-slot=image-editor-more-bar]")).toBeNull();
+    fireEvent.click(v.getByRole("radio", { name: "More" }));
+    expect(v.container.querySelector("[data-slot=image-editor-more-bar]")).toBeTruthy();
+    fireEvent.pointerDown(v.getByRole("radio", { name: "More" }));
+    expect(v.container.querySelector("[data-slot=image-editor-more-bar]")).toBeTruthy();
+  });
+
   test("Download triggers an anchor download of the current version", () => {
     const v = setup({ downloadName: "sunset.png" });
     fireEvent.click(v.getByRole("button", { name: "Download" }));

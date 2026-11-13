@@ -105,13 +105,29 @@ describe("zoom", () => {
     expect(wheelZoom(100, 0)).toBe(100);
   });
 
-  test("fit shrinks a big picture, never enlarges a small one, and survives bad input", () => {
-    expect(fitZoom({ width: 1000, height: 800 }, { width: 2000, height: 1000 }, 0)).toBe(50);
-    expect(fitZoom({ width: 1000, height: 800 }, { width: 2000, height: 1000 }, 24)).toBe(47);
-    expect(fitZoom({ width: 1000, height: 800 }, { width: 100, height: 100 })).toBe(100);
+  test("fit is the largest size that fits the visible stage on both axes: wide, tall, square and tiny pictures", () => {
+    const stage = { width: 1000, height: 800 };
+    // wide: width decides (952 / 2000)
+    expect(fitZoom(stage, { width: 2000, height: 1000 })).toBe(47);
+    expect(fitZoom(stage, { width: 2000, height: 1000 }, 0)).toBe(50);
+    // tall: height decides (752 / 3000)
+    expect(fitZoom(stage, { width: 1000, height: 3000 })).toBe(25);
+    // square: the shorter side of the stage decides (752 / 1000)
+    expect(fitZoom(stage, { width: 1000, height: 1000 })).toBe(75);
+    // a picture smaller than the stage is enlarged to fill it, up to the zoom limit
+    expect(fitZoom(stage, { width: 400, height: 300 })).toBe(238);
+    expect(fitZoom(stage, { width: 100, height: 100 })).toBe(400);
+    // the result fills one axis edge to edge (inside the padding), never overflows the other
+    for (const natural of [{ width: 1600, height: 900 }, { width: 900, height: 1600 }, { width: 640, height: 640 }, { width: 300, height: 200 }]) {
+      const z = fitZoom(stage, natural) / 100;
+      expect(natural.width * z).toBeLessThanOrEqual(952);
+      expect(natural.height * z).toBeLessThanOrEqual(752);
+      expect(Math.max(natural.width * z / 952, natural.height * z / 752)).toBeGreaterThan(0.98);
+    }
+    // bad input
     expect(fitZoom({ width: 10, height: 10 }, { width: 100, height: 100 })).toBe(10);
     expect(fitZoom({ width: 500, height: 500 }, { width: 0, height: 0 })).toBe(100);
-    expect(fitZoom({ width: 100000, height: 100000 }, { width: 5000, height: 5000 }, 0)).toBe(100);
+    expect(fitZoom({ width: 100000, height: 100000 }, { width: 5000, height: 5000 }, 0)).toBe(400);
   });
 });
 

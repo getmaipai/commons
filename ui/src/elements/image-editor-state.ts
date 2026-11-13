@@ -93,16 +93,17 @@ export function stepZoom(percent: number, direction: 1 | -1): number {
 
 /**
  * The zoom percent that fits `natural` inside `stage` (both in CSS pixels)
- * with `padding` px kept free on each side. Never above 100 so a small picture
- * is not blown up, never outside the zoom range.
+ * with `padding` px kept free on each side: the largest size that fits on both
+ * axes, so a small picture is enlarged to fill the stage. Never outside the zoom range.
  */
 export function fitZoom(stage: Size, natural: Size, padding = 24): number {
   if (!(natural.width > 0) || !(natural.height > 0)) return 100;
   const availW = stage.width - padding * 2;
   const availH = stage.height - padding * 2;
   if (!(availW > 0) || !(availH > 0)) return ZOOM_MIN;
+  // The largest size that fits the visible box on both axes (a small picture is enlarged to fill it, up to the zoom limit).
   const ratio = Math.min(availW / natural.width, availH / natural.height);
-  return clampZoom(Math.floor(Math.min(1, ratio) * 100));
+  return clampZoom(Math.floor(ratio * 100));
 }
 
 /** Zoom after a Ctrl/Cmd+wheel tick: up for a negative delta, one step at a time. */

@@ -608,8 +608,10 @@ export function ImageEditor({
     const root = rootRef.current;
     if (!stage || !root) return;
     const measure = () => {
-      const s = stage.getBoundingClientRect();
-      if (s.width > 0 && s.height > 0) setStageSize({ width: s.width, height: s.height });
+      // The visible box (a scrollbar is not room for the picture).
+      const w = stage.clientWidth;
+      const h = stage.clientHeight;
+      if (w > 0 && h > 0) setStageSize({ width: w, height: h });
       setRootWidth(root.getBoundingClientRect().width);
     };
     measure();
@@ -622,6 +624,18 @@ export function ImageEditor({
     window.addEventListener("resize", measure);
     return () => window.removeEventListener("resize", measure);
   }, []);
+
+  // The More menu is a menu: a press outside it (and outside the tool bar that opened it) closes it. Esc closes it through escape().
+  useEffect(() => {
+    if (mode !== "more" || pending || busy) return;
+    const onDown = (event: PointerEvent) => {
+      const target = event.target;
+      if (target instanceof Element && target.closest("[data-slot=image-editor-more-bar],[data-slot=image-editor-tools]")) return;
+      setMode(null);
+    };
+    document.addEventListener("pointerdown", onDown);
+    return () => document.removeEventListener("pointerdown", onDown);
+  }, [mode, pending, busy]);
 
   // Ctrl/Cmd + wheel zooms; a plain wheel scrolls the stage.
   useEffect(() => {
@@ -1639,7 +1653,7 @@ export function ImageEditor({
   );
 
   const statusLine = (
-    <p role="status" className="text-muted-foreground min-h-4 px-3 text-center text-xs empty:hidden" data-slot="image-editor-status">
+    <p role="status" className="text-muted-foreground min-h-4 px-3 text-center text-xs" data-slot="image-editor-status">
       {notice ?? statusNote ?? ""}
     </p>
   );
@@ -1691,8 +1705,15 @@ export function ImageEditor({
     </div>
   );
 
+  // Bars, panels and messages open over the stage, never in the column beside it: the picture does not move when one opens or closes.
+  const overlayClass = "pointer-events-none absolute inset-x-0 z-20 flex max-h-full flex-col items-center gap-2 overflow-y-auto px-2 py-2 *:pointer-events-auto";
   const stage = (
     <div className="relative min-h-0 flex-1">
+      <div className={cn(overlayClass, "top-0 empty:hidden")} data-slot="image-editor-overlay-top">
+        {notices}
+        {compact ? null : subBar}
+      </div>
+      {compact ? <div className={cn(overlayClass, "bottom-0 empty:hidden")} data-slot="image-editor-overlay-bottom">{subBar}</div> : null}
       {/* A scrollable, keyboard-zoomable region has to be focusable. */}
       <div
         ref={stageRef}
@@ -1791,7 +1812,6 @@ export function ImageEditor({
   const toolArea = (
     <div className="flex flex-col items-center gap-2 px-2 py-2" data-slot="image-editor-tools">
       {compact ? null : toolbar}
-      {subBar}
       {compact ? toolbar : null}
       {statusLine}
     </div>
@@ -1811,7 +1831,6 @@ export function ImageEditor({
         )}
       >
         {header}
-        {notices}
         {compact ? null : toolArea}
         {stage}
         <div className="flex items-center justify-between gap-2 px-2 py-2" data-slot="image-editor-footer">

@@ -1,3 +1,7 @@
+## [ui-v0.5.632] - 2026-11-13
+
+- EDITOR-OVERLAY and EDITOR-FIT, owner bug fixes. In `ImageEditor` the tool option bars (Comment, Erase, Crop, Adjust, Resize, More, Markup, the preview Apply bar) and the busy and error messages now open as an overlay on top of the stage (at the top on a wide layout, at the bottom on a phone) instead of in the column beside it, so the picture never moves when one opens or closes; a press outside the More menu closes it (Esc already did). Fit is the largest size that fits the visible stage on both axes (a small picture is enlarged to fill it, up to 400%), measured from the stage's visible box and re-measured when the stage resizes. The status line keeps its row so the stage height is steady.
+
 ## [ui-v0.5.631] - 2026-11-13
 
 - EDITOR-HANDOFF fix, additive. On a phone layout an `ImageEditor` hand-off with an `icon` is an icon button named by its label (the long label no longer runs off the header); `ImageEditorAction` gains `icon`; the `image_editor` node gives the Video hand-off a film icon. Choosing a reference picture clears an earlier error line.
