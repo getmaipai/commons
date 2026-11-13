@@ -49,6 +49,7 @@ import {
   RotateCwIcon,
   ScalingIcon,
   Share2Icon,
+  SquarePenIcon,
   SlidersHorizontalIcon,
   SquareIcon,
   Trash2Icon,
@@ -240,6 +241,8 @@ export interface ImageEditorProps {
    * Apply and Discard, exactly as it does for Erase (additive; a reply with only `message` behaves as before). */
   onComment: (request: ImageEditorCommentRequest, ctl: ImageEditorRunControl) => Promise<{ message: string; pending?: ImageEditorPending }>;
   onShare?: (version: ImageEditorVersion) => void;
+  /** EDITOR-07: opens the picture being shown in the host's full Studio (the chat canvas sets it for a picture that is a Library file). The editor draws "Open in Studio" beside Share when set. */
+  onOpenInStudio?: (version: ImageEditorVersion) => void;
   downloadName?: string;
   onClose: () => void;
   errorMessage?: string | null;
@@ -480,6 +483,7 @@ export function ImageEditor({
   onSaveMarkup,
   onComment,
   onShare,
+  onOpenInStudio,
   downloadName,
   onClose,
   errorMessage,
@@ -1000,6 +1004,18 @@ export function ImageEditor({
           <Button type="button" variant="ghost" size="sm" onClick={() => download(current.url, downloadName ?? title)}>
             <DownloadIcon aria-hidden />
             {i18n._({ id: "ui.Download", message: "Download" })}
+          </Button>
+        )
+      ) : null}
+      {onOpenInStudio && current ? (
+        compact ? (
+          <ToolButton label={i18n._({ id: "ui.Open in Studio", message: "Open in Studio" })} side="bottom" onClick={() => onOpenInStudio(current)}>
+            <SquarePenIcon aria-hidden />
+          </ToolButton>
+        ) : (
+          <Button type="button" variant="ghost" size="sm" onClick={() => onOpenInStudio(current)}>
+            <SquarePenIcon aria-hidden />
+            {i18n._({ id: "ui.Open in Studio", message: "Open in Studio" })}
           </Button>
         )
       ) : null}

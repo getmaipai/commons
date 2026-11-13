@@ -536,6 +536,16 @@ describe("UI schema, package apps", () => {
     }
   });
 
+  test("EDITOR-AGE-ADD: image_editor takes add_picture with a label and an action, and nothing else", () => {
+    const editor = { type: "image_editor", bind: { source: "package", path: "picture" } };
+    const add = { label: "Add a picture", action: { navigate: { to: "/apps/image/studio", state: { file: "{id}" } } } };
+    expect(validate({ ...editor, add_picture: add })).toBe(true);
+    expect(validate({ ...editor, add_picture: { action: add.action } })).toBe(true);
+    for (const patch of [{ add_picture: { label: "Add" } }, { add_picture: { ...add, label: "" } }, { add_picture: { ...add, label: "x".repeat(41) } }, { add_picture: { ...add, extra: 1 } }]) {
+      expect(validate({ ...editor, ...patch })).toBe(false);
+    }
+  });
+
   test("VIDEO-STUDIO-04: the studio node (TrackStudio) is additive and strict", () => {
     const studio = { type: "studio", bind: { source: "package", path: "studio" } };
     expect(validate(studio)).toBe(true);

@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useContext, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { i18n } from "@/kit/i18n";
 import { AsyncState } from "@/kit/primitives/AsyncState";
 import { LockTile } from "@/kit/elements/adult-lock";
@@ -17,6 +17,8 @@ import {
 import { useBinding } from "@/kit/schema/binding";
 import { useDispatchAction } from "@/kit/schema/actions";
 import { readField } from "@/kit/schema/fieldPath";
+import { MediaHostContext } from "@/kit/schema/mediaHost";
+import { Button } from "@/kit/ui/button";
 import type { Action, FeedHandler, ImageEditorNode } from "@/kit/schema/types";
 
 type Row = Record<string, unknown>;
@@ -140,7 +142,7 @@ export function ImageEditorNodeView({ node, state }: { node: ImageEditorNode; st
   const query = useBinding<Row | Row[]>(node.bind, state);
   const row = Array.isArray(query.data) ? query.data[0] : query.data;
   // A page with its own picker draws nothing here until a picture is open.
-  if (node.hide_when_empty && query.data && !query.isError && !row) return null;
+  if (node.hide_when_empty && query.data && !query.isError && !row) return node.add_picture ? <AddPictureRow node={node} /> : null;
   return (
     <AsyncState data={query.data} error={query.isError} isFetching={query.isFetching} onRetry={() => query.refetch()} errorMessage={i18n._({ id: "ui.Could not open this picture.", message: "Could not open this picture." })} isEmpty={() => !row} emptyIcon="image" emptyText={i18n._({ id: "ui.Pick a picture to open it in the Studio.", message: "Pick a picture to open it in the Studio." })}>
       {() => (row ? <EditorRow node={node} state={state} row={row} /> : null)}
@@ -152,15 +154,64 @@ function EditorRow({ node, state, row }: { node: ImageEditorNode; state: Row; ro
   const f = node.fields ?? {};
   if (readField(row, f.locked ?? "locked") === true) return <LockTile making={readField(row, "making") === true} shape="card" />;
   if (readField(row, f.empty ?? "empty") === true) return <EmptyPlaceholder node={node} />;
-  return node.operations ? <WithOperations node={node} state={state} row={row} /> : <EditorOpen node={node} row={row} operations={undefined} />;
+  return node.operations ? <WithOperations node={node} state={state} row={row} /> : <EditorOpen node={node} row={row} operations={undefined} toolStates={undefined} />;
+}
+
+/** EDITOR-AGE-ADD: the page's "Add a picture". The host's picker opens (the Library, or an upload through the Library's own route, with its gates);
+ * the chosen file's id is handed to the page's action as `{id}`. A host with no picker draws the control disabled with the reason. */
+function useAddPicture(node: ImageEditorNode) {
+  const host = useContext(MediaHostContext);
+  const { dispatch } = useDispatchAction();
+  const add = node.add_picture;
+  const [error, setError] = useState<string | null>(null);
+  const label = add?.label ?? i18n._({ id: "ui.Add a picture", message: "Add a picture" });
+  const reason = host?.pickMedia ? undefined : i18n._({ id: "ui.Adding a picture is not available on this screen.", message: "Adding a picture is not available on this screen." });
+  const onAdd = useCallback(() => {
+    if (!add || !host?.pickMedia) return;
+    setError(null);
+    host.pickMedia("picture").then((picked) => {
+      if (picked) dispatch(add.action, [{ id: picked.id }]);
+    }).catch((err: unknown) => setError(err instanceof Error && err.message ? err.message : i18n._({ id: "ui.That picture could not be added. Try again.", message: "That picture could not be added. Try again." })));
+  }, [add, host, dispatch]);
+  return { label, reason, onAdd, error, enabled: !!add };
+}
+
+/** The picker is showing and the person wants a picture that is not in it yet. */
+function AddPictureRow({ node }: { node: ImageEditorNode }) {
+  const add = useAddPicture(node);
+  if (!add.enabled) return null;
+  return (
+    <div className="flex flex-wrap items-center gap-2" data-slot="image-editor-add">
+      <Button type="button" variant="secondary" size="sm" disabled={!!add.reason} onClick={add.onAdd}>{add.label}</Button>
+      {add.reason ? <span className="text-muted-foreground text-sm">{add.reason}</span> : null}
+      {add.error ? <p role="alert" className="text-destructive text-sm">{add.error}</p> : null}
+    </div>
+  );
 }
 
 /** The page's own words and actions for "no pictures at all" (a placeholder row), instead of the default line. */
 function EmptyPlaceholder({ node }: { node: ImageEditorNode }) {
   const { dispatch } = useDispatchAction();
+  const add = useAddPicture(node);
   const empty = node.empty_state;
   if (!empty) return <EmptyState icon="image" text={i18n._({ id: "ui.Pick a picture to open it in the Studio.", message: "Pick a picture to open it in the Studio." })} />;
   const label = (action: Action, own: string | undefined) => own ?? ("navigate" in action ? i18n._({ id: "ui.Go", message: "Go" }) : i18n._({ id: "ui.Continue", message: "Continue" }));
+  // With "Add a picture" on the page it is the main action and the page's own action moves to the second place.
+  if (add.enabled && !add.reason) {
+    return (
+      <div className="flex flex-col gap-2">
+        <EmptyState
+          icon={empty.icon}
+          text={empty.text}
+          actionLabel={add.label}
+          onAction={add.onAdd}
+          secondaryLabel={empty.action ? label(empty.action, empty.action_label) : undefined}
+          onSecondary={empty.action ? () => dispatch(empty.action!) : undefined}
+        />
+        {add.error ? <p role="alert" className="text-destructive text-center text-sm">{add.error}</p> : null}
+      </div>
+    );
+  }
   return (
     <EmptyState
       icon={empty.icon}
@@ -173,23 +224,37 @@ function EmptyPlaceholder({ node }: { node: ImageEditorNode }) {
   );
 }
 
+/** The built-in tools a row of `operations` may speak for (its `tool` field). */
+const ROW_TOOLS = ["markup", "comment", "remove_background", "erase", "resize", "crop", "adjust"] as const;
+type RowTool = (typeof ROW_TOOLS)[number];
+const isRowTool = (v: unknown): v is RowTool => typeof v === "string" && (ROW_TOOLS as readonly string[]).includes(v);
+
 function WithOperations({ node, state, row }: { node: ImageEditorNode; state: Row; row: Row }) {
   const query = useBinding<Row[]>(node.operations!.bind, state);
-  const operations = useMemo<ImageEditorExtraOperation[]>(() => {
+  const { operations, toolStates } = useMemo(() => {
     const rows = Array.isArray(query.data) ? query.data : [];
-    return rows.filter(isRow).flatMap((r) => {
+    const extra: ImageEditorExtraOperation[] = [];
+    const states: Partial<Record<RowTool, ImageEditorToolState>> = {};
+    for (const r of rows.filter(isRow)) {
+      // A row with a `tool` is the readiness of one of the editor's own tools: it is never listed under More.
+      if (isRowTool(r.tool)) {
+        states[r.tool] = r.enabled === false ? { enabled: false, reason: str(r.reason) ?? "" } : { enabled: true };
+        continue;
+      }
       const id = str(r.id);
       const label = str(r.label);
-      if (!id || !label) return [];
-      return [{ id, label, summary: str(r.summary), controls: Array.isArray(r.controls) ? (r.controls as ImageEditorExtraOperation["controls"]) : undefined, enabled: r.enabled !== false, reason: str(r.reason) }];
-    });
+      if (!id || !label) continue;
+      extra.push({ id, label, summary: str(r.summary), controls: Array.isArray(r.controls) ? (r.controls as ImageEditorExtraOperation["controls"]) : undefined, enabled: r.enabled !== false, reason: str(r.reason) });
+    }
+    return { operations: extra, toolStates: states };
   }, [query.data]);
-  return <EditorOpen node={node} row={row} operations={operations} />;
+  return <EditorOpen node={node} row={row} operations={operations} toolStates={toolStates} />;
 }
 
-function EditorOpen({ node, row, operations }: { node: ImageEditorNode; row: Row; operations: ImageEditorExtraOperation[] | undefined }) {
+function EditorOpen({ node, row, operations, toolStates }: { node: ImageEditorNode; row: Row; operations: ImageEditorExtraOperation[] | undefined; toolStates: Partial<Record<RowTool, ImageEditorToolState>> | undefined }) {
   const f = node.fields ?? {};
   const { dispatch, lastError } = useDispatchAction();
+  const host = useContext(MediaHostContext);
   const file = String(readField(row, f.key ?? "id") ?? "");
   const title = str(readField(row, f.title ?? "title")) ?? i18n._({ id: "ui.Picture", message: "Picture" });
   const rowVersions = toVersions(row, f);
@@ -218,6 +283,9 @@ function EditorOpen({ node, row, operations }: { node: ImageEditorNode; row: Row
       if (listed && !listed.includes(key)) return { enabled: false, reason: i18n._({ id: "ui.Not offered here.", message: "Not offered here." }) };
       if (reasons[key]) return { enabled: false, reason: reasons[key] };
       if (!need[key]) return { enabled: false, reason: i18n._({ id: "ui.Not set up yet.", message: "Not set up yet." }) };
+      // EDITOR-TOOLS-READY: the host says a tool's engine is not ready: drawn disabled from the start, with its reason (the host's own not-ready line when the row has none).
+      const reported = toolStates?.[key];
+      if (reported && !reported.enabled) return { enabled: false, reason: reported.reason || host?.makingNotice?.("picture") || i18n._({ id: "ui.Picture tools are not ready yet. Try again in a minute.", message: "Picture tools are not ready yet. Try again in a minute." }) };
       return { enabled: true };
     };
     const out: ImageEditorProps["tools"] = {
@@ -230,7 +298,16 @@ function EditorOpen({ node, row, operations }: { node: ImageEditorNode; row: Row
     if (!listed || listed.includes("crop")) out.crop = state("crop");
     if (!listed || listed.includes("adjust")) out.adjust = state("adjust");
     return out;
-  }, [node.tools, node.tool_reasons, handlers.markup, handlers.comment, handlers.run]);
+  }, [node.tools, node.tool_reasons, handlers.markup, handlers.comment, handlers.run, toolStates, host]);
+  // One line up front, before any click: the reason of the first tool the host reported as not ready.
+  const toolsNote = useMemo(() => {
+    for (const key of ROW_TOOLS) {
+      const reported = toolStates?.[key];
+      const drawn = (tools as Record<string, ImageEditorToolState | undefined>)[key];
+      if (reported && !reported.enabled && drawn && !drawn.enabled && drawn.reason) return drawn.reason;
+    }
+    return null;
+  }, [tools, toolStates]);
 
   const shownOperations = !node.tools || node.tools.includes("more") ? operations : undefined;
 
@@ -309,10 +386,13 @@ function EditorOpen({ node, row, operations }: { node: ImageEditorNode; row: Row
     const pick = handlers.pick_reference;
     if (!pick) return undefined;
     return async (): Promise<ImageEditorReference | null> => {
-      const reply = await call(pick, { file });
+      // The host's picker (the person's own Library pictures) names the file; the call checks it and answers its label. Without a picker the call chooses for itself.
+      const picked = host?.pickMedia ? await host.pickMedia("picture") : undefined;
+      if (host?.pickMedia && !picked) return null;
+      const reply = await call(pick, { file: currentId || file, ref: picked?.id ?? "" });
       return isRow(reply) && str(reply.id) ? { id: String(reply.id), label: str(reply.label) ?? String(reply.id) } : null;
     };
-  }, [handlers.pick_reference, call, file]);
+  }, [handlers.pick_reference, call, file, currentId, host]);
 
   return (
     <div ref={frameRef} className="flex h-[min(52rem,calc(100dvh-8rem))] min-h-96 w-full flex-col gap-2" style={fitted ? { height: fitted } : undefined} data-slot="image-editor-node">
@@ -327,7 +407,7 @@ function EditorOpen({ node, row, operations }: { node: ImageEditorNode; row: Row
           setLockNote(null);
           setCurrentId(id);
         }}
-        statusNote={lockNote}
+        statusNote={lockNote ?? toolsNote}
         tools={tools}
         operations={shownOperations}
         initialTool={node.initial_tool === "more" ? undefined : node.initial_tool}

@@ -819,8 +819,15 @@
           "type": "object",
           "additionalProperties": false,
           "required": ["bind"],
-          "description": "The extra one-click operations, read from the host's registry, drawn under More. The Element names none of them. Each row: `{ id, label, summary, controls, enabled, reason }`; `controls` is a list of `{ kind: \"number\", name, label, min, max, step, default }` or `{ kind: \"choice\", name, label, options, default }`. A row with `enabled` false is drawn disabled with its `reason` as the tooltip.",
+          "description": "The extra one-click operations, read from the host's registry, drawn under More. The Element names none of them. Each row: `{ id, label, summary, controls, enabled, reason }`; `controls` is a list of `{ kind: \"number\", name, label, min, max, step, default }` or `{ kind: \"choice\", name, label, options, default }`. A row with `enabled` false is drawn disabled with its `reason` as the tooltip. EDITOR-TOOLS-READY: a row with `tool` (one of markup, comment, remove_background, erase, resize, crop, adjust) is not an operation: it is the readiness of that built-in tool, `{ tool, enabled, reason }`. A tool whose row says `enabled` false is drawn disabled from the start and its `reason` is shown as the editor's one line before any click (the host's own not-ready line when the row has none). It is never listed under More.",
           "properties": { "bind": { "$ref": "#/$defs/binding" } }
+        },
+        "add_picture": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["action"],
+          "description": "EDITOR-AGE-ADD: an \"Add a picture\" control for a page whose editor has no picture open. It opens the host's own media picker (the person's Library pictures, or an upload through the Library's own route with its gates); the chosen file's id is given to `action` as `{id}` (usually a `navigate` that writes it to the page state). It is drawn as the main action of the placeholder row's empty state (the empty state's own action moves to the second place) and as a button under the page's picker, which is where `hide_when_empty` otherwise draws nothing. A host with no picker draws it disabled with the reason.",
+          "properties": { "label": { "type": "string", "minLength": 1, "maxLength": 40 }, "action": { "$ref": "#/$defs/action" } }
         },
         "handlers": {
           "type": "object",
@@ -830,7 +837,7 @@
             "apply": { "$ref": "#/$defs/feed_handler" },
             "markup": { "$ref": "#/$defs/feed_handler" },
             "comment": { "$ref": "#/$defs/feed_handler" },
-            "pick_reference": { "$ref": "#/$defs/feed_handler" }
+            "pick_reference": { "$ref": "#/$defs/feed_handler", "description": "A `call` run with `{ file, ref }` whose reply is `{ id, label }` (the reference picture checked and named) or null. When the host has a media picker the Element opens it first and `ref` is the Library file id the person chose; without one `ref` is empty and the call chooses for itself. The reply's `id` is sent as `reference` with the next `comment`." }
           }
         },
         "on_close": { "$ref": "#/$defs/action", "description": "What the editor's Close does (usually a navigate back to the Library)." }

@@ -144,6 +144,17 @@ describe("layout and names", () => {
     expect(onShare.mock.calls[0]![0]).toEqual(versions[1]!);
   });
 
+  test("Open in Studio is hidden without onOpenInStudio and calls it with the current version (EDITOR-07)", () => {
+    const first = setup();
+    expect(first.queryByRole("button", { name: "Open in Studio" })).toBeNull();
+    cleanup();
+    const onOpenInStudio = mock((_v: ImageEditorVersion) => {});
+    const v = setup({ onOpenInStudio });
+    fireEvent.click(v.getByRole("button", { name: "Open in Studio" }));
+    expect(onOpenInStudio).toHaveBeenCalledTimes(1);
+    expect(onOpenInStudio.mock.calls[0]![0]).toEqual(versions[1]!);
+  });
+
   test("Download triggers an anchor download of the current version", () => {
     const v = setup({ downloadName: "sunset.png" });
     fireEvent.click(v.getByRole("button", { name: "Download" }));

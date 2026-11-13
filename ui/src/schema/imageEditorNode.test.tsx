@@ -7,6 +7,7 @@ import { renderWithQueryClient } from "../../tests/renderWithQueryClient";
 import { stubMatchMedia } from "../../tests/stubMatchMedia";
 import { NodeRenderer } from "@/kit/schema/NodeRenderer";
 import { PackageScopeContext } from "@/kit/schema/packageScope";
+import { MediaHostContext, type MediaHost } from "@/kit/schema/mediaHost";
 import { fitHeightOf } from "@/kit/schema/ImageEditorNodeView";
 import { ImageEditorNodeSchema, type UiNode } from "@/kit/schema/types";
 
@@ -60,14 +61,13 @@ const node = ImageEditorNodeSchema.parse({
   tool_reasons: { erase: "Erase is not ready yet." },
 }) as unknown as UiNode;
 
-function Harness({ n = node }: { n?: UiNode }) {
-  return (
-    <MemoryRouter>
-      <PackageScopeContext.Provider value={{ packageId: "images" }}>
-        <NodeRenderer node={n} state={{ file: "lib-1" }} />
-      </PackageScopeContext.Provider>
-    </MemoryRouter>
+function Harness({ n = node, host = null, file = "lib-1" }: { n?: UiNode; host?: Partial<MediaHost> | null; file?: string }) {
+  const page = (
+    <PackageScopeContext.Provider value={{ packageId: "images" }}>
+      <NodeRenderer node={n} state={{ file }} />
+    </PackageScopeContext.Provider>
   );
+  return <MemoryRouter>{host ? <MediaHostContext.Provider value={host as MediaHost}>{page}</MediaHostContext.Provider> : page}</MemoryRouter>;
 }
 
 describe("image_editor node", () => {
@@ -191,6 +191,106 @@ describe("image_editor node", () => {
     const second = renderWithQueryClient(<Harness n={shown} />);
     await waitFor(() => expect(second.container.textContent).toContain("Pick a picture to open it in the Studio."));
     globalThis.fetch = orig;
+  });
+});
+
+describe("image_editor node: Add a picture, reference picture, tools not ready (Studio gaps)", () => {
+  const addNode = (extra: Row = {}) => ImageEditorNodeSchema.parse({
+    type: "image_editor",
+    bind: { source: "package", path: "picture", params: { id: "$state.file" } },
+    hide_when_empty: true,
+    add_picture: { action: { call: { target: "/api/plugins/images/actions/opened", args: { picked: "{id}" } } } },
+    empty_state: { type: "empty_state", icon: "image", text: "No pictures yet.", action: { navigate: { to: "/create" } }, action_label: "Make a picture" },
+    ...extra,
+  }) as unknown as UiNode;
+
+  /** The page's picker has pictures and none is open: the bound data has no row. */
+  const noRow = () => {
+    globalThis.fetch = mock((input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+      calls.push({ url, body: init?.body ? (JSON.parse(String(init.body)) as Row) : {} });
+      return Promise.resolve(new Response(url.endsWith("/data/picture") ? "[]" : "{}", { status: 200 }));
+    }) as unknown as typeof fetch;
+  };
+
+  test("with pictures to pick from, Add a picture sits under the picker, opens the host's picker and hands the chosen id to the page's action", async () => {
+    noRow();
+    const pickMedia = mock(() => Promise.resolve({ id: "up-9" }));
+    const { findByRole } = renderWithQueryClient(<Harness n={addNode()} host={{ pickMedia }} />);
+    fireEvent.click(await findByRole("button", { name: "Add a picture" }));
+    expect(pickMedia).toHaveBeenCalledWith("picture");
+    await waitFor(() => expect(calls.some((c) => c.url.endsWith("/actions/opened"))).toBe(true));
+    expect(calls.find((c) => c.url.endsWith("/actions/opened"))!.body).toMatchObject({ picked: "up-9" });
+  });
+
+  test("a closed picker starts nothing; a host with no picker draws the control disabled with its reason", async () => {
+    noRow();
+    const pickMedia = mock(() => Promise.resolve(null));
+    const first = renderWithQueryClient(<Harness n={addNode()} host={{ pickMedia }} />);
+    fireEvent.click(await first.findByRole("button", { name: "Add a picture" }));
+    await new Promise((r) => setTimeout(r, 20));
+    expect(calls.some((c) => c.url.endsWith("/actions/opened"))).toBe(false);
+    cleanup();
+    const second = renderWithQueryClient(<Harness n={addNode()} />);
+    const button = await second.findByRole("button", { name: "Add a picture" });
+    expect(button.hasAttribute("disabled")).toBe(true);
+    expect(second.getByText("Adding a picture is not available on this screen.")).toBeTruthy();
+  });
+
+  test("the empty state's main action is Add a picture and the page's own action is second", async () => {
+    picture = { id: "", empty: true };
+    const { findByRole } = renderWithQueryClient(<Harness n={addNode()} host={{ pickMedia: () => Promise.resolve(null) }} />);
+    expect(await findByRole("button", { name: "Add a picture" })).toBeTruthy();
+    expect(await findByRole("button", { name: "Make a picture" })).toBeTruthy();
+  });
+
+  test("Add a reference picture opens the host's picker, then asks pick_reference with the file and the chosen id, and the answer rides on the comment", async () => {
+    const n = ImageEditorNodeSchema.parse({
+      type: "image_editor",
+      bind: { source: "package", path: "picture", params: { id: "$state.file" } },
+      handlers: {
+        comment: { call: { target: "/api/plugins/images/actions/comment", args: { file: "{file}", prompt: "{prompt}", reference: "{reference}" } } },
+        pick_reference: { call: { target: "/api/plugins/images/actions/ref", args: { file: "{file}", ref: "{ref}" } } },
+      },
+    }) as unknown as UiNode;
+    const baseFetch = globalThis.fetch;
+    globalThis.fetch = mock((input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+      if (url.endsWith("/actions/ref")) { calls.push({ url, body: JSON.parse(String(init?.body)) as Row }); return Promise.resolve(new Response(JSON.stringify({ id: "lib-7", label: "Dog.png" }), { status: 200 })); }
+      if (url.endsWith("/actions/comment")) { calls.push({ url, body: JSON.parse(String(init?.body)) as Row }); return Promise.resolve(new Response(JSON.stringify({ message: "Here is the change." }), { status: 200 })); }
+      return baseFetch(input, init);
+    }) as unknown as typeof fetch;
+    const pickMedia = mock(() => Promise.resolve({ id: "lib-7" }));
+    const { findByRole, getByRole, getByLabelText, getByText } = renderWithQueryClient(<Harness n={n} host={{ pickMedia }} />);
+    fireEvent.click(await findByRole("radio", { name: "Comment" }));
+    fireEvent.click(getByRole("button", { name: "Whole picture" }));
+    fireEvent.click(getByRole("button", { name: "Add a reference picture" }));
+    await waitFor(() => expect(getByText("Dog.png")).toBeTruthy());
+    expect(pickMedia).toHaveBeenCalledWith("picture");
+    expect(calls.find((c) => c.url.endsWith("/actions/ref"))!.body).toMatchObject({ file: "lib-2", ref: "lib-7" });
+    fireEvent.change(getByLabelText("Describe the change", { selector: "textarea" }), { target: { value: "Add the dog" } });
+    fireEvent.click(getByRole("button", { name: "Send" }));
+    await waitFor(() => expect(calls.some((c) => c.url.endsWith("/actions/comment"))).toBe(true));
+    expect(calls.find((c) => c.url.endsWith("/actions/comment"))!.body).toMatchObject({ reference: { id: "lib-7", label: "Dog.png" } });
+  });
+
+  test("a row with a tool says that tool is not ready: it is drawn disabled before any click with one line of why, and it is not listed under More", async () => {
+    const baseFetch = globalThis.fetch;
+    globalThis.fetch = mock((input: RequestInfo | URL, init?: RequestInit) => {
+      if (String(input).endsWith("/data/operations")) return Promise.resolve(new Response(JSON.stringify([
+        { id: "picture.remove_background", tool: "remove_background", enabled: false, reason: "Pictures are not ready yet. Try again in a minute." },
+        { id: "picture.erase", tool: "erase", enabled: false, reason: "Pictures are not ready yet. Try again in a minute." },
+        { id: "picture.crop", tool: "crop", enabled: true },
+      ]), { status: 200 }));
+      return baseFetch(input, init);
+    }) as unknown as typeof fetch;
+    const { findByRole, getByText, queryByRole } = renderWithQueryClient(<Harness />);
+    const remove = await findByRole("radio", { name: "Remove BG" });
+    await waitFor(() => expect(remove.getAttribute("aria-disabled")).toBe("true"));
+    expect(getByText("Pictures are not ready yet. Try again in a minute.")).toBeTruthy();
+    expect((await findByRole("radio", { name: "Crop" })).getAttribute("aria-disabled")).toBeNull();
+    // Only rows with no `tool` are operations: with none left there is no More tool.
+    expect(queryByRole("radio", { name: "More" })).toBeNull();
   });
 });
 

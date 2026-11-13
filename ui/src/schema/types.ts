@@ -848,6 +848,7 @@ export const ImageEditorNodeSchema = z.object({
   compare: z.boolean().default(true),
   comment_brush: z.boolean().default(true),
   operations: z.object({ bind: BindingSchema }).strict().optional(),
+  add_picture: z.object({ label: z.string().min(1).max(40).optional(), action: ActionSchema }).strict().optional(),
   handlers: z
     .object({ run: FeedHandlerSchema.optional(), apply: FeedHandlerSchema.optional(), markup: FeedHandlerSchema.optional(), comment: FeedHandlerSchema.optional(), pick_reference: FeedHandlerSchema.optional() })
     .strict()

@@ -1,3 +1,7 @@
+## [spec-v0.1.375] - 2026-11-13
+
+- EDITOR-AGE-ADD and EDITOR-TOOLS-READY, additive. `image_editor` gains `add_picture` (`{ label, action }`: an "Add a picture" control that opens the host's media picker and hands the chosen file id to `action` as `{id}`). A row of `operations` may carry `tool` (markup, comment, remove_background, erase, resize, crop or adjust): it is then the readiness of that built-in tool, `{ tool, enabled, reason }`, and is never listed under More. `handlers.pick_reference` is now run with `{ file, ref }` (`ref` is the Library file id the person chose in the host's picker).
+
 ## [spec-v0.1.374] - 2026-11-13
 
 - IMG-STUDIO-03, additive. `empty_state` gains `secondary_action` and `secondary_action_label` (a quiet second button, drawn only beside `action`). `image_editor` gains `empty_state`, `hide_when_empty` and `fields.empty` (a placeholder row draws the page's own empty state), and its `apply` and `markup` replies may carry `locked: true` and a `note` (the new version was saved behind the person's lock; the editor keeps the picture being edited and says so).
