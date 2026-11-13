@@ -952,6 +952,7 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
           id: chip.state,
           label: chip.label,
           ...(chip.group ? { group: chip.group } : {}),
+          ...(chip.icon ? { icon: chip.icon as never } : {}),
           options: chip.options.map((o) => ({ value: o.value, label: o.label })),
           value: chosen,
           onValueChange: (value: string | number) => {

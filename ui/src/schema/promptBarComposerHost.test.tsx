@@ -24,12 +24,12 @@ const node = {
   submit: { call: { target: "/api/plugins/image/actions/make", args: { prompt: "{prompt}", shape: "{shape}", tier: "{tier}" } } },
 } as unknown as UiNode;
 
-function draw(host: Partial<MediaHost>) {
+function draw(host: Partial<MediaHost>, bar: UiNode = node) {
   return renderWithQueryClient(
     <MemoryRouter>
       <PackageScopeContext.Provider value={{ packageId: "image" }}>
         <MediaHostContext.Provider value={host as MediaHost}>
-          <NodeRenderer node={node} state={{}} />
+          <NodeRenderer node={bar} state={{}} />
         </MediaHostContext.Provider>
       </PackageScopeContext.Provider>
     </MemoryRouter>,
@@ -49,6 +49,13 @@ describe("prompt_bar with the host's composer modes", () => {
     expect(view.container.querySelector('[data-slot="composer-chip-group"][data-group="Style"]')).not.toBeNull();
     expect(view.container.querySelector('[data-slot="composer-quality"]')).not.toBeNull();
     expect(view.container.querySelector("select")).toBeNull();
+  });
+
+  test("a chip's icon names its group's trigger icon; a group with no icon keeps the sliders", () => {
+    const withIcon = { ...node, chips: (node as unknown as { chips: Array<Record<string, unknown>> }).chips.map((chip) => (chip.group === "Style" ? { ...chip, icon: "palette" } : chip)) } as unknown as UiNode;
+    const view = draw({ composer: { modes, current: "picture", onModeChange: () => {} } }, withIcon);
+    expect(view.container.querySelector('[data-group="Style"] svg')?.getAttribute("class")).toContain("lucide-palette");
+    expect(view.container.querySelector('[data-group="Settings"] svg')?.getAttribute("class")).toContain("lucide-sliders-horizontal");
   });
 
   test("the host's quality list narrows the tiers (a minor never sees Max)", async () => {

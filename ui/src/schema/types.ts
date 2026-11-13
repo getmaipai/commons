@@ -565,6 +565,8 @@ export const PromptBarNodeSchema = z.object({
         quiet_value: z.union([z.string(), z.number()]).optional(),
         align: z.enum(["start", "end"]).optional(),
         icon_only: z.boolean().optional(),
+        /** ONE-COMPOSER: a name from the kit's icon set for the chip's group trigger in the modes composer (the first icon any chip of a group sets). */
+        icon: z.string().min(1).max(40).optional(),
         private: z.boolean().optional(),
       }),
     )

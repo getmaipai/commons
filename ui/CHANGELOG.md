@@ -1,3 +1,7 @@
+## [ui-v0.5.656] - 2026-11-13
+
+- ONE-COMPOSER follow-up. A prompt_bar chip in a page node takes `icon` (a name from the kit icon set); in the modes composer a combined chip's trigger shows the first icon any chip of its group sets, so Style and Settings can look different. No change when no chip sets one.
+
 ## [ui-v0.5.655] - 2026-11-13
 
 - ONE-COMPOSER one-line pass (owner: the Picture composer still looked like rows of dropdowns). The bottom row of the modes composer never wraps: mode pill, then the chips, then the primary, on one line; the chips scroll inside their own room with a fade at the edge, never onto a second row (the phone chips-on-their-own-line rule of 0.5.650 is replaced). At most three combined chips show, further groups fold into one "More" chip. A popover whose group holds three or more chip families (Look, Light, Angle, Format) opens as tabs, each section scrolling inside the popover; quiet defaults stay out of the chip's words. `mode.onAdd` also opens the top row, and a `prompt_bar` on a Create page passes the first reference slot's picker as the round "+". Every chip is now a soft filled pill with a small icon (`chip.icon`, else sliders) and its short value, settings of one group join with " · " (Kling's "1080p · 15s · 16:9"), and the primary gets a soft gradient of the theme's primary. `ui/package.json` is 0.5.655.
