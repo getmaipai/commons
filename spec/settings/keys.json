@@ -4296,7 +4296,7 @@
         "natural"
       ]
     },
-    "default": "off",
+    "default": "gentle",
     "label": "Talk before I finish",
     "help": "Lets Home answer with a short \"mm-hm\" the moment your sentence sounds finished, the way a person does, with the answer right after. If you keep talking, Home goes quiet and answers everything you said. Adults only; it needs Start answering early to be on.",
     "copy": {

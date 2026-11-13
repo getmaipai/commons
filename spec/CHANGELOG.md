@@ -1,3 +1,7 @@
+## [spec-v0.1.371] - 2026-11-12
+
+- TALK-OVER-01, additive. `voice.talk_over` now defaults to `gentle` (owner decision 2026-11-12).
+
 ## [spec-v0.1.370] - 2026-11-12
 
 - STT-SMARTTURN-01 and TALK-OVER-01, additive. Settings registry: `voice.speculative_start` now defaults to on (Home's declaration since 2026-11-12 never took effect: Home's registry keeps the spec's copy of a key the spec already carries, so the hub refused every speculative start as "off"); gains `voice.talk_over` (household, select off / gentle / natural, default off, advanced) and `voice.talk_over_window_ms` (household, number 500 to 1200, default 800, advanced), both honoured by home.
