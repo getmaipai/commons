@@ -983,26 +983,35 @@ function useMultiline(shell: RefObject<HTMLElement | null>, enabled: boolean): b
 /** The kit's own text field, for a caller whose `ComposerInputOverride` has to
  * render the real input (a draft restore, a waveform beside it) and keeps its
  * look: it carries the kit's classes, and the compact density sizes it. */
-export const ComposerInputField: FC<ComponentProps<typeof ComposerPrimitive.Input>> = ({ className, ...props }) => (
-  <ComposerPrimitive.Input
-    rows={1}
-    enterKeyHint="send"
-    aria-label={i18n._({ id: "ui.Message input", message: "Message input" })}
-    {...props}
-    className={cn(
-      "aui-composer-input caret-primary placeholder:text-muted-foreground max-h-48 min-h-10 w-full resize-none bg-transparent px-2.5 py-1 text-base leading-6 outline-none",
-      className,
-    )}
-  />
-);
+export const ComposerInputField: FC<ComponentProps<typeof ComposerPrimitive.Input>> = ({ className, placeholder, ...props }) => {
+  // ONE-COMPOSER: with `composerModes` the field is the unified panel's large borderless field, and the picked mode's placeholder wins
+  // (also for a host `ComposerInputOverride` that renders this field, so the host never has to know the mode).
+  const { composerModes, composerVariant } = useContext(ThreadComponentsContext);
+  const mode = composerModes && composerVariant !== "pill" ? (composerModes.modes.find((m) => m.id === composerModes.mode) ?? composerModes.modes[0]) : undefined;
+  const shown = mode?.placeholder ?? placeholder;
+  const fade = usePlaceholderFade(shown);
+  return (
+    <ComposerPrimitive.Input
+      rows={1}
+      enterKeyHint="send"
+      aria-label={i18n._({ id: "ui.Message input", message: "Message input" })}
+      {...props}
+      placeholder={shown}
+      data-placeholder-fade={fade}
+      className={cn(
+        "aui-composer-input caret-primary placeholder:text-muted-foreground max-h-48 min-h-10 w-full resize-none bg-transparent px-2.5 py-1 text-base leading-6 outline-none",
+        composerModes && composerVariant !== "pill" && "min-h-[4.5rem] px-1 text-xl leading-8 md:text-xl",
+        className,
+      )}
+    />
+  );
+};
 
 const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
   const { ComposerInputOverride, ComposerQuotePreview, ComposerNotice, sendHeld: sendHeldProp, composerDensity, composerVariant, composerNoticeLayout, composerNoticeReserve, composerPlaceholder, composerTourId, composerModes } = useContext(ThreadComponentsContext);
   const aui = useAui();
   const text = useAuiState((st) => st.composer.text);
   const currentMode = composerModes ? (composerModes.modes.find((m) => m.id === composerModes.mode) ?? composerModes.modes[0]) : undefined;
-  const placeholderText = currentMode?.placeholder ?? composerPlaceholder;
-  const placeholderFade = usePlaceholderFade(placeholderText);
   const slots = currentMode?.references ?? [];
   const chips = currentMode?.chips ?? [];
   const presets = currentMode?.presets;
@@ -1052,25 +1061,24 @@ const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
                 </div>
               </ComposerModeZone>
             ) : null}
-            {ComposerInputOverride && composerVariant !== "pill" ? (
-              <ComposerInputOverride />
-            ) : composerModes && composerVariant !== "pill" ? (
+            {composerModes && composerVariant !== "pill" ? (
               <div data-slot="composer-input-row" className="flex min-w-0 items-start gap-1">
                 <div className="min-w-0 flex-1">
-                  <ComposerInputField
-                    placeholder={placeholderText ?? i18n._({ id: "ui.Send a message...", message: "Send a message..." })}
-                    data-placeholder-fade={placeholderFade}
-                    autoFocus={autoFocus}
-                    submitMode={sendHeld ? "none" : undefined}
-                    className="min-h-[4.5rem] px-1 text-xl leading-8 md:text-xl"
-                  />
+                  {ComposerInputOverride ? <ComposerInputOverride /> : (
+                    <ComposerInputField
+                      placeholder={composerPlaceholder ?? i18n._({ id: "ui.Send a message...", message: "Send a message..." })}
+                      autoFocus={autoFocus}
+                      submitMode={sendHeld ? "none" : undefined}
+                    />
+                  )}
                 </div>
                 <ComposerFieldTools tools={tools} hasText={text.trim() !== ""} reasons={currentMode?.toolDisabledReasons} onTool={(tool) => { if (composerModes.onTool) composerModes.onTool(tool, currentMode!.id); else if (tool === "clear") aui.composer().setText(""); }} />
               </div>
+            ) : ComposerInputOverride && composerVariant !== "pill" ? (
+              <ComposerInputOverride />
             ) : (
               <ComposerInputField
-                placeholder={placeholderText ?? i18n._({ id: "ui.Send a message...", message: "Send a message..." })}
-                data-placeholder-fade={placeholderFade}
+                placeholder={composerPlaceholder ?? i18n._({ id: "ui.Send a message...", message: "Send a message..." })}
                 autoFocus={autoFocus}
                 submitMode={sendHeld ? "none" : undefined}
                 className={composerVariant === "pill" ? "min-h-9 flex-1 px-2 text-sm" : undefined}
