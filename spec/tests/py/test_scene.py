@@ -45,7 +45,9 @@ def observation(kind, value):
 
 def test_each_kind_valid_and_wrong_value_invalid():
     for kind, value in VALUES.items():
-        assert SceneObservation.model_validate(observation(kind, value)).root.kind == kind
+        assert (
+            SceneObservation.model_validate(observation(kind, value)).root.kind == kind
+        )
         with pytest.raises(ValidationError):
             SceneObservation.model_validate(observation(kind, {}))
 
