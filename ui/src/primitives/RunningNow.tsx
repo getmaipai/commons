@@ -19,6 +19,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/kit/ui/popover";
 import { Progress } from "@/kit/ui/progress";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/kit/ui/sheet";
 import { useBreakpoint } from "@/kit/hooks/useBreakpoint";
+import { useInsertedKeys } from "@/kit/hooks/useInsertedKeys";
 import { cn } from "@/kit/utils";
 
 export type RunningNowTone = "running" | "waiting" | "done" | "failed";
@@ -80,10 +81,10 @@ const toneDot: Record<RunningNowTone, string> = {
   failed: "bg-destructive",
 };
 
-function Row({ item, detailsLabel }: { item: RunningNowItem; detailsLabel: string }) {
+function Row({ item, detailsLabel, fresh }: { item: RunningNowItem; detailsLabel: string; fresh?: boolean }) {
   const pct = item.progress === undefined ? undefined : Math.round(Math.max(0, Math.min(1, item.progress)) * 100);
   return (
-    <li data-slot="running-now-item" data-tone={item.tone} className="flex flex-col gap-2 py-3">
+    <li data-slot="running-now-item" data-tone={item.tone} className={cn("flex flex-col gap-2 py-3", fresh && "motion-list")}>
       <div className="flex items-start gap-3">
         <span aria-hidden className={cn("mt-2 size-2 shrink-0 rounded-full", toneDot[item.tone])} />
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -134,6 +135,7 @@ function Row({ item, detailsLabel }: { item: RunningNowItem; detailsLabel: strin
 
 function Body({ heading, waitingHeading, doneLabel, emptyText, running, waiting, done, detailsLabel, headingId, showHeading }: Pick<RunningNowProps, "heading" | "waitingHeading" | "doneLabel" | "emptyText" | "running" | "waiting" | "done"> & { detailsLabel: string; headingId: string; showHeading: boolean }) {
   const empty = running.length === 0 && waiting.length === 0;
+  const inserted = useInsertedKeys([...waiting, ...running, ...done].map((item) => item.id));
   return (
     <div data-slot="running-now-body" className="flex flex-col gap-3">
       {showHeading ? <h2 id={headingId} className="text-base font-semibold">{heading}</h2> : null}
@@ -142,13 +144,13 @@ function Body({ heading, waitingHeading, doneLabel, emptyText, running, waiting,
         <section aria-label={waitingHeading} className="rounded-xl border border-[var(--tint-attention-hairline)] bg-[var(--tint-attention)] px-3">
           <h3 className="pt-3 text-base font-medium">{waitingHeading}</h3>
           <ul className="flex flex-col divide-y divide-[var(--tint-attention-hairline)]">
-            {waiting.map((item) => <Row key={item.id} item={item} detailsLabel={detailsLabel} />)}
+            {waiting.map((item) => <Row key={item.id} item={item} detailsLabel={detailsLabel} fresh={inserted.has(item.id)} />)}
           </ul>
         </section>
       ) : null}
       {running.length > 0 ? (
         <ul aria-label={heading} className="flex flex-col divide-y divide-border">
-          {running.map((item) => <Row key={item.id} item={item} detailsLabel={detailsLabel} />)}
+          {running.map((item) => <Row key={item.id} item={item} detailsLabel={detailsLabel} fresh={inserted.has(item.id)} />)}
         </ul>
       ) : null}
       {done.length > 0 ? (
@@ -161,7 +163,7 @@ function Body({ heading, waitingHeading, doneLabel, emptyText, running, waiting,
           </CollapsibleTrigger>
           <CollapsibleContent>
             <ul className="flex flex-col divide-y divide-border">
-              {done.map((item) => <Row key={item.id} item={item} detailsLabel={detailsLabel} />)}
+              {done.map((item) => <Row key={item.id} item={item} detailsLabel={detailsLabel} fresh={inserted.has(item.id)} />)}
             </ul>
           </CollapsibleContent>
         </Collapsible>

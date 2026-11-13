@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { DayDivider } from "./day-separator";
 import { cn } from "@/kit/utils";
 import { i18n } from "@/kit/i18n"
+import { useInsertedKeys } from "@/kit/hooks/useInsertedKeys";
 
 export type ActivityTone = "needs_you" | "working" | "done" | "plain";
 
@@ -35,6 +36,7 @@ const toneText = (): Record<ActivityTone, string> => ({
 });
 
 export function ActivityFeed({ groups, aside, empty, label }: ActivityFeedProps) {
+  const inserted = useInsertedKeys(groups.flatMap((group) => group.items.map((item) => item.id)));
   return (
     <section aria-label={label} data-slot="activity-feed">
       {groups.length === 0 ? empty : (
@@ -48,7 +50,7 @@ export function ActivityFeed({ groups, aside, empty, label }: ActivityFeedProps)
                   {group.items.map((item) => {
                     const tone = item.tone ?? "plain";
                     return (
-                      <li key={item.id} className="flex min-w-0 items-center gap-3 py-4">
+                      <li key={item.id} className={cn("flex min-w-0 items-center gap-3 py-4", inserted.has(item.id) && "motion-list")}>
                         <span aria-hidden="true" className={cn(
                           "size-2 shrink-0 rounded-full bg-muted-foreground",
                           tone === "needs_you" && "bg-primary",

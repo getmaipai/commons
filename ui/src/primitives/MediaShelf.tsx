@@ -10,6 +10,7 @@ import { DayDivider } from "@/kit/elements/day-separator";
 import { eyebrow } from "@/kit/elements/surfaces";
 import { CardSizeSlider, cardSizeStyle } from "@/kit/primitives/CardSizeSlider";
 import { cn, FOCUS_RING } from "@/kit/utils";
+import { useInsertedKeys } from "@/kit/hooks/useInsertedKeys";
 import { useSurface } from "@/kit/useSurface";
 import { LockTile, collapseLocked } from "@/kit/elements/adult-lock";
 import { LIKE_POP_CLASS, likeHaptic, useLikePop } from "@/kit/primitives/likeFeedback";
@@ -196,6 +197,7 @@ export function MediaShelf<T>({
   const { hasLocked, making } = collapsed;
   const reorder = useReorder(collapsed.open, getKey, reorderConfig, orientation === "vertical" ? "y" : "x");
   const items = reorder.items;
+  const inserted = useInsertedKeys(items.map((item) => String(getKey(item))));
   const reorderName = (item: T) => getReorderLabel?.(item) ?? getLabel?.(item) ?? i18n._({ id: "ui.item", message: "item" });
   // The handle and the Move buttons under (or, in rows, beside) a tile; nothing when reordering is off.
   const reorderControls = (item: T, i: number) => (reorder.enabled ? (
@@ -248,7 +250,7 @@ export function MediaShelf<T>({
               key={getKey(item)}
               aria-current={isHighlighted?.(item) ? "true" : undefined}
               {...reorder.itemProps(i)}
-              className={cn("group/row flex min-w-0 items-start gap-3", density === "compact" && "items-center", reorder.itemProps(i).className)}
+              className={cn("group/row flex min-w-0 items-start gap-3", density === "compact" && "items-center", reorder.itemProps(i).className, inserted.has(getKey(item)) && "motion-list")}
             >
               {reorder.enabled ? <span className="flex shrink-0 items-center self-center">{reorder.handle(i, reorderName(item))}</span> : null}
               {renderIndex ? (
@@ -365,7 +367,7 @@ export function MediaShelf<T>({
           key={getKey(item)}
           aria-current={isHighlighted?.(item) ? "true" : undefined}
           {...reorder.itemProps(items.indexOf(item))}
-          className={cn(reorder.itemProps(items.indexOf(item)).className, "flex flex-col gap-2", circle && "items-center text-center", layout === "grid" ? "min-w-0" : ["shrink-0 snap-start", proTiles ? "w-[156px] md:w-[176px]" : circle ? "w-[var(--media-artist-size)]" : variant === "plain" ? (density === "compact" ? PLAIN_ITEM_WIDTH_COMPACT : PLAIN_ITEM_WIDTH) : SHELF_ITEM_WIDTH[density]])}
+          className={cn(reorder.itemProps(items.indexOf(item)).className, inserted.has(getKey(item)) && "motion-list", "flex flex-col gap-2", circle && "items-center text-center", layout === "grid" ? "min-w-0" : ["shrink-0 snap-start", proTiles ? "w-[156px] md:w-[176px]" : circle ? "w-[var(--media-artist-size)]" : variant === "plain" ? (density === "compact" ? PLAIN_ITEM_WIDTH_COMPACT : PLAIN_ITEM_WIDTH) : SHELF_ITEM_WIDTH[density]])}
         >
           <TileFrame
             onPlay={onPlay ? () => onPlay(item) : undefined}

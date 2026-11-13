@@ -17,6 +17,7 @@ import { DayDivider } from "./day-separator";
 import { eyebrow } from "./surfaces";
 import { VideoPlayer, type VideoPlayerProps } from "./video-player";
 import { LockTile, type LockedRow } from "./adult-lock";
+import { useInsertedKeys } from "@/kit/hooks/useInsertedKeys";
 
 export interface ResultFeedReference {
   label: string;
@@ -200,6 +201,7 @@ export function ResultFeed({
     } else entries.push(entry as ResultFeedEntry);
   }
   const groups = groupFeedEntries(entries, grouping);
+  const inserted = useInsertedKeys(entries.map((entry) => entry.key));
   const media = look === "media";
   return (
     <section data-slot="result-feed" aria-label={label} className={cn("flex w-full flex-col gap-4", media && "@container")} data-look={media ? "media" : undefined}>
@@ -222,7 +224,7 @@ export function ResultFeed({
               const player = entry.player as VideoPlayerProps;
               const picked = [...(entry.references?.map((r) => r.label) ?? []), ...(entry.tags ?? [])];
               return (
-                <article key={entry.key} data-slot="result-feed-entry" data-status={entry.player.status} data-first={first ? "true" : undefined} aria-label={shorten(entry.words)} className={cn("flex min-w-0 flex-col gap-2", first && "@2xl:col-span-2")}>
+                <article key={entry.key} data-slot="result-feed-entry" data-status={entry.player.status} data-first={first ? "true" : undefined} aria-label={shorten(entry.words)} className={cn("flex min-w-0 flex-col gap-2", first && "@2xl:col-span-2", inserted.has(entry.key) && "motion-list")}>
                   {media ? (
                     <>
                       <VideoPlayer {...player} size={first ? "xl" : "full"} caption={false} badges={picked} chrome="overlay" actionsReveal="hover" />
