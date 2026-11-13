@@ -1,3 +1,7 @@
+## [ui-v0.5.658] - 2026-11-13
+
+- A prompt bar chip can set `icon_only` to show its selected option icon in the modes composer. The option name remains in the chip's accessible name and hover title, and the popover keeps full option names and icons. The Quality and Presets triggers also show only their icon and chevron, with their full accessible names and hover titles. A disabled chip keeps its reason as the tooltip.
+
 ## [ui-v0.5.657] - 2026-11-13
 
 - A prompt_bar reference takes `disabled_reason`. In the modes composer its slot and the round "+" draw disabled with that plain line instead of doing nothing. No change when it is not set.

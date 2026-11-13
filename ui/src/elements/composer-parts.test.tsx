@@ -93,8 +93,11 @@ describe("composer modes", () => {
     const list = modes();
     list[0] = { ...list[0]!, onTool: (t) => seen.push(t) };
     const view = render(<Harness list={list} />);
-    expect(view.getByRole("button", { name: "Presets" }).textContent).toBe("Presets");
-    fireEvent.click(view.getByRole("button", { name: "Presets" }));
+    const presets = view.getByRole("button", { name: "Presets" });
+    expect(presets.getAttribute("aria-label")).toBe("Presets");
+    expect(presets.getAttribute("title")).toBe("Presets");
+    expect(presets.textContent).not.toContain("Presets");
+    fireEvent.click(presets);
     expect(view.getByRole("radio", { name: "Poster" })).not.toBeNull();
     fireEvent.click(view.getByRole("button", { name: "Improve" }));
     fireEvent.click(view.getByRole("button", { name: "Clear" }));
@@ -133,6 +136,21 @@ describe("unified panel look", () => {
     list[0] = { ...list[0]!, chips: [shape(), { id: "n", label: "Count", group: "Settings", value: 1, onValueChange: () => {}, options: [{ value: 1, label: "1" }, { value: 4, label: "4" }] }] };
     const view = render(<Harness list={list} />);
     expect(view.getByRole("button", { name: "Settings: Landscape · 1" }).textContent).toBe("Landscape · 1");
+  });
+  test("icon-only choices show their chosen icon and name while other group choices keep text", () => {
+    const list = modes();
+    list[0] = { ...list[0]!, chips: [
+      { ...shape(), iconOnly: true, icon: "sliders-horizontal", options: [{ value: "landscape", label: "Landscape", icon: "image" }, { value: "portrait", label: "Portrait" }] },
+      { id: "count", label: "Count", group: "Settings", value: 1, onValueChange: () => {}, options: [{ value: 1, label: "1 picture" }] },
+    ] };
+    const view = render(<Harness list={list} />);
+    const trigger = view.getByRole("button", { name: "Shape: Landscape" });
+    expect(trigger.getAttribute("title")).toBe("Shape: Landscape");
+    expect(trigger.querySelector("svg")?.getAttribute("class")).toContain("lucide-image");
+    expect(trigger.textContent).toContain("1 picture");
+    fireEvent.click(trigger);
+    expect(view.getByRole("radio", { name: "Landscape" })).not.toBeNull();
+    expect(view.getByRole("radio", { name: "Portrait" })).not.toBeNull();
   });
 });
 
@@ -248,7 +266,12 @@ describe("Quality chip", () => {
     const q = { ...quality("child"), value: "thinking" };
     expect(qualityChipFor(q)!.value).toBe("standard");
     const view = render(<Harness quality={q} />);
-    fireEvent.click(view.getByRole("button", { name: /^Quality/ }));
+    const qualityTrigger = view.getByRole("button", { name: "Quality: Standard" });
+    expect(qualityTrigger.getAttribute("aria-label")).toBe("Quality: Standard");
+    expect(qualityTrigger.getAttribute("title")).toBe("Quality: Standard");
+    expect(qualityTrigger.textContent).not.toContain("Quality");
+    expect(qualityTrigger.textContent).not.toContain("Standard");
+    fireEvent.click(qualityTrigger);
     expect(view.getAllByRole("radio").map((r) => r.textContent?.replace(/(Fast|More detail|Best quality)$/, ""))).toEqual(expect.arrayContaining(["Standard", "Boost", "Max"]));
     expect(view.queryByRole("radio", { name: /Thinking|Model/ })).toBeNull();
   });

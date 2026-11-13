@@ -41,6 +41,7 @@ export interface ComposerSlotData {
 export interface ComposerChipOptionData {
   value: string | number;
   label: string;
+  icon?: IconName;
   /** One plain line under the label in the popover (for Quality: "Fast", "More detail", "Best quality"). */
   detail?: string;
 }
@@ -64,6 +65,8 @@ export interface ComposerChipData {
   note?: string;
   /** The chip's small icon (a name from the kit's icon set). A group shows the first icon any of its chips sets, else a sliders icon. */
   icon?: IconName;
+  /** Draw only the selected option icon in the grouped trigger; its accessible name still identifies the choice. */
+  iconOnly?: boolean;
 }
 
 /** The Presets button: one popover over chips the host already has (templates, styles, formats). */
@@ -337,6 +340,10 @@ function GroupIcon({ chips }: { chips: readonly ComposerChipData[] }) {
   return <Icon className="size-5 shrink-0" aria-hidden="true" />;
 }
 
+function chosenOption(chip: ComposerChipData) {
+  return chip.options.find((o) => String(o.value) === String(chip.value));
+}
+
 /** Three or more chip families in one popover (Look, Light, Angle, Format) open as tabs, one section at a time, each scrolling inside the
  * popover. Arrows, Home and End move between the tabs. */
 function ChipTabs({ chips }: { chips: readonly ComposerChipData[] }) {
@@ -378,8 +385,11 @@ function ChipTabs({ chips }: { chips: readonly ComposerChipData[] }) {
 }
 
 /** Chips that share a `group` fold into one trigger and one popover (a bottom sheet on a phone). The trigger shows the chosen words. */
-export function ComposerChipPopover({ name, chips, icon, slot = "composer-chip-group", align = "start", showSummary = true, variant = "plain" }: {
+export function ComposerChipPopover({ name, chips, icon, slot = "composer-chip-group", align = "start", showSummary = true, variant = "plain", iconOnlyTrigger = false, triggerLabel }: {
   variant?: "plain" | "soft";
+  /** Draw only the supplied icon and chevron, keeping the trigger fully named for assistive technology. */
+  iconOnlyTrigger?: boolean;
+  triggerLabel?: string;
   name: string;
   /** False keeps the trigger reading as the name (the Presets button), not the chosen words. */
   showSummary?: boolean;
@@ -391,8 +401,14 @@ export function ComposerChipPopover({ name, chips, icon, slot = "composer-chip-g
   const phone = useIsPhoneLayout();
   const [open, setOpen] = useState(false);
   const summary = showSummary ? chips.map(chosenLabel).filter(Boolean).join(" · ") : "";
+  const iconOnlyChip = chips.find((chip) => chip.iconOnly);
+  const iconOnlyOption = iconOnlyChip ? chosenOption(iconOnlyChip) : undefined;
+  const iconOnlyName = iconOnlyChip && iconOnlyOption ? `${iconOnlyChip.label}: ${iconOnlyOption.label}` : undefined;
+  const IconOnly = iconOnlyOption?.icon ?? iconOnlyChip?.icon ?? chips.find((chip) => chip.icon)?.icon ?? "sliders-horizontal";
+  const ChosenIcon = IconOnly ? getIcon(IconOnly) : undefined;
   const unavailable = chips.every((c) => Boolean(c.disabledReason));
   const reason = chips.find((c) => c.disabledReason)?.disabledReason;
+  const accessibleName = triggerLabel ?? iconOnlyName ?? (summary ? i18n._({ id: "ui.{name}: {summary}", message: "{name}: {summary}", values: { name, summary } }) : name);
   const trigger = (
     <button
       type="button"
@@ -400,12 +416,12 @@ export function ComposerChipPopover({ name, chips, icon, slot = "composer-chip-g
       data-group={name}
       aria-haspopup="dialog"
       aria-expanded={open}
-      aria-label={summary ? i18n._({ id: "ui.{name}: {summary}", message: "{name}: {summary}", values: { name, summary } }) : name}
-      title={unavailable ? reason : undefined}
+      aria-label={accessibleName}
+      title={unavailable ? reason : (iconOnlyTrigger ? accessibleName : iconOnlyName)}
       onClick={phone ? () => setOpen(true) : undefined}
       className={cn(variant === "soft" ? SOFT : CHIP, unavailable && "opacity-60")}
     >
-      {icon ?? <GroupIcon chips={chips} />}<span className="min-w-0 truncate">{summary || name}</span><ChevronDown className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+      {iconOnlyTrigger ? icon ?? <GroupIcon chips={chips} /> : iconOnlyChip ? (ChosenIcon ? <ChosenIcon className="size-5 shrink-0" aria-hidden="true" /> : icon ?? <GroupIcon chips={chips} />) : icon ?? <GroupIcon chips={chips} />}{iconOnlyTrigger ? null : iconOnlyChip ? (chips.filter((chip) => chip !== iconOnlyChip).length > 0 ? <span className="min-w-0 truncate">{chips.filter((chip) => chip !== iconOnlyChip).map(chosenLabel).filter(Boolean).join(" · ")}</span> : null) : <span className="min-w-0 truncate">{summary || name}</span>}<ChevronDown className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
     </button>
   );
   const body = chips.length >= 3 ? <ChipTabs chips={chips} /> : <div className="flex min-w-0 flex-col gap-4">{chips.map((c) => <OptionRadios key={c.id} chip={c} />)}</div>;
@@ -475,7 +491,7 @@ export function ComposerChips({ chips, quality }: { chips: readonly ComposerChip
     <div ref={row} data-slot="composer-chips" className="flex min-w-0 touch-pan-x flex-nowrap items-center gap-1.5 overflow-x-auto [scrollbar-width:none] data-[overflow=true]:[mask-image:linear-gradient(to_right,black_calc(100%-28px),transparent)] [&::-webkit-scrollbar]:hidden">
       {shown.map((g) => <ComposerChipPopover key={g.name} name={g.name} chips={g.chips} />)}
       {rest.length > 0 ? <ComposerChipPopover name={i18n._({ id: "ui.More", message: "More" })} chips={rest} showSummary={false} slot="composer-more" /> : null}
-      {quality ? <ComposerChipPopover name={quality.label} chips={[quality]} slot="composer-quality" icon={<Sparkles className="size-5 shrink-0" aria-hidden="true" />} /> : null}
+      {quality ? <ComposerChipPopover name={quality.label} chips={[quality]} slot="composer-quality" icon={<Sparkles className="size-5 shrink-0" aria-hidden="true" />} iconOnlyTrigger triggerLabel={`${quality.label}: ${chosenOption(quality)?.label ?? quality.label}`} /> : null}
     </div>
   );
 }
@@ -484,7 +500,7 @@ export function ComposerChips({ chips, quality }: { chips: readonly ComposerChip
 export function ComposerPresetsButton({ presets }: { presets: ComposerPresetsData }) {
   if (presets.chips.length === 0) return null;
   const name = presets.label ?? i18n._({ id: "ui.Presets", message: "Presets" });
-  return <ComposerChipPopover name={name} chips={presets.chips} slot="composer-presets" showSummary={false} variant="soft" icon={<SlidersHorizontal className="size-5 shrink-0" aria-hidden="true" />} align="end" />;
+  return <ComposerChipPopover name={name} chips={presets.chips} slot="composer-presets" showSummary={false} variant="soft" icon={<SlidersHorizontal className="size-5 shrink-0" aria-hidden="true" />} iconOnlyTrigger triggerLabel={name} align="end" />;
 }
 
 /** The field-end tools: clear, improve, lyrics. Each is an icon button with a name; a tool the engine cannot run is drawn disabled with its reason. */

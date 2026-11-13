@@ -955,7 +955,7 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
           label: chip.label,
           ...(chip.group ? { group: chip.group } : {}),
           ...(chip.icon ? { icon: chip.icon as never } : {}),
-          options: chip.options.map((o) => ({ value: o.value, label: o.label })),
+          options: chip.options.map((o) => ({ value: o.value, label: o.label, ...(o.icon ? { icon: o.icon as never } : {}) })),
           value: chosen,
           onValueChange: (value: string | number) => {
             setPicked((prev) => ({ ...prev, [chip.state]: value }));
@@ -963,6 +963,7 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
           },
           ...(unusable && chip.disabled_reason ? { disabledReason: chip.disabled_reason } : {}),
           ...(chip.quiet_value !== undefined ? { quietValue: chip.quiet_value } : {}),
+          ...(chip.icon_only !== undefined ? { iconOnly: chip.icon_only } : {}),
           ...(cards ? {
             variant: "cards" as const,
             cardOptions: [

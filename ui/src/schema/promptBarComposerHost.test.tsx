@@ -58,6 +58,18 @@ describe("prompt_bar with the host's composer modes", () => {
     expect(view.container.querySelector('[data-group="Settings"] svg')?.getAttribute("class")).toContain("lucide-sliders-horizontal");
   });
 
+  test("modes composer passes icon_only and option icons through to the shared chip", () => {
+    const bar = { ...node, chips: [{ state: "shape", label: "Shape", group: "Settings", icon_only: true, icon: "sliders-horizontal", default: "wide", options: [{ value: "wide", label: "Landscape", icon: "image" }, { value: "tall", label: "Portrait" }] }] } as unknown as UiNode;
+    const view = draw({ composer: { modes, current: "picture", onModeChange: () => {} } }, bar);
+    const trigger = view.getByRole("button", { name: "Shape: Landscape" });
+    expect(trigger.getAttribute("title")).toBe("Shape: Landscape");
+    expect(trigger.querySelector("svg")?.getAttribute("class")).toContain("lucide-image");
+    expect(trigger.textContent).not.toContain("Landscape");
+    fireEvent.click(trigger);
+    expect(view.getByRole("radio", { name: "Landscape" })).not.toBeNull();
+    expect(view.getByRole("radio", { name: "Portrait" })).not.toBeNull();
+  });
+
   test("a reference with a disabled_reason draws its slot and the plus disabled with that line", () => {
     const line = "Starting a picture from a reference is coming next.";
     const bar = { ...node, references: [{ state: "reference", label: "Image reference", kind: "picture", disabled_reason: line }] } as unknown as UiNode;
@@ -70,7 +82,11 @@ describe("prompt_bar with the host's composer modes", () => {
 
   test("the host's quality list narrows the tiers (a minor never sees Max)", async () => {
     const view = draw({ composer: { modes, current: "picture", onModeChange: () => {}, quality: ["standard", "boost"] } });
-    fireEvent.click(view.container.querySelector('[data-slot="composer-quality"]')!);
+    const trigger = view.container.querySelector('[data-slot="composer-quality"]') as HTMLButtonElement;
+    expect(trigger.getAttribute("aria-label")).toBe("Quality: Standard");
+    expect(trigger.getAttribute("title")).toBe("Quality: Standard");
+    expect(trigger.textContent).not.toContain("Standard");
+    fireEvent.click(trigger);
     await waitFor(() => expect(document.body.textContent).toContain("Boost"));
     expect(document.body.textContent).not.toContain("Max");
   });
@@ -98,6 +114,9 @@ describe("prompt_bar with the host's composer modes", () => {
 
   test("the host's presets draw one Presets pill on the current mode", () => {
     const view = draw({ composer: { modes, current: "picture", onModeChange: () => {}, presets: { chips: [{ id: "look", label: "Look", group: "Look / Light", value: "none", onValueChange: () => {}, options: [{ value: "none", label: "None" }, { value: "noir", label: "Noir" }] }] } } });
-    expect(view.getByRole("button", { name: "Presets" }).textContent).toBe("Presets");
+    const trigger = view.getByRole("button", { name: "Presets" });
+    expect(trigger.getAttribute("aria-label")).toBe("Presets");
+    expect(trigger.getAttribute("title")).toBe("Presets");
+    expect(trigger.textContent).not.toContain("Presets");
   });
 });
