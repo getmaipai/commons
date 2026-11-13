@@ -832,8 +832,8 @@
         "actions": {
           "type": "array",
           "maxItems": 3,
-          "items": { "type": "object", "additionalProperties": false, "required": ["label", "action"], "properties": { "label": { "type": "string", "minLength": 1, "maxLength": 40 }, "action": { "$ref": "#/$defs/action" } } },
-          "description": "EDITOR-HANDOFF: the page's own hand-offs for the picture on screen, drawn as quiet buttons in the editor's header (for example \"Make a video from this\", a `navigate` to the Video Create form with `state: { start_frame: \"{file}\" }`). `{file}` is the Library file id of the version being shown. A hand-off fills a form and starts nothing."
+          "items": { "type": "object", "additionalProperties": false, "required": ["label"], "oneOf": [{ "required": ["action"], "properties": { "action": {} } }, { "required": ["hand_off"], "properties": { "hand_off": {} } }], "properties": { "label": { "type": "string", "minLength": 1, "maxLength": 40 }, "action": { "$ref": "#/$defs/action" }, "hand_off": { "type": "string", "enum": ["video_create"] } } },
+          "description": "EDITOR-HANDOFF: the page's own hand-offs for the picture on screen, drawn as quiet buttons in the editor's header. Each has a `label` and exactly one of `action` (run with `{file}` set to the Library file id of the version being shown; it stays inside this package like every page action) or `hand_off`. `hand_off: \"video_create\"` (\"Make a video from this\") asks the host to open the Video app's Create form with the picture as its start picture: a package page cannot navigate into another app, so the host does it. A hand-off fills a form and starts nothing. A host with no hand-off draws the button disabled with a one-line reason."
         },
         "handlers": {
           "type": "object",

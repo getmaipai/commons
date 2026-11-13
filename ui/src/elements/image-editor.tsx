@@ -196,6 +196,8 @@ export interface ImageEditorAction {
   key: string;
   label: string;
   onSelect: (version: ImageEditorVersion) => void;
+  /** Set when the hand-off cannot be used now: the button stays, looks off, and tapping it says this in one line. */
+  disabledReason?: string;
 }
 
 /** A picture the person chose as a reference for a Comment. */
@@ -1030,7 +1032,7 @@ export function ImageEditor({
         )
       ) : null}
       {current ? (actions ?? []).map((action) => (
-        <Button key={action.key} type="button" variant="ghost" size="sm" data-slot="image-editor-action" onClick={() => action.onSelect(current)}>
+        <Button key={action.key} type="button" variant="ghost" size="sm" data-slot="image-editor-action" aria-disabled={action.disabledReason ? true : undefined} title={action.disabledReason} className={action.disabledReason ? "opacity-50" : undefined} onClick={() => (action.disabledReason ? setNotice(action.disabledReason) : action.onSelect(current))}>
           {action.label}
         </Button>
       )) : null}

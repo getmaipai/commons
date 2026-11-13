@@ -166,6 +166,16 @@ describe("layout and names", () => {
     expect(onSelect.mock.calls[0]![0]).toEqual(versions[1]!);
   });
 
+  test("a hand-off with a disabledReason stays, looks off, does nothing and says why (EDITOR-HANDOFF)", () => {
+    const onSelect = mock((_v: ImageEditorVersion) => {});
+    const v = setup({ actions: [{ key: "video", label: "Make a video from this", onSelect, disabledReason: "Video is not ready yet. Try again in a minute." }] });
+    const button = v.getByRole("button", { name: "Make a video from this" });
+    expect(button.getAttribute("aria-disabled")).toBe("true");
+    fireEvent.click(button);
+    expect(onSelect).not.toHaveBeenCalled();
+    expect(v.getByText("Video is not ready yet. Try again in a minute.")).toBeTruthy();
+  });
+
   test("Download triggers an anchor download of the current version", () => {
     const v = setup({ downloadName: "sunset.png" });
     fireEvent.click(v.getByRole("button", { name: "Download" }));

@@ -67,6 +67,8 @@ export interface MediaHost {
   /** VIDEO-CREATE-02: opens the host's media picker (the Library, or an upload) for a `prompt_bar` reference slot of this kind and
    * resolves with the chosen file id and an optional thumbnail address, or null when the person cancels. Absent: the slot
    * stays empty and is disabled, because the kit has no uploader of its own. */
+  /** EDITOR-HANDOFF: opens one of the host's own forms with a picture in place and starts nothing (`video_create`: the Video app's Create form with the picture as its start picture). A package page cannot navigate outside its own package, so a hand-off to another app goes through the host. Absent: the control that asks for it is drawn disabled with the reason. */
+  handOff?(to: "video_create", item: { file: string }): void;
   pickMedia?(kind: "picture" | "character" | "place" | "audio" | "video"): Promise<{ id: string; thumb?: string } | null>;
   /** VIDEO-UI-03 (K8): the one plain line to show instead of a control that starts a picture or a clip while that engine is not
    * ready ("Video is not ready yet. Try again in a minute."), or undefined when it is ready. A `prompt_bar` with `starts` uses it as

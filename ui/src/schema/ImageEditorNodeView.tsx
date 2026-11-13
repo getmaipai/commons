@@ -310,7 +310,16 @@ function EditorOpen({ node, row, operations, toolStates }: { node: ImageEditorNo
   }, [tools, toolStates]);
 
   // EDITOR-HANDOFF: the page's own hand-offs; each runs its action with the version on screen as `{file}` and starts nothing itself.
-  const handoffs = useMemo(() => (node.actions ?? []).map((a, i) => ({ key: `action-${i}`, label: a.label, onSelect: (version: ImageEditorVersion) => dispatch(a.action, [{ file: version.id }]) })), [node.actions, dispatch]);
+  const handoffs = useMemo(() => (node.actions ?? []).map((a, i) => ({
+    key: `action-${i}`,
+    label: a.label,
+    // A hand-off to another app goes through the host (a package page cannot navigate out of its package); without one the button says why it is off.
+    ...(a.hand_off && !host?.handOff ? { disabledReason: i18n._({ id: "ui.That is not available on this screen.", message: "That is not available on this screen." }) } : {}),
+    onSelect: (version: ImageEditorVersion) => {
+      if (a.hand_off) host?.handOff?.(a.hand_off, { file: version.id });
+      else if (a.action) dispatch(a.action, [{ file: version.id }]);
+    },
+  })), [node.actions, dispatch, host]);
 
   const shownOperations = !node.tools || node.tools.includes("more") ? operations : undefined;
 

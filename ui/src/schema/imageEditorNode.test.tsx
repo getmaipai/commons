@@ -287,6 +287,25 @@ describe("image_editor node: Add a picture, reference picture, tools not ready (
     expect(calls.filter((c) => c.url.includes("/actions/")).length).toBe(1);
   });
 
+  test("a hand_off goes through the host with the version on screen; with no host hand-off the button stays, looks off and says why", async () => {
+    const n = ImageEditorNodeSchema.parse({
+      type: "image_editor",
+      bind: { source: "package", path: "picture", params: { id: "$state.file" } },
+      actions: [{ label: "Make a video from this", hand_off: "video_create" }],
+    }) as unknown as UiNode;
+    const handOff = mock((_to: string, _item: { file: string }) => {});
+    const first = renderWithQueryClient(<Harness n={n} host={{ handOff }} />);
+    fireEvent.click(await first.findByRole("button", { name: "Make a video from this" }));
+    expect(handOff).toHaveBeenCalledWith("video_create", { file: "lib-2" });
+    expect(calls.filter((c) => c.url.includes("/actions/")).length).toBe(0);
+    cleanup();
+    const second = renderWithQueryClient(<Harness n={n} />);
+    const off = await second.findByRole("button", { name: "Make a video from this" });
+    expect(off.getAttribute("aria-disabled")).toBe("true");
+    fireEvent.click(off);
+    expect(second.getByText("That is not available on this screen.")).toBeTruthy();
+  });
+
   test("a row with a tool says that tool is not ready: it is drawn disabled before any click with one line of why, and it is not listed under More", async () => {
     const baseFetch = globalThis.fetch;
     globalThis.fetch = mock((input: RequestInfo | URL, init?: RequestInit) => {

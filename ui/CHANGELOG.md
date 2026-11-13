@@ -1,3 +1,7 @@
+## [ui-v0.5.630] - 2026-11-13
+
+- EDITOR-HANDOFF, additive, with spec 0.1.377. `MediaHost` gains `handOff(to, { file })`; an `image_editor` `actions` entry may use `hand_off: "video_create"`. With no host hand-off the button is drawn disabled and says so. `ImageEditorAction` gains `disabledReason`.
+
 ## [ui-v0.5.629] - 2026-11-13
 
 - EDITOR-HANDOFF, additive, with spec 0.1.376. `ImageEditor` gains `actions` (`{ key, label, onSelect }`): quiet header buttons for the host's own hand-offs, called with the current version. `image_editor` gains `actions`, so a page can offer "Make a video from this" (a `navigate` to the Video Create form with the picture as its start picture) without a wrapper.

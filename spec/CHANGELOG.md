@@ -1,3 +1,7 @@
+## [spec-v0.1.377] - 2026-11-13
+
+- EDITOR-HANDOFF, additive. An `image_editor` `actions` entry takes `hand_off: "video_create"` instead of `action`: the host opens the Video app's Create form with the picture in place and starts nothing (a package page cannot navigate into another app).
+
 ## [spec-v0.1.376] - 2026-11-13
 
 - EDITOR-HANDOFF, additive. `image_editor` gains `actions` (up to three `{ label, action }`): the page's own hand-offs for the picture on screen, drawn as header buttons; each runs its action with `{file}` set to the Library file id of the version being shown and starts nothing itself.

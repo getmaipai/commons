@@ -548,8 +548,11 @@ describe("UI schema, package apps", () => {
 
   test("EDITOR-HANDOFF: image_editor takes up to three hand-offs, each with a label and an action", () => {
     const editor = { type: "image_editor", bind: { source: "package", path: "picture" } };
-    const one = { label: "Make a video from this", action: { navigate: { to: "/apps/video/create", state: { start_frame: "{file}" } } } };
+    const one = { label: "Make a video from this", action: { navigate: { to: "/apps/image/studio", state: { file: "{file}" } } } };
+    const handOff = { label: "Make a video from this", hand_off: "video_create" };
     expect(validate({ ...editor, actions: [one] })).toBe(true);
+    expect(validate({ ...editor, actions: [handOff] })).toBe(true);
+    for (const bad of [{ label: "x" }, { ...handOff, action: one.action }, { ...handOff, hand_off: "photo" }]) expect(validate({ ...editor, actions: [bad] })).toBe(false);
     expect(validate({ ...editor, actions: [one, one, one] })).toBe(true);
     for (const patch of [{ actions: [one, one, one, one] }, { actions: [{ label: "x" }] }, { actions: [{ ...one, label: "" }] }, { actions: [{ ...one, extra: 1 }] }]) {
       expect(validate({ ...editor, ...patch })).toBe(false);
