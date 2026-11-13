@@ -1,3 +1,7 @@
+## [spec-v0.1.393] - 2026-11-13
+
+- INSTANT-FILLER-01a: update `voice.talk_over` copy to describe the varied short spoken cues Home uses.
+
 ## [spec-v0.1.392] - 2026-11-13
 
 - `media_shelf` accepts optional `poll_while: { field, values }` to refetch its bound rows while any row's configured field has a value that means work is still in progress (matches ui 0.5.664).
