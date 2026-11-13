@@ -37,6 +37,10 @@
 | `prompt-bar` `suggestedStyles` and `onDismissSuggestion` (schema: `style_suggest`) | STYLES-04, 2026-11-06; home `docs/design/styles-one-system-2026-11-05.md` section 4 | The Create pages must show up to two removable suggested style chips under the prompt, driven by what is typed, with the person confirming by leaving one on. `PromptBar` has suggestion idea chips (text into the box) and option chips, neither of which is a removable, named, per-prompt suggestion that feeds the submit. A Home wrapper is forbidden (rules 9 and 9b), so this is an optional prop of the shipped part and its schema field, default unchanged. | none new: the shipped `lucide-react` X icon | ui-v0.5.503 |
 | `elements` `MusicTrack` edit dialog phone fit (elements/music-track.tsx) | Owner, 2026-11-02: the new edit dialog clipped its content on a phone; the column is `minmax(0,1fr)` and the tab row scrolls. No prop changes. |
 
+## ui-v0.5.643: ImageEditor panels are popovers (EDITOR-MENU-ANCHOR)
+
+Owner report (Jesse, 2026-11-13). Decision: the More menu and every tool option panel are the kit `Popover` anchored to the tool button (side bottom, top on the phone layout, collision padding 8), so they take `motion-reveal` like every other floating surface. More and Resize are menus: a press anywhere outside, the picture too, and a scroll close them. Markup, Comment, Erase, Remove BG, Crop and Adjust are working tools: their panel stays while the person works on the picture and closes on a press elsewhere (the tool stays chosen; pressing it reopens the panel). Outside presses are caught in the capture phase because the crop frame stops propagation.
+
 ## ui-v0.5.420: ProgressRing and bottom tabs
 
 `ProgressRing` is a pure display component with caller supplied fractional progress, centered content, token colors, an accessible percentage, and an SVG arc that starts at 12 o'clock. Its transition respects reduced motion. `TabsList` adds a `bottom` variant for full width phone navigation, with equal width 48 px minimum triggers and safe-area padding; `position="sticky"` sticks the list to its container bottom. Existing default and line styles remain unchanged.
