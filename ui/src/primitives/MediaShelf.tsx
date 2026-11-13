@@ -1,4 +1,4 @@
-import { Children, isValidElement, type ReactNode, type RefObject } from "react";
+import { Children, isValidElement, type ComponentProps, type ImgHTMLAttributes, type ReactNode, type RefObject } from "react";
 import { Card } from "@/kit/primitives/Card";
 import { SafeImage } from "@/kit/primitives/SafeImage";
 import { Button } from "@/kit/ui/button";
@@ -478,20 +478,22 @@ function TileArtwork({ media, look }: { media: ReactNode; look: "default" | "bac
     <>
       <img src={image.src} alt="" aria-hidden="true" data-slot="media-tile-backdrop" className="pointer-events-none absolute inset-0 size-full scale-110 object-cover opacity-60 blur-xl" />
       {image.safe
-        ? <SafeImage {...image.props} className={cn(image.props.className, "relative z-0 object-contain motion-safe:transition-transform motion-safe:duration-[var(--motion-pill)] motion-safe:ease-[var(--press-ease)] group-hover/tile:scale-[1.03] group-focus-within/tile:scale-[1.03]")} />
-        : <img {...image.props} src={image.src} alt={image.props.alt ?? ""} className={cn(image.props.className, "relative z-0 object-contain motion-safe:transition-transform motion-safe:duration-[var(--motion-pill)] motion-safe:ease-[var(--press-ease)] group-hover/tile:scale-[1.03] group-focus-within/tile:scale-[1.03]")} />}
+        ? <SafeImage {...(image.props as ComponentProps<typeof SafeImage>)} className={cn(image.props.className, "relative z-0 object-contain motion-safe:transition-transform motion-safe:duration-[var(--motion-pill)] motion-safe:ease-[var(--press-ease)] group-hover/tile:scale-[1.03] group-focus-within/tile:scale-[1.03]")} />
+        : <img {...(image.props as ImgHTMLAttributes<HTMLImageElement>)} src={image.src} alt={image.props.alt ?? ""} className={cn(image.props.className, "relative z-0 object-contain motion-safe:transition-transform motion-safe:duration-[var(--motion-pill)] motion-safe:ease-[var(--press-ease)] group-hover/tile:scale-[1.03] group-focus-within/tile:scale-[1.03]")} />}
     </>
   );
 }
 
-function findTileImage(node: ReactNode): { src: string; safe: boolean; props: Record<string, any> } | undefined {
+type TileImageProps = { src?: string; alt?: string; className?: string } & Record<string, unknown>;
+
+function findTileImage(node: ReactNode): { src: string; safe: boolean; props: TileImageProps } | undefined {
   if (!isValidElement(node)) return undefined;
   if (node.type === "img") {
-    const props = node.props as Record<string, any>;
+    const props = node.props as TileImageProps;
     return typeof props.src === "string" ? { src: props.src, safe: false, props } : undefined;
   }
   if (node.type === SafeImage) {
-    const props = node.props as Record<string, any>;
+    const props = node.props as TileImageProps;
     return typeof props.src === "string" ? { src: props.src, safe: true, props } : undefined;
   }
   return findTileImage((node.props as { children?: ReactNode }).children);
