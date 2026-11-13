@@ -111,6 +111,30 @@ describe("composer modes", () => {
   });
 });
 
+describe("unified panel look", () => {
+  test("one large panel, borderless large field, plain chips, one big primary button with its words", () => {
+    const view = render(<Harness />);
+    const panel = view.container.querySelector('[data-slot="prompt-bar-composer"]') as HTMLElement;
+    expect(panel.getAttribute("data-unified")).toBe("true");
+    expect(panel.className).toContain("rounded-[30px]");
+    expect(panel.className).toContain("--hairline");
+    expect(view.getByRole("textbox", { name: "Describe" }).className).toContain("text-xl");
+    const chip = view.getByRole("button", { name: "Settings: Landscape" });
+    expect(chip.className).not.toMatch(/\bborder\b|bg-background/);
+    expect(chip.textContent).toBe("Landscape");
+    const primary = view.getByRole("button", { name: "Generate" });
+    expect(primary.textContent).toBe("Generate");
+    expect(primary.className).toContain("h-14");
+    expect(primary.className).toContain("bg-primary");
+  });
+  test("several settings of a group read joined with a slash in one chip", () => {
+    const list = modes();
+    list[0] = { ...list[0]!, chips: [shape(), { id: "n", label: "Count", group: "Settings", value: 1, onValueChange: () => {}, options: [{ value: 1, label: "1" }, { value: 4, label: "4" }] }] };
+    const view = render(<Harness list={list} />);
+    expect(view.getByRole("button", { name: "Settings: Landscape / 1" }).textContent).toBe("Landscape / 1");
+  });
+});
+
 describe("Quality chip", () => {
   const quality = (band?: ComposerQualityData["band"]): ComposerQualityData => ({
     value: "boost", onValueChange: () => {}, band,

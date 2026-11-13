@@ -18,7 +18,7 @@ import {
   ReasoningText,
   ReasoningTrigger,
 } from "./reasoning.aui";
-import { ComposerChips, ComposerFieldTools, ComposerModePill, ComposerModeZone, ComposerPresetsButton, ComposerSlots, qualityChipFor, usePlaceholderFade, type ComposerModeData, type ComposerQualityData, type ComposerTool, ComposerChipPopover } from "./composer-parts";
+import { ComposerChips, ComposerFieldTools, ComposerModePill, ComposerModeZone, ComposerPresetsButton, ComposerSlots, qualityChipFor, usePlaceholderFade, type ComposerModeData, type ComposerQualityData, type ComposerTool } from "./composer-parts";
 import { ThinkingIndicator } from "./thinking-indicator";
 import { ToolFallback } from "./tool-fallback.aui";
 import {
@@ -81,6 +81,7 @@ import {
   useRef,
   useState,
   type ComponentType,
+  type CSSProperties,
   type RefObject,
   type ComponentProps,
   type FC,
@@ -1021,6 +1022,8 @@ const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
             data-slot="aui_composer-shell"
             data-density={composerDensity}
             data-composer-variant={composerVariant}
+            data-unified={composerModes && composerVariant !== "pill" ? "true" : undefined}
+            style={composerModes && composerVariant !== "pill" ? ({ "--composer-radius": "30px", "--composer-padding": "20px" } as CSSProperties) : undefined}
             data-multiline={multiline ? "" : undefined}
             className={cn("border-foreground/10 focus-within:border-foreground/25 data-[dragging=true]:border-ring flex w-full cursor-text border bg-(--composer-bg) transition-[border-color]", composerVariant === "pill" ? "items-center gap-1 rounded-full p-1" : "flex-col gap-2 rounded-(--composer-radius) p-(--composer-padding)", "data-[dragging=true]:border-dashed data-[dragging=true]:bg-[color-mix(in_oklab,var(--color-accent)_50%,var(--color-background))]")}
           >
@@ -1041,22 +1044,30 @@ const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
                 <ComposerPrimitive.StopDictation asChild><TooltipIconButton tooltip={i18n._({ id: "ui.Stop dictation", message: "Stop dictation" })} side="top" type="button" variant="ghost" size="icon" className="size-9 shrink-0 rounded-full" aria-label={i18n._({ id: "ui.Stop dictation", message: "Stop dictation" })}><SquareIcon aria-hidden="true" className="size-4" /></TooltipIconButton></ComposerPrimitive.StopDictation>
               </AuiIf>
             </> : null}
+            {composerModes && composerVariant !== "pill" && composerModes.modes.some((m) => (m.references?.length ?? 0) > 0 || m.presets) ? (
+              <ComposerModeZone modeId={currentMode?.id ?? ""} open={rowOpen} className="data-[open=false]:-mb-5">
+                <div data-slot="composer-mode-row" className="flex min-w-0 touch-pan-x flex-nowrap items-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:flex-wrap sm:overflow-visible">
+                  <ComposerSlots slots={slots} />
+                  {presets ? <div className="ml-auto shrink-0"><ComposerPresetsButton presets={presets} /></div> : null}
+                </div>
+              </ComposerModeZone>
+            ) : null}
             {ComposerInputOverride && composerVariant !== "pill" ? (
               <ComposerInputOverride />
-            ) : (
-              tools.length > 0 && composerVariant !== "pill" ? (
-                <div data-slot="composer-input-row" className="flex min-w-0 items-start gap-1">
-                  <div className="min-w-0 flex-1">
-                    <ComposerInputField
-                      placeholder={placeholderText ?? i18n._({ id: "ui.Send a message...", message: "Send a message..." })}
-                      data-placeholder-fade={placeholderFade}
-                      autoFocus={autoFocus}
-                      submitMode={sendHeld ? "none" : undefined}
-                    />
-                  </div>
-                  <ComposerFieldTools tools={tools} hasText={text.trim() !== ""} reasons={currentMode?.toolDisabledReasons} onTool={(tool) => { if (composerModes?.onTool) composerModes.onTool(tool, currentMode!.id); else if (tool === "clear") aui.composer().setText(""); }} />
+            ) : composerModes && composerVariant !== "pill" ? (
+              <div data-slot="composer-input-row" className="flex min-w-0 items-start gap-1">
+                <div className="min-w-0 flex-1">
+                  <ComposerInputField
+                    placeholder={placeholderText ?? i18n._({ id: "ui.Send a message...", message: "Send a message..." })}
+                    data-placeholder-fade={placeholderFade}
+                    autoFocus={autoFocus}
+                    submitMode={sendHeld ? "none" : undefined}
+                    className="min-h-[4.5rem] px-1 text-xl leading-8 md:text-xl"
+                  />
                 </div>
-              ) : (
+                <ComposerFieldTools tools={tools} hasText={text.trim() !== ""} reasons={currentMode?.toolDisabledReasons} onTool={(tool) => { if (composerModes.onTool) composerModes.onTool(tool, currentMode!.id); else if (tool === "clear") aui.composer().setText(""); }} />
+              </div>
+            ) : (
               <ComposerInputField
                 placeholder={placeholderText ?? i18n._({ id: "ui.Send a message...", message: "Send a message..." })}
                 data-placeholder-fade={placeholderFade}
@@ -1064,17 +1075,7 @@ const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
                 submitMode={sendHeld ? "none" : undefined}
                 className={composerVariant === "pill" ? "min-h-9 flex-1 px-2 text-sm" : undefined}
               />
-              )
             )}
-            {composerModes && composerVariant !== "pill" && composerModes.modes.some((m) => (m.references?.length ?? 0) > 0 || (m.chips?.length ?? 0) > 0 || m.presets) ? (
-              <ComposerModeZone modeId={currentMode?.id ?? ""} open={rowOpen} className="data-[open=false]:-mb-2">
-                <div data-slot="composer-mode-row" className="flex min-w-0 touch-pan-x flex-nowrap items-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:flex-wrap sm:overflow-visible">
-                  <ComposerSlots slots={slots} />
-                  <ComposerChips chips={chips} />
-                  {presets ? <div className="ml-auto shrink-0"><ComposerPresetsButton presets={presets} /></div> : null}
-                </div>
-              </ComposerModeZone>
-            ) : null}
             <ComposerAction pill={composerVariant === "pill"} />
           </div>
         </DraftRestoreRegionContext.Provider>
@@ -1096,13 +1097,15 @@ const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
   );
 };
 
-/** The mode pill and the Quality chip, in the trailing group beside Send. */
-const ComposerModeControls: FC<{ composerModes: ThreadComposerModes }> = ({ composerModes }) => {
-  const quality = qualityChipFor(composerModes.quality);
+/** The mode pill and the mode's chips, in the leading group after "+": one bottom row, the chips scrolling sideways on a phone. */
+const ComposerModeLeading: FC<{ composerModes: ThreadComposerModes }> = ({ composerModes }) => {
+  const mode = composerModes.modes.find((m) => m.id === composerModes.mode) ?? composerModes.modes[0];
   return (
     <>
-      {quality ? <ComposerChipPopover name={quality.label} chips={[quality]} slot="composer-quality" align="end" /> : null}
       <ComposerModePill modes={composerModes.modes} mode={composerModes.mode} onModeChange={composerModes.onModeChange} />
+      <div key={mode?.id} className="motion-fade min-w-0 flex-1 sm:flex-none">
+        <ComposerChips chips={mode?.chips ?? []} quality={qualityChipFor(composerModes.quality)} />
+      </div>
     </>
   );
 };
@@ -1120,13 +1123,13 @@ const ComposerAction: FC<{ pill?: boolean }> = ({ pill = false }) => {
     </AuiIf>
   </div>;
   return (
-    <div className="aui-composer-action-wrapper relative flex items-center justify-between">
-      <div className="flex items-center gap-1.5">
+    <div className="aui-composer-action-wrapper relative flex min-w-0 items-center justify-between gap-2">
+      <div className={cn("flex items-center gap-1.5", composerModes && "min-w-0 flex-1")}>
         {ComposerAddAttachmentOverride ? <ComposerAddAttachmentOverride /> : <ComposerAddAttachment />}
+        {composerModes ? <ComposerModeLeading composerModes={composerModes} /> : null}
         {ComposerExtra && <ComposerExtra />}
       </div>
       <div className="flex items-center gap-1.5">
-        {composerModes ? <ComposerModeControls composerModes={composerModes} /> : null}
         {ComposerExtraEnd && <ComposerExtraEnd />}
         <AuiIf condition={(s) => s.thread.capabilities.dictation}>
           <AuiIf condition={(s) => s.composer.dictation == null}>

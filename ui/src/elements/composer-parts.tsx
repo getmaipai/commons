@@ -81,6 +81,8 @@ export interface ComposerModeData {
   /** Why a tool is unavailable right now (a plain line), by tool. */
   toolDisabledReasons?: Partial<Record<ComposerTool, string>>;
   primary?: ComposerPrimaryData;
+  /** The round "+" at the start of the top row (the attach menu). Drawn only when given. */
+  onAdd?: () => void;
 }
 
 export type ComposerQualityKind = "tier" | "thinking" | "model";
@@ -136,7 +138,11 @@ export function usePlaceholderFade(placeholder: string | undefined): "a" | "b" |
 
 const SLOT_ICON = { picture: ImageIcon, character: User, place: MapPin, audio: Music, video: Film } as const;
 
-const PILL = `flex min-h-12 shrink-0 items-center gap-1.5 rounded-full border border-border bg-background/70 px-3 text-sm text-foreground transition-colors hover:bg-muted outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50 ${hitArea(1)}`;
+// One look for every control in the panel: plain text-and-icon buttons with a small chevron, no box, no select border. Only the mode pill
+// (a raised surface) and the Presets pill (a soft fill) are drawn as shapes.
+const CHIP = `flex min-h-12 shrink-0 items-center gap-1.5 rounded-full px-3 text-base text-foreground transition-colors hover:bg-foreground/5 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-expanded:bg-foreground/5 disabled:opacity-50 ${hitArea(1)}`;
+const RAISED = `flex min-h-12 shrink-0 items-center gap-2 rounded-full bg-[var(--surface-1)] px-4 text-base font-medium text-foreground shadow-sm ring-1 ring-inset ring-[var(--hairline)] transition-colors hover:bg-foreground/5 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 ${hitArea(1)}`;
+const SOFT = `flex min-h-12 shrink-0 items-center gap-2 rounded-full bg-foreground/5 px-4 text-base text-foreground transition-colors hover:bg-foreground/10 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 ${hitArea(1)}`;
 
 function chosenLabel(chip: ComposerChipData): string {
   return chip.options.find((o) => String(o.value) === String(chip.value))?.label ?? "";
@@ -175,7 +181,7 @@ export function ComposerModePill({ modes, mode, onModeChange, onChosen }: {
         aria-label={i18n._({ id: "ui.Mode: {label}", message: "Mode: {label}", values: { label: current.label } })}
         onClick={() => (open ? setOpen(false) : openList())}
         onKeyDown={(e) => { if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); openList(); } }}
-        className={cn(PILL, "font-medium shadow-sm backdrop-blur-md")}
+        className={RAISED}
       >
         <Icon className="size-4" aria-hidden="true" /><span>{current.label}</span><ChevronDown className="size-4" aria-hidden="true" />
       </button>
@@ -205,6 +211,15 @@ export function ComposerModePill({ modes, mode, onModeChange, onChosen }: {
   );
 }
 
+/** The round "+" at the start of the top row. */
+export function ComposerAddButton({ onAdd }: { onAdd: () => void }) {
+  return (
+    <button type="button" data-slot="composer-add" aria-label={i18n._({ id: "ui.Add files", message: "Add files" })} onClick={onAdd} className={cn("flex size-12 shrink-0 items-center justify-center rounded-full bg-foreground/5 text-foreground outline-none transition-colors hover:bg-foreground/10 focus-visible:ring-[3px] focus-visible:ring-ring/50", hitArea(1))}>
+      <Plus className="size-5" aria-hidden="true" />
+    </button>
+  );
+}
+
 /** The reference slots of the current mode: a dashed add button per empty slot, a named thumbnail with a remove control per filled one. */
 export function ComposerSlots({ slots }: { slots: readonly ComposerSlotData[] }) {
   if (slots.length === 0) return null;
@@ -214,7 +229,7 @@ export function ComposerSlots({ slots }: { slots: readonly ComposerSlotData[] })
         const Icon = SLOT_ICON[slot.kind];
         if (slot.value) {
           return (
-            <span key={slot.id} data-slot-id={slot.id} className="flex min-w-0 items-center gap-2 rounded-xl border border-border bg-muted/50 p-1">
+            <span key={slot.id} data-slot-id={slot.id} className="flex min-w-0 items-center gap-2 rounded-2xl bg-foreground/5 p-1">
               <span className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-muted">
                 {slot.thumb ? <SafeImage src={slot.thumb} alt={slot.label} className="size-full object-cover" /> : <Icon className="size-4 text-muted-foreground" aria-hidden="true" />}
               </span>
@@ -235,9 +250,9 @@ export function ComposerSlots({ slots }: { slots: readonly ComposerSlotData[] })
             title={reason}
             aria-disabled={reason ? true : undefined}
             onClick={() => { if (!reason) slot.onPick?.(); }}
-            className={cn("flex min-h-12 min-w-24 items-center justify-center gap-2 rounded-xl border border-dashed border-border px-3 text-sm text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50", reason && "opacity-60", hitArea(1))}
+            className={cn("flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-foreground/5 px-4 text-base text-muted-foreground outline-none transition-colors hover:bg-foreground/10 hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50", reason && "opacity-60", hitArea(1))}
           >
-            <Plus className="size-4" aria-hidden="true" /><span>{slot.label}</span>
+            <Icon className="size-5" aria-hidden="true" /><span>{slot.label}</span>
           </button>
         );
       })}
@@ -293,7 +308,8 @@ function OptionRadios({ chip }: { chip: ComposerChipData }) {
 }
 
 /** Chips that share a `group` fold into one trigger and one popover (a bottom sheet on a phone). The trigger shows the chosen words. */
-export function ComposerChipPopover({ name, chips, icon, slot = "composer-chip-group", align = "start", showSummary = true }: {
+export function ComposerChipPopover({ name, chips, icon, slot = "composer-chip-group", align = "start", showSummary = true, variant = "plain" }: {
+  variant?: "plain" | "soft";
   name: string;
   /** False keeps the trigger reading as the name (the Presets button), not the chosen words. */
   showSummary?: boolean;
@@ -304,7 +320,7 @@ export function ComposerChipPopover({ name, chips, icon, slot = "composer-chip-g
 }) {
   const phone = useIsPhoneLayout();
   const [open, setOpen] = useState(false);
-  const summary = showSummary ? chips.map(chosenLabel).filter(Boolean).join(", ") : "";
+  const summary = showSummary ? chips.map(chosenLabel).filter(Boolean).join(" / ") : "";
   const unavailable = chips.every((c) => Boolean(c.disabledReason));
   const reason = chips.find((c) => c.disabledReason)?.disabledReason;
   const trigger = (
@@ -317,9 +333,9 @@ export function ComposerChipPopover({ name, chips, icon, slot = "composer-chip-g
       aria-label={summary ? i18n._({ id: "ui.{name}: {summary}", message: "{name}: {summary}", values: { name, summary } }) : name}
       title={unavailable ? reason : undefined}
       onClick={phone ? () => setOpen(true) : undefined}
-      className={cn(PILL, unavailable && "opacity-60")}
+      className={cn(variant === "soft" ? SOFT : CHIP, unavailable && "opacity-60")}
     >
-      {icon}<span className="min-w-0 truncate">{summary || name}</span><ChevronDown className="size-3.5 shrink-0" aria-hidden="true" />
+      {icon}<span className="min-w-0 truncate">{summary || name}</span><ChevronDown className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
     </button>
   );
   const body = <div className="flex min-w-0 flex-col gap-4">{chips.map((c) => <OptionRadios key={c.id} chip={c} />)}</div>;
@@ -362,7 +378,7 @@ export function ComposerChips({ chips, quality }: { chips: readonly ComposerChip
   return (
     <div data-slot="composer-chips" className="flex min-w-0 touch-pan-x flex-nowrap items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:flex-wrap sm:overflow-visible">
       {groups.map((g) => <ComposerChipPopover key={g.name} name={g.name} chips={g.chips} />)}
-      {quality ? <ComposerChipPopover name={quality.label} chips={[quality]} slot="composer-quality" icon={<Sparkles className="size-4 shrink-0" aria-hidden="true" />} /> : null}
+      {quality ? <ComposerChipPopover name={quality.label} chips={[quality]} slot="composer-quality" icon={<Sparkles className="size-5 shrink-0" aria-hidden="true" />} /> : null}
     </div>
   );
 }
@@ -371,7 +387,7 @@ export function ComposerChips({ chips, quality }: { chips: readonly ComposerChip
 export function ComposerPresetsButton({ presets }: { presets: ComposerPresetsData }) {
   if (presets.chips.length === 0) return null;
   const name = presets.label ?? i18n._({ id: "ui.Presets", message: "Presets" });
-  return <ComposerChipPopover name={name} chips={presets.chips} slot="composer-presets" showSummary={false} icon={<SlidersHorizontal className="size-4 shrink-0" aria-hidden="true" />} align="end" />;
+  return <ComposerChipPopover name={name} chips={presets.chips} slot="composer-presets" showSummary={false} variant="soft" icon={<SlidersHorizontal className="size-5 shrink-0" aria-hidden="true" />} align="end" />;
 }
 
 /** The field-end tools: clear, improve, lyrics. Each is an icon button with a name; a tool the engine cannot run is drawn disabled with its reason. */
@@ -402,9 +418,9 @@ export function ComposerFieldTools({ tools, hasText, reasons, onTool }: {
             title={reason ?? label}
             aria-disabled={off || undefined}
             onClick={() => { if (!off) onTool(tool); }}
-            className={cn("flex size-12 items-center justify-center rounded-full text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50", off && "opacity-50")}
+            className={cn("flex size-12 items-center justify-center rounded-full text-muted-foreground outline-none transition-colors hover:bg-foreground/5 hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50", off && "opacity-50")}
           >
-            <Icon className="size-4" aria-hidden="true" />
+            <Icon className="size-5" aria-hidden="true" />
           </button>
         );
       })}

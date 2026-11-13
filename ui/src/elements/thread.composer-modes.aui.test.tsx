@@ -40,7 +40,19 @@ describe("Thread composerModes (COMPOSER-02)", () => {
     expect(view.getByRole("button", { name: "Mode: Chat" })).not.toBeNull();
     expect(view.getByRole("textbox", { name: "Message input" }).getAttribute("placeholder")).toBe("Send a message...");
     expect(view.container.querySelector('[data-slot="composer-mode-zone"]')!.getAttribute("data-open")).toBe("false");
-    expect(view.container.querySelector('[data-slot="composer-input-row"]')).toBeNull();
+    expect(view.container.querySelector('[data-slot="composer-field-tools"]')).toBeNull();
+  });
+
+  test("the Thread draws the same unified panel: large radius, chips in the bottom row with no select box", () => {
+    const view = render(<Harness />);
+    fireEvent.click(view.getByRole("button", { name: "Mode: Chat" }));
+    fireEvent.click(view.getByRole("option", { name: "Image" }));
+    const shell = view.container.querySelector('[data-slot="aui_composer-shell"]') as HTMLElement;
+    expect(shell.getAttribute("data-unified")).toBe("true");
+    expect(shell.style.getPropertyValue("--composer-radius")).toBe("30px");
+    const chip = view.getByRole("button", { name: "Settings: Landscape" });
+    expect(chip.className).not.toMatch(/\bborder\b/);
+    expect(chip.closest(".aui-composer-action-wrapper")).not.toBeNull();
   });
 
   test("picking Image shows its slots, chips and tools inside the Thread and changes the placeholder", () => {

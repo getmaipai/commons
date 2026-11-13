@@ -17,7 +17,7 @@ import { SafeImage } from "../primitives/SafeImage";
 import { TierSegment, type TierId, type TierOptionDef } from "./tier-segment";
 import { i18n } from "@/kit/i18n"
 import { getIcon, type IconName } from "../icons";
-import { ComposerChips, ComposerFieldTools, ComposerModePill, ComposerModeZone, ComposerPresetsButton, ComposerSlots, qualityChipFor, usePlaceholderFade, type ComposerModeData, type ComposerQualityData, type ComposerTool } from "./composer-parts";
+import { ComposerAddButton, ComposerChips, ComposerFieldTools, ComposerModePill, ComposerModeZone, ComposerPresetsButton, ComposerSlots, qualityChipFor, usePlaceholderFade, type ComposerModeData, type ComposerQualityData, type ComposerTool } from "./composer-parts";
 
 export interface PromptBarModeOption {
   id: string;
@@ -480,18 +480,19 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
         return (
           <form data-slot="prompt-bar" data-layout={barLayout} data-composer-modes="true" className="flex w-full min-w-0 flex-col gap-2" onSubmit={(e) => { e.preventDefault(); trySubmit(); }} onKeyDown={(e) => { if (e.key === "Escape") { setActiveChoiceMenu(null); } }}>
             {errorRow}
-            <div data-slot="prompt-bar-composer" data-chat-input="true" className="flex min-w-0 flex-col gap-2 rounded-2xl border border-input bg-background p-2 shadow-sm transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/30">
+            <div data-slot="prompt-bar-composer" data-chat-input="true" data-unified="true" className="flex min-w-0 flex-col gap-3 rounded-[30px] border border-[var(--hairline)] bg-[var(--surface-2)] p-4 transition-colors focus-within:border-ring/60 focus-within:ring-3 focus-within:ring-ring/20 sm:p-6">
               <ComposerModeZone modeId={currentMode.id} open={topRowOpen}>
-                <div data-slot="prompt-bar-mode-attachments" className="flex min-w-0 flex-wrap items-center gap-2 pb-2">
+                <div data-slot="prompt-bar-mode-attachments" className="flex min-w-0 flex-nowrap items-center gap-2 pb-3 sm:flex-wrap">
+                  {currentMode.onAdd ? <ComposerAddButton onAdd={currentMode.onAdd} /> : null}
                   <ComposerSlots slots={slots} />
-                  {currentMode.presets ? <div className="ml-auto"><ComposerPresetsButton presets={currentMode.presets} /></div> : null}
+                  {currentMode.presets ? <div className="ml-auto shrink-0"><ComposerPresetsButton presets={currentMode.presets} /></div> : null}
                 </div>
               </ComposerModeZone>
               <div data-slot="prompt-bar-mode-field" data-mode={currentMode.id} className="flex min-w-0 items-start gap-1">
-                <div className="min-w-0 flex-1">{textbox(5, "min-h-24 resize-none")}</div>
+                <div className="min-w-0 flex-1">{textbox(5, "min-h-[4.5rem] resize-none px-1 text-xl leading-8 md:text-xl placeholder:text-muted-foreground")}</div>
                 <ComposerFieldTools tools={tools} hasText={!empty} reasons={currentMode.toolDisabledReasons} onTool={(tool) => { if (currentMode.onTool) currentMode.onTool(tool); else if (tool === "clear") { onValueChange(""); field.current?.focus(); } }} />
               </div>
-              <div data-slot="prompt-bar-composer-controls" className="flex min-w-0 flex-nowrap items-center gap-1.5 border-t border-border/70 pt-2 sm:flex-wrap">
+              <div data-slot="prompt-bar-composer-controls" className="flex min-w-0 flex-nowrap items-center gap-1 pt-1 sm:flex-wrap">
                 <ComposerModePill modes={modes!} mode={currentMode.id} onModeChange={(id) => onModeChange?.(id)} onChosen={preserveField} />
                 <ComposerModeZone modeId={currentMode.id} open className="min-w-0 max-w-full flex-1 sm:flex-none">
                   <ComposerChips chips={currentMode.chips ?? []} quality={qualityChip} />
@@ -501,14 +502,14 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
                   const chosen = option.value ?? modeChoices[option.id] ?? option.choices[0]?.value;
                   const chosenText = option.choices.find((choice) => choice.value === chosen)?.label ?? option.label;
                   return <div key={option.id} className="relative">
-                    <button type="button" aria-haspopup="listbox" aria-expanded={activeChoiceMenu === option.id} aria-label={`${option.label}: ${chosenText}`} onClick={() => setActiveChoiceMenu((id) => id === option.id ? null : option.id)} className={`flex min-h-12 items-center gap-1.5 rounded-full border border-border bg-background/70 px-3 text-sm text-foreground transition-colors hover:bg-muted ${hitArea(1)}`}>
-                      {OptionIcon ? <OptionIcon className="size-4" aria-hidden="true" /> : null}<span>{chosenText}</span><ChevronDown className="size-3.5" aria-hidden="true" />
+                    <button type="button" aria-haspopup="listbox" aria-expanded={activeChoiceMenu === option.id} aria-label={`${option.label}: ${chosenText}`} onClick={() => setActiveChoiceMenu((id) => id === option.id ? null : option.id)} className={`flex min-h-12 items-center gap-1.5 rounded-full px-3 text-base text-foreground transition-colors hover:bg-foreground/5 ${hitArea(1)}`}>
+                      {OptionIcon ? <OptionIcon className="size-5" aria-hidden="true" /> : null}<span>{chosenText}</span><ChevronDown className="size-4 text-muted-foreground" aria-hidden="true" />
                     </button>
                     {activeChoiceMenu === option.id ? <div role="listbox" aria-label={option.label} className="absolute bottom-full left-0 z-50 mb-2 min-w-40 motion-reveal rounded-xl border border-border bg-popover/90 p-1.5 text-popover-foreground shadow-lg backdrop-blur-xl">{option.choices.map((choice) => <button key={choice.value} type="button" role="option" aria-selected={choice.value === chosen} onClick={() => { setModeChoices((all) => ({ ...all, [option.id]: choice.value })); option.onValueChange?.(choice.value); setActiveChoiceMenu(null); }} className="flex min-h-12 w-full items-center rounded-lg px-3 text-left text-sm hover:bg-muted">{choice.label}</button>)}</div> : null}
                   </div>;
                 })}
-                {primaryDetail ? <span id={detailId} className="ml-auto sr-only min-w-0 truncate px-1 text-xs text-muted-foreground lg:not-sr-only">{primaryDetail}</span> : null}
-                <Button type="submit" size="icon" shape="pill" disabled={!ready} className={cn("size-12 shrink-0", primaryDetail ? "" : "ml-auto", hitArea(1))} aria-label={primary} aria-describedby={primaryDetail ? detailId : undefined} title={primaryDetail ? `${primary} · ${primaryDetail}` : primary}><ArrowUp className="size-5" aria-hidden="true" /></Button>
+                {primaryDetail ? <span id={detailId} className="sr-only">{primaryDetail}</span> : null}
+                <Button type="submit" size="lg" shape="pill" disabled={!ready} className={cn("ml-auto h-14 shrink-0 gap-2 px-6", hitArea(1))} aria-label={primary} aria-describedby={primaryDetail ? detailId : undefined} title={primaryDetail ? `${primary} · ${primaryDetail}` : primary}><span>{primary}</span><ArrowUp className="size-5" aria-hidden="true" /></Button>
               </div>
             </div>
             {disabledNote}

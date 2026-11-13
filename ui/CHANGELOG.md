@@ -1,3 +1,7 @@
+## [ui-v0.5.640] - 2026-11-13
+
+- ONE-COMPOSER visual pass (owner: one unified panel like Artlist, not dropdowns in a box). The modes composer and the Thread with `composerModes` draw one 30 px panel (hairline border, `--surface-2` fill, 24 px padding on desktop) with a borderless 20 px field two lines tall. Top row: an optional round "+" (`mode.onAdd`), reference slots as soft tiles with an icon and label, a soft Presets pill at the right. Bottom row: the mode pill on a raised surface, then chips drawn as plain text-and-icon buttons with a small chevron (no border, no fill; settings of one group join with " / " and open one popover), the Quality chip, and in `PromptBar` one large pill primary button (56 px, `bg-primary`, label and arrow). In `Thread` the pill and chips sit in the action row after "+" and the slots and Presets row sits above the field. Phone: the bottom row stays one row, the chips scroll sideways, the primary stays visible. Theme tokens and the motion tokens only. `ui/package.json` is 0.5.640.
+
 ## [ui-v0.5.639] - 2026-11-13
 
 - ONE-COMPOSER fixes found at the first preview of 0.5.638, no prop changes. The Presets button reads "Presets" (it showed the chosen preset); on a phone the modes composer's control row stays one row (the mode pill, the chips scrolling sideways with no visible scrollbar, the round submit) instead of wrapping; the Thread mode row hides its scrollbar. `ui/package.json` is 0.5.639.
