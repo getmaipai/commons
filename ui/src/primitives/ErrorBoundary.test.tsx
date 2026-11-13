@@ -62,4 +62,20 @@ describe("ErrorBoundary", () => {
       Object.defineProperty(window.location, "reload", { configurable: true, value: original });
     }
   });
+  test("a fallback replaces the recovery screen, so one failing part leaves its siblings on screen", () => {
+    const { queryByText, getByText } = render(
+      <div>
+        <p>Page</p>
+        <ErrorBoundary fallback={null}>
+          <Bomb />
+        </ErrorBoundary>
+        <ErrorBoundary fallback={<span>Player unavailable</span>}>
+          <Bomb />
+        </ErrorBoundary>
+      </div>,
+    );
+    expect(getByText("Page")).toBeTruthy();
+    expect(getByText("Player unavailable")).toBeTruthy();
+    expect(queryByText("Something went wrong")).toBeNull();
+  });
 });

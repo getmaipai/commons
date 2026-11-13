@@ -4,6 +4,10 @@ import { Button } from "@/kit/ui/button";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
+  /** What to draw instead of the full recovery screen when the children throw. For one shell part (a player bar, a
+   * banner) whose failure must not take the page down: `null` draws nothing and the rest of the app keeps working.
+   * Left out, the boundary shows the whole-page recovery screen as before. */
+  fallback?: ReactNode;
 }
 
 interface ErrorBoundaryState {
@@ -34,6 +38,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   render() {
     if (this.state.error) {
+      if (this.props.fallback !== undefined) return this.props.fallback;
       return (
         <div className="flex h-screen items-center justify-center p-6 text-center">
           <div className="flex max-w-md flex-col items-center gap-4">

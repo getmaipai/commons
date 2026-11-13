@@ -1,3 +1,7 @@
+## [ui-v0.5.647] - 2026-11-13
+
+- `ErrorBoundary` takes an optional `fallback`. When given, a render error in the children draws that (`null` draws nothing) instead of the whole-page recovery screen, so one shell part (Home's Music player bar) that fails leaves the rest of the app on screen. Left out, nothing changes. `ui/package.json` is 0.5.647.
+
 ## [ui-v0.5.646] - 2026-11-13
 
 - ONE-COMPOSER phone fix: the reference tiles no longer shrink under the Presets pill in the top row (they keep their width and the row scrolls sideways). `ui/package.json` is 0.5.646.
