@@ -96,6 +96,8 @@ export interface ComposerModeData {
   allowEmpty?: boolean;
   /** The round "+" at the start of the top row (the attach menu). Drawn only when given. */
   onAdd?: () => void;
+  /** Draws the "+" disabled, with this plain line as its reason. */
+  addDisabledReason?: string;
 }
 
 export type ComposerQualityKind = "tier" | "thinking" | "model";
@@ -226,9 +228,9 @@ export function ComposerModePill({ modes, mode, onModeChange, onChosen }: {
 }
 
 /** The round "+" at the start of the top row. */
-export function ComposerAddButton({ onAdd }: { onAdd: () => void }) {
+export function ComposerAddButton({ onAdd, disabledReason }: { onAdd: () => void; disabledReason?: string }) {
   return (
-    <button type="button" data-slot="composer-add" aria-label={i18n._({ id: "ui.Add files", message: "Add files" })} onClick={onAdd} className={cn("flex size-12 shrink-0 items-center justify-center rounded-full bg-foreground/5 text-foreground outline-none transition-colors hover:bg-foreground/10 focus-visible:ring-[3px] focus-visible:ring-ring/50", hitArea(1))}>
+    <button type="button" data-slot="composer-add" aria-label={i18n._({ id: "ui.Add files", message: "Add files" })} disabled={Boolean(disabledReason)} title={disabledReason} onClick={onAdd} className={cn("flex size-12 shrink-0 items-center justify-center rounded-full bg-foreground/5 text-foreground outline-none transition-colors hover:bg-foreground/10 focus-visible:ring-[3px] focus-visible:ring-ring/50", hitArea(1))}>
       <Plus className="size-5" aria-hidden="true" />
     </button>
   );

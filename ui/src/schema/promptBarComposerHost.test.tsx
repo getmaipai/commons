@@ -58,6 +58,16 @@ describe("prompt_bar with the host's composer modes", () => {
     expect(view.container.querySelector('[data-group="Settings"] svg')?.getAttribute("class")).toContain("lucide-sliders-horizontal");
   });
 
+  test("a reference with a disabled_reason draws its slot and the plus disabled with that line", () => {
+    const line = "Starting a picture from a reference is coming next.";
+    const bar = { ...node, references: [{ state: "reference", label: "Image reference", kind: "picture", disabled_reason: line }] } as unknown as UiNode;
+    const view = draw({ composer: { modes, current: "picture", onModeChange: () => {} }, pickMedia: () => Promise.resolve({ id: "f" }) }, bar);
+    const add = view.container.querySelector('[data-slot="composer-add"]') as HTMLButtonElement;
+    expect(add.disabled).toBe(true);
+    expect(add.getAttribute("title")).toBe(line);
+    expect(view.container.querySelector('[data-slot="composer-slots"] [aria-disabled="true"]')).not.toBeNull();
+  });
+
   test("the host's quality list narrows the tiers (a minor never sees Max)", async () => {
     const view = draw({ composer: { modes, current: "picture", onModeChange: () => {}, quality: ["standard", "boost"] } });
     fireEvent.click(view.container.querySelector('[data-slot="composer-quality"]')!);

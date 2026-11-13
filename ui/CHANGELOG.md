@@ -1,3 +1,7 @@
+## [ui-v0.5.657] - 2026-11-13
+
+- A prompt_bar reference takes `disabled_reason`. In the modes composer its slot and the round "+" draw disabled with that plain line instead of doing nothing. No change when it is not set.
+
 ## [ui-v0.5.656] - 2026-11-13
 
 - ONE-COMPOSER follow-up. A prompt_bar chip in a page node takes `icon` (a name from the kit icon set); in the modes composer a combined chip's trigger shows the first icon any chip of its group sets, so Style and Settings can look different. No change when no chip sets one.

@@ -484,7 +484,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
             <div data-slot="prompt-bar-composer" data-chat-input="true" data-unified="true" className="surface-float flex min-w-0 flex-col gap-3 p-4 transition-colors [--elev-2-radius:30px] focus-within:ring-3 focus-within:ring-ring/20 sm:p-6">
               <ComposerModeZone modeId={currentMode.id} open={topRowOpen}>
                 <div data-slot="prompt-bar-mode-attachments" className="flex min-w-0 touch-pan-x flex-nowrap items-center gap-2 overflow-x-auto pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:flex-wrap sm:overflow-visible">
-                  {currentMode.onAdd ? <ComposerAddButton onAdd={currentMode.onAdd} /> : null}
+                  {currentMode.onAdd ? <ComposerAddButton onAdd={currentMode.onAdd} disabledReason={currentMode.addDisabledReason} /> : null}
                   <ComposerSlots slots={slots} />
                   {currentMode.presets ? <div className="ml-auto shrink-0"><ComposerPresetsButton presets={currentMode.presets} /></div> : null}
                 </div>
