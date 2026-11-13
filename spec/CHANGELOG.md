@@ -1,3 +1,7 @@
+## [spec-v0.1.383] - 2026-11-13
+
+- STACKCHAN-VOICE-01, additive. `device-command` gains the kinds `timer_set` (`seconds` 1 to 86400, optional `label`), `alarm_set` (`hour`, `minute`, optional `label`), `timer_list`, `timer_cancel` (optional `id`; none cancels all), `timer_stop` and `timer_snooze` (optional `seconds`, at most 3600) for the robot's own timers. The robot's answer rides in the ack state as `{ok: true, ...}` or `{ok: false, error}`.
+
 ## [spec-v0.1.382] - 2026-11-13
 
 - CREATOR-13 (CREATOR-PORT-2026-11-13), additive. `media-template` fragment `group` gains `picture_look`, `relight`, `angle` and `format`, the picture preset families, so they never share a group with the shot-card `look` and `light` words.

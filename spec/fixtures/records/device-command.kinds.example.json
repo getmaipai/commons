@@ -212,5 +212,64 @@
     "issued_at": "2026-10-05T12:00:00Z",
     "expires_at": "2026-10-05T12:01:00Z",
     "hlc": "1791201600000:0:robot123"
+  },
+  {
+    "id": "cmd-timer-set",
+    "kind": "timer_set",
+    "payload": {
+      "seconds": 600,
+      "label": "tea"
+    },
+    "issued_at": "2026-10-05T12:00:00Z",
+    "expires_at": "2026-10-05T12:00:30Z",
+    "hlc": "1791201600000:0:robot123"
+  },
+  {
+    "id": "cmd-alarm-set",
+    "kind": "alarm_set",
+    "payload": {
+      "hour": 7,
+      "minute": 0,
+      "label": "gym"
+    },
+    "issued_at": "2026-10-05T12:00:00Z",
+    "expires_at": "2026-10-05T12:00:30Z",
+    "hlc": "1791201600000:0:robot123"
+  },
+  {
+    "id": "cmd-timer-list",
+    "kind": "timer_list",
+    "payload": {},
+    "issued_at": "2026-10-05T12:00:00Z",
+    "expires_at": "2026-10-05T12:00:30Z",
+    "hlc": "1791201600000:0:robot123"
+  },
+  {
+    "id": "cmd-timer-cancel",
+    "kind": "timer_cancel",
+    "payload": {
+      "id": 1
+    },
+    "issued_at": "2026-10-05T12:00:00Z",
+    "expires_at": "2026-10-05T12:00:30Z",
+    "hlc": "1791201600000:0:robot123"
+  },
+  {
+    "id": "cmd-timer-stop",
+    "kind": "timer_stop",
+    "payload": {},
+    "issued_at": "2026-10-05T12:00:00Z",
+    "expires_at": "2026-10-05T12:00:30Z",
+    "hlc": "1791201600000:0:robot123"
+  },
+  {
+    "id": "cmd-timer-snooze",
+    "kind": "timer_snooze",
+    "payload": {
+      "seconds": 300
+    },
+    "issued_at": "2026-10-05T12:00:00Z",
+    "expires_at": "2026-10-05T12:00:30Z",
+    "hlc": "1791201600000:0:robot123"
   }
 ]

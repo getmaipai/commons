@@ -1073,6 +1073,295 @@
           }
         }
       }
+    },
+    {
+      "description": "The robot starts its own countdown timer, kept on the unit so it rings with no hub (1 second to 24 hours, at most 8 active). The robot answers in the ack state: {ok: true, ...} or {ok: false, error} in plain words.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "payload",
+        "issued_at",
+        "expires_at",
+        "hlc"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "kind": {
+          "type": "string",
+          "const": "timer_set"
+        },
+        "issued_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "hlc": {
+          "type": "string",
+          "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "seconds"
+          ],
+          "properties": {
+            "seconds": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 86400
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 60
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "The robot sets an alarm for the next HH:MM of its own local day. The robot answers in the ack state: {ok: true, ...} or {ok: false, error} in plain words.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "payload",
+        "issued_at",
+        "expires_at",
+        "hlc"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "kind": {
+          "type": "string",
+          "const": "alarm_set"
+        },
+        "issued_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "hlc": {
+          "type": "string",
+          "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "hour",
+            "minute"
+          ],
+          "properties": {
+            "hour": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 23
+            },
+            "minute": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 59
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 60
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "The robot lists its active timers and alarms with the time left. The robot answers in the ack state: {ok: true, ...} or {ok: false, error} in plain words.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "payload",
+        "issued_at",
+        "expires_at",
+        "hlc"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "kind": {
+          "type": "string",
+          "const": "timer_list"
+        },
+        "issued_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "hlc": {
+          "type": "string",
+          "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false
+        }
+      }
+    },
+    {
+      "description": "The robot cancels one timer by id, or all of them when no id is given. The robot answers in the ack state: {ok: true, ...} or {ok: false, error} in plain words.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "payload",
+        "issued_at",
+        "expires_at",
+        "hlc"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "kind": {
+          "type": "string",
+          "const": "timer_cancel"
+        },
+        "issued_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "hlc": {
+          "type": "string",
+          "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "The robot ends the timer that is ringing now. The robot answers in the ack state: {ok: true, ...} or {ok: false, error} in plain words.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "payload",
+        "issued_at",
+        "expires_at",
+        "hlc"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "kind": {
+          "type": "string",
+          "const": "timer_stop"
+        },
+        "issued_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "hlc": {
+          "type": "string",
+          "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false
+        }
+      }
+    },
+    {
+      "description": "The robot ends the ringing timer and starts a new one with the same label (default 5 minutes, at most 1 hour). The robot answers in the ack state: {ok: true, ...} or {ok: false, error} in plain words.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "payload",
+        "issued_at",
+        "expires_at",
+        "hlc"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "kind": {
+          "type": "string",
+          "const": "timer_snooze"
+        },
+        "issued_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "hlc": {
+          "type": "string",
+          "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "seconds": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 3600
+            }
+          }
+        }
+      }
     }
   ]
 }

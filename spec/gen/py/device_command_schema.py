@@ -488,6 +488,133 @@ class DeviceCommand20(BaseModel):
     payload: Payload17
 
 
+class Payload18(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    seconds: conint(ge=1, le=86400)
+    label: constr(min_length=1, max_length=60) | None = None
+
+
+class DeviceCommand21(BaseModel):
+    """
+    The robot starts its own countdown timer, kept on the unit so it rings with no hub (1 second to 24 hours, at most 8 active). The robot answers in the ack state: {ok: true, ...} or {ok: false, error} in plain words.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(min_length=1, max_length=128)
+    kind: Literal['timer_set']
+    issued_at: AwareDatetime
+    expires_at: AwareDatetime
+    hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
+    payload: Payload18
+
+
+class Payload19(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    hour: conint(ge=0, le=23)
+    minute: conint(ge=0, le=59)
+    label: constr(min_length=1, max_length=60) | None = None
+
+
+class DeviceCommand22(BaseModel):
+    """
+    The robot sets an alarm for the next HH:MM of its own local day. The robot answers in the ack state: {ok: true, ...} or {ok: false, error} in plain words.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(min_length=1, max_length=128)
+    kind: Literal['alarm_set']
+    issued_at: AwareDatetime
+    expires_at: AwareDatetime
+    hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
+    payload: Payload19
+
+
+class DeviceCommand23(BaseModel):
+    """
+    The robot lists its active timers and alarms with the time left. The robot answers in the ack state: {ok: true, ...} or {ok: false, error} in plain words.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(min_length=1, max_length=128)
+    kind: Literal['timer_list']
+    issued_at: AwareDatetime
+    expires_at: AwareDatetime
+    hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
+    payload: dict[str, Any] = Field(..., max_length=0)
+
+
+class Payload20(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: conint(ge=1) | None = None
+
+
+class DeviceCommand24(BaseModel):
+    """
+    The robot cancels one timer by id, or all of them when no id is given. The robot answers in the ack state: {ok: true, ...} or {ok: false, error} in plain words.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(min_length=1, max_length=128)
+    kind: Literal['timer_cancel']
+    issued_at: AwareDatetime
+    expires_at: AwareDatetime
+    hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
+    payload: Payload20
+
+
+class DeviceCommand25(BaseModel):
+    """
+    The robot ends the timer that is ringing now. The robot answers in the ack state: {ok: true, ...} or {ok: false, error} in plain words.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(min_length=1, max_length=128)
+    kind: Literal['timer_stop']
+    issued_at: AwareDatetime
+    expires_at: AwareDatetime
+    hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
+    payload: dict[str, Any] = Field(..., max_length=0)
+
+
+class Payload21(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    seconds: conint(ge=1, le=3600) | None = None
+
+
+class DeviceCommand26(BaseModel):
+    """
+    The robot ends the ringing timer and starts a new one with the same label (default 5 minutes, at most 1 hour). The robot answers in the ack state: {ok: true, ...} or {ok: false, error} in plain words.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(min_length=1, max_length=128)
+    kind: Literal['timer_snooze']
+    issued_at: AwareDatetime
+    expires_at: AwareDatetime
+    hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
+    payload: Payload21
+
+
 class DeviceCommand(
     RootModel[
         DeviceCommand1
@@ -510,6 +637,12 @@ class DeviceCommand(
         | DeviceCommand18
         | DeviceCommand19
         | DeviceCommand20
+        | DeviceCommand21
+        | DeviceCommand22
+        | DeviceCommand23
+        | DeviceCommand24
+        | DeviceCommand25
+        | DeviceCommand26
     ]
 ):
     root: (
@@ -533,6 +666,12 @@ class DeviceCommand(
         | DeviceCommand18
         | DeviceCommand19
         | DeviceCommand20
+        | DeviceCommand21
+        | DeviceCommand22
+        | DeviceCommand23
+        | DeviceCommand24
+        | DeviceCommand25
+        | DeviceCommand26
     ) = Field(
         ...,
         description='A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.',

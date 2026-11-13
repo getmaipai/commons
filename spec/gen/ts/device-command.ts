@@ -348,6 +348,99 @@ export const DeviceCommand = z
         .describe(
           "The robot shows a card and says the text aloud. The robot refuses (and says why in its answer) when announcements are off, it is muted, in quiet hours or at night, or the text is empty.",
         ),
+      z
+        .object({
+          id: z.string().min(1).max(128),
+          kind: z.literal("timer_set"),
+          issued_at: z.string().datetime({ offset: true }),
+          expires_at: z.string().datetime({ offset: true }),
+          hlc: z.string().regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$")),
+          payload: z
+            .object({
+              seconds: z.number().int().gte(1).lte(86400),
+              label: z.string().min(1).max(60).optional(),
+            })
+            .strict(),
+        })
+        .strict()
+        .describe(
+          "The robot starts its own countdown timer, kept on the unit so it rings with no hub (1 second to 24 hours, at most 8 active). The robot answers in the ack state: {ok: true, ...} or {ok: false, error} in plain words.",
+        ),
+      z
+        .object({
+          id: z.string().min(1).max(128),
+          kind: z.literal("alarm_set"),
+          issued_at: z.string().datetime({ offset: true }),
+          expires_at: z.string().datetime({ offset: true }),
+          hlc: z.string().regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$")),
+          payload: z
+            .object({
+              hour: z.number().int().gte(0).lte(23),
+              minute: z.number().int().gte(0).lte(59),
+              label: z.string().min(1).max(60).optional(),
+            })
+            .strict(),
+        })
+        .strict()
+        .describe(
+          "The robot sets an alarm for the next HH:MM of its own local day. The robot answers in the ack state: {ok: true, ...} or {ok: false, error} in plain words.",
+        ),
+      z
+        .object({
+          id: z.string().min(1).max(128),
+          kind: z.literal("timer_list"),
+          issued_at: z.string().datetime({ offset: true }),
+          expires_at: z.string().datetime({ offset: true }),
+          hlc: z.string().regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$")),
+          payload: z.record(z.string(), z.never()),
+        })
+        .strict()
+        .describe(
+          "The robot lists its active timers and alarms with the time left. The robot answers in the ack state: {ok: true, ...} or {ok: false, error} in plain words.",
+        ),
+      z
+        .object({
+          id: z.string().min(1).max(128),
+          kind: z.literal("timer_cancel"),
+          issued_at: z.string().datetime({ offset: true }),
+          expires_at: z.string().datetime({ offset: true }),
+          hlc: z.string().regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$")),
+          payload: z
+            .object({ id: z.number().int().gte(1).optional() })
+            .strict(),
+        })
+        .strict()
+        .describe(
+          "The robot cancels one timer by id, or all of them when no id is given. The robot answers in the ack state: {ok: true, ...} or {ok: false, error} in plain words.",
+        ),
+      z
+        .object({
+          id: z.string().min(1).max(128),
+          kind: z.literal("timer_stop"),
+          issued_at: z.string().datetime({ offset: true }),
+          expires_at: z.string().datetime({ offset: true }),
+          hlc: z.string().regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$")),
+          payload: z.record(z.string(), z.never()),
+        })
+        .strict()
+        .describe(
+          "The robot ends the timer that is ringing now. The robot answers in the ack state: {ok: true, ...} or {ok: false, error} in plain words.",
+        ),
+      z
+        .object({
+          id: z.string().min(1).max(128),
+          kind: z.literal("timer_snooze"),
+          issued_at: z.string().datetime({ offset: true }),
+          expires_at: z.string().datetime({ offset: true }),
+          hlc: z.string().regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$")),
+          payload: z
+            .object({ seconds: z.number().int().gte(1).lte(3600).optional() })
+            .strict(),
+        })
+        .strict()
+        .describe(
+          "The robot ends the ringing timer and starts a new one with the same label (default 5 minutes, at most 1 hour). The robot answers in the ack state: {ok: true, ...} or {ok: false, error} in plain words.",
+        ),
     ];
     const { errors, failed } = schemas.reduce<{
       errors: z.core.$ZodIssue[];
