@@ -25,3 +25,23 @@ describe("playlist record", () => {
     expect(() => MediaCollection.parse({ ...base, cover_file_id: "cover" })).toThrow();
   });
 });
+
+describe("family picks record", () => {
+  const base = read("media-collection.queue.example.json");
+  const familyPicks = {
+    ...base,
+    kind: "family_picks",
+    items: [{ ...base.items[0], votes: ["person-nova001", "person-iris001"], added_by: "person-nova001" }],
+    shared_to: "household",
+  };
+
+  test("accepts the shared vote queue and validates voter ids", () => {
+    expect(MediaCollection.parse(familyPicks)).toMatchObject({ kind: "family_picks", items: [{ votes: ["person-nova001", "person-iris001"], added_by: "person-nova001" }] });
+    expect(() => MediaCollection.parse({ ...familyPicks, items: [{ ...familyPicks.items[0], votes: ["nova"] }] })).toThrow();
+  });
+
+  test("accepts an older family picks record without vote fields", () => {
+    const old = { ...familyPicks, items: [{ media_id: "media-video01", added_at: "2025-01-01T00:00:00Z", position: 0 }] };
+    expect(() => MediaCollection.parse(old)).not.toThrow();
+  });
+});

@@ -4,7 +4,7 @@
 
 import { z } from "zod";
 
-/**MEDIA-SPEC-01 (media design section 7). A person's ordered references to media items: liked, watch later, the queue, a playlist, the watchlist, pins. One liked, one watch_later and one queue per person exist by construction. The list record stays for text lists (its items are text with a checked state; these are references with order, status and a pointer). PODCAST-PORT-03: a filter is a saved episode filter; its items stay empty and its rules say which episodes match.*/
+/**MEDIA-SPEC-01 (media design section 7). A person's ordered references to media items: liked, watch later, the queue, a playlist, the watchlist, pins. One liked, one watch_later and one queue per person exist by construction. The list record stays for text lists (its items are text with a checked state; these are references with order, status and a pointer). PODCAST-PORT-03: a filter is a saved episode filter; its items stay empty and its rules say which episodes match. VIDEO-LD-04: family_picks is one shared household collection where anyone adds and everyone votes; the top pick plays next.*/
 export const MediaCollection = z
   .object({
     id: z.string().regex(new RegExp("^mcol-[a-z0-9]{6,}$")),
@@ -17,6 +17,7 @@ export const MediaCollection = z
       "watchlist",
       "pins",
       "filter",
+      "family_picks",
     ]),
     title: z.string().min(1),
     items: z.array(
@@ -25,6 +26,17 @@ export const MediaCollection = z
           media_id: z.string().regex(new RegExp("^media-[a-z0-9]{6,}$")),
           added_at: z.string().datetime({ offset: true }),
           position: z.number().int().gte(0),
+          votes: z
+            .array(z.string().regex(new RegExp("^person-[a-z0-9]{6,}$")))
+            .refine(
+              (arr) => arr.every((item, i) => arr.indexOf(item) == i),
+              "All items must be unique!",
+            )
+            .default([]),
+          added_by: z
+            .string()
+            .regex(new RegExp("^person-[a-z0-9]{6,}$"))
+            .optional(),
           /**Watchlist only.*/
           status: z
             .union([
@@ -289,6 +301,6 @@ export const MediaCollection = z
   })
   .strict()
   .describe(
-    "MEDIA-SPEC-01 (media design section 7). A person's ordered references to media items: liked, watch later, the queue, a playlist, the watchlist, pins. One liked, one watch_later and one queue per person exist by construction. The list record stays for text lists (its items are text with a checked state; these are references with order, status and a pointer). PODCAST-PORT-03: a filter is a saved episode filter; its items stay empty and its rules say which episodes match.",
+    "MEDIA-SPEC-01 (media design section 7). A person's ordered references to media items: liked, watch later, the queue, a playlist, the watchlist, pins. One liked, one watch_later and one queue per person exist by construction. The list record stays for text lists (its items are text with a checked state; these are references with order, status and a pointer). PODCAST-PORT-03: a filter is a saved episode filter; its items stay empty and its rules say which episodes match. VIDEO-LD-04: family_picks is one shared household collection where anyone adds and everyone votes; the top pick plays next.",
   );
 export type MediaCollection = z.infer<typeof MediaCollection>;

@@ -23,6 +23,8 @@ class Item(BaseModel):
     media_id: constr(pattern=r'^media-[a-z0-9]{6,}$')
     added_at: AwareDatetime
     position: conint(ge=0)
+    votes: list[constr(pattern=r'^person-[a-z0-9]{6,}$')] = Field(default_factory=list)
+    added_by: constr(pattern=r'^person-[a-z0-9]{6,}$') | None = Field(None)
     status: Literal['want', 'watching', 'completed'] | None = Field(
         None, description='Watchlist only.'
     )
@@ -80,7 +82,8 @@ class MediaCollection(BaseModel):
     id: constr(pattern=r'^mcol-[a-z0-9]{6,}$')
     person_id: constr(pattern=r'^person-[a-z0-9]{6,}$')
     kind: Literal[
-        'liked', 'watch_later', 'queue', 'playlist', 'watchlist', 'pins', 'filter'
+        'liked', 'watch_later', 'queue', 'playlist', 'watchlist', 'pins', 'filter',
+        'family_picks'
     ]
     title: constr(min_length=1)
     items: list[Item]

@@ -4,6 +4,8 @@
 
 ## [spec-v0.1.384] - 2026-11-13
 
+- VIDEO-LD-04, additive. `media-collection` gains `family_picks`, a shared household vote queue; items can record unique voter ids in `votes` and the person who added them in `added_by`.
+
 - MAKE-CLEARER-02 (MAKE-CLEARER-2026-11-13), additive. The `image_editor` node takes `resize_upscale` (boolean, default true); false hides the Resize bar's own Upscale 2x and 4x buttons (matches ui 0.5.650). `spec/package.json` is 0.1.384.
 
 ## [spec-v0.1.383] - 2026-11-13
