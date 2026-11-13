@@ -89,7 +89,12 @@ function DialogContent({
                 "flex flex-col gap-0 border-0 bg-transparent p-0 shadow-none",
                 size === "lg" ? "sm:max-w-3xl" : "sm:max-w-sm"
               )
-              : "grid gap-4 rounded-lg border bg-background p-6 shadow-lg sm:max-w-lg",
+              : cn(
+                "grid gap-4 rounded-lg border bg-background p-6 shadow-lg sm:max-w-lg",
+                // MOTION-01: below sm a plain dialog is a bottom sheet (slides up, handle, safe-area padding); sm and up it is the centred card.
+                "max-sm:top-auto max-sm:bottom-0 max-sm:left-0 max-sm:max-h-[90dvh] max-sm:max-w-none max-sm:translate-x-0 max-sm:translate-y-0 max-sm:overflow-y-auto max-sm:rounded-b-none max-sm:border-x-0 max-sm:border-b-0 max-sm:pb-[max(1.5rem,env(safe-area-inset-bottom))] max-sm:motion-sheet-bottom",
+                "max-sm:before:mx-auto max-sm:before:-mt-3 max-sm:before:h-1.5 max-sm:before:w-10 max-sm:before:rounded-full max-sm:before:bg-muted max-sm:before:content-['']"
+              ),
           variant === "default" && size === "sm" && "sm:max-w-sm",
           variant === "default" && size === "xl" && "sm:max-w-2xl",
           scroll === "viewport" && "max-h-screen overflow-y-auto",
