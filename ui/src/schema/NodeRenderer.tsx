@@ -921,6 +921,14 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
       primaryLabel: node.submit_label ?? m.primaryLabel,
       ...(node.placeholder ? { placeholder: node.placeholder } : {}),
       ...(composerHost.presets ? { presets: composerHost.presets } : {}),
+      ...(host?.pickMedia && refs[0] ? { onAdd: () => {
+        const ref = refs[0]!;
+        void host.pickMedia!(ref.kind).then((got) => {
+          if (!got) return;
+          setFilled((prev) => ({ ...prev, [ref.state]: got }));
+          writer?.merge({ [ref.state]: got.id });
+        }, () => {});
+      } } : {}),
       references: refs.map((ref) => ({
         id: ref.state, label: ref.label, kind: ref.kind, value: filled[ref.state]?.id ?? null, thumb: filled[ref.state]?.thumb,
         onPick: () => {

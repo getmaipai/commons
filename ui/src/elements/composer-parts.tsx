@@ -62,6 +62,8 @@ export interface ComposerChipData {
   quietValue?: string | number;
   /** COMPOSER-03: one plain line under the options while the chip is open. */
   note?: string;
+  /** The chip's small icon (a name from the kit's icon set). A group shows the first icon any of its chips sets, else a sliders icon. */
+  icon?: IconName;
 }
 
 /** The Presets button: one popover over chips the host already has (templates, styles, formats). */
@@ -151,7 +153,7 @@ const SLOT_ICON = { picture: ImageIcon, character: User, place: MapPin, audio: M
 
 // One look for every control in the panel: plain text-and-icon buttons with a small chevron, no box, no select border. Only the mode pill
 // (a raised surface) and the Presets pill (a soft fill) are drawn as shapes.
-const CHIP = `flex min-h-12 shrink-0 whitespace-nowrap items-center gap-1.5 rounded-full px-3 text-base text-foreground transition-colors hover:bg-foreground/5 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-expanded:bg-foreground/5 disabled:opacity-50 ${hitArea(1)}`;
+const CHIP = `flex min-h-12 shrink-0 items-center gap-2 whitespace-nowrap rounded-full bg-foreground/5 px-4 text-base text-foreground transition-colors hover:bg-foreground/10 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-expanded:bg-foreground/10 disabled:opacity-50 ${hitArea(1)}`;
 const RAISED = `flex min-h-12 shrink-0 items-center gap-2 rounded-full bg-[var(--surface-1)] px-4 text-base font-medium text-foreground shadow-sm ring-1 ring-inset ring-[var(--hairline)] transition-colors hover:bg-foreground/5 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 ${hitArea(1)}`;
 const SOFT = `flex min-h-12 shrink-0 whitespace-nowrap items-center gap-2 rounded-full bg-foreground/5 px-4 text-base text-foreground transition-colors hover:bg-foreground/10 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 ${hitArea(1)}`;
 
@@ -328,6 +330,51 @@ function OptionRadios({ chip }: { chip: ComposerChipData }) {
   );
 }
 
+function GroupIcon({ chips }: { chips: readonly ComposerChipData[] }) {
+  const Icon = getIcon(chips.find((c) => c.icon)?.icon ?? "sliders-horizontal");
+  return <Icon className="size-5 shrink-0" aria-hidden="true" />;
+}
+
+/** Three or more chip families in one popover (Look, Light, Angle, Format) open as tabs, one section at a time, each scrolling inside the
+ * popover. Arrows, Home and End move between the tabs. */
+function ChipTabs({ chips }: { chips: readonly ComposerChipData[] }) {
+  const [activeId, setActiveId] = useState(chips[0]!.id);
+  const active = chips.find((c) => c.id === activeId) ?? chips[0]!;
+  const refs = useRef<(HTMLButtonElement | null)[]>([]);
+  const index = chips.indexOf(active);
+  const go = (next: number) => {
+    const i = (next + chips.length) % chips.length;
+    setActiveId(chips[i]!.id);
+    requestAnimationFrame(() => refs.current[i]?.focus());
+  };
+  return (
+    <div data-slot="composer-chip-tabs" className="flex min-w-0 flex-col gap-3">
+      <div role="tablist" tabIndex={-1} aria-label={i18n._({ id: "ui.Settings sections", message: "Settings sections" })} className="flex min-w-0 touch-pan-x flex-nowrap gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        onKeyDown={(e) => {
+          if (e.key === "ArrowRight") { e.preventDefault(); go(index + 1); }
+          else if (e.key === "ArrowLeft") { e.preventDefault(); go(index - 1); }
+          else if (e.key === "Home") { e.preventDefault(); go(0); }
+          else if (e.key === "End") { e.preventDefault(); go(chips.length - 1); }
+        }}>
+        {chips.map((c, i) => {
+          const on = c.id === active.id;
+          const chosen = chosenLabel(c);
+          return (
+            <button key={c.id} ref={(el) => { refs.current[i] = el; }} type="button" role="tab" id={`composer-tab-${c.id}`} aria-selected={on} aria-controls={`composer-panel-${c.id}`} tabIndex={on ? 0 : -1} onClick={() => setActiveId(c.id)}
+              className={cn("flex min-h-11 shrink-0 flex-col items-start justify-center whitespace-nowrap rounded-xl px-3 text-left text-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50", on ? "bg-foreground/10 font-medium text-foreground" : "text-muted-foreground hover:bg-foreground/5")}>
+              <span>{c.label}</span>
+              {chosen ? <span className="text-xs font-normal text-muted-foreground">{chosen}</span> : null}
+            </button>
+          );
+        })}
+      </div>
+      <div role="tabpanel" id={`composer-panel-${active.id}`} aria-labelledby={`composer-tab-${active.id}`} className="min-w-0">
+        <OptionRadios chip={active} />
+      </div>
+    </div>
+  );
+}
+
 /** Chips that share a `group` fold into one trigger and one popover (a bottom sheet on a phone). The trigger shows the chosen words. */
 export function ComposerChipPopover({ name, chips, icon, slot = "composer-chip-group", align = "start", showSummary = true, variant = "plain" }: {
   variant?: "plain" | "soft";
@@ -341,7 +388,7 @@ export function ComposerChipPopover({ name, chips, icon, slot = "composer-chip-g
 }) {
   const phone = useIsPhoneLayout();
   const [open, setOpen] = useState(false);
-  const summary = showSummary ? chips.map(chosenLabel).filter(Boolean).join(" / ") : "";
+  const summary = showSummary ? chips.map(chosenLabel).filter(Boolean).join(" · ") : "";
   const unavailable = chips.every((c) => Boolean(c.disabledReason));
   const reason = chips.find((c) => c.disabledReason)?.disabledReason;
   const trigger = (
@@ -356,10 +403,10 @@ export function ComposerChipPopover({ name, chips, icon, slot = "composer-chip-g
       onClick={phone ? () => setOpen(true) : undefined}
       className={cn(variant === "soft" ? SOFT : CHIP, unavailable && "opacity-60")}
     >
-      {icon}<span className="min-w-0 truncate">{summary || name}</span><ChevronDown className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+      {icon ?? <GroupIcon chips={chips} />}<span className="min-w-0 truncate">{summary || name}</span><ChevronDown className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
     </button>
   );
-  const body = <div className="flex min-w-0 flex-col gap-4">{chips.map((c) => <OptionRadios key={c.id} chip={c} />)}</div>;
+  const body = chips.length >= 3 ? <ChipTabs chips={chips} /> : <div className="flex min-w-0 flex-col gap-4">{chips.map((c) => <OptionRadios key={c.id} chip={c} />)}</div>;
   if (phone) {
     return (
       <>
@@ -392,13 +439,40 @@ export function groupComposerChips(chips: readonly ComposerChipData[]): { name: 
   return groups;
 }
 
-/** The mode's combined chips, each group one popover trigger, then the Quality chip in its own place. */
+/** At most this many combined chips show; the rest fold into one "More" chip so the bottom row never grows. */
+const MAX_VISIBLE_GROUPS = 3;
+
+/** Sets `data-overflow` on the chip row while it scrolls, so a fade shows at its right edge (never a second row). */
+function useOverflowFade() {
+  const ref = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const update = () => {
+      const more = el.scrollWidth - el.clientWidth - el.scrollLeft > 4;
+      if (more) el.setAttribute("data-overflow", "true"); else el.removeAttribute("data-overflow");
+    };
+    update();
+    el.addEventListener("scroll", update, { passive: true });
+    const ro = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(update);
+    ro?.observe(el);
+    return () => { el.removeEventListener("scroll", update); ro?.disconnect(); };
+  });
+  return ref;
+}
+
+/** The mode's combined chips (each group one popover trigger, at most three, the rest under "More"), then the Quality chip. It is one
+ * line: when it is wider than its room it scrolls with a fade at the edge. */
 export function ComposerChips({ chips, quality }: { chips: readonly ComposerChipData[]; quality?: ComposerChipData | null }) {
+  const row = useOverflowFade();
   const groups = groupComposerChips(chips);
+  const shown = groups.slice(0, MAX_VISIBLE_GROUPS);
+  const rest = groups.slice(MAX_VISIBLE_GROUPS).flatMap((g) => g.chips);
   if (groups.length === 0 && !quality) return null;
   return (
-    <div data-slot="composer-chips" className="flex min-w-0 touch-pan-x flex-nowrap items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:flex-wrap sm:overflow-visible">
-      {groups.map((g) => <ComposerChipPopover key={g.name} name={g.name} chips={g.chips} />)}
+    <div ref={row} data-slot="composer-chips" className="flex min-w-0 touch-pan-x flex-nowrap items-center gap-1.5 overflow-x-auto [scrollbar-width:none] data-[overflow=true]:[mask-image:linear-gradient(to_right,black_calc(100%-28px),transparent)] [&::-webkit-scrollbar]:hidden">
+      {shown.map((g) => <ComposerChipPopover key={g.name} name={g.name} chips={g.chips} />)}
+      {rest.length > 0 ? <ComposerChipPopover name={i18n._({ id: "ui.More", message: "More" })} chips={rest} showSummary={false} slot="composer-more" /> : null}
       {quality ? <ComposerChipPopover name={quality.label} chips={[quality]} slot="composer-quality" icon={<Sparkles className="size-5 shrink-0" aria-hidden="true" />} /> : null}
     </div>
   );
@@ -458,10 +532,10 @@ export function ComposerModeZone({ modeId, open, children, className }: { modeId
       data-open={open ? "true" : "false"}
       aria-hidden={open ? undefined : true}
       inert={open ? undefined : true}
-      className={cn("grid transition-[grid-template-rows,opacity] duration-[var(--motion-collapse-in)] ease-[var(--motion-ease-out)]", open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0 duration-[var(--motion-collapse-out)]", className)}
+      className={cn("grid grid-cols-[minmax(0,1fr)] transition-[grid-template-rows,opacity] duration-[var(--motion-collapse-in)] ease-[var(--motion-ease-out)]", open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0 duration-[var(--motion-collapse-out)]", className)}
     >
-      <div className="min-h-0 overflow-hidden">
-        <div key={modeId} className="motion-fade">{children}</div>
+      <div className="min-h-0 min-w-0 overflow-hidden">
+        <div key={modeId} className="motion-fade min-w-0">{children}</div>
       </div>
     </div>
   );

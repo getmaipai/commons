@@ -132,7 +132,7 @@ describe("unified panel look", () => {
     const list = modes();
     list[0] = { ...list[0]!, chips: [shape(), { id: "n", label: "Count", group: "Settings", value: 1, onValueChange: () => {}, options: [{ value: 1, label: "1" }, { value: 4, label: "4" }] }] };
     const view = render(<Harness list={list} />);
-    expect(view.getByRole("button", { name: "Settings: Landscape / 1" }).textContent).toBe("Landscape / 1");
+    expect(view.getByRole("button", { name: "Settings: Landscape · 1" }).textContent).toBe("Landscape · 1");
   });
 });
 
@@ -164,14 +164,54 @@ describe("fixes from use", () => {
     expect(list.className).toContain("surface-menu");
     expect(list.className).not.toMatch(/bg-popover\/|backdrop-blur/);
   });
-  test("on a phone the chips take their own line above the bottom row (the submit never sits in the scroll area)", () => {
+  test("the bottom row never wraps: pill, chips, primary on one line; the chips scroll inside their own room", () => {
     const view = render(<Harness />);
     const row = view.container.querySelector('[data-slot="prompt-bar-composer-controls"]')!;
-    expect(row.className).toContain("flex-wrap");
-    const zone = row.querySelector('[data-slot="composer-mode-zone"]')!;
-    expect(zone.className).toContain("max-sm:order-first");
-    expect(zone.className).toContain("max-sm:basis-full");
-    expect(zone.contains(view.getByRole("button", { name: "Generate" }))).toBe(false);
+    expect(row.className).toContain("flex-nowrap");
+    expect(row.className).not.toContain("flex-wrap");
+    const kids = [...row.children].map((el) => el.getAttribute("data-slot") ?? el.tagName);
+    expect(kids[0]).toBe("composer-mode-pill");
+    expect(row.lastElementChild!.tagName).toBe("BUTTON");
+    const chips = row.querySelector('[data-slot="composer-chips"]') as HTMLElement;
+    expect(chips.className).toContain("overflow-x-auto");
+    expect(chips.className).toContain("mask-image");
+    expect(chips.closest('[data-slot="composer-mode-zone"]')!.className).toContain("flex-1");
+  });
+});
+
+describe("combined chips", () => {
+  const fam = (id: string, label: string, labels: string[], value: string | number, quiet?: string | number): ComposerChipData => ({ id, label, group: "Style", value, quietValue: quiet, onValueChange: () => {}, options: labels.map((l, i) => ({ value: i === 0 ? "none" : l, label: l })) });
+  test("many families in one group are one chip: quiet values stay out of the words, three or more open as tabs", () => {
+    const list = modes();
+    list[0] = { ...list[0]!, chips: [fam("look", "Look", ["Auto", "Art"], "Art"), fam("light", "Light", ["Auto", "Golden hour"], "Golden hour", "none"), fam("angle", "Angle", ["Auto", "Low angle"], "none", "none"), fam("format", "Format", ["Auto", "Poster"], "none", "none")] };
+    const view = render(<Harness list={list} />);
+    const chip = view.getByRole("button", { name: /^Style:/ });
+    expect(chip.textContent).toBe("Art · Golden hour");
+    fireEvent.click(chip);
+    const tabs = view.getAllByRole("tab").map((t) => t.textContent);
+    expect(tabs.length).toBe(4);
+    expect(view.getAllByRole("tab")[0]!.getAttribute("aria-selected")).toBe("true");
+    fireEvent.keyDown(view.getAllByRole("tab")[0]!, { key: "ArrowRight" });
+    expect(view.getAllByRole("tab")[1]!.getAttribute("aria-selected")).toBe("true");
+    expect(view.getByRole("tabpanel")).not.toBeNull();
+  });
+  test("more than three groups fold the rest under one More chip", () => {
+    const list = modes();
+    const g = (n: string): ComposerChipData => ({ id: n, label: n, group: n, value: "a", onValueChange: () => {}, options: [{ value: "a", label: n + " A" }, { value: "b", label: n + " B" }] });
+    list[0] = { ...list[0]!, chips: [g("One"), g("Two"), g("Three"), g("Four"), g("Five")] };
+    const view = render(<Harness list={list} />);
+    expect(view.getByRole("button", { name: "One: One A" })).not.toBeNull();
+    expect(view.queryByRole("button", { name: /^Four/ })).toBeNull();
+    fireEvent.click(view.getByRole("button", { name: "More" }));
+    expect(view.getAllByRole("radiogroup").map((r) => r.getAttribute("aria-labelledby"))).toEqual(["composer-chip-Four", "composer-chip-Five"]);
+  });
+  test("a mode with onAdd draws the round plus in the top row", () => {
+    const list = modes();
+    let added = 0;
+    list[0] = { ...list[0]!, onAdd: () => { added += 1; } };
+    const view = render(<Harness list={list} />);
+    fireEvent.click(view.getByRole("button", { name: "Add files" }));
+    expect(added).toBe(1);
   });
 });
 

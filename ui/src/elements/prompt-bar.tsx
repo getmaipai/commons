@@ -473,7 +473,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
           });
         };
         const slots = currentMode.references ?? [];
-        const topRowOpen = slots.length > 0 || Boolean(currentMode.presets?.chips.length);
+        const topRowOpen = slots.length > 0 || Boolean(currentMode.presets?.chips.length) || Boolean(currentMode.onAdd);
         const tools = currentMode.tools ?? [];
         const qualityChip = qualityChipFor(quality);
         const primary = currentMode.primary?.label ?? modeSubmitLabel;
@@ -493,9 +493,9 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
                 <div className="min-w-0 flex-1">{textbox(5, "min-h-[4.5rem] resize-none px-1 text-xl leading-8 md:text-xl placeholder:text-muted-foreground")}</div>
                 <ComposerFieldTools tools={tools} hasText={!empty} reasons={currentMode.toolDisabledReasons} onTool={(tool) => { if (currentMode.onTool) currentMode.onTool(tool); else if (tool === "clear") { onValueChange(""); field.current?.focus(); } }} />
               </div>
-              <div data-slot="prompt-bar-composer-controls" className="flex min-w-0 flex-wrap items-center gap-1 pt-1">
+              <div data-slot="prompt-bar-composer-controls" className="flex min-w-0 flex-nowrap items-center gap-1 pt-1">
                 {modes!.length > 1 ? <ComposerModePill modes={modes!} mode={currentMode.id} onModeChange={(id) => onModeChange?.(id)} onChosen={preserveField} /> : null}
-                <ComposerModeZone modeId={currentMode.id} open className="min-w-0 max-w-full max-sm:order-first max-sm:basis-full">
+                <ComposerModeZone modeId={currentMode.id} open className="min-w-0 flex-1">
                   <ComposerChips chips={currentMode.chips ?? []} quality={qualityChip} />
                 </ComposerModeZone>
                 {currentMode.options?.map((option) => {
@@ -510,7 +510,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
                   </div>;
                 })}
                 {primaryDetail ? <span id={detailId} className="sr-only">{primaryDetail}</span> : null}
-                <Button type="submit" size="lg" shape="pill" disabled={!ready} className={cn("ml-auto size-14 shrink-0 gap-2 px-0 sm:h-14 sm:w-auto sm:px-6", hitArea(1))} aria-label={primary} aria-describedby={primaryDetail ? detailId : undefined} title={primaryDetail ? `${primary} · ${primaryDetail}` : primary}><span className="hidden sm:inline">{primary}</span><ArrowUp className="size-5" aria-hidden="true" /></Button>
+                <Button type="submit" size="lg" shape="pill" disabled={!ready} className={cn("ml-auto size-14 shrink-0 gap-2 bg-linear-to-br from-primary to-primary/80 px-0 sm:h-14 sm:w-auto sm:px-6", hitArea(1))} aria-label={primary} aria-describedby={primaryDetail ? detailId : undefined} title={primaryDetail ? `${primary} · ${primaryDetail}` : primary}><span className="hidden sm:inline">{primary}</span><ArrowUp className="size-5" aria-hidden="true" /></Button>
               </div>
             </div>
             {disabledNote}

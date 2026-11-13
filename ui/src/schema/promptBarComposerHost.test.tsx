@@ -45,7 +45,7 @@ describe("prompt_bar with the host's composer modes", () => {
   test("draws one composer: a mode pill, one combined chip per group, the Quality chip, no dropdown row", () => {
     const view = draw({ composer: { modes, current: "picture", onModeChange: () => {} } });
     expect(view.container.querySelector('[data-composer-modes="true"]')).not.toBeNull();
-    expect(view.container.querySelector('[data-slot="composer-chip-group"][data-group="Settings"]')?.textContent).toContain("Square / 1 picture");
+    expect(view.container.querySelector('[data-slot="composer-chip-group"][data-group="Settings"]')?.textContent).toContain("Square · 1 picture");
     expect(view.container.querySelector('[data-slot="composer-chip-group"][data-group="Style"]')).not.toBeNull();
     expect(view.container.querySelector('[data-slot="composer-quality"]')).not.toBeNull();
     expect(view.container.querySelector("select")).toBeNull();
