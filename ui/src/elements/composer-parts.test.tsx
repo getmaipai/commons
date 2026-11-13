@@ -93,7 +93,8 @@ describe("composer modes", () => {
     const list = modes();
     list[0] = { ...list[0]!, onTool: (t) => seen.push(t) };
     const view = render(<Harness list={list} />);
-    fireEvent.click(view.getByRole("button", { name: /^Presets/ }));
+    expect(view.getByRole("button", { name: "Presets" }).textContent).toBe("Presets");
+    fireEvent.click(view.getByRole("button", { name: "Presets" }));
     expect(view.getByRole("radio", { name: "Poster" })).not.toBeNull();
     fireEvent.click(view.getByRole("button", { name: "Improve" }));
     fireEvent.click(view.getByRole("button", { name: "Clear" }));

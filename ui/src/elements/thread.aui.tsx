@@ -1068,7 +1068,7 @@ const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
             )}
             {composerModes && composerVariant !== "pill" && composerModes.modes.some((m) => (m.references?.length ?? 0) > 0 || (m.chips?.length ?? 0) > 0 || m.presets) ? (
               <ComposerModeZone modeId={currentMode?.id ?? ""} open={rowOpen} className="data-[open=false]:-mb-2">
-                <div data-slot="composer-mode-row" className="flex min-w-0 touch-pan-x flex-nowrap items-center gap-2 overflow-x-auto sm:flex-wrap sm:overflow-visible">
+                <div data-slot="composer-mode-row" className="flex min-w-0 touch-pan-x flex-nowrap items-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:flex-wrap sm:overflow-visible">
                   <ComposerSlots slots={slots} />
                   <ComposerChips chips={chips} />
                   {presets ? <div className="ml-auto shrink-0"><ComposerPresetsButton presets={presets} /></div> : null}

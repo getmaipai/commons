@@ -1,3 +1,7 @@
+## [ui-v0.5.639] - 2026-11-13
+
+- ONE-COMPOSER fixes found at the first preview of 0.5.638, no prop changes. The Presets button reads "Presets" (it showed the chosen preset); on a phone the modes composer's control row stays one row (the mode pill, the chips scrolling sideways with no visible scrollbar, the round submit) instead of wrapping; the Thread mode row hides its scrollbar. `ui/package.json` is 0.5.639.
+
 ## [ui-v0.5.638] - 2026-11-13
 
 - ONE-COMPOSER (COMPOSER-01 and COMPOSER-02), additive. New module `composer-parts` holds the one composer's parts once: mode pill, reference slots, combined chips (each group opens one popover, a sheet on a phone), Presets button, field tools (clear, improve, lyrics), the Quality chip and a mode zone that opens and closes on the collapse tokens and cross-fades on the fade tokens. `PromptBar` `modes[]` gain `placeholder`, `references` (with `value`, `thumb`, `onRemove`, `max`, `disabledReason`), `chips`, `presets`, `tools`, `toolDisabledReasons`, `primary` and `onTool`, and the bar takes `quality`; the field's placeholder cross-fades without remounting it (new `data-placeholder-fade` rule in tokens.css). `Thread` takes `components.composerModes` and draws the pill and Quality chip beside Send and the slots, chips and Presets as one extra row under the field, with no `ComposerInputOverride`. A child, a teen or an unknown band never sees Thinking or a model choice in the Quality chip. The dummy "Upload reference" plus in the modes composer is gone (it had no action). `ui/package.json` is 0.5.638.

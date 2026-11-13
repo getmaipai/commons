@@ -293,8 +293,10 @@ function OptionRadios({ chip }: { chip: ComposerChipData }) {
 }
 
 /** Chips that share a `group` fold into one trigger and one popover (a bottom sheet on a phone). The trigger shows the chosen words. */
-export function ComposerChipPopover({ name, chips, icon, slot = "composer-chip-group", align = "start" }: {
+export function ComposerChipPopover({ name, chips, icon, slot = "composer-chip-group", align = "start", showSummary = true }: {
   name: string;
+  /** False keeps the trigger reading as the name (the Presets button), not the chosen words. */
+  showSummary?: boolean;
   chips: readonly ComposerChipData[];
   icon?: ReactNode;
   slot?: string;
@@ -302,7 +304,7 @@ export function ComposerChipPopover({ name, chips, icon, slot = "composer-chip-g
 }) {
   const phone = useIsPhoneLayout();
   const [open, setOpen] = useState(false);
-  const summary = chips.map(chosenLabel).filter(Boolean).join(", ");
+  const summary = showSummary ? chips.map(chosenLabel).filter(Boolean).join(", ") : "";
   const unavailable = chips.every((c) => Boolean(c.disabledReason));
   const reason = chips.find((c) => c.disabledReason)?.disabledReason;
   const trigger = (
@@ -358,7 +360,7 @@ export function ComposerChips({ chips, quality }: { chips: readonly ComposerChip
   const groups = groupComposerChips(chips);
   if (groups.length === 0 && !quality) return null;
   return (
-    <div data-slot="composer-chips" className="flex min-w-0 touch-pan-x flex-nowrap items-center gap-1.5 overflow-x-auto sm:flex-wrap sm:overflow-visible">
+    <div data-slot="composer-chips" className="flex min-w-0 touch-pan-x flex-nowrap items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:flex-wrap sm:overflow-visible">
       {groups.map((g) => <ComposerChipPopover key={g.name} name={g.name} chips={g.chips} />)}
       {quality ? <ComposerChipPopover name={quality.label} chips={[quality]} slot="composer-quality" icon={<Sparkles className="size-4 shrink-0" aria-hidden="true" />} /> : null}
     </div>
@@ -369,7 +371,7 @@ export function ComposerChips({ chips, quality }: { chips: readonly ComposerChip
 export function ComposerPresetsButton({ presets }: { presets: ComposerPresetsData }) {
   if (presets.chips.length === 0) return null;
   const name = presets.label ?? i18n._({ id: "ui.Presets", message: "Presets" });
-  return <ComposerChipPopover name={name} chips={presets.chips} slot="composer-presets" icon={<SlidersHorizontal className="size-4 shrink-0" aria-hidden="true" />} align="end" />;
+  return <ComposerChipPopover name={name} chips={presets.chips} slot="composer-presets" showSummary={false} icon={<SlidersHorizontal className="size-4 shrink-0" aria-hidden="true" />} align="end" />;
 }
 
 /** The field-end tools: clear, improve, lyrics. Each is an icon button with a name; a tool the engine cannot run is drawn disabled with its reason. */

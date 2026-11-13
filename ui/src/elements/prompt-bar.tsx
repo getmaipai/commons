@@ -491,9 +491,9 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
                 <div className="min-w-0 flex-1">{textbox(5, "min-h-24 resize-none")}</div>
                 <ComposerFieldTools tools={tools} hasText={!empty} reasons={currentMode.toolDisabledReasons} onTool={(tool) => { if (currentMode.onTool) currentMode.onTool(tool); else if (tool === "clear") { onValueChange(""); field.current?.focus(); } }} />
               </div>
-              <div data-slot="prompt-bar-composer-controls" className="flex min-w-0 flex-wrap items-center gap-1.5 border-t border-border/70 pt-2">
+              <div data-slot="prompt-bar-composer-controls" className="flex min-w-0 flex-nowrap items-center gap-1.5 border-t border-border/70 pt-2 sm:flex-wrap">
                 <ComposerModePill modes={modes!} mode={currentMode.id} onModeChange={(id) => onModeChange?.(id)} onChosen={preserveField} />
-                <ComposerModeZone modeId={currentMode.id} open className="min-w-0 max-w-full">
+                <ComposerModeZone modeId={currentMode.id} open className="min-w-0 max-w-full flex-1 sm:flex-none">
                   <ComposerChips chips={currentMode.chips ?? []} quality={qualityChip} />
                 </ComposerModeZone>
                 {currentMode.options?.map((option) => {
