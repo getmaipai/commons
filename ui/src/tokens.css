@@ -2338,6 +2338,60 @@ html[data-ease-motion="calm"] body {
     animation: motion-fade-out var(--motion-fade-out) var(--motion-ease-in) both;
   }
 }
+/* Phone dialogs: a bottom sheet that slides up on the slide family (a dialog that sits at the bottom edge below the sm breakpoint). */
+@keyframes motion-sheet-in {
+  from {
+    transform: translate3d(0, 100%, 0);
+  }
+}
+@keyframes motion-sheet-out {
+  to {
+    transform: translate3d(0, 100%, 0);
+  }
+}
+@utility motion-sheet-bottom {
+  animation: motion-sheet-in var(--motion-slide-in) var(--motion-ease-slide) both;
+  &[data-state="closed"],
+  &[data-closed] {
+    animation: motion-sheet-out var(--motion-slide-out) var(--motion-ease-in) both;
+  }
+}
+/* Media viewer: grows from the thumbnail that opened it and returns to it (--viewer-from is set from that thumbnail's rect; without one it
+ * is the rise). */
+@keyframes motion-viewer-in {
+  from {
+    opacity: 0;
+    transform: var(--viewer-from, translate3d(0, var(--motion-rise-distance), 0) scale(var(--motion-rise-scale)));
+  }
+}
+@keyframes motion-viewer-out {
+  to {
+    opacity: 0;
+    transform: var(--viewer-from, translate3d(0, var(--motion-rise-distance), 0) scale(var(--motion-rise-scale)));
+  }
+}
+@utility motion-viewer-in {
+  transform-origin: 0 0;
+  animation: motion-viewer-in var(--motion-slide-in) var(--motion-ease-slide) both;
+}
+@utility motion-viewer-out {
+  transform-origin: 0 0;
+  animation: motion-viewer-out var(--motion-slide-out) var(--motion-ease-in) both;
+}
+/* Skeleton to content: loaded content fades in over the skeleton's footprint. */
+@utility motion-loaded {
+  animation: motion-fade-in var(--motion-fade-in) var(--motion-ease-out) both;
+}
+/* Third-party toasts and drawers: their own transitions move onto the tokens (they set them in their own stylesheet, so these win by
+ * specificity). */
+[data-sonner-toaster] [data-sonner-toast] {
+  transition-duration: var(--motion-slide-in), var(--motion-slide-in), var(--motion-slide-in), var(--motion-fade-in);
+  transition-timing-function: var(--motion-ease-slide);
+}
+[data-sonner-toaster] [data-sonner-toast][data-removed="true"] {
+  transition-duration: var(--motion-slide-out), var(--motion-slide-out), var(--motion-slide-out), var(--motion-fade-out);
+  transition-timing-function: var(--motion-ease-in);
+}
 @utility motion-list {
   animation: motion-list-in var(--motion-list-in) var(--motion-ease-out) both;
 }

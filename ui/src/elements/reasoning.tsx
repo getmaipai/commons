@@ -19,7 +19,7 @@ import {
 import { cn } from "cn";
 import { i18n } from "@/kit/i18n"
 
-export const ANIMATION_DURATION = 200;
+export const ANIMATION_DURATION = 220; // the --motion-collapse-in token, in ms (the scroll lock waits this long)
 
 const ReasoningPreviewContext = createContext(false);
 
@@ -112,7 +112,7 @@ function ReasoningRoot({
       )}
       style={
         {
-          "--animation-duration": `${ANIMATION_DURATION}ms`,
+          "--animation-duration": "var(--motion-collapse-in)",
         } as React.CSSProperties
       }
       {...props}
@@ -228,7 +228,7 @@ function ReasoningTrigger({
         <span
           key={text}
           aria-hidden={active && announce !== undefined ? true : undefined}
-          className={label !== undefined ? "animate-in fade-in-0 duration-500 motion-reduce:animate-none" : undefined}
+          className={label !== undefined ? "animate-in fade-in-0 duration-(--motion-fade-in) motion-reduce:animate-none" : undefined}
         >
           {text}
         </span>
@@ -242,7 +242,7 @@ function ReasoningTrigger({
         data-slot="reasoning-trigger-chevron"
         className={cn(
           "aui-reasoning-trigger-chevron mt-0.5 size-4 shrink-0",
-          "transition-transform duration-(--animation-duration) ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none",
+          "transition-transform duration-(--animation-duration) ease-(--motion-ease-slide) motion-reduce:transition-none",
           "-rotate-90",
           "group-data-open/trigger:rotate-0",
           "group-data-panel-open/trigger:rotate-0",
@@ -264,7 +264,7 @@ function ReasoningContent({
       data-slot="reasoning-content"
       className={cn(
         "aui-reasoning-content text-muted-foreground relative overflow-hidden text-sm outline-none",
-        "group/collapsible-content ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:animate-none",
+        "group/collapsible-content ease-(--motion-ease-slide) motion-reduce:animate-none",
         "data-closed:animate-collapsible-up",
         "data-open:animate-collapsible-down",
         "data-closed:fill-mode-forwards",
@@ -340,7 +340,7 @@ function ReasoningText({
       data-slot="reasoning-text"
       className={cn(
         "aui-reasoning-text relative z-0 max-h-64 overflow-y-auto ps-6 pt-2 pb-2 leading-relaxed text-pretty",
-        "transform-gpu transition-[transform,opacity] ease-[cubic-bezier(0.32,0.72,0,1)]",
+        "transform-gpu transition-[transform,opacity] ease-(--motion-ease-slide)",
         "motion-reduce:animate-none",
         "group-data-open/collapsible-content:animate-in",
         "group-data-closed/collapsible-content:animate-out",
