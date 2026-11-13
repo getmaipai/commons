@@ -218,7 +218,7 @@ const ComposerTriggerPopoverImpl: FC<ComposerTriggerPopoverProps> = ({
       data-slot="composer-trigger-popover"
       className={cn(
         floating,
-        "aui-composer-trigger-popover text-foreground absolute start-0 bottom-full z-50 mb-2 w-64 overflow-hidden rounded-xl",
+        "aui-composer-trigger-popover motion-reveal [--reveal-origin:bottom_left] [--reveal-y:var(--motion-reveal-distance)] text-foreground absolute start-0 bottom-full z-50 mb-2 w-64 overflow-hidden rounded-xl",
         className,
       )}
       isLoading={isLoading}

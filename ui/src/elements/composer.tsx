@@ -157,10 +157,11 @@ export function ComposerMenu({
         align === "start"
           ? "start-0 origin-bottom-left"
           : "end-0 origin-bottom-right",
-        "transition-[opacity,scale,visibility] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none",
+        // MOTION-01 reveal family: always mounted, so it moves with a transition on the same tokens (slower in, quicker out).
+        "transition-[opacity,scale,translate,visibility] motion-reduce:transition-none",
         open
-          ? "scale-100 opacity-100"
-          : "pointer-events-none invisible scale-[0.97] opacity-0",
+          ? "translate-y-0 scale-100 opacity-100 duration-(--motion-reveal-in) ease-(--motion-ease-out)"
+          : "pointer-events-none invisible translate-y-(--motion-reveal-distance) scale-(--motion-reveal-scale) opacity-0 duration-(--motion-reveal-out) ease-(--motion-ease-in)",
         className,
       )}
       {...props}
@@ -519,10 +520,10 @@ export function ComposerContext({
         className={cn(
           floating,
           "absolute end-0 bottom-full z-10 mb-2 flex w-60 origin-bottom-right flex-col gap-3.5 rounded-2xl p-4",
-          "transition-[opacity,scale] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none",
-          "pointer-events-none scale-[0.97] opacity-0",
-          "group-hover/ctx:pointer-events-auto group-hover/ctx:scale-100 group-hover/ctx:opacity-100",
-          "group-focus-within/ctx:pointer-events-auto group-focus-within/ctx:scale-100 group-focus-within/ctx:opacity-100",
+          "transition-[opacity,scale,translate] duration-(--motion-reveal-out) ease-(--motion-ease-in) motion-reduce:transition-none",
+          "pointer-events-none translate-y-(--motion-reveal-distance) scale-(--motion-reveal-scale) opacity-0",
+          "group-hover/ctx:pointer-events-auto group-hover/ctx:translate-y-0 group-hover/ctx:scale-100 group-hover/ctx:opacity-100 group-hover/ctx:duration-(--motion-reveal-in) group-hover/ctx:ease-(--motion-ease-out)",
+          "group-focus-within/ctx:pointer-events-auto group-focus-within/ctx:translate-y-0 group-focus-within/ctx:scale-100 group-focus-within/ctx:opacity-100 group-focus-within/ctx:duration-(--motion-reveal-in) group-focus-within/ctx:ease-(--motion-ease-out)",
         )}
       >
         <div className="flex items-baseline justify-between">

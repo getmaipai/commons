@@ -2209,6 +2209,138 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* MOTION-01: the one motion system for everything that appears, leaves or changes place. Families:
+ *   reveal  menus, dropdowns, submenus, selects, popovers, tooltips, hover cards, mention popovers (fade + small scale + a few px
+ *           from the trigger side, transform-origin at the trigger);
+ *   rise    modals and dialogs (fade + a slightly larger rise and scale from the centre);
+ *   slide   sheets, drawers, the sidebar and rail, side panels (the panel moves, or one width animates with its content clipped);
+ *   fade    backdrops, tab content, anything that only needs to appear;
+ *   collapse  collapsibles and accordions (height);
+ *   list    an item added to a list.
+ * One enter curve (ease-out, quick start and a long soft landing), one exit curve (ease-in, so leaving is not draggy), and one
+ * slide curve for panels. Enter is slower than exit (exit is about 70 percent of enter). Only opacity and transform move, except the
+ * width of a panel that must reflow its neighbour (clipped, animated once) and the height of a collapse.
+ * Reduced motion and the calm setting: no distance and no scale, and the rule above already shrinks every duration to nothing, so
+ * the surface simply appears. Press feel (--press-*) stays its own token set. */
+:root {
+  --motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --motion-ease-slide: cubic-bezier(0.32, 0.72, 0, 1);
+  --motion-reveal-in: 140ms;
+  --motion-reveal-out: 100ms;
+  --motion-reveal-distance: 6px;
+  --motion-reveal-scale: 0.96;
+  --motion-rise-in: 220ms;
+  --motion-rise-out: 150ms;
+  --motion-rise-distance: 12px;
+  --motion-rise-scale: 0.97;
+  --motion-slide-in: 260ms;
+  --motion-slide-out: 180ms;
+  --motion-collapse-in: 220ms;
+  --motion-collapse-out: 160ms;
+  --motion-fade-in: 160ms;
+  --motion-fade-out: 110ms;
+  --motion-list-in: 200ms;
+  --motion-list-distance: 6px;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root:root {
+    --motion-reveal-distance: 0px;
+    --motion-reveal-scale: 1;
+    --motion-rise-distance: 0px;
+    --motion-rise-scale: 1;
+    --motion-list-distance: 0px;
+  }
+}
+html[data-ease-motion="calm"] body {
+  --motion-reveal-distance: 0px;
+  --motion-reveal-scale: 1;
+  --motion-rise-distance: 0px;
+  --motion-rise-scale: 1;
+  --motion-list-distance: 0px;
+}
+@keyframes motion-reveal-in {
+  from {
+    opacity: 0;
+    transform: translate3d(var(--reveal-x, 0px), var(--reveal-y, 0px), 0) scale(var(--motion-reveal-scale));
+  }
+}
+@keyframes motion-reveal-out {
+  to {
+    opacity: 0;
+    transform: translate3d(calc(var(--reveal-x, 0px) * 0.5), calc(var(--reveal-y, 0px) * 0.5), 0) scale(var(--motion-reveal-scale));
+  }
+}
+@keyframes motion-rise-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, var(--motion-rise-distance), 0) scale(var(--motion-rise-scale));
+  }
+}
+@keyframes motion-rise-out {
+  to {
+    opacity: 0;
+    transform: translate3d(0, calc(var(--motion-rise-distance) * 0.5), 0) scale(var(--motion-rise-scale));
+  }
+}
+@keyframes motion-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes motion-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes motion-list-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, calc(var(--motion-list-distance) * -1), 0);
+  }
+}
+/* Floating surfaces: Radix sets data-state and data-side, Base UI sets data-open, data-closed and data-side. */
+@utility motion-reveal {
+  transform-origin: var(--radix-popper-transform-origin, var(--transform-origin, var(--reveal-origin, center)));
+  animation: motion-reveal-in var(--motion-reveal-in) var(--motion-ease-out) both;
+  &[data-side="bottom"] {
+    --reveal-y: calc(var(--motion-reveal-distance) * -1);
+  }
+  &[data-side="top"] {
+    --reveal-y: var(--motion-reveal-distance);
+  }
+  &[data-side="right"],
+  &[data-side="inline-end"] {
+    --reveal-x: calc(var(--motion-reveal-distance) * -1);
+  }
+  &[data-side="left"],
+  &[data-side="inline-start"] {
+    --reveal-x: var(--motion-reveal-distance);
+  }
+  &[data-state="closed"],
+  &[data-closed] {
+    animation: motion-reveal-out var(--motion-reveal-out) var(--motion-ease-in) both;
+  }
+}
+@utility motion-rise {
+  transform-origin: center;
+  animation: motion-rise-in var(--motion-rise-in) var(--motion-ease-out) both;
+  &[data-state="closed"],
+  &[data-closed] {
+    animation: motion-rise-out var(--motion-rise-out) var(--motion-ease-in) both;
+  }
+}
+@utility motion-fade {
+  animation: motion-fade-in var(--motion-fade-in) var(--motion-ease-out) both;
+  &[data-state="closed"],
+  &[data-closed] {
+    animation: motion-fade-out var(--motion-fade-out) var(--motion-ease-in) both;
+  }
+}
+@utility motion-list {
+  animation: motion-list-in var(--motion-list-in) var(--motion-ease-out) both;
+}
 .weather-remove-hit { background: transparent !important; opacity: 1; }
 .weather-remove-chip { display: grid; width: 28px; height: 28px; place-items: center; border-radius: 999px; background: var(--weather-scrim-remove); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
 
