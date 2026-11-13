@@ -906,6 +906,69 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
     if (modeConfig) item[modeConfig.state] = mode;
     dispatch(modeAction ?? node.submit, [item], () => setBusy(false), { typedArgs: true });
   }
+  // ONE-COMPOSER (COMPOSER-03): on a Create page the host lists the composer's modes. The bar then draws the kit composer: this page's
+  // mode carries the node's own placeholder, chips (one popover per `group`), slots and Quality; the others are a name and an icon that
+  // hand the draft to the host. Every chip stays reachable (Look and Camera keep their picture cards inside their group's popover).
+  const composerHost = host?.composer;
+  const withModes = Boolean(composerHost && node.layout === "chat" && composerHost.modes.length > 1);
+  const tierList = (node.tier?.tiers ?? []).filter((t) => !composerHost?.quality || composerHost.quality.includes(t.id));
+  const modeData = withModes && composerHost ? composerHost.modes.map((m) => {
+    if (m.id !== composerHost.current) return { id: m.id, label: m.label, icon: m.icon as never, primaryLabel: m.primaryLabel };
+    return {
+      id: m.id,
+      label: m.label,
+      icon: m.icon as never,
+      primaryLabel: node.submit_label ?? m.primaryLabel,
+      ...(node.placeholder ? { placeholder: node.placeholder } : {}),
+      references: refs.map((ref) => ({
+        id: ref.state, label: ref.label, kind: ref.kind, value: filled[ref.state]?.id ?? null, thumb: filled[ref.state]?.thumb,
+        onPick: () => {
+          if (!host?.pickMedia) return;
+          void host.pickMedia(ref.kind).then((got) => {
+            if (!got) return;
+            setFilled((prev) => ({ ...prev, [ref.state]: got }));
+            writer?.merge({ [ref.state]: got.id });
+          }, () => {});
+        },
+        onRemove: () => {
+          setFilled((prev) => { const next = { ...prev }; delete next[ref.state]; return next; });
+          writer?.merge({ [ref.state]: undefined });
+        },
+      })),
+      chips: chips.map((chip) => {
+        const unusable = chipUnusable(chip, tier);
+        const chosen = unusable && chip.quiet_value !== undefined ? chip.quiet_value : picked[chip.state]!;
+        const cards = chip.variant === "cards";
+        return {
+          id: chip.state,
+          label: chip.label,
+          ...(chip.group ? { group: chip.group } : {}),
+          options: chip.options.map((o) => ({ value: o.value, label: o.label })),
+          value: chosen,
+          onValueChange: (value: string | number) => {
+            setPicked((prev) => ({ ...prev, [chip.state]: value }));
+            writer?.merge({ [chip.state]: value });
+          },
+          ...(unusable && chip.disabled_reason ? { disabledReason: chip.disabled_reason } : {}),
+          ...(chip.quiet_value !== undefined ? { quietValue: chip.quiet_value } : {}),
+          ...(cards ? {
+            variant: "cards" as const,
+            cardOptions: [
+              ...chip.options.map((o) => ({ value: o.value, label: o.label, media: assetSrc(o.media) })),
+              ...(chip.locked === true && !unusable ? [{ locked: true as const }] : []),
+            ],
+          } : {}),
+          ...(chip.options.find((o) => o.value === chosen)?.note ? { note: chip.options.find((o) => o.value === chosen)!.note } : {}),
+        };
+      }),
+      tools: ["clear" as const],
+    };
+  }) : undefined;
+  const quality = withModes && tierList.length > 1 && node.tier ? {
+    value: tierList.some((t) => t.id === tier) ? tier : tierList[0]!.id,
+    onValueChange: (next: string) => { setTier(next as TierId); writer?.merge({ [node.tier!.state]: next }); },
+    options: tierList.map((t) => ({ value: t.id, label: t.label, ...(t.hint ? { detail: t.hint } : {}) })),
+  } : undefined;
   return (
     <PromptBar
       label={node.label}
@@ -914,10 +977,11 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
       value={text}
       onValueChange={setText}
       submitLabel={node.submit_label}
+      {...(withModes && modeData && composerHost ? { modes: modeData, mode: composerHost.current, onModeChange: (id: string) => composerHost.onModeChange(id, { text }), quality } : {})}
       placement={node.placement}
       layout={node.layout}
       chatDistribution={node.chat_distribution}
-      modeSelector={modeConfig ? {
+      modeSelector={modeConfig && !withModes ? {
         label: modeConfig.label,
         value: mode,
         options: modeConfig.options,
@@ -933,7 +997,7 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
       onSubmit={submit}
       suggestedStyles={suggested}
       onDismissSuggestion={(id) => setDismissed((prev) => (prev.includes(id) ? prev : [...prev, id]))}
-      chips={chips.map((chip) => {
+      chips={withModes ? [] : chips.map((chip) => {
         // VIDEO-LORA-09: a chip that works only at some levels is disabled at the others, with its one plain line.
         const unusable = chipUnusable(chip, tier);
         return {
@@ -960,7 +1024,7 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
           },
         };
       })}
-      references={refs.map((ref) => ({
+      references={withModes ? [] : refs.map((ref) => ({
         id: ref.state,
         label: ref.label,
         kind: ref.kind,
@@ -982,7 +1046,7 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
           writer?.merge({ [ref.state]: undefined });
         },
       }))}
-      tier={node.tier ? {
+      tier={node.tier && !withModes ? {
         value: tier,
         label: node.tier.label,
         presentation: node.tier.presentation,

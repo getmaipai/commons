@@ -74,6 +74,17 @@ export interface MediaHost {
    * ready ("Video is not ready yet. Try again in a minute."), or undefined when it is ready. A `prompt_bar` with `starts` uses it as
    * its `disabledReason`. Called during render, so it may read a query. Absent: nothing is disabled. */
   makingNotice?(kind: "picture" | "video"): string | undefined;
+  /** ONE-COMPOSER (COMPOSER-03): the modes of the one composer, from the host's list for this person (Home's `GET /api/composer/modes`).
+   * A `prompt_bar` with `layout: "chat"` on a Create page then draws the kit composer with a mode pill: its own page's mode shows
+   * the node's placeholder, chips, slots and Quality, the others only their name and icon, and picking one calls `onModeChange`
+   * with the words typed so far (the host opens that mode's page with the draft). `quality` lists the tier ids this person may pick
+   * in the current mode; absent, the node's own tiers stand. */
+  composer?: {
+    modes: readonly { id: string; label: string; icon: string; primaryLabel: string }[];
+    current: string;
+    onModeChange(id: string, draft: { text: string }): void;
+    quality?: readonly string[];
+  };
   /** VIDEO-CREATE-02: turns a package asset path (a card's `media`) into an address. Absent: `/api/plugins/<package>/assets/<path>`. */
   assetUrl?(packageId: string, path: string): string;
   castTo?(targetId: string, item: Record<string, unknown>, position_s: number): Promise<void>;

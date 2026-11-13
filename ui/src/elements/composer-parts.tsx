@@ -13,6 +13,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "../ui/drawer";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { useIsPhoneLayout } from "../hooks/useIsPhoneLayout";
 import { SafeImage } from "../primitives/SafeImage";
+import { OptionCards, type LockedOptionCard, type OptionCard } from "./option-cards";
 import { i18n } from "@/kit/i18n";
 import { getIcon, type IconName } from "../icons";
 
@@ -53,6 +54,14 @@ export interface ComposerChipData {
   value: string | number;
   onValueChange: (value: string | number) => void;
   disabledReason?: string;
+  /** COMPOSER-03: `cards` draws the options as picture cards (a Look or Camera loop) inside the group's one popover, with `cardOptions`
+   * (which may end in one locked tile). Plain `options` still name the choice in the trigger's words. */
+  variant?: "cards";
+  cardOptions?: readonly (OptionCard | LockedOptionCard)[];
+  /** COMPOSER-03: while this value is chosen the chip adds nothing to the trigger's words (an "Auto" or "No style" default). */
+  quietValue?: string | number;
+  /** COMPOSER-03: one plain line under the options while the chip is open. */
+  note?: string;
 }
 
 /** The Presets button: one popover over chips the host already has (templates, styles, formats). */
@@ -145,6 +154,7 @@ const RAISED = `flex min-h-12 shrink-0 items-center gap-2 rounded-full bg-[var(-
 const SOFT = `flex min-h-12 shrink-0 items-center gap-2 rounded-full bg-foreground/5 px-4 text-base text-foreground transition-colors hover:bg-foreground/10 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 ${hitArea(1)}`;
 
 function chosenLabel(chip: ComposerChipData): string {
+  if (chip.quietValue !== undefined && String(chip.quietValue) === String(chip.value)) return "";
   return chip.options.find((o) => String(o.value) === String(chip.value))?.label ?? "";
 }
 
@@ -265,6 +275,15 @@ function OptionRadios({ chip }: { chip: ComposerChipData }) {
   const disabled = Boolean(chip.disabledReason);
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
   const index = Math.max(0, chip.options.findIndex((o) => String(o.value) === String(chip.value)));
+  if (chip.variant === "cards" && chip.cardOptions) {
+    return (
+      <div data-slot="composer-chip-section" data-chip={chip.id} className="flex min-w-0 flex-col gap-1.5">
+        <span className="text-sm font-medium text-muted-foreground">{chip.label}</span>
+        <OptionCards label={chip.label} chipId={chip.id} options={chip.cardOptions} value={chip.value} onValueChange={chip.onValueChange} disabled={disabled} columns="three" />
+        {chip.disabledReason ? <p role="status" data-slot="composer-chip-reason" className="text-sm text-muted-foreground">{chip.disabledReason}</p> : chip.note ? <p data-slot="composer-chip-note" className="text-sm text-muted-foreground">{chip.note}</p> : null}
+      </div>
+    );
+  }
   const move = (next: number) => {
     const target = chip.options[(next + chip.options.length) % chip.options.length];
     if (!target) return;
