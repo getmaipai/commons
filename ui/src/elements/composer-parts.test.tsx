@@ -24,6 +24,19 @@ function Harness({ initial = "image", list = modes(), quality }: { initial?: str
 }
 
 describe("composer modes", () => {
+  test("a multi-reference slot draws each choice and only shows add while under max", () => {
+    const list = modes();
+    list[0] = { ...list[0]!, references: [{ id: "pic", label: "Image reference", kind: "picture", max: 3, value: "file-a,file-b", onPick: () => {}, onRemove: () => {} }] };
+    const view = render(<Harness list={list} />);
+    expect(view.getByRole("button", { name: "Remove Image reference 1" })).not.toBeNull();
+    expect(view.getByRole("button", { name: "Remove Image reference 2" })).not.toBeNull();
+    expect(view.getByRole("button", { name: "Add Image reference" })).not.toBeNull();
+    cleanup();
+    const full = modes();
+    full[0] = { ...full[0]!, references: [{ id: "pic", label: "Image reference", kind: "picture", max: 2, value: "file-a,file-b" }] };
+    const fullView = render(<Harness list={full} />);
+    expect(fullView.container.querySelector('button[aria-label="Add Image reference"]')).toBeNull();
+  });
   test("a mode shows only its own slots and chips, and the placeholder changes with it", () => {
     const view = render(<Harness />);
     const box = () => view.getByRole("textbox", { name: "Describe" });

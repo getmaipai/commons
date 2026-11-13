@@ -29,7 +29,7 @@ export interface PromptBarModeOption {
 }
 
 export interface PromptBarMode extends Omit<ComposerModeData, "references"> {
-  references?: readonly { id: string; label: string; kind: PromptBarReference["kind"]; max?: number; value?: string | null; thumb?: string; disabledReason?: string; onPick?: () => void; onRemove?: () => void }[];
+  references?: readonly { id: string; label: string; kind: PromptBarReference["kind"]; max?: number; value?: string | null; thumbs?: readonly (string | undefined)[]; thumb?: string; disabledReason?: string; onPick?: () => void; onRemove?: (id?: string) => void }[];
   options?: readonly PromptBarModeOption[];
   primaryLabel: string;
   /** COMPOSER-01: called with a field tool (`improve`, `lyrics`, or `clear`). Without it `clear` empties the field. */
@@ -60,15 +60,20 @@ export interface PromptBarReference {
    * as the named thumbnail with a remove control, as `in_field` does. Only a picture, character or place; shares the one in-field place
    * with `in_field`. */
   hint?: string;
+  /** Maximum selected references in this slot. Defaults to one. */
+  max?: number;
   /** The chosen file id; empty or absent while the slot is empty. */
   value?: string | null;
   /** A resolved address for the thumbnail of a filled slot. */
   thumb?: string;
+  /** Resolved thumbnail addresses for comma-separated multi-choice values. */
+  thumbs?: readonly (string | undefined)[];
   /** Called when an empty slot is clicked: the host opens its media picker and sets the value. */
   onPick: () => void;
   /** True when the host has no media picker, so an empty slot cannot be filled. */
   disabled?: boolean;
-  onRemove: () => void;
+  disabledReason?: string;
+  onRemove: (id?: string) => void;
 }
 
 export interface PromptBarChip {
@@ -706,6 +711,11 @@ function KindIcon({ kind, className }: { kind: PromptBarReference["kind"]; class
 
 /** One dashed slot of the reference row, or its filled thumbnail with a remove control. */
 function ReferenceSlot({ reference: ref, locked }: { reference: PromptBarReference; locked: boolean }) {
+  const ids = ref.value ? ref.value.split(",").filter(Boolean) : [];
+  if ((ref.max ?? 1) > 1) return <div data-reference={ref.id} className="flex flex-wrap gap-2">{ids.map((id, index) => <span key={id} className="relative">
+    <span className="flex size-20 items-center justify-center overflow-hidden rounded-lg border bg-muted">{(ref.thumbs?.[index] ?? (index === 0 ? ref.thumb : undefined)) ? <SafeImage src={(ref.thumbs?.[index] ?? ref.thumb)!} alt={ref.label} className="size-full object-cover" /> : <KindIcon kind={ref.kind} className="size-5 text-muted-foreground" />}</span>
+    <button type="button" aria-label={i18n._({ id: "ui.Remove {label} {n}", message: "Remove {label} {n}", values: { label: ref.label, n: index + 1 } })} disabled={locked} onClick={() => ref.onRemove(id)} className="absolute -top-2 -right-2 flex size-6 items-center justify-center rounded-full border bg-background text-foreground outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50"><X className="size-3.5" aria-hidden="true" /></button>
+  </span>)}{ids.length < ref.max! ? <button type="button" aria-label={i18n._({ id: "ui.Add {label}", message: "Add {label}", values: { label: ref.label } })} disabled={locked || ref.disabled || Boolean(ref.disabledReason)} title={ref.disabledReason} onClick={ref.onPick} className="flex size-20 flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-border text-muted-foreground outline-none transition-colors hover:border-primary focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50"><Plus className="size-5" aria-hidden="true" /><span className="max-w-full truncate px-1 text-xs">{ref.label}</span></button> : null}</div>;
   return (
     <div data-reference={ref.id} className="relative">
       {ref.value ? (
@@ -713,12 +723,12 @@ function ReferenceSlot({ reference: ref, locked }: { reference: PromptBarReferen
           <div className="flex size-20 items-center justify-center overflow-hidden rounded-lg border bg-muted">
             {ref.thumb ? <SafeImage src={ref.thumb} alt={ref.label} className="size-full object-cover" /> : <span className="px-1 text-center text-xs text-muted-foreground">{ref.label}</span>}
           </div>
-          <button type="button" aria-label={i18n._({ id: "ui.Remove {label}", message: "Remove {label}", values: { label: ref.label } })} disabled={locked} onClick={ref.onRemove} className="absolute -top-2 -right-2 flex size-6 items-center justify-center rounded-full border bg-background text-foreground outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50">
+          <button type="button" aria-label={i18n._({ id: "ui.Remove {label}", message: "Remove {label}", values: { label: ref.label } })} disabled={locked} onClick={() => ref.onRemove()} className="absolute -top-2 -right-2 flex size-6 items-center justify-center rounded-full border bg-background text-foreground outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50">
             <X className="size-3.5" aria-hidden="true" />
           </button>
         </>
       ) : (
-        <button type="button" aria-label={i18n._({ id: "ui.Add {label}", message: "Add {label}", values: { label: ref.label } })} disabled={locked || ref.disabled} onClick={ref.onPick} className="flex size-20 flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-border text-muted-foreground outline-none transition-colors hover:border-primary focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50">
+        <button type="button" aria-label={i18n._({ id: "ui.Add {label}", message: "Add {label}", values: { label: ref.label } })} disabled={locked || ref.disabled || Boolean(ref.disabledReason)} title={ref.disabledReason} onClick={ref.onPick} className="flex size-20 flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-border text-muted-foreground outline-none transition-colors hover:border-primary focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50">
           {ref.kind === "audio" || ref.kind === "video" ? <KindIcon kind={ref.kind} className="size-5" /> : <Plus className="size-5" aria-hidden="true" />}
           <span className="max-w-full truncate px-1 text-xs">{ref.label}</span>
         </button>
@@ -757,7 +767,7 @@ function InFieldThumb({ reference: ref, locked, compact }: { reference: PromptBa
           {ref.thumb ? <SafeImage src={ref.thumb} alt={ref.label} className="size-full object-cover" /> : <KindIcon kind={ref.kind} className="size-4 text-muted-foreground" />}
         </span>
         <span className="min-w-0 max-w-40 truncate text-sm">{ref.label}</span>
-        <button type="button" aria-label={i18n._({ id: "ui.Remove {label}", message: "Remove {label}", values: { label: ref.label } })} disabled={locked} onClick={ref.onRemove} className="flex size-12 shrink-0 items-center justify-center rounded-lg text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50">
+        <button type="button" aria-label={i18n._({ id: "ui.Remove {label}", message: "Remove {label}", values: { label: ref.label } })} disabled={locked} onClick={() => ref.onRemove()} className="flex size-12 shrink-0 items-center justify-center rounded-lg text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50">
           <Trash2 className="size-4" aria-hidden="true" />
         </button>
       </span>

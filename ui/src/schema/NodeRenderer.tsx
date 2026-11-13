@@ -805,9 +805,9 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
     return scope ? `/api/plugins/${scope.packageId}/assets/${path}` : undefined;
   };
   const refs = node.references ?? [];
-  const [filled, setFilled] = useState<Record<string, { id: string; thumb?: string }>>(() => {
-    const out: Record<string, { id: string; thumb?: string }> = {};
-    for (const ref of refs) { const v = state[ref.state]; if (typeof v === "string" && v) out[ref.state] = { id: v }; }
+  const [filled, setFilled] = useState<Record<string, { id: string; thumb?: string }[]>>(() => {
+    const out: Record<string, { id: string; thumb?: string }[]> = {};
+    for (const ref of refs) { const v = state[ref.state]; if (typeof v === "string" && v) out[ref.state] = v.split(",").filter(Boolean).map((id) => ({ id })); }
     return out;
   });
   const { dispatch, lastError } = useDispatchAction();
@@ -847,7 +847,7 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
       const quiet = chip.quiet_value ?? chip.default ?? chip.options[0]!.value;
       return String(picked[key]) !== String(quiet);
     }
-    return Boolean(filled[key]);
+    return Boolean(filled[key]?.length);
   };
   const suggested: Suggested[] = suggestCfg ? fetched.filter((row) => !dismissed.includes(row.id) && !handPicked(row.kind)).slice(0, suggestCfg.max ?? 2) : [];
 
@@ -877,7 +877,13 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
       const out = { ...prev };
       for (const ref of refs) {
         const v = state[ref.state];
-        if (typeof v === "string" && v && prev[ref.state]?.id !== v) { out[ref.state] = { id: v }; changed = true; }
+        const ids = typeof v === "string" ? v.split(",").filter(Boolean) : [];
+        const nextIds = ids.slice(0, refMax(ref));
+        if (nextIds.join(",") !== (prev[ref.state] ?? []).map((x) => x.id).join(",")) {
+          if (nextIds.length) out[ref.state] = nextIds.map((id) => ({ id }));
+          else delete out[ref.state];
+          changed = true;
+        }
       }
       return changed ? out : prev;
     });
@@ -896,7 +902,7 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
     // VIDEO-LORA-09: a chip that cannot be used at the chosen level sends nothing.
     for (const chip of chips) if (chipUnusable(chip, tier)) delete item[chip.state];
     if (node.tier) item[node.tier.state] = tier;
-    for (const ref of refs) { const f = filled[ref.state]; if (f) item[ref.state] = f.id; }
+    for (const ref of refs) { const f = filled[ref.state]; if (f?.length) item[ref.state] = f.map((x) => x.id).join(","); }
     // STYLES-04: a suggested chip left on is the person's yes. Only the submit carries the id (never page state, so never the address).
     const taken = new Set<"style" | "character">();
     for (const row of suggested) if (!taken.has(row.kind)) { taken.add(row.kind); item[suggestStates[row.kind]] = row.id; }
@@ -911,6 +917,26 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
   // hand the draft to the host. Every chip stays reachable (Look and Camera keep their picture cards inside their group's popover).
   const composerHost = host?.composer;
   const withModes = Boolean(composerHost && node.layout === "chat" && composerHost.modes.length > 1);
+  const refMax = (ref: typeof refs[number]) => (ref.kind === "picture" || ref.kind === "character" ? ref.max ?? 1 : 1);
+  const pickReference = (ref: typeof refs[number]) => {
+    if (!host?.pickMedia) return;
+    const current = filled[ref.state] ?? [];
+    if (current.length >= refMax(ref)) return;
+    void host.pickMedia(ref.kind).then((got) => {
+      if (!got || current.some((choice) => choice.id === got.id)) return;
+      const next = [...current, got].slice(0, refMax(ref));
+      setFilled((prev) => ({ ...prev, [ref.state]: next }));
+      writer?.merge({ [ref.state]: next.map((choice) => choice.id).join(",") });
+    }, () => {});
+  };
+  const removeReference = (ref: typeof refs[number], id?: string) => {
+    const current = filled[ref.state] ?? [];
+    const next = id ? current.filter((choice) => choice.id !== id) : [];
+    setFilled((prev) => ({ ...prev, [ref.state]: next }));
+    writer?.merge({ [ref.state]: next.length ? next.map((choice) => choice.id).join(",") : undefined });
+  };
+  const addRef = refs.find((ref) => (filled[ref.state]?.length ?? 0) < refMax(ref) && !ref.disabled_reason);
+  const unavailableAddReason = !addRef ? refs.find((ref) => ref.disabled_reason)?.disabled_reason : undefined;
   const tierList = (node.tier?.tiers ?? []).filter((t) => !composerHost?.quality || composerHost.quality.includes(t.id));
   const modeData = withModes && composerHost ? composerHost.modes.map((m) => {
     if (m.id !== composerHost.current) return { id: m.id, label: m.label, icon: m.icon as never, primaryLabel: m.primaryLabel };
@@ -921,30 +947,15 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
       primaryLabel: node.submit_label ?? m.primaryLabel,
       ...(node.placeholder ? { placeholder: node.placeholder } : {}),
       ...(composerHost.presets ? { presets: composerHost.presets } : {}),
-      ...(refs[0]?.disabled_reason ? { onAdd: () => {}, addDisabledReason: refs[0].disabled_reason } : {}),
-      ...(!refs[0]?.disabled_reason && host?.pickMedia && refs[0] ? { onAdd: () => {
-        const ref = refs[0]!;
-        void host.pickMedia!(ref.kind).then((got) => {
-          if (!got) return;
-          setFilled((prev) => ({ ...prev, [ref.state]: got }));
-          writer?.merge({ [ref.state]: got.id });
-        }, () => {});
-      } } : {}),
+      ...(unavailableAddReason ? { addDisabledReason: unavailableAddReason } : {}),
+      ...(host?.pickMedia && (addRef || unavailableAddReason) ? { onAdd: () => { if (addRef) pickReference(addRef); } } : {}),
       references: refs.map((ref) => ({
-        id: ref.state, label: ref.label, kind: ref.kind, value: filled[ref.state]?.id ?? null, thumb: filled[ref.state]?.thumb,
+        id: ref.state, label: ref.label, kind: ref.kind, max: refMax(ref), value: filled[ref.state]?.map((x) => x.id).join(",") ?? null, thumbs: filled[ref.state]?.map((x) => x.thumb),
         ...(ref.disabled_reason ? { disabledReason: ref.disabled_reason } : {}),
         onPick: () => {
-          if (!host?.pickMedia) return;
-          void host.pickMedia(ref.kind).then((got) => {
-            if (!got) return;
-            setFilled((prev) => ({ ...prev, [ref.state]: got }));
-            writer?.merge({ [ref.state]: got.id });
-          }, () => {});
+          pickReference(ref);
         },
-        onRemove: () => {
-          setFilled((prev) => { const next = { ...prev }; delete next[ref.state]; return next; });
-          writer?.merge({ [ref.state]: undefined });
-        },
+        onRemove: (id?: string) => removeReference(ref, id),
       })),
       chips: chips.map((chip) => {
         const unusable = chipUnusable(chip, tier);
@@ -1042,22 +1053,17 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
         label: ref.label,
         kind: ref.kind,
         placement: ref.placement,
+        max: refMax(ref),
         hint: ref.hint,
-        value: filled[ref.state]?.id ?? null,
-        thumb: filled[ref.state]?.thumb,
+        disabledReason: ref.disabled_reason,
+        value: filled[ref.state]?.map((x) => x.id).join(",") ?? null,
+        thumb: filled[ref.state]?.[0]?.thumb,
+        thumbs: filled[ref.state]?.map((x) => x.thumb),
         disabled: !host?.pickMedia,
         onPick: () => {
-          if (!host?.pickMedia) return;
-          void host.pickMedia(ref.kind).then((got) => {
-            if (!got) return;
-            setFilled((prev) => ({ ...prev, [ref.state]: got }));
-            writer?.merge({ [ref.state]: got.id });
-          }, () => {});
+          pickReference(ref);
         },
-        onRemove: () => {
-          setFilled((prev) => { const next = { ...prev }; delete next[ref.state]; return next; });
-          writer?.merge({ [ref.state]: undefined });
-        },
+        onRemove: (id?: string) => removeReference(ref, id),
       }))}
       tier={node.tier && !withModes ? {
         value: tier,

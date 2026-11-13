@@ -5,7 +5,7 @@ import { MemoryRouter } from "react-router-dom";
 import { renderWithQueryClient } from "../../tests/renderWithQueryClient";
 import { stubMatchMedia } from "../../tests/stubMatchMedia";
 import { NodeRenderer } from "@/kit/schema/NodeRenderer";
-import { PackageScopeContext } from "@/kit/schema/packageScope";
+import { PackageScopeContext, PageStateContext } from "@/kit/schema/packageScope";
 import { MediaHostContext, type MediaHost } from "@/kit/schema/mediaHost";
 import type { UiNode } from "@/kit/schema/types";
 
@@ -24,13 +24,15 @@ const node = {
   submit: { call: { target: "/api/plugins/image/actions/make", args: { prompt: "{prompt}", shape: "{shape}", tier: "{tier}" } } },
 } as unknown as UiNode;
 
-function draw(host: Partial<MediaHost>, bar: UiNode = node) {
+function draw(host: Partial<MediaHost>, bar: UiNode = node, state: Record<string, unknown> = {}, onState: (patch: Record<string, unknown>) => void = () => {}) {
   return renderWithQueryClient(
     <MemoryRouter>
       <PackageScopeContext.Provider value={{ packageId: "image" }}>
-        <MediaHostContext.Provider value={host as MediaHost}>
-          <NodeRenderer node={bar} state={{}} />
-        </MediaHostContext.Provider>
+        <PageStateContext.Provider value={{ merge: onState }}>
+          <MediaHostContext.Provider value={host as MediaHost}>
+            <NodeRenderer node={bar} state={state} />
+          </MediaHostContext.Provider>
+        </PageStateContext.Provider>
       </PackageScopeContext.Provider>
     </MemoryRouter>,
   );
@@ -78,6 +80,36 @@ describe("prompt_bar with the host's composer modes", () => {
     expect(add.disabled).toBe(true);
     expect(add.getAttribute("title")).toBe(line);
     expect(view.container.querySelector('[data-slot="composer-slots"] [aria-disabled="true"]')).not.toBeNull();
+  });
+
+  test("multi-reference slots add distinct choices, remove one, and write the joined page-state value", async () => {
+    const picked: string[] = [];
+    const stateWrites: Record<string, unknown>[] = [];
+    const bar = { ...node, references: [{ state: "reference", label: "Image reference", kind: "picture", max: 3 }], submit: { call: { target: "/make", args: { references: "{reference}" } } } } as unknown as UiNode;
+    const host = { composer: { modes, current: "picture", onModeChange: () => {} }, pickMedia: mock(async () => { const id = `file-${picked.length + 1}`; picked.push(id); return { id }; }) };
+    const view = draw(host, bar, {}, (patch) => stateWrites.push(patch));
+    fireEvent.click(view.getByRole("button", { name: "Add Image reference" }));
+    await waitFor(() => expect(picked).toHaveLength(1));
+    fireEvent.click(view.getByRole("button", { name: "Add Image reference" }));
+    await waitFor(() => expect(picked).toHaveLength(2));
+    expect(stateWrites.at(-1)).toEqual({ reference: "file-1,file-2" });
+    expect(view.getByRole("button", { name: "Remove Image reference 1" })).not.toBeNull();
+    expect(view.getByRole("button", { name: "Remove Image reference 2" })).not.toBeNull();
+    fireEvent.click(view.getByRole("button", { name: "Remove Image reference 1" }));
+    expect(stateWrites.at(-1)).toEqual({ reference: "file-2" });
+    expect(view.getByRole("button", { name: "Remove Image reference 1" })).not.toBeNull();
+    expect(view.getByRole("button", { name: "Add Image reference" })).not.toBeNull();
+  });
+
+  test("the composer plus picks the first reference slot with room", async () => {
+    const seen: string[] = [];
+    const bar = { ...node, references: [
+      { state: "reference", label: "Image reference", kind: "picture", max: 1 },
+      { state: "character", label: "Character", kind: "character", max: 2 },
+    ] } as unknown as UiNode;
+    const view = draw({ composer: { modes, current: "picture", onModeChange: () => {} }, pickMedia: mock(async (kind: string) => { seen.push(kind); return { id: `file-${seen.length}` }; }) as MediaHost["pickMedia"] }, bar, { reference: "existing-file" });
+    fireEvent.click(view.container.querySelector('[data-slot="composer-add"]')!);
+    await waitFor(() => expect(seen).toEqual(["character"]));
   });
 
   test("the host's quality list narrows the tiers (a minor never sees Max)", async () => {

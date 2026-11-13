@@ -1,3 +1,7 @@
+## [ui-v0.5.663] - 2026-11-13
+
+- A `prompt_bar` reference takes `max` (1 to 3, default 1). Picture and character slots can add up to that many distinct references, show each as its own tile with a numbered remove control, and send their ids joined by commas in state and submit arguments. Existing single reference values stay unchanged.
+
 ## [ui-v0.5.661] - 2026-11-13
 
 - Image Editor More panel. A `choice` with more than four options is one labelled Select instead of a wide toggle row; the operation tabs, the controls and the Preview button wrap inside the panel (no sideways scroll), so Preview is always reachable at desktop and phone widths. Four or fewer options are unchanged.

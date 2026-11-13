@@ -1,3 +1,7 @@
+## [spec-v0.1.391] - 2026-11-13
+
+- `prompt_bar.references` takes `max`, an integer from 1 to 3 with a default of 1, matching ui 0.5.663.
+
 ## [spec-v0.1.389] - 2026-11-13
 
 - MUSIC-ID-01, additive. New household setting `music.identify.online` (`on` default, `ask`, `off`): whether Home may look a song up on AcoustID by fingerprint when its own library has no match. `spec/package.json` is 0.1.389.

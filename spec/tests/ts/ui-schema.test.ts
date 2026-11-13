@@ -322,6 +322,10 @@ describe("UI schema, package apps", () => {
     expect(validate({ ...ok, chips: [{ ...cards, options: [{ value: "a", label: "A", media: "/abs.mp4" }] }] })).toBe(false);
     expect(validate({ ...ok, chips: [{ ...cards, options: [{ value: "a", label: "A", media: "https://x.test/a.mp4" }] }] })).toBe(false);
     expect(validate({ ...ok, references: [{ state: "start_frame", label: "Picture", kind: "picture" }, { state: "who", label: "Character", kind: "character" }, { state: "where", label: "Place", kind: "place" }] })).toBe(true);
+    expect(validate({ ...ok, references: [{ state: "start_frame", label: "Picture", kind: "picture", max: 3 }] })).toBe(true);
+    expect(validate({ ...ok, references: [{ state: "start_frame", label: "Picture", kind: "picture", max: 0 }] })).toBe(false);
+    expect(validate({ ...ok, references: [{ state: "start_frame", label: "Picture", kind: "picture", max: 4 }] })).toBe(false);
+    expect(validate({ ...ok, references: [{ state: "start_frame", label: "Picture", kind: "picture", max: 1.5 }] })).toBe(false);
     expect(validate({ ...ok, references: [{ state: "x", label: "X", kind: "movie" }] })).toBe(false);
     expect(validate({ ...ok, references: [{ state: "x", label: "X" }] })).toBe(false);
   });

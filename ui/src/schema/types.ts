@@ -585,6 +585,7 @@ export const PromptBarNodeSchema = z.object({
         state: z.string().regex(/^[a-z][a-z0-9_]*$/).max(40),
         label: z.string().min(1).max(40),
         kind: z.enum(["picture", "character", "place", "audio", "video"]),
+        max: z.number().int().min(1).max(3).default(1),
         placement: z.enum(["row", "in_field", "tile"]).optional(),
         hint: z.string().min(1).max(80).optional(),
         /** The plain line shown while this slot cannot be filled yet (the slot and the composer "+" draw disabled with it). */

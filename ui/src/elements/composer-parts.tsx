@@ -30,10 +30,12 @@ export interface ComposerSlotData {
   max?: number;
   /** The chosen file id; empty or absent while the slot is empty. */
   value?: string | null;
+  /** Resolved thumbnail addresses, aligned with comma-separated ids in value. */
+  thumbs?: readonly (string | undefined)[];
   /** A resolved address for the thumbnail of a filled slot. */
   thumb?: string;
   onPick?: () => void;
-  onRemove?: () => void;
+  onRemove?: (id?: string) => void;
   /** Set when the slot cannot be filled right now; the plain reason shows as its tooltip and accessible description. */
   disabledReason?: string;
 }
@@ -246,14 +248,28 @@ export function ComposerSlots({ slots }: { slots: readonly ComposerSlotData[] })
     <div data-slot="composer-slots" role="group" aria-label={i18n._({ id: "ui.References", message: "References" })} className="flex min-w-0 items-center gap-2 max-sm:shrink-0 max-sm:flex-nowrap sm:flex-wrap">
       {slots.map((slot) => {
         const Icon = SLOT_ICON[slot.kind];
-        if (slot.value) {
+        const ids = slot.value ? slot.value.split(",").filter(Boolean) : [];
+        if (ids.length && (slot.max ?? 1) > 1) {
+          return <span key={slot.id} className="contents">{ids.map((id, index) => (
+            <span key={`${slot.id}-${id}`} data-slot-id={slot.id} className="flex min-w-0 items-center gap-2 rounded-2xl bg-foreground/5 p-1">
+              <span className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-muted">
+                {slot.thumbs?.[index] ? <SafeImage src={slot.thumbs[index]!} alt={slot.label} className="size-full object-cover" /> : <Icon className="size-4 text-muted-foreground" aria-hidden="true" />}
+              </span>
+              <span className="min-w-0 max-w-32 truncate text-sm">{slot.label}</span>
+              <button type="button" aria-label={i18n._({ id: "ui.Remove {label} {n}", message: "Remove {label} {n}", values: { label: slot.label, n: index + 1 } })} onClick={() => slot.onRemove?.(id)} className="flex size-12 shrink-0 items-center justify-center rounded-lg text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50">
+                <Trash2 className="size-4" aria-hidden="true" />
+              </button>
+            </span>
+          ))}{ids.length < (slot.max ?? 1) ? <button key={`${slot.id}-add`} type="button" data-slot-id={slot.id} aria-label={i18n._({ id: "ui.Add {label}", message: "Add {label}", values: { label: slot.label } })} title={slot.disabledReason} aria-disabled={slot.disabledReason ? true : undefined} onClick={() => { if (!slot.disabledReason) slot.onPick?.(); }} className={cn("flex min-h-12 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-2xl border border-dashed border-border bg-foreground/5 px-4 text-base text-muted-foreground outline-none transition-colors hover:bg-foreground/10 hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50", slot.disabledReason && "opacity-60", hitArea(1))}><Icon className="size-5" aria-hidden="true" /><span>{slot.label}</span></button> : null}</span>;
+        }
+        if (ids.length) {
           return (
             <span key={slot.id} data-slot-id={slot.id} className="flex min-w-0 items-center gap-2 rounded-2xl bg-foreground/5 p-1">
               <span className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-muted">
-                {slot.thumb ? <SafeImage src={slot.thumb} alt={slot.label} className="size-full object-cover" /> : <Icon className="size-4 text-muted-foreground" aria-hidden="true" />}
+                {(slot.thumbs?.[0] ?? slot.thumb) ? <SafeImage src={(slot.thumbs?.[0] ?? slot.thumb)!} alt={slot.label} className="size-full object-cover" /> : <Icon className="size-4 text-muted-foreground" aria-hidden="true" />}
               </span>
               <span className="min-w-0 max-w-32 truncate text-sm">{slot.label}</span>
-              <button type="button" aria-label={i18n._({ id: "ui.Remove {label}", message: "Remove {label}", values: { label: slot.label } })} onClick={slot.onRemove} className="flex size-12 shrink-0 items-center justify-center rounded-lg text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50">
+              <button type="button" aria-label={i18n._({ id: "ui.Remove {label}", message: "Remove {label}", values: { label: slot.label } })} onClick={() => slot.onRemove?.()} className="flex size-12 shrink-0 items-center justify-center rounded-lg text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50">
                 <Trash2 className="size-4" aria-hidden="true" />
               </button>
             </span>
@@ -269,7 +285,7 @@ export function ComposerSlots({ slots }: { slots: readonly ComposerSlotData[] })
             title={reason}
             aria-disabled={reason ? true : undefined}
             onClick={() => { if (!reason) slot.onPick?.(); }}
-            className={cn("flex min-h-12 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-2xl bg-foreground/5 px-4 text-base text-muted-foreground outline-none transition-colors hover:bg-foreground/10 hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50", reason && "opacity-60", hitArea(1))}
+            className={cn("flex min-h-12 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-2xl bg-foreground/5 px-4 text-base text-muted-foreground outline-none transition-colors hover:bg-foreground/10 hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50", (slot.max ?? 1) > 1 && "border border-dashed border-border", reason && "opacity-60", hitArea(1))}
           >
             <Icon className="size-5" aria-hidden="true" /><span>{slot.label}</span>
           </button>
