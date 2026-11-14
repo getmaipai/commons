@@ -184,6 +184,11 @@ describe("spec/settings/keys.json", () => {
     expect(entry).toMatchObject({ scope: "person", selector: "boolean", default: true, label: "Start tours automatically", lives_in: "profile.appearance" });
   });
 
+  test("VOICE-MATCH-01 declares voice matching as an advanced person privacy switch", () => {
+    const entry = (loadRegistry() as Record<string, unknown>[]).find((row) => row.key === "person.voice.match");
+    expect(entry).toMatchObject({ key: "person.voice.match", scope: "person", selector: "boolean", default: false, level: "advanced", secret: false, lives_in: "person.privacy", honoured_by: ["home"] });
+  });
+
   test("AI companions default on and are guardian-controlled for every age band", () => {
     const entries = loadRegistry() as Record<string, unknown>[];
     const matches = entries.filter((row) => row.key === "companions.allowed");

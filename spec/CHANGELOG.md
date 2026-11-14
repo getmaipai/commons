@@ -1,3 +1,7 @@
+## [spec-v0.1.400] - 2026-11-14
+
+- VOICE-MATCH-01, additive. The person setting `person.voice.match` lets Home compare someone's voice with their own recorded samples to verify who is speaking.
+
 ## [spec-v0.1.397] - 2026-11-14
 
 - MUSIC-ID-05, additive. The household setting `music.identify.shazam` (on by default) lets Home ask Shazam about a short clip's sound signature; the card help for `music.identify.online` now says Home asks Shazam and AcoustID at the same time and that only a signature or fingerprint leaves the home, never the recording. `device-command` gains `song_title` with payload `{ text }` (0 to 80 characters; empty clears), which Home sends when a person confirms or corrects a song name so the robot shows the right title.
