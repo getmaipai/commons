@@ -271,5 +271,16 @@
     "issued_at": "2026-10-05T12:00:00Z",
     "expires_at": "2026-10-05T12:00:30Z",
     "hlc": "1791201600000:0:robot123"
+  },
+  {
+    "id": "cmd-listen-song",
+    "kind": "listen_song",
+    "payload": {
+      "request_id": "name-that-tune-01",
+      "seconds": 10
+    },
+    "issued_at": "2026-11-14T12:00:00Z",
+    "expires_at": "2026-11-14T12:01:00Z",
+    "hlc": "1791201600000:0:hub123"
   }
 ]

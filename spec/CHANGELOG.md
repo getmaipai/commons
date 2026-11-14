@@ -1,3 +1,7 @@
+## [spec-v0.1.396] - 2026-11-14
+
+- LISTEN-SONG-01, additive: `device-command` gains `listen_song` with a `request_id` and optional 5 to 15 second clip duration (default 10); the robot posts the clip to Home for song identification and never keeps it.
+
 ## [spec-v0.1.395] - 2026-11-14
 
 - SCENE-01f, additive. The person setting `scene.ha_person_entity` links someone's own Home Assistant person or device tracker for Home's coarse home-state cue on their place line.

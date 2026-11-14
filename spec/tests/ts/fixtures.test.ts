@@ -319,7 +319,7 @@ describe("record fixtures validate against their generated Zod models", () => {
 
   test("device-command fixtures cover every kind and reject a mismatched payload", () => {
     const commands = JSON.parse(readFileSync(join(import.meta.dir, "..", "..", "fixtures", "records", "device-command.kinds.example.json"), "utf-8")) as unknown[];
-    expect(commands).toHaveLength(26);
+    expect(commands).toHaveLength(27);
     for (const command of commands) expect(() => DeviceCommand.parse(command)).not.toThrow();
     const invalid = { ...(commands[0] as object), kind: "capture_request" };
     expect(() => DeviceCommand.parse(invalid)).toThrow();
@@ -329,6 +329,20 @@ describe("record fixtures validate against their generated Zod models", () => {
     const offer = (commands as { kind: string; payload: Record<string, unknown> }[]).find((command) => command.kind === "offer")!;
     expect(offer.payload).not.toHaveProperty("text");
     expect(() => DeviceCommand.parse({ ...offer, payload: { ...offer.payload, text: "prepared content" } })).toThrow();
+    const listenSong = (commands as { kind: string; payload: Record<string, unknown> }[]).find((command) => command.kind === "listen_song")!;
+    expect(listenSong.payload).toEqual({ request_id: "name-that-tune-01", seconds: 10 });
+    for (const payload of [
+      {},
+      { request_id: "" },
+      { request_id: "x".repeat(65) },
+      { request_id: "valid", seconds: 4 },
+      { request_id: "valid", seconds: 16 },
+      { request_id: "valid", seconds: 5.5 },
+      { request_id: "valid", extra: true },
+    ]) {
+      expect(() => DeviceCommand.parse({ ...listenSong, payload }), JSON.stringify(payload)).toThrow();
+    }
+    expect(() => DeviceCommand.parse({ ...listenSong, payload: { request_id: "valid" } })).not.toThrow();
     const selfTest = (commands as { kind: string; payload: Record<string, unknown> }[]).find((command) => command.kind === "self_test")!;
     expect(() => DeviceCommand.parse(selfTest)).not.toThrow();
     expect(() => DeviceCommand.parse({ ...selfTest, payload: { ...selfTest.payload, part: "camera" } })).toThrow();

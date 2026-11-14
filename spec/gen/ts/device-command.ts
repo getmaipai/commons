@@ -333,6 +333,24 @@ export const DeviceCommand = z
       z
         .object({
           id: z.string().min(1).max(128),
+          kind: z.literal("listen_song"),
+          issued_at: z.string().datetime({ offset: true }),
+          expires_at: z.string().datetime({ offset: true }),
+          hlc: z.string().regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$")),
+          payload: z
+            .object({
+              request_id: z.string().min(1).max(64),
+              seconds: z.number().int().gte(5).lte(15).default(10),
+            })
+            .strict(),
+        })
+        .strict()
+        .describe(
+          "The robot records a few seconds of the room's sound with its microphone and posts the clip to Home to name the song, quoting request_id. The robot refuses when it is muted, at night or already capturing; it never keeps the clip.",
+        ),
+      z
+        .object({
+          id: z.string().min(1).max(128),
           kind: z.literal("announce"),
           issued_at: z.string().datetime({ offset: true }),
           expires_at: z.string().datetime({ offset: true }),

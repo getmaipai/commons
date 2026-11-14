@@ -1022,6 +1022,62 @@
       }
     },
     {
+      "description": "The robot records a few seconds of the room's sound with its microphone and posts the clip to Home to name the song, quoting request_id. The robot refuses when it is muted, at night or already capturing; it never keeps the clip.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "payload",
+        "issued_at",
+        "expires_at",
+        "hlc"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "kind": {
+          "type": "string",
+          "const": "listen_song"
+        },
+        "issued_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "hlc": {
+          "type": "string",
+          "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "request_id"
+          ],
+          "properties": {
+            "request_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            "seconds": {
+              "type": "integer",
+              "minimum": 5,
+              "maximum": 15,
+              "default": 10
+            }
+          }
+        }
+      }
+    },
+    {
       "description": "The robot shows a card and says the text aloud. The robot refuses (and says why in its answer) when announcements are off, it is muted, in quiet hours or at night, or the text is empty.",
       "type": "object",
       "additionalProperties": false,
