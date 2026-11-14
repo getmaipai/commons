@@ -41,7 +41,7 @@ export default function NavItem({
 
     <SidebarMenuButton render={render ?? <motion.div
       className={cn("relative flex items-center gap-3 w-full group group-data-[state=collapsed]:px-2.5 px-3 py-2 my-0.5 transition-all duration-200 rounded-md",
-        isActive && "bg-primary text-background font-medium", className)}
+        isActive && "bg-primary/10 text-primary font-medium", className)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       aria-label={ariaLabel}

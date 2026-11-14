@@ -14,6 +14,7 @@ import {
   SidebarMenuItem,
 } from "../dashboard/components/ui/sidebar";
 import { cn } from "../dashboard/lib/utils";
+import { menuHover, menuIndicator, menuSelected, navTransition } from "../dashboard/lib/navItemStyle";
 import { HitField } from "../settings/HitField";
 import { Chip } from "./Chip";
 import { SafeImage } from "./SafeImage";
@@ -330,7 +331,7 @@ export function SectionSidebar({
         <SidebarMenuButton
           size="settings"
           isActive={item.active === true}
-          className={cn(compact && "h-8 rounded-lg px-2 text-[13px] before:-inset-y-1.5", rail && "justify-center gap-0 px-0", item.active && "font-semibold bg-settings-selected")}
+          className={cn("rounded-lg", navTransition, menuHover, menuSelected, compact && "h-8 px-2 text-[13px] before:-inset-y-1.5", rail && "justify-center gap-0 px-0")}
           render={(props) => (
             <a {...props} href={item.href ?? "#"} onClick={(event) => { item.onClick?.(event); }} title={rail ? item.label : undefined}>
               {props.children}
@@ -340,8 +341,8 @@ export function SectionSidebar({
           aria-current={item.active ? "page" : undefined}
           aria-describedby={item.describedBy}
         >
-          {item.active ? <span aria-hidden data-active="true" className="absolute inset-y-0 start-0 w-[3px] rounded-full bg-settings-accent" /> : null}
-          <span className={cn("relative flex shrink-0", !rail && !compact && item.icon && !item.media && "size-7 items-center justify-center rounded-lg bg-settings-icon-tile", item.active && item.icon && !item.media && "bg-settings-accent/15")}>
+          {item.active ? <span aria-hidden data-active="true" data-slot="section-sidebar-indicator" className={menuIndicator} /> : null}
+          <span className={cn("relative flex shrink-0", !rail && !compact && item.icon && !item.media && "size-7 items-center justify-center rounded-lg", !rail && !compact && !item.active && item.icon && !item.media && "bg-settings-icon-tile")}>
             {item.media ? <SafeImage src={item.media} alt="" aria-hidden className="size-[18px] rounded-sm object-cover" /> : <Icon aria-hidden className={cn(compact ? "size-4" : "size-[18px]", item.icon ? "text-settings-helper" : "text-settings-helper", item.active && item.icon && "text-settings-accent")} />}
             {rail && item.dot ? <span data-slot="section-sidebar-dot" aria-hidden className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-primary" /> : null}
           </span>

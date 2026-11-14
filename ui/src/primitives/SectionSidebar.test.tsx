@@ -520,3 +520,38 @@ describe("SectionSidebar", () => {
     expect(container.querySelector('[data-slot="section-sidebar-header"]')?.contains(screen.getByRole("searchbox"))).toBe(false);
   });
 });
+
+describe("SectionSidebar modern look (selected and hover rows)", () => {
+  const classes = (el: Element | null) => (el?.getAttribute("class") ?? "").split(/\s+/);
+
+  test("the selected row is a soft primary tint with a 2px indicator inside its left edge and no box behind the icon", () => {
+    const { container } = column();
+    const today = screen.getByRole("link", { name: "Today" });
+    expect(today.getAttribute("aria-current")).toBe("page");
+    for (const cls of ["rounded-lg", "data-active:bg-primary/10", "data-active:text-primary", "data-active:font-medium", "focus-visible:ring-2"]) expect(classes(today)).toContain(cls);
+    const indicator = today.querySelector('[data-slot="section-sidebar-indicator"]');
+    expect(classes(indicator)).toContain("w-0.5");
+    expect(classes(indicator)).toContain("bg-primary");
+    const tile = today.querySelector("svg")!.parentElement!;
+    expect(tile.className).not.toContain("bg-settings-icon-tile");
+    expect(tile.className).not.toContain("bg-settings-accent");
+    expect(tile.className).not.toContain("bg-settings-selected");
+    expect(container.querySelectorAll('[data-slot="section-sidebar-indicator"]')).toHaveLength(1);
+  });
+
+  test("other rows get the calm hover and keep their row height", () => {
+    column();
+    const saved = screen.getByRole("link", { name: "Saved" });
+    expect(saved.getAttribute("aria-current")).toBeNull();
+    expect(saved.querySelector('[data-slot="section-sidebar-indicator"]')).toBeNull();
+    for (const cls of ["hover:bg-foreground/5", "hover:text-foreground", "duration-150", "motion-reduce:transition-none"]) expect(classes(saved)).toContain(cls);
+    expect(classes(saved)).toContain("h-[30px]");
+  });
+
+  test("the menu style uses only theme tokens", () => {
+    const style = readFileSync(new URL("../dashboard/lib/navItemStyle.ts", import.meta.url), "utf8");
+    const palette = /\b(?:bg|text|border|ring)-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|white|black)(?:-\d{2,3})?\b/;
+    expect(style).not.toMatch(palette);
+    expect(style).not.toContain("—");
+  });
+});

@@ -1,3 +1,8 @@
+## [ui-v0.5.666] - 2026-11-13
+
+- Modern rail and app-menu look, all from theme tokens (no new tokens). Rail: the selected item is a rounded tile tinted `bg-primary/15` with a primary icon (and label when labelled or expanded) and a slim 3 px primary pill (`data-slot="rail-indicator"`); hover is `bg-foreground/10` with the icon moving from muted to full foreground over 150 ms (off under reduced motion), a deeper pressed state, and the focus ring is kept. It applies to icons-only, labelled, grouped, the All apps launcher and its popover list, and the phone list. App menu (second column, `SectionSidebar`): the selected row is a soft `data-active:bg-primary/10` rounded-lg row with primary text and icon, medium weight and a 2 px primary indicator inside its left edge, with no box behind the icon; hover is `bg-foreground/5`. The full-layout sidebar item drops its solid primary pill for the same tint. Shared classes live in `dashboard/lib/navItemStyle.ts`.
+- Fix: the collapsed grouped rail items (icon only, the main app destinations) had no tooltip since the grouped rail arrived in 0.5.598, so hovering showed nothing; they are now wrapped in the rail tooltip (expanded rows already print their name).
+
 ## [ui-v0.5.665] - 2026-11-13
 
 - VIDEO-LD-05: a `player` takes `marks` (`{ bind?, field?, heading? }`): saved moments `{ at_s, label? }` draw as a wrapping row of 44 px buttons under the player, and a tap seeks to `at_s`. An empty list draws nothing. A player action's args may use `{position_s}`, the player's current time in seconds at the click (a number when the whole argument is the token), so a button can save a moment.

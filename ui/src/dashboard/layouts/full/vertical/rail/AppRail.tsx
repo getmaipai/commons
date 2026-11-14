@@ -10,6 +10,7 @@ import { Button } from "../../../../components/ui/button";
 import { getIcon } from "../../../../../icons";
 import { cn } from "../../../../lib/utils";
 import { hitArea } from "../../../../../utils";
+import { navTransition, railHover, railIndicator, railSelected } from "../../../../lib/navItemStyle";
 import SidebarContent, { type ChildItem } from "../sidebar/sidebaritems";
 import { STATUS_LEVEL_TONE, STATUS_TONE_BG } from "../../../../../ui/status-colors";
 import type { RailStatusLevel } from "./RailProfileMenu";
@@ -104,9 +105,12 @@ export function isRailItemActive(pathname: string, url: string): boolean {
   return pathname.startsWith(`${bare}/`) || pathname.startsWith(`${url}/`);
 }
 
-const railButton =
-  "relative flex size-[var(--rail-button,40px)] items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
-const groupedRowClass = "relative flex h-[var(--rail-row-height,32px)] min-h-0 w-full min-w-0 items-center gap-2 overflow-visible rounded-lg px-[var(--rail-padding,12px)] text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+const railButton = `relative flex size-[var(--rail-button,40px)] items-center justify-center rounded-xl text-muted-foreground ${navTransition} ${railHover}`;
+/** The selected rail item's slim primary pill; the tile itself takes `railSelected`. */
+function RailIndicator() {
+  return <span aria-hidden data-slot="rail-indicator" className={railIndicator} />;
+}
+const groupedRowClass = `relative flex h-[var(--rail-row-height,32px)] min-h-0 w-full min-w-0 items-center gap-2 overflow-visible rounded-lg px-[var(--rail-padding,12px)] text-muted-foreground ${navTransition} ${railHover}`;
 const groupedRowIcon = "size-[var(--rail-icon-size,16px)] shrink-0";
 
 /** RAIL-01 (owner's layout, 2026-10-06): the permanent 56px app rail.
@@ -143,7 +147,7 @@ function AppLauncher({ apps, onTogglePin, isActive, grouped = false, expanded = 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <Tooltip>
-      <TooltipTrigger render={<PopoverTrigger data-slot="app-rail-launcher" aria-label={i18n._({ id: "ui.All apps", message: "All apps" })} className={cn(grouped ? groupedRowClass : railButton, grouped && expanded && "justify-start", grouped && !expanded && "justify-center", hitArea(grouped ? 2 : 1), open && "bg-foreground/10 text-foreground")} />}>
+      <TooltipTrigger render={<PopoverTrigger data-slot="app-rail-launcher" aria-label={i18n._({ id: "ui.All apps", message: "All apps" })} className={cn(grouped ? groupedRowClass : railButton, grouped && expanded && "justify-start", grouped && !expanded && "justify-center", hitArea(grouped ? 2 : 1), open && railSelected)} />}>
           <GridIcon className={grouped ? groupedRowIcon : "size-5"} aria-hidden />
           {grouped && expanded ? <span className="text-[length:var(--rail-label-size,13px)]">{i18n._({ id: "ui.All apps", message: "All apps" })}</span> : null}
         </TooltipTrigger>
@@ -161,9 +165,10 @@ function AppLauncher({ apps, onTogglePin, isActive, grouped = false, expanded = 
                   to={railHref(app.url)}
                   onClick={() => setOpen(false)}
                   aria-current={active ? "page" : undefined}
-                  className={cn("flex min-h-10 min-w-0 flex-1 items-center gap-3 rounded-lg px-2 hover:bg-foreground/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring", active && "bg-foreground/10")}
+                  className={cn("relative flex min-h-10 min-w-0 flex-1 items-center gap-3 rounded-lg px-2", navTransition, railHover, active && railSelected)}
                 >
-                  <Icon className="size-5 shrink-0 text-muted-foreground" aria-hidden />
+                  {active ? <RailIndicator /> : null}
+                  <Icon className={cn("size-5 shrink-0", active ? "text-primary" : "text-muted-foreground")} aria-hidden />
                   <span className="min-w-0 truncate text-sm">{app.name}</span>
                 </Link>
                 {onTogglePin ? (
@@ -199,11 +204,11 @@ function AllAppsLink({ href, active, grouped = false, expanded = false }: { href
             aria-current={active ? "page" : undefined}
             data-active={active ? "" : undefined}
             data-slot="app-rail-launcher"
-            className={cn(grouped ? groupedRowClass : railButton, grouped && expanded && "justify-start", grouped && !expanded && "justify-center", hitArea(grouped ? 2 : 1), active && "bg-foreground/10 text-foreground")}
+            className={cn(grouped ? groupedRowClass : railButton, grouped && expanded && "justify-start", grouped && !expanded && "justify-center", hitArea(grouped ? 2 : 1), active && railSelected)}
           />
         }
       >
-        <GridIcon className={grouped ? groupedRowIcon : "size-5"} aria-hidden />{grouped && expanded ? <span className="text-[length:var(--rail-label-size,13px)]">{i18n._({ id: "ui.All apps", message: "All apps" })}</span> : null}
+        {active ? <RailIndicator /> : null}<GridIcon className={grouped ? groupedRowIcon : "size-5"} aria-hidden />{grouped && expanded ? <span className="text-[length:var(--rail-label-size,13px)]">{i18n._({ id: "ui.All apps", message: "All apps" })}</span> : null}
       </TooltipTrigger>
       <TooltipContent side="right">{i18n._({ id: "ui.All apps", message: "All apps" })}</TooltipContent>
     </Tooltip>
@@ -229,7 +234,8 @@ export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, 
   const isActive = (url: string) => (activeAppHref ? railHref(activeAppHref) === railHref(url) : isRailItemActive(pathname, url));
   const pinnedApps = mobile ? (apps ?? []) : (apps ?? []).filter((app) => app.pinned);
   const labelled = !mobile && variant === "labelled";
-  const entryClass = mobile ? "relative flex min-h-12 w-full items-center gap-3 rounded-lg px-3 text-foreground hover:bg-foreground/5 focus-visible:ring-2 focus-visible:ring-ring" : labelled ? "relative flex h-[60px] w-[68px] flex-col items-center justify-center gap-1 rounded-2xl text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" : railButton;
+  const entryClass = mobile ? cn("relative flex min-h-12 w-full items-center gap-3 rounded-lg px-3 text-foreground", navTransition, railHover) : labelled ? cn("relative flex h-[60px] w-[68px] flex-col items-center justify-center gap-1 rounded-2xl text-muted-foreground", navTransition, railHover) : railButton;
+  const selectedEntry = railSelected;
   const homeActive = home?.url ? (activeAppHref ? railHref(activeAppHref) === railHref(home.url) : isRailItemActive(pathname, home.url)) : false;
   const homeStatus = home ? itemStatus?.(home) : undefined;
   const logo = (
@@ -249,7 +255,7 @@ export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, 
 
   if (grouped) {
     return <>
-      {brandSlot ?? (home ? <Tooltip><TooltipTrigger render={<Link to={railHref(home.url ?? "/")} aria-label={itemLabel(home, homeStatus)} aria-current={homeActive ? "page" : undefined} data-slot="app-rail-home" className={cn(groupedRowClass, "group", !expanded && "justify-center", homeActive && "bg-foreground/10")} />}>{brandVisual}{expanded ? <span className="min-w-0 truncate whitespace-nowrap text-[length:var(--rail-label-size,14px)]">{home.name}</span> : null}<StatusMark status={homeStatus} /></TooltipTrigger><ItemTooltip name={home.name} status={homeStatus} /></Tooltip> : null)}
+      {brandSlot ?? (home ? <Tooltip><TooltipTrigger render={<Link to={railHref(home.url ?? "/")} aria-label={itemLabel(home, homeStatus)} aria-current={homeActive ? "page" : undefined} data-slot="app-rail-home" className={cn(groupedRowClass, "group", !expanded && "justify-center", homeActive && railSelected)} />}>{homeActive ? <RailIndicator /> : null}{brandVisual}{expanded ? <span className="min-w-0 truncate whitespace-nowrap text-[length:var(--rail-label-size,14px)]">{home.name}</span> : null}<StatusMark status={homeStatus} /></TooltipTrigger><ItemTooltip name={home.name} status={homeStatus} /></Tooltip> : null)}
       <Tooltip><TooltipTrigger render={<div data-slot="app-rail-search" className="w-full" />}><HeaderSearch remote={searchRemote} triggerDataSlot="app-rail-search-trigger" triggerIconClassName={groupedRowIcon} triggerLabel={expanded ? i18n._({ id: "ui.Search", message: "Search" }) : undefined} triggerClassName={cn(groupedRowClass, expanded && "justify-start", !expanded && "justify-center", hitArea(2))} /></TooltipTrigger>{!expanded ? <TooltipContent side="right">{i18n._({ id: "ui.Search", message: "Search" })}</TooltipContent> : null}</Tooltip>
       <div className="min-h-0 w-full flex-1 overflow-y-auto">{children}</div>
       <div className={cn("mt-auto flex w-full shrink-0 flex-col gap-1", expanded ? "items-stretch" : "items-center")}>
@@ -272,10 +278,11 @@ export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, 
                 data-active={homeActive ? "" : undefined}
                       data-slot="app-rail-home"
                       data-tour={itemTourId?.(home)}
-                className={cn(entryClass, "group mb-1", !mobile && !labelled && hitArea(1), homeActive && (labelled ? "bg-[var(--surface-2)] ring-1 ring-border" : "bg-foreground/10"))}
+                className={cn(entryClass, "group mb-1", !mobile && !labelled && hitArea(1), homeActive && selectedEntry)}
               />
             }
           >
+            {homeActive ? <RailIndicator /> : null}
             {brandVisual}
             {mobile || labelled ? <span className={labelled ? "text-[11px] font-semibold leading-none" : undefined}>{home.name}</span> : null}
             <StatusMark status={homeStatus} />
@@ -291,7 +298,7 @@ export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, 
       <div className="flex items-center gap-3">
       <Tooltip>
         <TooltipTrigger render={<div data-slot="app-rail-search" className="flex size-[var(--rail-button,40px)] items-center justify-center" />}>
-          <HeaderSearch remote={searchRemote} triggerClassName="rounded-lg text-muted-foreground hover:bg-foreground/5 hover:text-foreground [&_svg]:size-5" />
+          <HeaderSearch remote={searchRemote} triggerClassName={cn("rounded-xl text-muted-foreground", navTransition, railHover, "[&_svg]:size-5")} />
         </TooltipTrigger>
         <TooltipContent side="right">{i18n._({ id: "ui.Search", message: "Search" })}</TooltipContent>
       </Tooltip>
@@ -315,10 +322,11 @@ export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, 
                       data-active={active ? "" : undefined}
                       data-slot={item.fixed ? "app-rail-core-destination" : "app-rail-item"}
                       data-tour={itemTourId?.(item)}
-                      className={cn(entryClass, !mobile && !labelled && hitArea(1), active && (labelled ? "bg-[var(--surface-2)] ring-1 ring-border text-foreground" : "bg-foreground/10 text-foreground"))}
+                      className={cn(entryClass, !mobile && !labelled && hitArea(1), active && selectedEntry)}
                     />
                   }
                 >
+                  {active ? <RailIndicator /> : null}
                   {Icon ? <Icon className={labelled ? "size-[var(--rail-icon-size,20px)] shrink-0" : "size-5 shrink-0"} aria-hidden /> : null}
                   {mobile || labelled ? <span className={labelled ? "text-[11px] font-semibold leading-none" : undefined}>{item.name}</span> : null}
                   <StatusMark status={status} />
@@ -348,10 +356,11 @@ export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, 
                         data-active={active ? "" : undefined}
                         data-slot="app-rail-app"
                         data-tour={itemTourId?.({ name: app.name, url: app.url })}
-                        className={cn(entryClass, !mobile && !labelled && hitArea(1), active && (labelled ? "bg-[var(--surface-2)] ring-1 ring-border text-foreground" : "bg-foreground/10 text-foreground"))}
+                        className={cn(entryClass, !mobile && !labelled && hitArea(1), active && selectedEntry)}
                       />
                     }
                   >
+                    {active ? <RailIndicator /> : null}
                     <Icon className={labelled ? "size-[var(--rail-icon-size,20px)] shrink-0" : "size-5 shrink-0"} aria-hidden />
                     {mobile || labelled ? <span className={labelled ? "text-[11px] font-semibold leading-none" : undefined}>{app.name}</span> : null}
                     <StatusMark status={itemStatus?.(app)} />
@@ -394,14 +403,14 @@ export default function AppRail(props: AppRailProps) {
   const expandedHeader = expanded && grouped ? (
     <div className="flex w-full shrink-0 items-center justify-between gap-1">
       <Link to="/" aria-label="MaiPai Home" className="flex size-12 items-center justify-center rounded-lg focus-visible:ring-2 focus-visible:ring-ring">{<img src={LogoIcon} alt="" className="size-7 dark:hidden" />}<img src={LogoIconDark} alt="" className="hidden size-7 dark:block" /></Link>
-      {props.context ? <div className="flex min-w-0 flex-1 items-center gap-1"><button type="button" aria-label={i18n._({ id: "ui.Back", message: "Back" })} onClick={props.context.onBack} className="flex size-12 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-foreground/5 focus-visible:ring-2 focus-visible:ring-ring"><ArrowLeft aria-hidden className="size-5" /></button>{props.context.title ? <span className="truncate text-sm font-medium">{props.context.title}</span> : null}</div> : null}
-      <button type="button" aria-label={i18n._({ id: "ui.Hide sidebar", message: "Hide sidebar" })} onClick={toggleExpanded} className="flex size-12 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-foreground/5 focus-visible:ring-2 focus-visible:ring-ring"><PanelLeftClose aria-hidden className="size-5" /></button>
+      {props.context ? <div className="flex min-w-0 flex-1 items-center gap-1"><button type="button" aria-label={i18n._({ id: "ui.Back", message: "Back" })} onClick={props.context.onBack} className="flex size-12 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors duration-150 motion-reduce:transition-none hover:bg-foreground/10 hover:text-foreground active:bg-foreground/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><ArrowLeft aria-hidden className="size-5" /></button>{props.context.title ? <span className="truncate text-sm font-medium">{props.context.title}</span> : null}</div> : null}
+      <button type="button" aria-label={i18n._({ id: "ui.Hide sidebar", message: "Hide sidebar" })} onClick={toggleExpanded} className="flex size-12 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors duration-150 motion-reduce:transition-none hover:bg-foreground/10 hover:text-foreground active:bg-foreground/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><PanelLeftClose aria-hidden className="size-5" /></button>
     </div>
   ) : grouped ? <div className="group relative flex w-full shrink-0 justify-center">
-    {props.onExpandedChange ? <button type="button" aria-label={i18n._({ id: "ui.Expand navigation", message: "Expand navigation" })} onClick={() => { if (props.expanded === undefined) setInternalExpanded(true); props.onExpandedChange?.(true); }} className="group relative flex size-12 items-center justify-center rounded-lg text-muted-foreground hover:bg-foreground/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+    {props.onExpandedChange ? <button type="button" aria-label={i18n._({ id: "ui.Expand navigation", message: "Expand navigation" })} onClick={() => { if (props.expanded === undefined) setInternalExpanded(true); props.onExpandedChange?.(true); }} className="group relative flex size-12 items-center justify-center rounded-lg text-muted-foreground transition-colors duration-150 motion-reduce:transition-none hover:bg-foreground/10 hover:text-foreground active:bg-foreground/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
       <span aria-hidden className="absolute transition-opacity duration-150 group-hover:opacity-0 group-focus-visible:opacity-0 motion-reduce:transition-none"><img src={LogoIcon} alt="" className="size-7 dark:hidden" /><img src={LogoIconDark} alt="" className="hidden size-7 dark:block" /></span>
       <span aria-hidden className="grid size-8 place-items-center rounded-lg bg-foreground/5 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none"><PanelLeftOpen className="size-5" /></span>
-    </button> : <button type="button" aria-label={i18n._({ id: "ui.Show sidebar", message: "Show sidebar" })} onClick={toggleExpanded} className="flex size-12 items-center justify-center rounded-lg text-muted-foreground hover:bg-foreground/5 focus-visible:ring-2 focus-visible:ring-ring"><PanelLeftOpen aria-hidden className="size-5" /></button>}
+    </button> : <button type="button" aria-label={i18n._({ id: "ui.Show sidebar", message: "Show sidebar" })} onClick={toggleExpanded} className="flex size-12 items-center justify-center rounded-lg text-muted-foreground transition-colors duration-150 motion-reduce:transition-none hover:bg-foreground/10 hover:text-foreground active:bg-foreground/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><PanelLeftOpen aria-hidden className="size-5" /></button>}
   </div> : null;
   const groupedNavigation = grouped ? <div className="flex min-h-0 w-full flex-1 flex-col overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
     {groupIds.map((id, index) => {
@@ -413,10 +422,13 @@ export default function AppRail(props: AppRailProps) {
           const ItemIcon = Icon(item);
           const active = isRailItemActive(pathname, item.href);
           const status = props.itemStatus?.({ name: item.label, url: item.href });
-          return <li key={item.id}><Link to={railHref(item.href)} aria-label={itemLabel({ name: item.label }, status)} aria-current={active ? "page" : undefined} data-slot="app-rail-item" className={cn(groupedRowClass, expanded && "justify-start", !expanded && "justify-center gap-0", active && "bg-[var(--nav-active-bg,var(--surface-2))] text-foreground", hitArea(2))}>
+          const row = <Link to={railHref(item.href)} aria-label={itemLabel({ name: item.label }, status)} aria-current={active ? "page" : undefined} data-active={active ? "" : undefined} data-slot="app-rail-item" className={cn(groupedRowClass, expanded && "justify-start", !expanded && "justify-center gap-0", active && railSelected, hitArea(2))}>
+            {active ? <RailIndicator /> : null}
             {ItemIcon ? <ItemIcon className={groupedRowIcon} aria-hidden /> : null}<span className={cn("min-w-0 truncate whitespace-nowrap text-[length:var(--rail-label-size,13px)] transition-opacity duration-(--motion-fade-in) ease-(--motion-ease-out)", reducedMotion, expanded ? "opacity-100" : "w-0 overflow-hidden opacity-0")} aria-hidden={!expanded}>{item.label}</span>
             <StatusMark status={status} />
-          </Link></li>;
+          </Link>;
+          // Collapsed rows show only an icon, so the name lives in a tooltip (expanded rows already print it).
+          return <li key={item.id}>{expanded ? row : <Tooltip><TooltipTrigger render={row} /><ItemTooltip name={item.label} status={status} /></Tooltip>}</li>;
         })}</ul>
       </section>;
     })}
@@ -425,6 +437,6 @@ export default function AppRail(props: AppRailProps) {
     data-expanded={expanded ? "true" : "false"} data-auto-collapse={props.autoCollapse ? "true" : undefined}
     style={{ "--rail-width-labelled": "80px", ...(grouped ? { width: expanded ? "var(--rail-width-expanded,240px)" : "var(--rail-width,56px)", minWidth: expanded ? "var(--rail-width-expanded,240px)" : "var(--rail-width,56px)", maxWidth: expanded ? "var(--rail-width-expanded,240px)" : "var(--rail-width,56px)" } : labelled ? { width: "var(--rail-width-labelled)", minWidth: "var(--rail-width-labelled)", maxWidth: "var(--rail-width-labelled)" } : {}) } as React.CSSProperties}
     className={cn("sticky top-0 flex h-svh min-h-0 shrink-0 flex-col gap-1 overflow-hidden bg-[color:var(--app-rail-bg,var(--sidebar))] p-2", grouped ? "items-stretch transition-[width,min-width,max-width] duration-(--motion-slide-in) ease-(--motion-ease-slide) motion-reduce:transition-none [[html[data-ease-motion=calm]_&]]:duration-0" : "items-center", labelled ? "w-[var(--rail-width-labelled)] min-w-[var(--rail-width-labelled)] max-w-[var(--rail-width-labelled)]" : !grouped ? "w-[var(--rail-width,56px)] min-w-[var(--rail-width,56px)] max-w-[var(--rail-width,56px)]" : "")}>
-    {grouped ? <RailEntries {...props} grouped expanded={expanded} brandSlot={expandedHeader ?? (!props.onExpandedChange ? <div className="group relative flex w-full shrink-0 justify-center"><button type="button" aria-label={i18n._({ id: "ui.Show sidebar", message: "Show sidebar" })} onClick={toggleExpanded} className="flex size-12 items-center justify-center rounded-lg text-muted-foreground hover:bg-foreground/5 focus-visible:ring-2 focus-visible:ring-ring"><PanelLeftOpen aria-hidden className="size-5" /></button></div> : null)}>{groupedNavigation}</RailEntries> : <RailEntries {...props} />}
+    {grouped ? <RailEntries {...props} grouped expanded={expanded} brandSlot={expandedHeader ?? (!props.onExpandedChange ? <div className="group relative flex w-full shrink-0 justify-center"><button type="button" aria-label={i18n._({ id: "ui.Show sidebar", message: "Show sidebar" })} onClick={toggleExpanded} className="flex size-12 items-center justify-center rounded-lg text-muted-foreground transition-colors duration-150 motion-reduce:transition-none hover:bg-foreground/10 hover:text-foreground active:bg-foreground/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><PanelLeftOpen aria-hidden className="size-5" /></button></div> : null)}>{groupedNavigation}</RailEntries> : <RailEntries {...props} />}
   </nav>;
 }

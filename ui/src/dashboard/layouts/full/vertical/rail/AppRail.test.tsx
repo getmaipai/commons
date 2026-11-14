@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { TooltipProvider } from "../../../../components/ui/tooltip";
 import AppRail, { type RailApp } from "./AppRail";
@@ -63,7 +63,8 @@ describe("PRO-LOOK labelled rail variant", () => {
     expect(nav?.className).toContain("w-[var(--rail-width-labelled)]");
     expect(nav?.getAttribute("style")).toContain("--rail-width-labelled: 80px");
     expect(chat.textContent).toContain("Chat");
-    expect(chat.className).toContain("bg-[var(--surface-2)]");
+    expect(chat.className).toContain("bg-primary/15");
+    expect(chat.querySelector('[data-slot="rail-indicator"]')).not.toBeNull();
     expect(chat.className).toContain("rounded-2xl");
   });
 });
@@ -127,14 +128,14 @@ describe("grouped expanding AppRail", () => {
     const search = view.container.querySelector('[data-slot="app-rail-search-trigger"]');
     const chat = view.container.querySelector('[data-slot="app-rail-item"]');
     const classes = (value: Element | null) => (value?.getAttribute("class") ?? "").split(/\s+/);
-    expect(classes(search)).toContain("hover:bg-foreground/5");
+    expect(classes(search)).toContain("hover:bg-foreground/10");
     expect(classes(search)).toContain("focus-visible:ring-2");
     expect(classes(search)).toContain("before:-inset-2");
     expect(classes(search)).toContain("h-[var(--rail-row-height,32px)]");
     expect(classes(search)).toContain("px-[var(--rail-padding,12px)]");
     expect(search?.querySelector("svg")?.getAttribute("class")).toContain("size-[var(--rail-icon-size,16px)]");
     expect(classes(search)).toContain("justify-center");
-    expect(classes(chat)).toContain("hover:bg-foreground/5");
+    expect(classes(chat)).toContain("hover:bg-foreground/10");
     expect(classes(chat)).toContain("focus-visible:ring-2");
     expect(classes(chat)).toContain("before:-inset-2");
     expect(classes(chat)).toContain("justify-center");
@@ -146,7 +147,7 @@ describe("grouped expanding AppRail", () => {
     const chat = view.getByRole("link", { name: "Chat" });
     expect(chat.className).toContain("--rail-row-height");
     expect(chat.querySelector("svg")?.getAttribute("class")).toContain("--rail-icon-size");
-    expect(chat.querySelector("span")?.getAttribute("class")).toContain("--rail-label-size");
+    expect(chat.querySelector("span:not([data-slot])")?.getAttribute("class")).toContain("--rail-label-size");
     expect(chat.className).not.toContain("text-sm");
     expect(chat.querySelector("svg")?.getAttribute("class")).not.toContain("size-5");
   });
@@ -213,5 +214,102 @@ describe("grouped expanding AppRail", () => {
     expect(view.container.querySelector('[data-slot="app-rail"]')?.getAttribute("data-expanded")).toBe("false");
     expect(view.container.querySelector('[data-slot="app-rail"]')?.className).toContain("motion-reduce:transition-none");
     expect(view.getByRole("button", { name: "Show sidebar" })).toBeTruthy();
+  });
+});
+
+describe("rail modern look: selected, hover, tooltip", () => {
+  const items = [
+    { id: "chat", label: "Chat", icon: "message-square", href: "/chat" },
+    { id: "media", label: "Media", icon: "image", href: "/media" },
+  ];
+  const groups = [{ id: "default" }];
+  const apps = [{ name: "Atlas", url: "/apps/atlas", icon: "layout-grid", pinned: true }];
+  const classes = (el: Element | null) => (el?.getAttribute("class") ?? "").split(/\s+/);
+  const variants: Array<[string, React.ReactElement]> = [
+    ["icons", <AppRail apps={apps} />],
+    ["labelled", <AppRail variant="labelled" apps={apps} />],
+    ["grouped collapsed", <AppRail items={items} groups={groups} expanded={false} />],
+    ["grouped expanded", <AppRail items={items} groups={groups} expanded />],
+  ];
+
+  for (const [name, node] of variants) {
+    test(`${name}: the selected item is current, tinted and has the primary indicator; others get calm hover`, () => {
+      const view = render(<MemoryRouter initialEntries={["/chat"]}><TooltipProvider>{node}</TooltipProvider></MemoryRouter>);
+      const current = view.container.querySelector('[aria-current="page"]');
+      if (name.startsWith("grouped")) {
+        expect(current?.getAttribute("aria-label")).toBe("Chat");
+        expect(classes(current)).toContain("bg-primary/15");
+        expect(classes(current)).toContain("text-primary");
+        expect(current?.querySelector('[data-slot="rail-indicator"]')?.className).toContain("w-[3px]");
+        expect(classes(current)).toContain("focus-visible:ring-2");
+        const other = view.getByRole("link", { name: "Media" });
+        expect(other.getAttribute("aria-current")).toBeNull();
+        expect(other.querySelector('[data-slot="rail-indicator"]')).toBeNull();
+        for (const cls of ["hover:bg-foreground/10", "hover:text-foreground", "active:bg-foreground/15", "duration-150", "motion-reduce:transition-none", "focus-visible:ring-2"]) expect(classes(other)).toContain(cls);
+      } else {
+        // No sidebar items in the flat variants; the pinned app is not on /chat, so nothing is current there.
+        expect(current?.getAttribute("data-slot") ?? null).not.toBe("app-rail-app");
+        const app = view.getByRole("link", { name: /Atlas/ });
+        for (const cls of ["hover:bg-foreground/10", "hover:text-foreground", "active:bg-foreground/15", "duration-150", "motion-reduce:transition-none", "focus-visible:ring-2"]) expect(classes(app)).toContain(cls);
+      }
+    });
+  }
+
+  test("a selected pinned app, the launcher link and the popover list use the same tint and indicator", async () => {
+    const view = render(<MemoryRouter initialEntries={["/apps/atlas"]}><TooltipProvider><AppRail apps={apps} /></TooltipProvider></MemoryRouter>);
+    const app = view.getByRole("link", { name: /Atlas/ });
+    expect(app.getAttribute("aria-current")).toBe("page");
+    expect(classes(app)).toContain("bg-primary/15");
+    expect(classes(app)).toContain("text-primary");
+    expect(app.querySelector('[data-slot="rail-indicator"]')).not.toBeNull();
+    fireEvent.click(view.getByRole("button", { name: "All apps" }));
+    const row = await waitFor(() => view.getAllByRole("link", { name: "Atlas" }).find((el) => el.getAttribute("data-slot") !== "app-rail-app")!);
+    expect(classes(row)).toContain("bg-primary/15");
+    expect(row.querySelector('[data-slot="rail-indicator"]')).not.toBeNull();
+    cleanup();
+    const link = render(<MemoryRouter initialEntries={["/apps"]}><TooltipProvider><AppRail apps={apps} allAppsHref="/apps" /></TooltipProvider></MemoryRouter>);
+    const all = link.getByRole("link", { name: "All apps" });
+    expect(classes(all)).toContain("bg-primary/15");
+    expect(all.querySelector('[data-slot="rail-indicator"]')).not.toBeNull();
+  });
+
+  test("hovering or focusing a collapsed grouped rail item shows its name in a tooltip", async () => {
+    const view = render(<MemoryRouter><TooltipProvider><AppRail items={items} groups={groups} expanded={false} /></TooltipProvider></MemoryRouter>);
+    const media = view.getByRole("link", { name: "Media" });
+    fireEvent.mouseEnter(media);
+    fireEvent.mouseMove(media);
+    fireEvent.pointerEnter(media);
+    fireEvent.pointerMove(media);
+    const tip = await waitFor(() => {
+      const found = document.querySelector('[data-slot="tooltip-content"]');
+      expect(found?.textContent).toContain("Media");
+      return found;
+    });
+    expect(tip).not.toBeNull();
+    fireEvent.mouseLeave(media);
+    cleanup();
+    const again = render(<MemoryRouter><TooltipProvider><AppRail items={items} groups={groups} expanded={false} /></TooltipProvider></MemoryRouter>);
+    const chat = again.getByRole("link", { name: "Chat" });
+    await act(async () => { chat.focus(); });
+    await waitFor(() => expect(document.querySelector('[data-slot="tooltip-content"]')?.textContent).toContain("Chat"));
+  });
+
+  test("hovering a flat rail app shows its name in a tooltip", async () => {
+    const view = render(<MemoryRouter><TooltipProvider><AppRail apps={apps} /></TooltipProvider></MemoryRouter>);
+    const app = view.getByRole("link", { name: /Atlas/ });
+    fireEvent.mouseEnter(app);
+    fireEvent.pointerEnter(app);
+    fireEvent.pointerMove(app);
+    await waitFor(() => expect(document.querySelector('[data-slot="tooltip-content"]')?.textContent).toContain("Atlas"));
+  });
+
+  test("the rail uses only theme tokens: no raw palette colour classes", async () => {
+    const source = await Bun.file(new URL("./AppRail.tsx", import.meta.url)).text();
+    const style = await Bun.file(new URL("../../../../lib/navItemStyle.ts", import.meta.url)).text();
+    const palette = /\b(?:bg|text|border|ring|fill|stroke|from|to|via)-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|white|black)(?:-\d{2,3})?\b/;
+    expect(source).not.toMatch(palette);
+    expect(style).not.toMatch(palette);
+    expect(source).not.toMatch(/#[0-9a-fA-F]{3,8}\b|rgb\(|hsl\(/);
+    expect(source + style).not.toContain("\u2014");
   });
 });

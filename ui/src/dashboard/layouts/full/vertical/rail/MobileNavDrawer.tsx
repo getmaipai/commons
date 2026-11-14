@@ -45,7 +45,7 @@ export default function MobileNavDrawer({ mobileSections, settingsHref, hideMobi
       </RailEntries>
       <div className="mt-auto flex shrink-0 items-center justify-between border-t border-border pt-3">
         {props.profile}
-        {settingsHref ? <Link to={settingsHref} aria-label={i18n._({ id: "ui.Settings", message: "Settings" })} className="flex size-12 items-center justify-center rounded-lg hover:bg-foreground/5"><Settings aria-hidden className="size-5" /></Link> : null}
+        {settingsHref ? <Link to={settingsHref} aria-label={i18n._({ id: "ui.Settings", message: "Settings" })} className="flex size-12 items-center justify-center rounded-lg hover:bg-foreground/10"><Settings aria-hidden className="size-5" /></Link> : null}
       </div>
     </SheetContent>
   </Sheet>;
