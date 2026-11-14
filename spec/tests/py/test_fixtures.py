@@ -387,7 +387,9 @@ def test_device_command_fixtures_cover_every_kind_and_reject_mismatch():
         with pytest.raises(ValidationError):
             DeviceCommand.model_validate({**listen_song, "payload": payload})
     DeviceCommand.model_validate({**listen_song, "payload": {"request_id": "valid"}})
-    song_title = next(command for command in commands if command["kind"] == "song_title")
+    song_title = next(
+        command for command in commands if command["kind"] == "song_title"
+    )
     assert song_title["payload"] == {"text": "Take Five - Dave Brubeck"}
     for payload in ({}, {"text": "x" * 81}, {"text": 5}, {"text": "ok", "extra": True}):
         with pytest.raises(ValidationError):
