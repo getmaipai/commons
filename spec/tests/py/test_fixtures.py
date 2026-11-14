@@ -371,7 +371,9 @@ def test_device_command_fixtures_cover_every_kind_and_reject_mismatch():
         DeviceCommand.model_validate(
             load_fixture("device-command.notify-waiting-with-text.invalid.example.json")
         )
-    listen_song = next(command for command in commands if command["kind"] == "listen_song")
+    listen_song = next(
+        command for command in commands if command["kind"] == "listen_song"
+    )
     assert listen_song["payload"] == {"request_id": "name-that-tune-01", "seconds": 10}
     for payload in (
         {},
