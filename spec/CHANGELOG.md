@@ -1,3 +1,7 @@
+## [spec-v0.1.395] - 2026-11-14
+
+- SCENE-01f, additive. The person setting `scene.ha_person_entity` links someone's own Home Assistant person or device tracker for Home's coarse home-state cue on their place line.
+
 ## [spec-v0.1.394] - 2026-11-13
 
 - `player` accepts optional `marks: { bind?, field?, heading? }` for a seekable list of saved moments, and its `actions` args may use `{position_s}` (matches ui 0.5.665).

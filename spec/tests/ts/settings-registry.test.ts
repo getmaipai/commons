@@ -100,6 +100,18 @@ describe("spec/settings/keys.json", () => {
     expect(entry.self_service).toBeUndefined();
   });
 
+  test("Home Assistant presence is a person-scoped text setting", () => {
+    const entries = loadRegistry() as Record<string, unknown>[];
+    const matches = entries.filter((row) => row.key === "scene.ha_person_entity");
+    expect(matches).toHaveLength(1);
+    expect(SettingsKey.parse(matches[0])).toMatchObject({
+      scope: "person",
+      selector: "text",
+      default: "",
+      lives_in: "person.privacy",
+    });
+  });
+
   test("Home hidden cards is a person-scoped advanced JSON list", () => {
     const entries = loadRegistry() as Record<string, unknown>[];
     const matches = entries.filter((row) => row.key === "ui.home_hidden");

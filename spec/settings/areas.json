@@ -1240,6 +1240,11 @@
     },
     {
       "scope": "person",
+      "group": "person.privacy",
+      "reason": "A person links their own Home Assistant presence entity with their personal privacy settings; no person privacy card is currently drawn in the shared Settings area."
+    },
+    {
+      "scope": "person",
       "group": "person.topics",
       "reason": "A parent sets a child's sensitive-subject levels on that child's Family page; a settings area only reads and writes the viewer's own scope, never another person's, and a teen has no person-level topic key at all."
     },

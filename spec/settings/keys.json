@@ -3003,6 +3003,20 @@
     ]
   },
   {
+    "key": "scene.ha_person_entity",
+    "scope": "person",
+    "selector": "text",
+    "default": "",
+    "label": "Your Home Assistant presence entity",
+    "help": "Link your own Home Assistant person or device tracker. Home may use its coarse home state as a soft cue on your place line.",
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "person.privacy",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "search.dictionary_fallback",
     "scope": "household",
     "selector": "boolean",
