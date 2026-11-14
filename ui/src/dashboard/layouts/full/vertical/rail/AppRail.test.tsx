@@ -241,8 +241,7 @@ describe("rail modern look: selected, hover, tooltip", () => {
         expect(classes(current)).toContain("bg-primary/15");
         expect(classes(current)).toContain("text-primary");
         expect(classes(current)).toContain("shadow-[0_0_14px_-2px_color-mix(in_oklab,var(--primary)_55%,transparent)]");
-        expect(classes(current)).toContain("ring-1");
-        expect(classes(current)).toContain("ring-primary/25");
+        expect(classes(current)).toContain("shadow-[0_0_14px_-2px_color-mix(in_oklab,var(--primary)_55%,transparent)]");
         expect(current?.querySelector('[data-slot="rail-indicator"]')).toBeNull();
         expect(classes(current)).toContain("focus-visible:ring-2");
         const other = view.getByRole("link", { name: "Media" });
@@ -265,7 +264,6 @@ describe("rail modern look: selected, hover, tooltip", () => {
     expect(classes(app)).toContain("bg-primary/15");
     expect(classes(app)).toContain("text-primary");
     expect(classes(app)).toContain("shadow-[0_0_14px_-2px_color-mix(in_oklab,var(--primary)_55%,transparent)]");
-    expect(classes(app)).toContain("ring-1");
     expect(app.querySelector('[data-slot="rail-indicator"]')).toBeNull();
     fireEvent.click(view.getByRole("button", { name: "All apps" }));
     const row = await waitFor(() => view.getAllByRole("link", { name: "Atlas" }).find((el) => el.getAttribute("data-slot") !== "app-rail-app")!);

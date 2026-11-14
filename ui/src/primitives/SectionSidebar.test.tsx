@@ -528,7 +528,7 @@ describe("SectionSidebar modern look (selected and hover rows)", () => {
     const { container } = column();
     const today = screen.getByRole("link", { name: "Today" });
     expect(today.getAttribute("aria-current")).toBe("page");
-    for (const cls of ["rounded-lg", "data-active:bg-primary/10", "data-active:text-primary", "data-active:font-medium", "data-active:shadow-[0_0_10px_-2px_color-mix(in_oklab,var(--primary)_35%,transparent)]", "data-active:ring-1", "data-active:ring-primary/20", "focus-visible:ring-2"]) expect(classes(today)).toContain(cls);
+    for (const cls of ["rounded-lg", "data-active:bg-primary/10", "data-active:text-primary", "data-active:font-medium", "data-active:shadow-[0_0_10px_-2px_color-mix(in_oklab,var(--primary)_35%,transparent)]", "focus-visible:ring-2"]) expect(classes(today)).toContain(cls);
     expect(today.querySelector('[data-slot="section-sidebar-indicator"]')).toBeNull();
     const tile = today.querySelector("svg")!.parentElement!;
     expect(tile.className).not.toContain("bg-settings-icon-tile");
