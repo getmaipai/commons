@@ -69,14 +69,18 @@ export function SchemaPage({
   // Text a person is still typing into a search box is not a choice yet: it joins the address only when it is submitted (the navigation's own state).
   const typedKeys = useMemo(() => typedStateKeys(page), [page]);
   const [state, setState] = useState<Record<string, unknown>>(() => ({ ...(packageId ? Object.fromEntries(new URLSearchParams(location.search)) : {}), ...arrived }));
+  // A new arrival is merged on the next render. Until then `state` still holds the previous item, so the address write below must skip
+  // that one commit: writing the old state back replaced the new address, and the two then kept replacing each other in a loop.
+  const arrivalPending = useRef(false);
   useEffect(() => {
-    if (arrived) setState((prev) => ({ ...prev, ...arrived }));
+    if (arrived) { arrivalPending.current = true; setState((prev) => ({ ...prev, ...arrived })); }
   }, [location.key, arrived]);
   // APP-URL-02: a package page's own choices (a topic chip, a tab, a picked place) are written into its address, replacing the entry in
   // place, so the page as it is shown reloads, shares and goes back the same. The arrival state carries the same values, so the shell
   // does not treat the new address as a different page. Only plain text values are kept; an empty choice leaves the address clean.
   useEffect(() => {
     if (!packageId) return;
+    if (arrivalPending.current) { arrivalPending.current = false; return; }
     const params = new URLSearchParams();
     for (const [name, value] of Object.entries(state)) if (typeof value === "string" && value !== "" && !typedKeys.has(name)) params.set(name, value);
     params.sort();
