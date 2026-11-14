@@ -1,4 +1,6 @@
 import { describe, expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { RobotState } from "../../gen/ts/robot-state.js";
 
 const frame = { activity: "idle", muted: false, tracking: false };
@@ -35,5 +37,16 @@ describe("robot-state motion", () => {
 
   test("accepts frames that omit motion fields", () => {
     expect(RobotState.safeParse(frame).success).toBe(true);
+  });
+});
+
+describe("robot-state motion lists", () => {
+  test("stay in step with the scene motion lists", () => {
+    const read = (name: string) => JSON.parse(readFileSync(join(import.meta.dir, "../../schemas", name), "utf8"));
+    const scene = read("scene-observation.schema.json").$defs.motionValue.properties;
+    const robot = read("robot-state.schema.json").properties;
+    const expected = ["resting", "held", ...scene.state.enum.filter((s: string) => s !== "still"), null];
+    expect([...robot.motion.enum].sort()).toEqual([...expected].sort());
+    expect([...robot.motion_pose.enum].sort()).toEqual([...scene.pose.enum, null].sort());
   });
 });

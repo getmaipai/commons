@@ -61,10 +61,6 @@ class Thermal(BaseModel):
     )
 
 
-class LegacyMotion(RootModel[Literal['resting', 'held'] | None]):
-    root: Literal['resting', 'held'] | None
-
-
 class RobotState(BaseModel):
     """
     A hub-local projection of a paired robot's current state, keyed externally by device_id and never synced or given its own record identity (home docs/dev.md, ‘Robot device state’; bot docs/dev.md, ‘Robot device state’ pointer). It deliberately has no id, timestamps, or hlc. Battery, daemon and app version fields may be omitted by producers that do not report them yet; explicit null means the body cannot tell or has no version to report. Reachy Mini always sends null for on_battery per section 7 of the design record.
@@ -111,7 +107,8 @@ class RobotState(BaseModel):
     )
     motion: (
         Literal[
-            'still',
+            'resting',
+            'held',
             'bumped',
             'lifted',
             'carried',
@@ -122,11 +119,10 @@ class RobotState(BaseModel):
             'falling',
             'rolling',
         ]
-        | Literal['resting', 'held']
         | None
     ) = Field(
         None,
-        description="The robot's reported motion state. A consumer that meets a value it does not know treats it as unknown. Omission means the producer does not report motion. Null means the body cannot tell.",
+        description="The robot's reported motion state. The list matches the scene motion states (scene-observation MotionValue) plus the older resting and held, and a test keeps the two in step. A consumer that meets a value it does not know treats it as unknown. Omission means the producer does not report motion. Null means the body cannot tell.",
     )
     motion_pose: (
         Literal[

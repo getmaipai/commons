@@ -96,47 +96,36 @@ export const RobotState = z
         "The robot daemon version, when available, so the hub can display which software is running. Null means no version is currently known; omission means the producer does not yet report this field.",
       )
       .optional(),
-    /**The robot's reported motion state. A consumer that meets a value it does not know treats it as unknown. Omission means the producer does not report motion. Null means the body cannot tell.*/
+    /**The robot's reported motion state. The list matches the scene motion states (scene-observation MotionValue) plus the older resting and held, and a test keeps the two in step. A consumer that meets a value it does not know treats it as unknown. Omission means the producer does not report motion. Null means the body cannot tell.*/
     motion: z
       .union([
-        z.intersection(
-          z.enum([
-            "still",
-            "bumped",
-            "lifted",
-            "carried",
-            "set_down",
-            "shaken",
-            "tilted",
-            "tapped",
-            "falling",
-            "rolling",
-          ]),
-          z
-            .any()
-            .refine(
-              (value) => !z.literal("still").safeParse(value).success,
-              "Invalid input: Should NOT be valid against schema",
-            ),
-        ),
-        z.union([z.literal("resting"), z.literal("held"), z.literal(null)]),
+        z.literal("resting"),
+        z.literal("held"),
+        z.literal("bumped"),
+        z.literal("lifted"),
+        z.literal("carried"),
+        z.literal("set_down"),
+        z.literal("shaken"),
+        z.literal("tilted"),
+        z.literal("tapped"),
+        z.literal("falling"),
+        z.literal("rolling"),
+        z.literal(null),
       ])
       .describe(
-        "The robot's reported motion state. A consumer that meets a value it does not know treats it as unknown. Omission means the producer does not report motion. Null means the body cannot tell.",
+        "The robot's reported motion state. The list matches the scene motion states (scene-observation MotionValue) plus the older resting and held, and a test keeps the two in step. A consumer that meets a value it does not know treats it as unknown. Omission means the producer does not report motion. Null means the body cannot tell.",
       )
       .optional(),
     /**The robot's reported pose when known. A consumer that meets a value it does not know treats it as unknown. Null means the pose cannot be determined; omission means the producer does not report it.*/
     motion_pose: z
       .union([
-        z.enum([
-          "upright",
-          "left_side",
-          "right_side",
-          "upside_down",
-          "face_down",
-          "on_back",
-        ]),
-        z.null(),
+        z.literal("upright"),
+        z.literal("left_side"),
+        z.literal("right_side"),
+        z.literal("upside_down"),
+        z.literal("face_down"),
+        z.literal("on_back"),
+        z.literal(null),
       ])
       .describe(
         "The robot's reported pose when known. A consumer that meets a value it does not know treats it as unknown. Null means the pose cannot be determined; omission means the producer does not report it.",
