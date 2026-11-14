@@ -1078,6 +1078,55 @@
       }
     },
     {
+      "description": "Home tells the robot what to show as the song title at the bottom of its screen (after the person confirms or corrects a song name); an empty text clears it. The robot refuses while it is muted or in full quiet.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "payload",
+        "issued_at",
+        "expires_at",
+        "hlc"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "kind": {
+          "type": "string",
+          "const": "song_title"
+        },
+        "issued_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "hlc": {
+          "type": "string",
+          "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "text"
+          ],
+          "properties": {
+            "text": {
+              "type": "string",
+              "maxLength": 80
+            }
+          }
+        }
+      }
+    },
+    {
       "description": "The robot shows a card and says the text aloud. The robot refuses (and says why in its answer) when announcements are off, it is muted, in quiet hours or at night, or the text is empty.",
       "type": "object",
       "additionalProperties": false,

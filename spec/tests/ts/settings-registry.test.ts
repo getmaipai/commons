@@ -112,6 +112,16 @@ describe("spec/settings/keys.json", () => {
     });
   });
 
+  test("the Shazam switch is a household boolean that defaults on and says the recording is never sent", () => {
+    const entries = loadRegistry() as Record<string, unknown>[];
+    const matches = entries.filter((row) => row.key === "music.identify.shazam");
+    expect(matches).toHaveLength(1);
+    const key = SettingsKey.parse(matches[0]);
+    expect(key).toMatchObject({ scope: "household", selector: "boolean", default: true, lives_in: "household.media_lookups" });
+    expect(key.help).toContain("Shazam");
+    expect(key.help).toContain("never the recording");
+  });
+
   test("Home hidden cards is a person-scoped advanced JSON list", () => {
     const entries = loadRegistry() as Record<string, unknown>[];
     const matches = entries.filter((row) => row.key === "ui.home_hidden");

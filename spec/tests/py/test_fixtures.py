@@ -359,9 +359,9 @@ def test_reachy_eye_capability_is_only_on_the_fitted_fixture():
 
 def test_device_command_fixtures_cover_every_kind_and_reject_mismatch():
     commands = load_fixture("device-command.kinds.example.json")
-    # 26 kinds; notify appears twice (the text form and the waiting form).
-    assert len(commands) == 27
-    assert len({command["kind"] for command in commands}) == 26
+    # 27 kinds; notify appears twice (the text form and the waiting form).
+    assert len(commands) == 28
+    assert len({command["kind"] for command in commands}) == 27
     for command in commands:
         DeviceCommand.model_validate(command)
     invalid = {**commands[0], "kind": "capture_request"}
@@ -387,6 +387,12 @@ def test_device_command_fixtures_cover_every_kind_and_reject_mismatch():
         with pytest.raises(ValidationError):
             DeviceCommand.model_validate({**listen_song, "payload": payload})
     DeviceCommand.model_validate({**listen_song, "payload": {"request_id": "valid"}})
+    song_title = next(command for command in commands if command["kind"] == "song_title")
+    assert song_title["payload"] == {"text": "Take Five - Dave Brubeck"}
+    for payload in ({}, {"text": "x" * 81}, {"text": 5}, {"text": "ok", "extra": True}):
+        with pytest.raises(ValidationError):
+            DeviceCommand.model_validate({**song_title, "payload": payload})
+    DeviceCommand.model_validate({**song_title, "payload": {"text": ""}})
     offer = next(command for command in commands if command["kind"] == "offer")
     assert "text" not in offer["payload"]
     with pytest.raises(ValidationError):

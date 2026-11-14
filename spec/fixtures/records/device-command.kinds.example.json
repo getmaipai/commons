@@ -282,5 +282,15 @@
     "issued_at": "2026-11-14T12:00:00Z",
     "expires_at": "2026-11-14T12:01:00Z",
     "hlc": "1791201600000:0:hub123"
+  },
+  {
+    "id": "cmd-song-title",
+    "kind": "song_title",
+    "payload": {
+      "text": "Take Five - Dave Brubeck"
+    },
+    "issued_at": "2026-11-14T12:00:00Z",
+    "expires_at": "2026-11-14T12:01:00Z",
+    "hlc": "1791201600000:0:hub123"
   }
 ]

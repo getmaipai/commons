@@ -319,7 +319,7 @@ describe("record fixtures validate against their generated Zod models", () => {
 
   test("device-command fixtures cover every kind and reject a mismatched payload", () => {
     const commands = JSON.parse(readFileSync(join(import.meta.dir, "..", "..", "fixtures", "records", "device-command.kinds.example.json"), "utf-8")) as unknown[];
-    expect(commands).toHaveLength(27);
+    expect(commands).toHaveLength(28);
     for (const command of commands) expect(() => DeviceCommand.parse(command)).not.toThrow();
     const invalid = { ...(commands[0] as object), kind: "capture_request" };
     expect(() => DeviceCommand.parse(invalid)).toThrow();
@@ -343,6 +343,12 @@ describe("record fixtures validate against their generated Zod models", () => {
       expect(() => DeviceCommand.parse({ ...listenSong, payload }), JSON.stringify(payload)).toThrow();
     }
     expect(() => DeviceCommand.parse({ ...listenSong, payload: { request_id: "valid" } })).not.toThrow();
+    const songTitle = (commands as { kind: string; payload: Record<string, unknown> }[]).find((command) => command.kind === "song_title")!;
+    expect(songTitle.payload).toEqual({ text: "Take Five - Dave Brubeck" });
+    for (const payload of [{}, { text: "x".repeat(81) }, { text: 5 }, { text: "ok", extra: true }]) {
+      expect(() => DeviceCommand.parse({ ...songTitle, payload }), JSON.stringify(payload)).toThrow();
+    }
+    expect(() => DeviceCommand.parse({ ...songTitle, payload: { text: "" } })).not.toThrow();
     const selfTest = (commands as { kind: string; payload: Record<string, unknown> }[]).find((command) => command.kind === "self_test")!;
     expect(() => DeviceCommand.parse(selfTest)).not.toThrow();
     expect(() => DeviceCommand.parse({ ...selfTest, payload: { ...selfTest.payload, part: "camera" } })).toThrow();

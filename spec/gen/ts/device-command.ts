@@ -351,6 +351,19 @@ export const DeviceCommand = z
       z
         .object({
           id: z.string().min(1).max(128),
+          kind: z.literal("song_title"),
+          issued_at: z.string().datetime({ offset: true }),
+          expires_at: z.string().datetime({ offset: true }),
+          hlc: z.string().regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$")),
+          payload: z.object({ text: z.string().max(80) }).strict(),
+        })
+        .strict()
+        .describe(
+          "Home tells the robot what to show as the song title at the bottom of its screen (after the person confirms or corrects a song name); an empty text clears it. The robot refuses while it is muted or in full quiet.",
+        ),
+      z
+        .object({
+          id: z.string().min(1).max(128),
           kind: z.literal("announce"),
           issued_at: z.string().datetime({ offset: true }),
           expires_at: z.string().datetime({ offset: true }),
