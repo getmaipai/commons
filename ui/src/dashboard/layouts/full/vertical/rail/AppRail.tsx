@@ -10,7 +10,7 @@ import { Button } from "../../../../components/ui/button";
 import { getIcon } from "../../../../../icons";
 import { cn } from "../../../../lib/utils";
 import { hitArea } from "../../../../../utils";
-import { navTransition, railHover, railIndicator, railSelected } from "../../../../lib/navItemStyle";
+import { navTransition, railHover, railSelected } from "../../../../lib/navItemStyle";
 import SidebarContent, { type ChildItem } from "../sidebar/sidebaritems";
 import { STATUS_LEVEL_TONE, STATUS_TONE_BG } from "../../../../../ui/status-colors";
 import type { RailStatusLevel } from "./RailProfileMenu";
@@ -106,10 +106,6 @@ export function isRailItemActive(pathname: string, url: string): boolean {
 }
 
 const railButton = `relative flex size-[var(--rail-button,40px)] items-center justify-center rounded-xl text-muted-foreground ${navTransition} ${railHover}`;
-/** The selected rail item's slim primary pill; the tile itself takes `railSelected`. */
-function RailIndicator() {
-  return <span aria-hidden data-slot="rail-indicator" className={railIndicator} />;
-}
 const groupedRowClass = `relative flex h-[var(--rail-row-height,32px)] min-h-0 w-full min-w-0 items-center gap-2 overflow-visible rounded-lg px-[var(--rail-padding,12px)] text-muted-foreground ${navTransition} ${railHover}`;
 const groupedRowIcon = "size-[var(--rail-icon-size,16px)] shrink-0";
 
@@ -167,7 +163,6 @@ function AppLauncher({ apps, onTogglePin, isActive, grouped = false, expanded = 
                   aria-current={active ? "page" : undefined}
                   className={cn("relative flex min-h-10 min-w-0 flex-1 items-center gap-3 rounded-lg px-2", navTransition, railHover, active && railSelected)}
                 >
-                  {active ? <RailIndicator /> : null}
                   <Icon className={cn("size-5 shrink-0", active ? "text-primary" : "text-muted-foreground")} aria-hidden />
                   <span className="min-w-0 truncate text-sm">{app.name}</span>
                 </Link>
@@ -208,7 +203,7 @@ function AllAppsLink({ href, active, grouped = false, expanded = false }: { href
           />
         }
       >
-        {active ? <RailIndicator /> : null}<GridIcon className={grouped ? groupedRowIcon : "size-5"} aria-hidden />{grouped && expanded ? <span className="text-[length:var(--rail-label-size,13px)]">{i18n._({ id: "ui.All apps", message: "All apps" })}</span> : null}
+        <GridIcon className={grouped ? groupedRowIcon : "size-5"} aria-hidden />{grouped && expanded ? <span className="text-[length:var(--rail-label-size,13px)]">{i18n._({ id: "ui.All apps", message: "All apps" })}</span> : null}
       </TooltipTrigger>
       <TooltipContent side="right">{i18n._({ id: "ui.All apps", message: "All apps" })}</TooltipContent>
     </Tooltip>
@@ -255,7 +250,7 @@ export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, 
 
   if (grouped) {
     return <>
-      {brandSlot ?? (home ? <Tooltip><TooltipTrigger render={<Link to={railHref(home.url ?? "/")} aria-label={itemLabel(home, homeStatus)} aria-current={homeActive ? "page" : undefined} data-slot="app-rail-home" className={cn(groupedRowClass, "group", !expanded && "justify-center", homeActive && railSelected)} />}>{homeActive ? <RailIndicator /> : null}{brandVisual}{expanded ? <span className="min-w-0 truncate whitespace-nowrap text-[length:var(--rail-label-size,14px)]">{home.name}</span> : null}<StatusMark status={homeStatus} /></TooltipTrigger><ItemTooltip name={home.name} status={homeStatus} /></Tooltip> : null)}
+      {brandSlot ?? (home ? <Tooltip><TooltipTrigger render={<Link to={railHref(home.url ?? "/")} aria-label={itemLabel(home, homeStatus)} aria-current={homeActive ? "page" : undefined} data-slot="app-rail-home" className={cn(groupedRowClass, "group", !expanded && "justify-center", homeActive && railSelected)} />}>{brandVisual}{expanded ? <span className="min-w-0 truncate whitespace-nowrap text-[length:var(--rail-label-size,14px)]">{home.name}</span> : null}<StatusMark status={homeStatus} /></TooltipTrigger><ItemTooltip name={home.name} status={homeStatus} /></Tooltip> : null)}
       <Tooltip><TooltipTrigger render={<div data-slot="app-rail-search" className="w-full" />}><HeaderSearch remote={searchRemote} triggerDataSlot="app-rail-search-trigger" triggerIconClassName={groupedRowIcon} triggerLabel={expanded ? i18n._({ id: "ui.Search", message: "Search" }) : undefined} triggerClassName={cn(groupedRowClass, expanded && "justify-start", !expanded && "justify-center", hitArea(2))} /></TooltipTrigger>{!expanded ? <TooltipContent side="right">{i18n._({ id: "ui.Search", message: "Search" })}</TooltipContent> : null}</Tooltip>
       <div className="min-h-0 w-full flex-1 overflow-y-auto">{children}</div>
       <div className={cn("mt-auto flex w-full shrink-0 flex-col gap-1", expanded ? "items-stretch" : "items-center")}>
@@ -282,7 +277,6 @@ export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, 
               />
             }
           >
-            {homeActive ? <RailIndicator /> : null}
             {brandVisual}
             {mobile || labelled ? <span className={labelled ? "text-[11px] font-semibold leading-none" : undefined}>{home.name}</span> : null}
             <StatusMark status={homeStatus} />
@@ -326,7 +320,6 @@ export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, 
                     />
                   }
                 >
-                  {active ? <RailIndicator /> : null}
                   {Icon ? <Icon className={labelled ? "size-[var(--rail-icon-size,20px)] shrink-0" : "size-5 shrink-0"} aria-hidden /> : null}
                   {mobile || labelled ? <span className={labelled ? "text-[11px] font-semibold leading-none" : undefined}>{item.name}</span> : null}
                   <StatusMark status={status} />
@@ -360,7 +353,6 @@ export function RailEntries({ searchRemote, itemStatus, profile, activeAppHref, 
                       />
                     }
                   >
-                    {active ? <RailIndicator /> : null}
                     <Icon className={labelled ? "size-[var(--rail-icon-size,20px)] shrink-0" : "size-5 shrink-0"} aria-hidden />
                     {mobile || labelled ? <span className={labelled ? "text-[11px] font-semibold leading-none" : undefined}>{app.name}</span> : null}
                     <StatusMark status={itemStatus?.(app)} />
@@ -423,7 +415,6 @@ export default function AppRail(props: AppRailProps) {
           const active = isRailItemActive(pathname, item.href);
           const status = props.itemStatus?.({ name: item.label, url: item.href });
           const row = <Link to={railHref(item.href)} aria-label={itemLabel({ name: item.label }, status)} aria-current={active ? "page" : undefined} data-active={active ? "" : undefined} data-slot="app-rail-item" className={cn(groupedRowClass, expanded && "justify-start", !expanded && "justify-center gap-0", active && railSelected, hitArea(2))}>
-            {active ? <RailIndicator /> : null}
             {ItemIcon ? <ItemIcon className={groupedRowIcon} aria-hidden /> : null}<span className={cn("min-w-0 truncate whitespace-nowrap text-[length:var(--rail-label-size,13px)] transition-opacity duration-(--motion-fade-in) ease-(--motion-ease-out)", reducedMotion, expanded ? "opacity-100" : "w-0 overflow-hidden opacity-0")} aria-hidden={!expanded}>{item.label}</span>
             <StatusMark status={status} />
           </Link>;

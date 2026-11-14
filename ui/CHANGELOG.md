@@ -1,3 +1,7 @@
+## [ui-v0.5.667] - 2026-11-14
+
+- Replace the selected-item left bars in the app rail and app menu with soft primary-token glows and hairline rings. Selected rows retain their tinted fill and primary text/icon; hover remains a calm foreground fill without a glow, and transitions respect reduced motion.
+
 ## [ui-v0.5.666] - 2026-11-13
 
 - Modern rail and app-menu look, all from theme tokens (no new tokens). Rail: the selected item is a rounded tile tinted `bg-primary/15` with a primary icon (and label when labelled or expanded) and a slim 3 px primary pill (`data-slot="rail-indicator"`); hover is `bg-foreground/10` with the icon moving from muted to full foreground over 150 ms (off under reduced motion), a deeper pressed state, and the focus ring is kept. It applies to icons-only, labelled, grouped, the All apps launcher and its popover list, and the phone list. App menu (second column, `SectionSidebar`): the selected row is a soft `data-active:bg-primary/10` rounded-lg row with primary text and icon, medium weight and a 2 px primary indicator inside its left edge, with no box behind the icon; hover is `bg-foreground/5`. The full-layout sidebar item drops its solid primary pill for the same tint. Shared classes live in `dashboard/lib/navItemStyle.ts`.

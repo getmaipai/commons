@@ -64,7 +64,7 @@ describe("PRO-LOOK labelled rail variant", () => {
     expect(nav?.getAttribute("style")).toContain("--rail-width-labelled: 80px");
     expect(chat.textContent).toContain("Chat");
     expect(chat.className).toContain("bg-primary/15");
-    expect(chat.querySelector('[data-slot="rail-indicator"]')).not.toBeNull();
+    expect(chat.querySelector('[data-slot="rail-indicator"]')).toBeNull();
     expect(chat.className).toContain("rounded-2xl");
   });
 });
@@ -233,14 +233,17 @@ describe("rail modern look: selected, hover, tooltip", () => {
   ];
 
   for (const [name, node] of variants) {
-    test(`${name}: the selected item is current, tinted and has the primary indicator; others get calm hover`, () => {
+    test(`${name}: the selected item is current, tinted and glowing; others get calm hover`, () => {
       const view = render(<MemoryRouter initialEntries={["/chat"]}><TooltipProvider>{node}</TooltipProvider></MemoryRouter>);
       const current = view.container.querySelector('[aria-current="page"]');
       if (name.startsWith("grouped")) {
         expect(current?.getAttribute("aria-label")).toBe("Chat");
         expect(classes(current)).toContain("bg-primary/15");
         expect(classes(current)).toContain("text-primary");
-        expect(current?.querySelector('[data-slot="rail-indicator"]')?.className).toContain("w-[3px]");
+        expect(classes(current)).toContain("shadow-[0_0_14px_-2px_color-mix(in_oklab,var(--primary)_55%,transparent)]");
+        expect(classes(current)).toContain("ring-1");
+        expect(classes(current)).toContain("ring-primary/25");
+        expect(current?.querySelector('[data-slot="rail-indicator"]')).toBeNull();
         expect(classes(current)).toContain("focus-visible:ring-2");
         const other = view.getByRole("link", { name: "Media" });
         expect(other.getAttribute("aria-current")).toBeNull();
@@ -255,22 +258,26 @@ describe("rail modern look: selected, hover, tooltip", () => {
     });
   }
 
-  test("a selected pinned app, the launcher link and the popover list use the same tint and indicator", async () => {
+  test("a selected pinned app, the launcher link and the popover list use the same tint and glow", async () => {
     const view = render(<MemoryRouter initialEntries={["/apps/atlas"]}><TooltipProvider><AppRail apps={apps} /></TooltipProvider></MemoryRouter>);
     const app = view.getByRole("link", { name: /Atlas/ });
     expect(app.getAttribute("aria-current")).toBe("page");
     expect(classes(app)).toContain("bg-primary/15");
     expect(classes(app)).toContain("text-primary");
-    expect(app.querySelector('[data-slot="rail-indicator"]')).not.toBeNull();
+    expect(classes(app)).toContain("shadow-[0_0_14px_-2px_color-mix(in_oklab,var(--primary)_55%,transparent)]");
+    expect(classes(app)).toContain("ring-1");
+    expect(app.querySelector('[data-slot="rail-indicator"]')).toBeNull();
     fireEvent.click(view.getByRole("button", { name: "All apps" }));
     const row = await waitFor(() => view.getAllByRole("link", { name: "Atlas" }).find((el) => el.getAttribute("data-slot") !== "app-rail-app")!);
     expect(classes(row)).toContain("bg-primary/15");
-    expect(row.querySelector('[data-slot="rail-indicator"]')).not.toBeNull();
+    expect(classes(row)).toContain("shadow-[0_0_14px_-2px_color-mix(in_oklab,var(--primary)_55%,transparent)]");
+    expect(row.querySelector('[data-slot="rail-indicator"]')).toBeNull();
     cleanup();
     const link = render(<MemoryRouter initialEntries={["/apps"]}><TooltipProvider><AppRail apps={apps} allAppsHref="/apps" /></TooltipProvider></MemoryRouter>);
     const all = link.getByRole("link", { name: "All apps" });
     expect(classes(all)).toContain("bg-primary/15");
-    expect(all.querySelector('[data-slot="rail-indicator"]')).not.toBeNull();
+    expect(classes(all)).toContain("shadow-[0_0_14px_-2px_color-mix(in_oklab,var(--primary)_55%,transparent)]");
+    expect(all.querySelector('[data-slot="rail-indicator"]')).toBeNull();
   });
 
   test("hovering or focusing a collapsed grouped rail item shows its name in a tooltip", async () => {
