@@ -6,6 +6,12 @@
   "type": "object",
   "additionalProperties": false,
   "required": ["activity", "muted", "tracking"],
+  "$defs": {
+    "legacyMotion": {
+      "type": ["string", "null"],
+      "enum": ["resting", "held", null]
+    }
+  },
   "properties": {
     "activity": {
       "type": "string",
@@ -40,8 +46,23 @@
     },
     "motion": {
       "type": ["string", "null"],
-      "enum": ["resting", "held", null],
-      "description": "Whether the body is resting on a surface or being held, so the hub can show when someone is carrying the robot. Null means the body cannot tell; omission means the producer does not yet report this field. A consumer that meets a value it does not know treats it as unknown, not as an error."
+      "anyOf": [
+        {
+          "allOf": [
+            { "$ref": "scene-observation.schema.json#/$defs/motionValue/properties/state" },
+            { "not": { "const": "still" } }
+          ]
+        },
+        { "$ref": "#/$defs/legacyMotion" }
+      ],
+      "description": "The robot's reported motion state. A consumer that meets a value it does not know treats it as unknown. Omission means the producer does not report motion. Null means the body cannot tell."
+    },
+    "motion_pose": {
+      "anyOf": [
+        { "$ref": "scene-observation.schema.json#/$defs/motionValue/properties/pose" },
+        { "type": "null" }
+      ],
+      "description": "The robot's reported pose when known. A consumer that meets a value it does not know treats it as unknown. Null means the pose cannot be determined; omission means the producer does not report it."
     },
     "put_down_count": {
       "type": "integer",

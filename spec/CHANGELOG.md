@@ -1,3 +1,10 @@
+## [spec-v0.1.401] - 2026-11-14
+
+- MOVE-SCENE-01a, additive. RobotState `motion` accepts the shared scene
+  motion states while retaining `resting` and `held`; optional `motion_pose`
+  uses the shared scene pose values. Unknown motion values remain invalid at
+  the schema boundary for Home to handle as unknown.
+
 ## [spec-v0.1.400] - 2026-11-14
 
 - VOICE-MATCH-01, additive. The person setting `person.voice.match` lets Home compare someone's voice with their own recorded samples to verify who is speaking.

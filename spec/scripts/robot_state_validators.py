@@ -19,6 +19,13 @@ def require_boolean(value: Any, _info: ValidationInfo) -> Any:
     return value
 
 
+def reject_robot_motion_still(value: Any, _info: ValidationInfo) -> Any:
+    """Robot motion shares the scene state enum except for its `still` value."""
+    if value == "still":
+        raise ValueError("still is not a robot motion state")
+    return value
+
+
 def confirm_off_requires_boolean(value: Any, info: ValidationInfo) -> Any:
     """Match the schema: confirm_off copy is only allowed on a boolean selector."""
     if value is not None and info.data.get("selector") != "boolean":

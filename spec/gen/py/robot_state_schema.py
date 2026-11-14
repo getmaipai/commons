@@ -5,7 +5,11 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from gen.py._validators import reject_explicit_null, require_boolean
+from gen.py._validators import (
+    reject_explicit_null,
+    reject_robot_motion_still,
+    require_boolean,
+)
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -57,6 +61,10 @@ class Thermal(BaseModel):
     )
 
 
+class LegacyMotion(RootModel[Literal['resting', 'held'] | None]):
+    root: Literal['resting', 'held'] | None
+
+
 class RobotState(BaseModel):
     """
     A hub-local projection of a paired robot's current state, keyed externally by device_id and never synced or given its own record identity (home docs/dev.md, ‘Robot device state’; bot docs/dev.md, ‘Robot device state’ pointer). It deliberately has no id, timestamps, or hlc. Battery, daemon and app version fields may be omitted by producers that do not report them yet; explicit null means the body cannot tell or has no version to report. Reachy Mini always sends null for on_battery per section 7 of the design record.
@@ -101,9 +109,33 @@ class RobotState(BaseModel):
         None,
         description='The robot daemon version, when available, so the hub can display which software is running. Null means no version is currently known; omission means the producer does not yet report this field.',
     )
-    motion: Literal['resting', 'held'] | None = Field(
+    motion: (
+        Literal[
+            'still',
+            'bumped',
+            'lifted',
+            'carried',
+            'set_down',
+            'shaken',
+            'tilted',
+            'tapped',
+            'falling',
+            'rolling',
+        ]
+        | Literal['resting', 'held']
+        | None
+    ) = Field(
         None,
-        description='Whether the body is resting on a surface or being held, so the hub can show when someone is carrying the robot. Null means the body cannot tell; omission means the producer does not yet report this field. A consumer that meets a value it does not know treats it as unknown, not as an error.',
+        description="The robot's reported motion state. A consumer that meets a value it does not know treats it as unknown. Omission means the producer does not report motion. Null means the body cannot tell.",
+    )
+    motion_pose: (
+        Literal[
+            'upright', 'left_side', 'right_side', 'upside_down', 'face_down', 'on_back'
+        ]
+        | None
+    ) = Field(
+        None,
+        description="The robot's reported pose when known. A consumer that meets a value it does not know treats it as unknown. Null means the pose cannot be determined; omission means the producer does not report it.",
     )
     put_down_count: conint(ge=0) | None = Field(
         None,
@@ -167,3 +199,8 @@ class RobotState(BaseModel):
     @classmethod
     def require_boolean_validator(cls, v: Any, info: ValidationInfo) -> Any:
         return require_boolean(v, info)
+
+    @field_validator('motion', mode='before')
+    @classmethod
+    def reject_robot_motion_still_validator(cls, v: Any, info: ValidationInfo) -> Any:
+        return reject_robot_motion_still(v, info)
