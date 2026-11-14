@@ -403,8 +403,12 @@ def test_device_command_fixtures_cover_every_kind_and_reject_mismatch():
     ):
         with pytest.raises(ValidationError):
             DeviceCommand.model_validate({**wifi_add, "payload": payload})
-    DeviceCommand.model_validate({**wifi_add, "payload": {"ssid": "valid", "password": ""}})
-    wifi_forget = next(command for command in commands if command["kind"] == "wifi_forget")
+    DeviceCommand.model_validate(
+        {**wifi_add, "payload": {"ssid": "valid", "password": ""}}
+    )
+    wifi_forget = next(
+        command for command in commands if command["kind"] == "wifi_forget"
+    )
     assert wifi_forget["payload"] == {"ssid": "Example Home"}
     for payload in (
         {},
