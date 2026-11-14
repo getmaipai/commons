@@ -1,3 +1,7 @@
+## [ui-v0.5.665] - 2026-11-13
+
+- VIDEO-LD-05: a `player` takes `marks` (`{ bind?, field?, heading? }`): saved moments `{ at_s, label? }` draw as a wrapping row of 44 px buttons under the player, and a tap seeks to `at_s`. An empty list draws nothing. A player action's args may use `{position_s}`, the player's current time in seconds at the click (a number when the whole argument is the token), so a button can save a moment.
+
 ## [ui-v0.5.664] - 2026-11-13
 
 - `media_shelf.poll_while` takes `{ field, values }`: while a row field such as `badge` matches one of the configured values, the shelf refetches its whole bound list every three seconds. It pauses while the tab is hidden, resumes when visible, and keeps the current tiles on screen during each refresh.

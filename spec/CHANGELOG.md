@@ -1,3 +1,7 @@
+## [spec-v0.1.394] - 2026-11-13
+
+- `player` accepts optional `marks: { bind?, field?, heading? }` for a seekable list of saved moments, and its `actions` args may use `{position_s}` (matches ui 0.5.665).
+
 ## [spec-v0.1.393] - 2026-11-13
 
 - INSTANT-FILLER-01a: update `voice.talk_over` copy to describe the varied short spoken cues Home uses.

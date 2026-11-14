@@ -276,6 +276,14 @@ describe("UI schema", () => {
     expect(validate({ ...shelf, poll_while: { statuses: ["queued"], record: { path: "recent" } } })).toBe(false);
   });
 
+  test("player marks take bind, field and heading and reject unknown keys", () => {
+    const player = { type: "player", bind: { source: "package", path: "item" } };
+    expect(validate({ ...player, marks: { field: "marks", heading: "Moments" } })).toBe(true);
+    expect(validate({ ...player, marks: { bind: { source: "package", path: "marks" } }, actions: [{ label: "Save moment", action: { call: { target: "/x", args: { at_s: "{position_s}" } } } }] })).toBe(true);
+    expect(validate({ ...player, marks: {} })).toBe(false);
+    expect(validate({ ...player, marks: { field: "marks", extra: 1 } })).toBe(false);
+  });
+
   test("widget_card and widget_row validate a minimal bind and reject an unbound one", () => {
     expect(validate({ type: "widget_card", bind: { source: "route", path: "/api/widgets" } })).toBe(true);
     expect(validate({ type: "widget_row", bind: { source: "route", path: "/api/widgets" } })).toBe(true);

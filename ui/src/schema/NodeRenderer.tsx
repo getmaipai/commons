@@ -1963,7 +1963,8 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
                 transcript={node.details_show?.includes("transcript") ? { bind: node.transcript_bind, state, fallback: readField(r, field("transcript", "transcript")), getMedia: () => mediaEl.current, phone } : undefined}
               />
             ) : null}
-            {node.actions && node.actions.length > 0 || (editButton && !audioLayout) ? <PlayerActions actions={node.actions ?? []} item={r} dispatch={dispatch} wrap={node.actions_wrap === true}>{!audioLayout ? editButton : null}</PlayerActions> : null}
+            {node.actions && node.actions.length > 0 || (editButton && !audioLayout) ? <PlayerActions actions={node.actions ?? []} item={r} dispatch={dispatch} wrap={node.actions_wrap === true} getPosition={() => mediaEl.current?.currentTime ?? 0}>{!audioLayout ? editButton : null}</PlayerActions> : null}
+            {node.marks ? <PlayerMarks config={node.marks} state={state} item={r} seek={(time) => { if (mediaEl.current) mediaEl.current.currentTime = time; }} /> : null}
             {node.edit ? <EditPlayerSheet open={editOpen} onOpenChange={setEditOpen} phone={phone} definition={node.edit} item={r} values={editValues} setValues={setEditValues} error={editError} onSave={() => { const id = readField(r, field("id", "id")); const changed = Object.fromEntries(node.edit!.fields.filter(f => JSON.stringify(editValues[f.name] ?? "") !== JSON.stringify(readField(r, f.name) ?? "")).map(f => [f.name, editValues[f.name]])); if (!Object.keys(changed).length) { setEditOpen(false); return; } setEditError(null); const save = node.edit!.on_save; const action: Action = "call" in save ? { call: { ...save.call, args: { ...changed, id } } } : save; dispatch(action, [{ ...changed, id }], undefined, { onSuccess: () => setEditOpen(false) }); }} /> : null}
             {lastError ? <p role="status" className="text-base text-destructive">{lastError}</p> : null}
             {castError ? <p role="status" className="text-base text-destructive">{castError}</p> : null}
@@ -2099,7 +2100,7 @@ function PlayerDetails({ title, subtitle, facts, description, chapters, seek, sh
 
 /** MEDIA-POLISH-01: the actions row under the title (Like, Watch later): pill buttons in one row that scrolls sideways
  * on a phone. A button with a `field` is a toggle, pressed while that field of the item is true. */
-function PlayerActions({ actions, item, dispatch, wrap, children }: { actions: PlayerActionNode[]; item: Row; dispatch: ReturnType<typeof useDispatchAction>["dispatch"]; wrap?: boolean; children?: ReactNode }) {
+function PlayerActions({ actions, item, dispatch, wrap, getPosition, children }: { actions: PlayerActionNode[]; item: Row; dispatch: ReturnType<typeof useDispatchAction>["dispatch"]; wrap?: boolean; getPosition?: () => number; children?: ReactNode }) {
   const [busy, setBusy] = useState<string | null>(null);
   return (
     <div className={wrap ? "flex min-w-0 flex-wrap gap-2 pb-1" : "flex min-w-0 items-center gap-2 pb-1"} role="group" aria-label={i18n._({ id: "ui.Actions", message: "Actions" })} data-slot="player-actions">
@@ -2118,7 +2119,11 @@ function PlayerActions({ actions, item, dispatch, wrap, children }: { actions: P
             disabled={busy !== null && a.busy_label !== undefined && busy === a.label}
             onClick={() => {
               if (a.busy_label) setBusy(a.label);
-              dispatch(a.action, [a.field ? { ...item, on: !on } : item], a.busy_label ? () => setBusy(null) : undefined);
+              // VIDEO-LD-05: `{position_s}` is the player's current time (whole tenths of a second) at the click; a whole-token argument stays a number.
+              const base = a.field ? { ...item, on: !on } : item;
+              const at = Math.round(Math.max(0, getPosition?.() ?? 0) * 10) / 10;
+              const usesPosition = JSON.stringify(a.action).includes("{position_s}");
+              dispatch(a.action, [usesPosition ? { ...base, position_s: at } : base], a.busy_label ? () => setBusy(null) : undefined, usesPosition ? { typedArgs: true } : undefined);
             }}
           >
             {Glyph ? <Glyph aria-hidden className={on ? "fill-current" : undefined} /> : null}
@@ -2129,6 +2134,35 @@ function PlayerActions({ actions, item, dispatch, wrap, children }: { actions: P
       </div>
       {children ? <div className="flex shrink-0 items-center gap-2">{children}</div> : null}
     </div>
+  );
+}
+
+/** VIDEO-LD-05: saved moments ({ at_s, label? }) as a wrapping row of 44 px buttons under the player; one seeks to its time. An empty list draws nothing. */
+function PlayerMarks({ config, state, item, seek }: { config: NonNullable<PlayerNode["marks"]>; state: Row; item: Row; seek: (time: number) => void }) {
+  if (config.bind) return <BoundPlayerMarks bind={config.bind} heading={config.heading} state={state} seek={seek} />;
+  return <PlayerMarkList heading={config.heading} marks={readField(item, config.field ?? "marks")} seek={seek} />;
+}
+function BoundPlayerMarks({ bind, heading, state, seek }: { bind: NonNullable<NonNullable<PlayerNode["marks"]>["bind"]>; heading?: string; state: Row; seek: (time: number) => void }) {
+  const query = useBinding<Row[] | { rows?: Row[] }>(bind, state);
+  const data = query.data;
+  return <PlayerMarkList heading={heading} marks={Array.isArray(data) ? data : data?.rows} seek={seek} />;
+}
+function PlayerMarkList({ heading, marks, seek }: { heading?: string; marks: unknown; seek: (time: number) => void }) {
+  const list = (Array.isArray(marks) ? marks : [])
+    .filter((m): m is { at_s: number; label?: unknown } => typeof m === "object" && m !== null && typeof (m as { at_s?: unknown }).at_s === "number" && Number.isFinite((m as { at_s: number }).at_s) && (m as { at_s: number }).at_s >= 0)
+    .sort((a, b) => a.at_s - b.at_s);
+  if (list.length === 0) return null;
+  return (
+    <ul className="m-0 flex min-w-0 list-none flex-wrap gap-2 p-0" aria-label={heading ?? i18n._({ id: "ui.Saved moments", message: "Saved moments" })} data-slot="player-marks">
+      {list.map((m) => (
+        <li key={m.at_s} className="min-w-0">
+          <Button type="button" variant="secondary" size="sm" className="min-h-11 max-w-full rounded-full px-4" data-slot="player-mark" onClick={() => seek(m.at_s)}>
+            <span className="tabular-nums">{formatTime(m.at_s)}</span>
+            {typeof m.label === "string" && m.label.trim() ? <span className="min-w-0 truncate text-muted-foreground">{m.label.trim()}</span> : null}
+          </Button>
+        </li>
+      ))}
+    </ul>
   );
 }
 

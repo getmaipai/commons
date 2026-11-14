@@ -334,6 +334,8 @@ export const PlayerNodeSchema = z.object({
   rate: z.object({ field: z.string().min(1).optional(), value: z.number().min(0.25).max(4).optional(), on_change: ActionSchema.optional() }).strict().refine((r) => r.field !== undefined || r.value !== undefined || r.on_change !== undefined, "rate needs field, value or on_change").optional(),
   skip: z.object({ back: z.number().min(1).max(120), forward: z.number().min(1).max(120) }).strict().optional(),
   transcript_bind: BindingSchema.optional(),
+  // VIDEO-LD-05: saved moments (media-progress marks) as a seekable list under the player.
+  marks: z.object({ bind: BindingSchema.optional(), field: z.string().min(1).optional(), heading: z.string().min(1).max(40).optional() }).strict().optional(),
   double_tap_seek: z.boolean().optional(),
   long_press_speed: z.boolean().optional(),
   pip: z.boolean().optional(),

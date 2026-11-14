@@ -1106,6 +1106,15 @@
           "properties": { "back": { "type": "number", "minimum": 1, "maximum": 120 }, "forward": { "type": "number", "minimum": 1, "maximum": 120 } }
         },
         "transcript_bind": { "$ref": "#/$defs/binding", "description": "PARITY-01: the call returning the transcript as rows [{start_s, text}] (or {rows}); the first row of the bound item is not used. Absent: the item's own `transcript` field, if any." },
+        "marks": {
+          "type": "object", "additionalProperties": false, "minProperties": 1,
+          "description": "VIDEO-LD-05: saved moments (the media-progress `marks`, items { at_s, label? }) as a compact wrapping list of 44 px buttons under the player; a tap seeks the player to `at_s`. `bind` is a call returning the marks as rows (or {rows}); without it the list is read from the item's own `field` (default `marks`). An empty list draws nothing. To save a moment, give an `actions` button an `action` whose args use `{position_s}` (the player's current time in seconds at the click, a number when the whole argument is the token).",
+          "properties": {
+            "bind": { "$ref": "#/$defs/binding" },
+            "field": { "type": "string", "minLength": 1, "description": "Dotted row path to the marks array; default marks. Ignored when `bind` is set." },
+            "heading": { "type": "string", "minLength": 1, "maxLength": 40, "description": "Accessible name of the list; default Saved moments." }
+          }
+        },
         "double_tap_seek": { "type": "boolean", "default": false, "description": "PARITY-01: video only. A double tap on the left or right third of the picture seeks 10 s back or forward; further quick taps stack." },
         "long_press_speed": { "type": "boolean", "default": false, "description": "PARITY-01: video only. Holding the picture plays at 2x until release." },
         "pip": { "type": "boolean", "default": false, "description": "PARITY-01: video only. Draw a Picture in picture button (shown only where the browser supports it)." },
