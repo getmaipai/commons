@@ -319,7 +319,7 @@ describe("record fixtures validate against their generated Zod models", () => {
 
   test("device-command fixtures cover every kind and reject a mismatched payload", () => {
     const commands = JSON.parse(readFileSync(join(import.meta.dir, "..", "..", "fixtures", "records", "device-command.kinds.example.json"), "utf-8")) as unknown[];
-    expect(commands).toHaveLength(28);
+    expect(commands).toHaveLength(30);
     for (const command of commands) expect(() => DeviceCommand.parse(command)).not.toThrow();
     const invalid = { ...(commands[0] as object), kind: "capture_request" };
     expect(() => DeviceCommand.parse(invalid)).toThrow();
@@ -343,6 +343,25 @@ describe("record fixtures validate against their generated Zod models", () => {
       expect(() => DeviceCommand.parse({ ...listenSong, payload }), JSON.stringify(payload)).toThrow();
     }
     expect(() => DeviceCommand.parse({ ...listenSong, payload: { request_id: "valid" } })).not.toThrow();
+    const wifiAdd = (commands as { kind: string; payload: Record<string, unknown> }[]).find((command) => command.kind === "wifi_add")!;
+    expect(wifiAdd.payload).toEqual({ ssid: "Example Home", password: "example-password" });
+    for (const payload of [
+      {},
+      { ssid: "", password: "password" },
+      { ssid: "x".repeat(33), password: "password" },
+      { ssid: "valid", password: "x".repeat(64) },
+      { ssid: "valid", password: "password", extra: true },
+      { ssid: 5, password: "password" },
+      { ssid: "valid", password: 5 },
+    ]) {
+      expect(() => DeviceCommand.parse({ ...wifiAdd, payload }), JSON.stringify(payload)).toThrow();
+    }
+    expect(() => DeviceCommand.parse({ ...wifiAdd, payload: { ssid: "valid", password: "" } })).not.toThrow();
+    const wifiForget = (commands as { kind: string; payload: Record<string, unknown> }[]).find((command) => command.kind === "wifi_forget")!;
+    expect(wifiForget.payload).toEqual({ ssid: "Example Home" });
+    for (const payload of [{}, { ssid: "" }, { ssid: "x".repeat(33) }, { ssid: 5 }, { ssid: "valid", extra: true }]) {
+      expect(() => DeviceCommand.parse({ ...wifiForget, payload }), JSON.stringify(payload)).toThrow();
+    }
     const songTitle = (commands as { kind: string; payload: Record<string, unknown> }[]).find((command) => command.kind === "song_title")!;
     expect(songTitle.payload).toEqual({ text: "Take Five - Dave Brubeck" });
     for (const payload of [{}, { text: "x".repeat(81) }, { text: 5 }, { text: "ok", extra: true }]) {

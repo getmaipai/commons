@@ -1127,6 +1127,49 @@
       }
     },
     {
+      "description": "Home tells the robot to save a Wi-Fi network. The password is write-only: the hub never persists or logs it.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "payload", "issued_at", "expires_at", "hlc"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "kind": { "type": "string", "const": "wifi_add" },
+        "issued_at": { "type": "string", "format": "date-time" },
+        "expires_at": { "type": "string", "format": "date-time" },
+        "hlc": { "type": "string", "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$" },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["ssid", "password"],
+          "properties": {
+            "ssid": { "type": "string", "minLength": 1, "maxLength": 32 },
+            "password": { "type": "string", "maxLength": 63 }
+          }
+        }
+      }
+    },
+    {
+      "description": "Home tells the robot to forget a saved Wi-Fi network.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "payload", "issued_at", "expires_at", "hlc"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "kind": { "type": "string", "const": "wifi_forget" },
+        "issued_at": { "type": "string", "format": "date-time" },
+        "expires_at": { "type": "string", "format": "date-time" },
+        "hlc": { "type": "string", "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$" },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["ssid"],
+          "properties": {
+            "ssid": { "type": "string", "minLength": 1, "maxLength": 32 }
+          }
+        }
+      }
+    },
+    {
       "description": "The robot shows a card and says the text aloud. The robot refuses (and says why in its answer) when announcements are off, it is muted, in quiet hours or at night, or the text is empty.",
       "type": "object",
       "additionalProperties": false,

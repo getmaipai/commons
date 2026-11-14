@@ -359,9 +359,9 @@ def test_reachy_eye_capability_is_only_on_the_fitted_fixture():
 
 def test_device_command_fixtures_cover_every_kind_and_reject_mismatch():
     commands = load_fixture("device-command.kinds.example.json")
-    # 27 kinds; notify appears twice (the text form and the waiting form).
-    assert len(commands) == 28
-    assert len({command["kind"] for command in commands}) == 27
+    # 29 kinds; notify appears twice (the text form and the waiting form).
+    assert len(commands) == 30
+    assert len({command["kind"] for command in commands}) == 29
     for command in commands:
         DeviceCommand.model_validate(command)
     invalid = {**commands[0], "kind": "capture_request"}
@@ -387,6 +387,34 @@ def test_device_command_fixtures_cover_every_kind_and_reject_mismatch():
         with pytest.raises(ValidationError):
             DeviceCommand.model_validate({**listen_song, "payload": payload})
     DeviceCommand.model_validate({**listen_song, "payload": {"request_id": "valid"}})
+    wifi_add = next(command for command in commands if command["kind"] == "wifi_add")
+    assert wifi_add["payload"] == {
+        "ssid": "Example Home",
+        "password": "example-password",
+    }
+    for payload in (
+        {},
+        {"ssid": "", "password": "password"},
+        {"ssid": "x" * 33, "password": "password"},
+        {"ssid": "valid", "password": "x" * 64},
+        {"ssid": "valid", "password": "password", "extra": True},
+        {"ssid": 5, "password": "password"},
+        {"ssid": "valid", "password": 5},
+    ):
+        with pytest.raises(ValidationError):
+            DeviceCommand.model_validate({**wifi_add, "payload": payload})
+    DeviceCommand.model_validate({**wifi_add, "payload": {"ssid": "valid", "password": ""}})
+    wifi_forget = next(command for command in commands if command["kind"] == "wifi_forget")
+    assert wifi_forget["payload"] == {"ssid": "Example Home"}
+    for payload in (
+        {},
+        {"ssid": ""},
+        {"ssid": "x" * 33},
+        {"ssid": 5},
+        {"ssid": "valid", "extra": True},
+    ):
+        with pytest.raises(ValidationError):
+            DeviceCommand.model_validate({**wifi_forget, "payload": payload})
     song_title = next(
         command for command in commands if command["kind"] == "song_title"
     )

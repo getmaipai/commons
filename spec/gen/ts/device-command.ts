@@ -364,6 +364,35 @@ export const DeviceCommand = z
       z
         .object({
           id: z.string().min(1).max(128),
+          kind: z.literal("wifi_add"),
+          issued_at: z.string().datetime({ offset: true }),
+          expires_at: z.string().datetime({ offset: true }),
+          hlc: z.string().regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$")),
+          payload: z
+            .object({
+              ssid: z.string().min(1).max(32),
+              password: z.string().max(63),
+            })
+            .strict(),
+        })
+        .strict()
+        .describe(
+          "Home tells the robot to save a Wi-Fi network. The password is write-only: the hub never persists or logs it.",
+        ),
+      z
+        .object({
+          id: z.string().min(1).max(128),
+          kind: z.literal("wifi_forget"),
+          issued_at: z.string().datetime({ offset: true }),
+          expires_at: z.string().datetime({ offset: true }),
+          hlc: z.string().regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$")),
+          payload: z.object({ ssid: z.string().min(1).max(32) }).strict(),
+        })
+        .strict()
+        .describe("Home tells the robot to forget a saved Wi-Fi network."),
+      z
+        .object({
+          id: z.string().min(1).max(128),
           kind: z.literal("announce"),
           issued_at: z.string().datetime({ offset: true }),
           expires_at: z.string().datetime({ offset: true }),

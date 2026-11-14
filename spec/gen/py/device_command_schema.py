@@ -515,11 +515,58 @@ class Payload19(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
+    ssid: constr(min_length=1, max_length=32)
+    password: constr(max_length=63)
+
+
+class DeviceCommand22(BaseModel):
+    """
+    Home tells the robot to save a Wi-Fi network. The password is write-only: the hub never persists or logs it.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(min_length=1, max_length=128)
+    kind: Literal['wifi_add']
+    issued_at: AwareDatetime
+    expires_at: AwareDatetime
+    hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
+    payload: Payload19
+
+
+class Payload20(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    ssid: constr(min_length=1, max_length=32)
+
+
+class DeviceCommand23(BaseModel):
+    """
+    Home tells the robot to forget a saved Wi-Fi network.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(min_length=1, max_length=128)
+    kind: Literal['wifi_forget']
+    issued_at: AwareDatetime
+    expires_at: AwareDatetime
+    hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
+    payload: Payload20
+
+
+class Payload21(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
     text: constr(min_length=1, max_length=400)
     urgent: bool | None = None
 
 
-class DeviceCommand22(BaseModel):
+class DeviceCommand24(BaseModel):
     """
     The robot shows a card and says the text aloud. The robot refuses (and says why in its answer) when announcements are off, it is muted, in quiet hours or at night, or the text is empty.
     """
@@ -532,10 +579,10 @@ class DeviceCommand22(BaseModel):
     issued_at: AwareDatetime
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload19
+    payload: Payload21
 
 
-class Payload20(BaseModel):
+class Payload22(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
@@ -543,7 +590,7 @@ class Payload20(BaseModel):
     label: constr(min_length=1, max_length=60) | None = None
 
 
-class DeviceCommand23(BaseModel):
+class DeviceCommand25(BaseModel):
     """
     The robot starts its own countdown timer, kept on the unit so it rings with no hub (1 second to 24 hours, at most 8 active). The robot answers in the ack state: {ok: true, ...} or {ok: false, error} in plain words.
     """
@@ -556,10 +603,10 @@ class DeviceCommand23(BaseModel):
     issued_at: AwareDatetime
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload20
+    payload: Payload22
 
 
-class Payload21(BaseModel):
+class Payload23(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
@@ -568,7 +615,7 @@ class Payload21(BaseModel):
     label: constr(min_length=1, max_length=60) | None = None
 
 
-class DeviceCommand24(BaseModel):
+class DeviceCommand26(BaseModel):
     """
     The robot sets an alarm for the next HH:MM of its own local day. The robot answers in the ack state: {ok: true, ...} or {ok: false, error} in plain words.
     """
@@ -581,10 +628,10 @@ class DeviceCommand24(BaseModel):
     issued_at: AwareDatetime
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload21
+    payload: Payload23
 
 
-class DeviceCommand25(BaseModel):
+class DeviceCommand27(BaseModel):
     """
     The robot lists its active timers and alarms with the time left. The robot answers in the ack state: {ok: true, ...} or {ok: false, error} in plain words.
     """
@@ -600,14 +647,14 @@ class DeviceCommand25(BaseModel):
     payload: dict[str, Any] = Field(..., max_length=0)
 
 
-class Payload22(BaseModel):
+class Payload24(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
     id: conint(ge=1) | None = None
 
 
-class DeviceCommand26(BaseModel):
+class DeviceCommand28(BaseModel):
     """
     The robot cancels one timer by id, or all of them when no id is given. The robot answers in the ack state: {ok: true, ...} or {ok: false, error} in plain words.
     """
@@ -620,10 +667,10 @@ class DeviceCommand26(BaseModel):
     issued_at: AwareDatetime
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload22
+    payload: Payload24
 
 
-class DeviceCommand27(BaseModel):
+class DeviceCommand29(BaseModel):
     """
     The robot ends the timer that is ringing now. The robot answers in the ack state: {ok: true, ...} or {ok: false, error} in plain words.
     """
@@ -639,14 +686,14 @@ class DeviceCommand27(BaseModel):
     payload: dict[str, Any] = Field(..., max_length=0)
 
 
-class Payload23(BaseModel):
+class Payload25(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
     seconds: conint(ge=1, le=3600) | None = None
 
 
-class DeviceCommand28(BaseModel):
+class DeviceCommand30(BaseModel):
     """
     The robot ends the ringing timer and starts a new one with the same label (default 5 minutes, at most 1 hour). The robot answers in the ack state: {ok: true, ...} or {ok: false, error} in plain words.
     """
@@ -659,7 +706,7 @@ class DeviceCommand28(BaseModel):
     issued_at: AwareDatetime
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload23
+    payload: Payload25
 
 
 class DeviceCommand(
@@ -692,6 +739,8 @@ class DeviceCommand(
         | DeviceCommand26
         | DeviceCommand27
         | DeviceCommand28
+        | DeviceCommand29
+        | DeviceCommand30
     ]
 ):
     root: (
@@ -723,6 +772,8 @@ class DeviceCommand(
         | DeviceCommand26
         | DeviceCommand27
         | DeviceCommand28
+        | DeviceCommand29
+        | DeviceCommand30
     ) = Field(
         ...,
         description='A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.',

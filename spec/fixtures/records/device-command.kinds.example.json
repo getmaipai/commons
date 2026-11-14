@@ -273,6 +273,27 @@
     "hlc": "1791201600000:0:robot123"
   },
   {
+    "id": "cmd-wifi-add",
+    "kind": "wifi_add",
+    "payload": {
+      "ssid": "Example Home",
+      "password": "example-password"
+    },
+    "issued_at": "2026-11-14T12:00:00Z",
+    "expires_at": "2026-11-14T12:01:00Z",
+    "hlc": "1791201600000:0:hub123"
+  },
+  {
+    "id": "cmd-wifi-forget",
+    "kind": "wifi_forget",
+    "payload": {
+      "ssid": "Example Home"
+    },
+    "issued_at": "2026-11-14T12:00:00Z",
+    "expires_at": "2026-11-14T12:01:00Z",
+    "hlc": "1791201600000:0:hub123"
+  },
+  {
     "id": "cmd-listen-song",
     "kind": "listen_song",
     "payload": {
