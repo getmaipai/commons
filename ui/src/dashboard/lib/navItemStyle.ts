@@ -15,7 +15,7 @@ export const navTransition = "transition-[background-color,color,box-shadow] dur
 export const railHover = "hover:bg-foreground/10 hover:text-foreground active:bg-foreground/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
 /** Rail selected: clearly visible primary tint, primary icon and label. */
-export const railSelected = "bg-primary/15 text-primary shadow-[0_0_14px_-2px_color-mix(in_oklab,var(--primary)_55%,transparent)] hover:bg-primary/20 hover:text-primary active:bg-primary/25";
+export const railSelected = "bg-primary/15 text-primary shadow-[inset_0_0_14px_-3px_color-mix(in_oklab,var(--primary)_60%,transparent)] hover:bg-primary/20 hover:text-primary active:bg-primary/25";
 
 /** App menu (second column) hover: quieter than the rail. */
 export const menuHover = "text-sidebar-foreground/80 hover:bg-foreground/5 hover:text-foreground";

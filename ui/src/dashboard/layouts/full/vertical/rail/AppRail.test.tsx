@@ -240,8 +240,8 @@ describe("rail modern look: selected, hover, tooltip", () => {
         expect(current?.getAttribute("aria-label")).toBe("Chat");
         expect(classes(current)).toContain("bg-primary/15");
         expect(classes(current)).toContain("text-primary");
-        expect(classes(current)).toContain("shadow-[0_0_14px_-2px_color-mix(in_oklab,var(--primary)_55%,transparent)]");
-        expect(classes(current)).toContain("shadow-[0_0_14px_-2px_color-mix(in_oklab,var(--primary)_55%,transparent)]");
+        expect(classes(current)).toContain("shadow-[inset_0_0_14px_-3px_color-mix(in_oklab,var(--primary)_60%,transparent)]");
+        expect(classes(current)).toContain("shadow-[inset_0_0_14px_-3px_color-mix(in_oklab,var(--primary)_60%,transparent)]");
         expect(current?.querySelector('[data-slot="rail-indicator"]')).toBeNull();
         expect(classes(current)).toContain("focus-visible:ring-2");
         const other = view.getByRole("link", { name: "Media" });
@@ -263,18 +263,18 @@ describe("rail modern look: selected, hover, tooltip", () => {
     expect(app.getAttribute("aria-current")).toBe("page");
     expect(classes(app)).toContain("bg-primary/15");
     expect(classes(app)).toContain("text-primary");
-    expect(classes(app)).toContain("shadow-[0_0_14px_-2px_color-mix(in_oklab,var(--primary)_55%,transparent)]");
+    expect(classes(app)).toContain("shadow-[inset_0_0_14px_-3px_color-mix(in_oklab,var(--primary)_60%,transparent)]");
     expect(app.querySelector('[data-slot="rail-indicator"]')).toBeNull();
     fireEvent.click(view.getByRole("button", { name: "All apps" }));
     const row = await waitFor(() => view.getAllByRole("link", { name: "Atlas" }).find((el) => el.getAttribute("data-slot") !== "app-rail-app")!);
     expect(classes(row)).toContain("bg-primary/15");
-    expect(classes(row)).toContain("shadow-[0_0_14px_-2px_color-mix(in_oklab,var(--primary)_55%,transparent)]");
+    expect(classes(row)).toContain("shadow-[inset_0_0_14px_-3px_color-mix(in_oklab,var(--primary)_60%,transparent)]");
     expect(row.querySelector('[data-slot="rail-indicator"]')).toBeNull();
     cleanup();
     const link = render(<MemoryRouter initialEntries={["/apps"]}><TooltipProvider><AppRail apps={apps} allAppsHref="/apps" /></TooltipProvider></MemoryRouter>);
     const all = link.getByRole("link", { name: "All apps" });
     expect(classes(all)).toContain("bg-primary/15");
-    expect(classes(all)).toContain("shadow-[0_0_14px_-2px_color-mix(in_oklab,var(--primary)_55%,transparent)]");
+    expect(classes(all)).toContain("shadow-[inset_0_0_14px_-3px_color-mix(in_oklab,var(--primary)_60%,transparent)]");
     expect(all.querySelector('[data-slot="rail-indicator"]')).toBeNull();
   });
 
