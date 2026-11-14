@@ -1,3 +1,7 @@
+## [spec-v0.1.402] - 2026-11-14
+
+- MOVE-SCENE-01a, no schema change. The package version now matches its tag. The tag spec-v0.1.401 was cut before `package.json` was bumped, so it is burned; use spec-v0.1.402, which carries the same motion change.
+
 ## [spec-v0.1.401] - 2026-11-14
 
 - MOVE-SCENE-01a, additive. RobotState `motion` accepts the shared scene
