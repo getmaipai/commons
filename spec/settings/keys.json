@@ -1440,6 +1440,20 @@
     ]
   },
   {
+    "key": "music.tempo.online",
+    "scope": "household",
+    "selector": "boolean",
+    "default": true,
+    "label": "Look up a song's tempo online",
+    "help": "After Home names a song, it can ask Deezer's public catalogue for the song's tempo (beats per minute). Only the song's title and artist are sent, never the recording and nothing about your home. The tempo helps the robot dance in time and helps Home check that the match is right. Turn this off to use only the tempos Home works out from your own library.",
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.media_lookups",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "music.artist_wikimedia",
     "scope": "household",
     "selector": "boolean",

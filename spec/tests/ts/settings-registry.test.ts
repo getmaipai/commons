@@ -122,6 +122,16 @@ describe("spec/settings/keys.json", () => {
     expect(key.help).toContain("never the recording");
   });
 
+  test("the tempo switch is a household boolean that defaults on and says only title and artist are sent", () => {
+    const entries = loadRegistry() as Record<string, unknown>[];
+    const matches = entries.filter((row) => row.key === "music.tempo.online");
+    expect(matches).toHaveLength(1);
+    const key = SettingsKey.parse(matches[0]);
+    expect(key).toMatchObject({ scope: "household", selector: "boolean", default: true, lives_in: "household.media_lookups" });
+    expect(key.help).toContain("title and artist");
+    expect(key.help).toContain("never the recording");
+  });
+
   test("Home hidden cards is a person-scoped advanced JSON list", () => {
     const entries = loadRegistry() as Record<string, unknown>[];
     const matches = entries.filter((row) => row.key === "ui.home_hidden");

@@ -2,6 +2,10 @@
 
 - MUSIC-ID-05, additive. The household setting `music.identify.shazam` (on by default) lets Home ask Shazam about a short clip's sound signature; the card help for `music.identify.online` now says Home asks Shazam and AcoustID at the same time and that only a signature or fingerprint leaves the home, never the recording. `device-command` gains `song_title` with payload `{ text }` (0 to 80 characters; empty clears), which Home sends when a person confirms or corrects a song name so the robot shows the right title.
 
+## [spec-v0.1.399] - 2026-11-14
+
+- MUSIC-TEMPO-01, additive. The household setting `music.tempo.online` (on by default) lets Home ask Deezer's public catalogue for a named song's tempo, sending only the song's title and artist, never audio or anything about the home. Off keeps tempos to the household's own library.
+
 ## [spec-v0.1.398] - 2026-11-14
 
 - ANYWHERE-02, additive: `device-command` gains `wifi_add` and `wifi_forget` commands to save and forget Wi-Fi networks. `wifi_add` carries a write-only password that the hub never persists or logs.
