@@ -393,6 +393,34 @@ export const DeviceCommand = z
       z
         .object({
           id: z.string().min(1).max(128),
+          kind: z.literal("wifi_use"),
+          issued_at: z.string().datetime({ offset: true }),
+          expires_at: z.string().datetime({ offset: true }),
+          hlc: z.string().regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$")),
+          payload: z.object({ ssid: z.string().min(1).max(32) }).strict(),
+        })
+        .strict()
+        .describe(
+          "Home tells the robot to leave its current Wi-Fi and join one saved network now (an away test without moving the robot). The robot holds the choice in memory only, never rewrites its saved list, and goes back to its saved networks by itself if it does not reach the hub within 3 minutes.",
+        ),
+      z
+        .object({
+          id: z.string().min(1).max(128),
+          kind: z.literal("prefer_tailnet"),
+          issued_at: z.string().datetime({ offset: true }),
+          expires_at: z.string().datetime({ offset: true }),
+          hlc: z.string().regex(new RegExp("^[0-9]+:[0-9]+:[a-z0-9]{6,}$")),
+          payload: z
+            .object({ minutes: z.number().int().gte(0).lte(120) })
+            .strict(),
+        })
+        .strict()
+        .describe(
+          "Home tells the robot to prefer its tailnet path to the hub for a number of minutes (0 turns it off), so the tailnet path can be proven while the robot is on the home network. Not saved on the robot.",
+        ),
+      z
+        .object({
+          id: z.string().min(1).max(128),
           kind: z.literal("announce"),
           issued_at: z.string().datetime({ offset: true }),
           expires_at: z.string().datetime({ offset: true }),

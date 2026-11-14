@@ -294,6 +294,26 @@
     "hlc": "1791201600000:0:hub123"
   },
   {
+    "id": "cmd-wifi-use",
+    "kind": "wifi_use",
+    "payload": {
+      "ssid": "Example Hotspot"
+    },
+    "issued_at": "2026-11-14T12:00:00Z",
+    "expires_at": "2026-11-14T12:01:00Z",
+    "hlc": "1791201600000:0:hub123"
+  },
+  {
+    "id": "cmd-prefer-tailnet",
+    "kind": "prefer_tailnet",
+    "payload": {
+      "minutes": 10
+    },
+    "issued_at": "2026-11-14T12:00:00Z",
+    "expires_at": "2026-11-14T12:01:00Z",
+    "hlc": "1791201600000:0:hub123"
+  },
+  {
     "id": "cmd-listen-song",
     "kind": "listen_song",
     "payload": {

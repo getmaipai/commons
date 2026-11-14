@@ -558,7 +558,46 @@ class DeviceCommand23(BaseModel):
     payload: Payload20
 
 
-class Payload21(BaseModel):
+class DeviceCommand24(BaseModel):
+    """
+    Home tells the robot to leave its current Wi-Fi and join one saved network now (an away test without moving the robot). The robot holds the choice in memory only, never rewrites its saved list, and goes back to its saved networks by itself if it does not reach the hub within 3 minutes.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(min_length=1, max_length=128)
+    kind: Literal['wifi_use']
+    issued_at: AwareDatetime
+    expires_at: AwareDatetime
+    hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
+    payload: Payload20
+
+
+class Payload22(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    minutes: conint(ge=0, le=120)
+
+
+class DeviceCommand25(BaseModel):
+    """
+    Home tells the robot to prefer its tailnet path to the hub for a number of minutes (0 turns it off), so the tailnet path can be proven while the robot is on the home network. Not saved on the robot.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(min_length=1, max_length=128)
+    kind: Literal['prefer_tailnet']
+    issued_at: AwareDatetime
+    expires_at: AwareDatetime
+    hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
+    payload: Payload22
+
+
+class Payload23(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
@@ -566,7 +605,7 @@ class Payload21(BaseModel):
     urgent: bool | None = None
 
 
-class DeviceCommand24(BaseModel):
+class DeviceCommand26(BaseModel):
     """
     The robot shows a card and says the text aloud. The robot refuses (and says why in its answer) when announcements are off, it is muted, in quiet hours or at night, or the text is empty.
     """
@@ -579,10 +618,10 @@ class DeviceCommand24(BaseModel):
     issued_at: AwareDatetime
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload21
+    payload: Payload23
 
 
-class Payload22(BaseModel):
+class Payload24(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
@@ -590,7 +629,7 @@ class Payload22(BaseModel):
     label: constr(min_length=1, max_length=60) | None = None
 
 
-class DeviceCommand25(BaseModel):
+class DeviceCommand27(BaseModel):
     """
     The robot starts its own countdown timer, kept on the unit so it rings with no hub (1 second to 24 hours, at most 8 active). The robot answers in the ack state: {ok: true, ...} or {ok: false, error} in plain words.
     """
@@ -603,10 +642,10 @@ class DeviceCommand25(BaseModel):
     issued_at: AwareDatetime
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload22
+    payload: Payload24
 
 
-class Payload23(BaseModel):
+class Payload25(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
@@ -615,7 +654,7 @@ class Payload23(BaseModel):
     label: constr(min_length=1, max_length=60) | None = None
 
 
-class DeviceCommand26(BaseModel):
+class DeviceCommand28(BaseModel):
     """
     The robot sets an alarm for the next HH:MM of its own local day. The robot answers in the ack state: {ok: true, ...} or {ok: false, error} in plain words.
     """
@@ -628,10 +667,10 @@ class DeviceCommand26(BaseModel):
     issued_at: AwareDatetime
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload23
+    payload: Payload25
 
 
-class DeviceCommand27(BaseModel):
+class DeviceCommand29(BaseModel):
     """
     The robot lists its active timers and alarms with the time left. The robot answers in the ack state: {ok: true, ...} or {ok: false, error} in plain words.
     """
@@ -647,14 +686,14 @@ class DeviceCommand27(BaseModel):
     payload: dict[str, Any] = Field(..., max_length=0)
 
 
-class Payload24(BaseModel):
+class Payload26(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
     id: conint(ge=1) | None = None
 
 
-class DeviceCommand28(BaseModel):
+class DeviceCommand30(BaseModel):
     """
     The robot cancels one timer by id, or all of them when no id is given. The robot answers in the ack state: {ok: true, ...} or {ok: false, error} in plain words.
     """
@@ -667,10 +706,10 @@ class DeviceCommand28(BaseModel):
     issued_at: AwareDatetime
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload24
+    payload: Payload26
 
 
-class DeviceCommand29(BaseModel):
+class DeviceCommand31(BaseModel):
     """
     The robot ends the timer that is ringing now. The robot answers in the ack state: {ok: true, ...} or {ok: false, error} in plain words.
     """
@@ -686,14 +725,14 @@ class DeviceCommand29(BaseModel):
     payload: dict[str, Any] = Field(..., max_length=0)
 
 
-class Payload25(BaseModel):
+class Payload27(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
     seconds: conint(ge=1, le=3600) | None = None
 
 
-class DeviceCommand30(BaseModel):
+class DeviceCommand32(BaseModel):
     """
     The robot ends the ringing timer and starts a new one with the same label (default 5 minutes, at most 1 hour). The robot answers in the ack state: {ok: true, ...} or {ok: false, error} in plain words.
     """
@@ -706,7 +745,7 @@ class DeviceCommand30(BaseModel):
     issued_at: AwareDatetime
     expires_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$')
-    payload: Payload25
+    payload: Payload27
 
 
 class DeviceCommand(
@@ -741,6 +780,8 @@ class DeviceCommand(
         | DeviceCommand28
         | DeviceCommand29
         | DeviceCommand30
+        | DeviceCommand31
+        | DeviceCommand32
     ]
 ):
     root: (
@@ -774,6 +815,8 @@ class DeviceCommand(
         | DeviceCommand28
         | DeviceCommand29
         | DeviceCommand30
+        | DeviceCommand31
+        | DeviceCommand32
     ) = Field(
         ...,
         description='A typed hub-to-device command event. The id is stable across replay; payload shape is selected by kind.',

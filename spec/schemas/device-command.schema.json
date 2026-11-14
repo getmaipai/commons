@@ -1170,6 +1170,48 @@
       }
     },
     {
+      "description": "Home tells the robot to leave its current Wi-Fi and join one saved network now (an away test without moving the robot). The robot holds the choice in memory only, never rewrites its saved list, and goes back to its saved networks by itself if it does not reach the hub within 3 minutes.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "payload", "issued_at", "expires_at", "hlc"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "kind": { "type": "string", "const": "wifi_use" },
+        "issued_at": { "type": "string", "format": "date-time" },
+        "expires_at": { "type": "string", "format": "date-time" },
+        "hlc": { "type": "string", "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$" },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["ssid"],
+          "properties": {
+            "ssid": { "type": "string", "minLength": 1, "maxLength": 32 }
+          }
+        }
+      }
+    },
+    {
+      "description": "Home tells the robot to prefer its tailnet path to the hub for a number of minutes (0 turns it off), so the tailnet path can be proven while the robot is on the home network. Not saved on the robot.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "payload", "issued_at", "expires_at", "hlc"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "kind": { "type": "string", "const": "prefer_tailnet" },
+        "issued_at": { "type": "string", "format": "date-time" },
+        "expires_at": { "type": "string", "format": "date-time" },
+        "hlc": { "type": "string", "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$" },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["minutes"],
+          "properties": {
+            "minutes": { "type": "integer", "minimum": 0, "maximum": 120 }
+          }
+        }
+      }
+    },
+    {
       "description": "The robot shows a card and says the text aloud. The robot refuses (and says why in its answer) when announcements are off, it is muted, in quiet hours or at night, or the text is empty.",
       "type": "object",
       "additionalProperties": false,

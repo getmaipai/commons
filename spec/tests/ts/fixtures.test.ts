@@ -319,7 +319,7 @@ describe("record fixtures validate against their generated Zod models", () => {
 
   test("device-command fixtures cover every kind and reject a mismatched payload", () => {
     const commands = JSON.parse(readFileSync(join(import.meta.dir, "..", "..", "fixtures", "records", "device-command.kinds.example.json"), "utf-8")) as unknown[];
-    expect(commands).toHaveLength(30);
+    expect(commands).toHaveLength(32);
     for (const command of commands) expect(() => DeviceCommand.parse(command)).not.toThrow();
     const invalid = { ...(commands[0] as object), kind: "capture_request" };
     expect(() => DeviceCommand.parse(invalid)).toThrow();
@@ -362,6 +362,17 @@ describe("record fixtures validate against their generated Zod models", () => {
     for (const payload of [{}, { ssid: "" }, { ssid: "x".repeat(33) }, { ssid: 5 }, { ssid: "valid", extra: true }]) {
       expect(() => DeviceCommand.parse({ ...wifiForget, payload }), JSON.stringify(payload)).toThrow();
     }
+    const wifiUse = (commands as { kind: string; payload: Record<string, unknown> }[]).find((command) => command.kind === "wifi_use")!;
+    expect(wifiUse.payload).toEqual({ ssid: "Example Hotspot" });
+    for (const payload of [{}, { ssid: "" }, { ssid: "x".repeat(33) }, { ssid: 5 }, { ssid: "valid", extra: true }]) {
+      expect(() => DeviceCommand.parse({ ...wifiUse, payload }), JSON.stringify(payload)).toThrow();
+    }
+    const preferTailnet = (commands as { kind: string; payload: Record<string, unknown> }[]).find((command) => command.kind === "prefer_tailnet")!;
+    expect(preferTailnet.payload).toEqual({ minutes: 10 });
+    for (const payload of [{}, { minutes: -1 }, { minutes: 121 }, { minutes: 1.5 }, { minutes: "5" }, { minutes: 5, extra: true }]) {
+      expect(() => DeviceCommand.parse({ ...preferTailnet, payload }), JSON.stringify(payload)).toThrow();
+    }
+    expect(() => DeviceCommand.parse({ ...preferTailnet, payload: { minutes: 0 } })).not.toThrow();
     const songTitle = (commands as { kind: string; payload: Record<string, unknown> }[]).find((command) => command.kind === "song_title")!;
     expect(songTitle.payload).toEqual({ text: "Take Five - Dave Brubeck" });
     for (const payload of [{}, { text: "x".repeat(81) }, { text: 5 }, { text: "ok", extra: true }]) {

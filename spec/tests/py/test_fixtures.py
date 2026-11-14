@@ -359,9 +359,9 @@ def test_reachy_eye_capability_is_only_on_the_fitted_fixture():
 
 def test_device_command_fixtures_cover_every_kind_and_reject_mismatch():
     commands = load_fixture("device-command.kinds.example.json")
-    # 29 kinds; notify appears twice (the text form and the waiting form).
-    assert len(commands) == 30
-    assert len({command["kind"] for command in commands}) == 29
+    # 31 kinds; notify appears twice (the text form and the waiting form).
+    assert len(commands) == 32
+    assert len({command["kind"] for command in commands}) == 31
     for command in commands:
         DeviceCommand.model_validate(command)
     invalid = {**commands[0], "kind": "capture_request"}
@@ -419,6 +419,31 @@ def test_device_command_fixtures_cover_every_kind_and_reject_mismatch():
     ):
         with pytest.raises(ValidationError):
             DeviceCommand.model_validate({**wifi_forget, "payload": payload})
+    wifi_use = next(command for command in commands if command["kind"] == "wifi_use")
+    assert wifi_use["payload"] == {"ssid": "Example Hotspot"}
+    for payload in (
+        {},
+        {"ssid": ""},
+        {"ssid": "x" * 33},
+        {"ssid": 5},
+        {"ssid": "valid", "extra": True},
+    ):
+        with pytest.raises(ValidationError):
+            DeviceCommand.model_validate({**wifi_use, "payload": payload})
+    prefer_tailnet = next(
+        command for command in commands if command["kind"] == "prefer_tailnet"
+    )
+    assert prefer_tailnet["payload"] == {"minutes": 10}
+    for payload in (
+        {},
+        {"minutes": -1},
+        {"minutes": 121},
+        {"minutes": 1.5},
+        {"minutes": 5, "extra": True},
+    ):
+        with pytest.raises(ValidationError):
+            DeviceCommand.model_validate({**prefer_tailnet, "payload": payload})
+    DeviceCommand.model_validate({**prefer_tailnet, "payload": {"minutes": 0}})
     song_title = next(
         command for command in commands if command["kind"] == "song_title"
     )

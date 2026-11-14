@@ -1,3 +1,7 @@
+## [spec-v0.1.403] - 2026-11-14
+
+- ANYWHERE-08, additive: `device-command` gains `wifi_use` with payload `{ ssid }` (the robot leaves its current Wi-Fi and joins that saved network now; the choice lives in memory only and the robot goes back to its saved networks by itself when the hub is not reached within 3 minutes) and `prefer_tailnet` with payload `{ minutes }` (0 to 120; the robot prefers its tailnet path to the hub for that long, 0 turns it off).
+
 ## [spec-v0.1.402] - 2026-11-14
 
 - MOVE-SCENE-01a, no schema change. The package version now matches its tag. The tag spec-v0.1.401 was cut before `package.json` was bumped, so it is burned; use spec-v0.1.402, which carries the same motion change.
