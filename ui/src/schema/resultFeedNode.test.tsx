@@ -162,6 +162,12 @@ describe("result_feed poll_while", () => {
 });
 
 describe("result_feed entries", () => {
+  test("up to 16 actions pass the schema (the rest go in the More menu)", () => {
+    const many = Array.from({ length: 16 }, (_, i) => ({ label: `Action ${i}`, action: { call: { target: "/api/plugins/videos/actions/x" } } }));
+    expect(ResultFeedNodeSchema.safeParse({ ...(feed as object), actions: many }).success).toBe(true);
+    expect(ResultFeedNodeSchema.safeParse({ ...(feed as object), actions: [...many, many[0]] }).success).toBe(false);
+  });
+
   test("show_when only draws a row action for a truthy dotted field", async () => {
     server = [queued("a", { flags: { nsfw: true }, status: "failed" }), queued("b", { flags: { nsfw: false }, status: "failed" })];
     const node = { ...(feed as object), actions: [

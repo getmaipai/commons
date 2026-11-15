@@ -730,7 +730,7 @@
         },
         "actions": {
           "type": "array",
-          "maxItems": 8,
+          "maxItems": 16,
           "description": "Extra buttons after the built-in ones. With no `when`, an action shows in `ready`.",
           "items": {
             "type": "object",

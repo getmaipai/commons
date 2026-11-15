@@ -1,3 +1,7 @@
+## [ui-v0.5.671] - 2026-11-15
+
+- A `result_feed` accepts up to 16 `actions`; those past `actions_inline` go in the player More menu (PHOSPHENE-PARITY).
+
 ## [ui-v0.5.667] - 2026-11-14
 
 - Replace the selected-item left bars in the app rail and app menu with soft primary-token glows and hairline rings. Selected rows retain their tinted fill and primary text/icon; hover remains a calm foreground fill without a glow, and transitions respect reduced motion.
