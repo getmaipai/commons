@@ -1,5 +1,6 @@
 import { useCallback, useContext, useMemo, useState } from "react";
 import { request } from "@/kit/http";
+import { fillTemplate, fillTemplateDeep } from "@/kit/schema/fieldPath";
 import { i18n } from "@/kit/i18n";
 import { AsyncState } from "@/kit/primitives/AsyncState";
 import { VideoPlayer, type VideoPlayerAction, type VideoPlayerProps, type VideoPlayerStatus } from "@/kit/elements/video-player";
@@ -7,10 +8,10 @@ import { LockTile } from "@/kit/elements/adult-lock";
 import { TrackStudio, type StudioAdded, type StudioMakeMore, type StudioPlan } from "@/kit/elements/track-studio";
 import { useBinding } from "@/kit/schema/binding";
 import { useDispatchAction } from "@/kit/schema/actions";
-import { fillTemplateDeep, readField } from "@/kit/schema/fieldPath";
+import { readField } from "@/kit/schema/fieldPath";
 import { useFeedPolling } from "@/kit/schema/feedPolling";
 import { MediaHostContext, type MediaHost } from "@/kit/schema/mediaHost";
-import { PackageScopeContext, PageStateContext } from "@/kit/schema/packageScope";
+import { PackageScopeContext, PageStateContext, underPluginApi } from "@/kit/schema/packageScope";
 import type { Action, FeedHandler, StudioNode } from "@/kit/schema/types";
 
 type Row = Record<string, unknown>;
@@ -53,14 +54,17 @@ function StudioOpen({ node, state, row }: { node: StudioNode; state: Row; row: R
   const f = node.fields ?? {};
   const host = useContext(MediaHostContext) as HostWithNotice | null;
   const writer = useContext(PageStateContext);
+  const scope = useContext(PackageScopeContext);
   const { dispatch, lastError } = useDispatchAction();
   const key = String(readField(row, f.key ?? "id") ?? "clip");
   const title = str(readField(row, f.title ?? "title"));
   const poster = str(readField(row, f.poster ?? "poster"));
   const lanes = readField(row, f.lanes ?? "lanes");
   const [exportOpen, setExportOpen] = useState(false);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
 
   const exportAction = node.handlers?.export;
+  const exportNleAction = node.handlers?.export_nle;
   const addAction = node.handlers?.add;
 
   const onExport = useCallback(
@@ -78,6 +82,37 @@ function StudioOpen({ node, state, row }: { node: StudioNode; state: Row; row: R
     },
     [exportAction, dispatch, key, writer, setExportOpen],
   );
+
+  const onExportNle = useCallback(async (plan: StudioPlan) => {
+    if (!exportNleAction || !("call" in exportNleAction)) return;
+    const call = exportNleAction.call;
+    if (!call) return;
+    const item = { clip: key, plan };
+    const target = fillTemplate(call.target, item);
+    if (scope && !underPluginApi(target, scope.packageId)) { setDownloadError("This export is unavailable."); return; }
+    const args = call.args ? fillTemplateDeep(call.args, item, true) : undefined;
+    try {
+      const response = await fetch(target, { method: call.method ?? "POST", credentials: "include", headers: { "content-type": "application/json" }, body: args ? JSON.stringify(args) : undefined });
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        throw new Error(typeof body.error === "string" ? body.error : response.statusText);
+      }
+      const blob = await response.blob();
+      const disposition = response.headers.get("content-disposition");
+      const filename = disposition?.match(/filename\*=UTF-8''([^;]+)|filename="?([^";]+)"?/i);
+      const name = filename ? decodeURIComponent(filename[1] ?? filename[2] ?? "studio-timeline.zip") : "studio-timeline.zip";
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = name;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 0);
+    } catch (error) {
+      setDownloadError(error instanceof Error ? error.message : "Could not export for editing.");
+    }
+  }, [exportNleAction, key, scope]);
 
   const onAdd = useMemo(() => {
     if (!addAction) return undefined;
@@ -123,13 +158,16 @@ function StudioOpen({ node, state, row }: { node: StudioNode; state: Row; row: R
         limits={node.limits}
         levelSteps={node.level_steps}
         exportLabel={node.export_label}
+        exportNleLabel={node.export_nle_label}
         exportDisabledReason={node.export_disabled_reason}
         onExport={exportAction ? onExport : undefined}
+        onExportNle={exportNleAction ? onExportNle : undefined}
         onAdd={onAdd}
         makeMore={makeMore}
         exportCard={exportOpen && node.export_result ? <ExportCard result={node.export_result} state={state} /> : undefined}
         onKeepEditing={() => setExportOpen(false)}
       />
+      {downloadError ? <p role="alert" className="text-destructive text-sm">{downloadError}</p> : null}
       {lastError ? <p role="alert" className="text-destructive text-sm">{lastError}</p> : null}
     </>
   );

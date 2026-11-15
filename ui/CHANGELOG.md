@@ -1,3 +1,7 @@
+## [ui-v0.5.672] - 2026-11-15
+
+- VIDEO-STUDIO-NLE-01, additive. Studio can show `Export for editing`; it sends the current clip and plan to `handlers.export_nle`, downloads the returned file using its `content-disposition` filename, and defaults to `studio-timeline.zip`.
+
 ## [ui-v0.5.671] - 2026-11-15
 
 - A `result_feed` accepts up to 16 `actions`; those past `actions_inline` go in the player More menu (PHOSPHENE-PARITY).

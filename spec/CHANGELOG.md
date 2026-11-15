@@ -1,3 +1,7 @@
+## [spec-v0.1.405] - 2026-11-15
+
+- VIDEO-STUDIO-NLE-01, additive. Studio `handlers` takes optional `export_nle` with the same `{ clip, plan }` call shape as `export`, and `export_nle_label` defaults to `Export for editing`; the reply is downloaded as a file.
+
 ## [spec-v0.1.404] - 2026-11-15
 
 - Additive: a `result_feed` takes up to 16 `actions` (was 8); the player shows the first `actions_inline` and puts the rest in its More menu (PHOSPHENE-PARITY).

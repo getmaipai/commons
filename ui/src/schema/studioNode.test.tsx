@@ -10,7 +10,7 @@ import { installFakeMedia } from "../../tests/fakeMedia";
 import { NodeRenderer } from "@/kit/schema/NodeRenderer";
 import { MediaHostContext, type MediaHost } from "@/kit/schema/mediaHost";
 import { PackageScopeContext, PageStateContext } from "@/kit/schema/packageScope";
-import { StudioNodeSchema, type UiNode } from "@/kit/schema/types";
+import { StudioNodeSchema, type StudioNode, type UiNode } from "@/kit/schema/types";
 
 type Row = Record<string, unknown>;
 let calls: { url: string; body: Row }[] = [];
@@ -43,6 +43,7 @@ beforeEach(() => {
     if (url.endsWith("/data/studio")) return Promise.resolve(new Response(JSON.stringify([clip]), { status: 200 }));
     if (url.endsWith("/data/job")) return Promise.resolve(new Response(JSON.stringify(job ? [job] : []), { status: 200 }));
     if (url.endsWith("/actions/export")) return Promise.resolve(new Response(JSON.stringify({ id: "job-7" }), { status: 200 }));
+    if (url.endsWith("/actions/export-nle")) return Promise.resolve(new Response(new Blob(["zip-data"]), { status: 200, headers: { "content-disposition": 'attachment; filename="edit.zip"' } }));
     if (url.endsWith("/actions/add")) return Promise.resolve(new Response(JSON.stringify({ ref: "n1", src: "/f/n1.wav", label: "A new voice", duration_s: 2.5 }), { status: 200 }));
     if (url.endsWith("/f/1.mp4") || url.endsWith("/f/2.mp4") || url.includes("/f/")) return new Promise(() => undefined);
     return Promise.resolve(new Response("{}", { status: 200 }));
@@ -57,14 +58,14 @@ const node = StudioNodeSchema.parse({
   export_result: { bind: { source: "package", path: "job", params: { id: "$state.export_id" } }, fields: { status: "status", words: "words" }, poll_while: { statuses: ["queued", "generating"], record: { path: "job", params: { id: "{id}" } } }, actions: [{ label: "Open in My clips", action: { navigate: { to: "/apps/videos/clips" } } }] },
 }) as unknown as UiNode;
 
-function Harness({ host = null }: { host?: MediaHost | null }) {
+function Harness({ host = null, studioNode = node }: { host?: MediaHost | null; studioNode?: UiNode }) {
   const [state, setState] = useState<Row>({ clip: "clip-1" });
   return (
     <MemoryRouter>
       <PackageScopeContext.Provider value={{ packageId: "videos" }}>
         <MediaHostContext.Provider value={host}>
           <PageStateContext.Provider value={{ merge: (patch) => setState((prev) => ({ ...prev, ...patch })) }}>
-            <NodeRenderer node={node} state={state} />
+            <NodeRenderer node={studioNode} state={state} />
           </PageStateContext.Provider>
         </MediaHostContext.Provider>
       </PackageScopeContext.Provider>
@@ -74,6 +75,50 @@ function Harness({ host = null }: { host?: MediaHost | null }) {
 const pieces = (c: HTMLElement, lane: string) => c.querySelectorAll(`[data-lane="${lane}"] [data-piece]`);
 
 describe("studio node", () => {
+  test("Export for editing is absent without its handler", async () => {
+    const { queryByRole, findByRole } = renderWithQueryClient(<Harness />);
+    await findByRole("button", { name: /Video piece 1 of 2/ });
+    expect(queryByRole("button", { name: "Export for editing" })).toBeNull();
+  });
+
+  test("Export for editing shares Export's disabled reason", async () => {
+    const studioNode = StudioNodeSchema.parse({ ...node, handlers: { ...(node as StudioNode).handlers, export_nle: { call: { target: "/api/plugins/videos/actions/export-nle" } } }, export_disabled_reason: "Editing is not ready yet." }) as unknown as UiNode;
+    const { findByRole, getByText } = renderWithQueryClient(<Harness studioNode={studioNode} />);
+    const editButton = await findByRole("button", { name: "Export for editing" });
+    expect(editButton.hasAttribute("disabled")).toBe(true);
+    expect(getByText("Editing is not ready yet.")).toBeTruthy();
+  });
+
+  test("Export for editing calls its handler with clip and plan and downloads the returned blob", async () => {
+    const create = mock(() => "blob:studio-export");
+    let saved: { download: string; href: string } | undefined;
+    const anchorClick = mock(function (this: HTMLAnchorElement) { saved = { download: this.download, href: this.href }; });
+    const originalCreate = URL.createObjectURL;
+    const originalClick = HTMLAnchorElement.prototype.click;
+    URL.createObjectURL = create;
+    HTMLAnchorElement.prototype.click = anchorClick;
+    try {
+      const studioNode = StudioNodeSchema.parse({ ...node, handlers: { ...(node as StudioNode).handlers, export_nle: { call: { target: "/api/plugins/videos/actions/export-nle", args: { clip: "{clip}", plan: "{plan}" } } } } }) as unknown as UiNode;
+      const { findByRole } = renderWithQueryClient(<Harness studioNode={studioNode} />);
+      const editButton = await findByRole("button", { name: "Export for editing" });
+      fireEvent.click(pieces(document.body, "video")[1]!);
+      fireEvent.click(await findByRole("button", { name: "Delete piece" }));
+      await waitFor(() => expect(editButton.hasAttribute("disabled")).toBe(false));
+      fireEvent.click(editButton);
+      await waitFor(() => expect(calls.some((call) => call.url.endsWith("/actions/export-nle"))).toBe(true));
+      const posted = calls.find((call) => call.url.endsWith("/actions/export-nle"))!;
+      expect(posted.body.clip).toBe("clip-1");
+      expect(posted.body.plan).toBeTruthy();
+      await waitFor(() => expect(create).toHaveBeenCalledTimes(1));
+      expect(anchorClick).toHaveBeenCalledTimes(1);
+      expect(saved?.download).toBe("edit.zip");
+      expect(saved?.href).toContain("blob:studio-export");
+    } finally {
+      URL.createObjectURL = originalCreate;
+      HTMLAnchorElement.prototype.click = originalClick;
+    }
+  });
+
   test("draws the clip's lanes from the bound row", async () => {
     const { container, findByRole } = renderWithQueryClient(<Harness />);
     expect(await findByRole("button", { name: /Video piece 1 of 2, Paper boat A/ })).toBeTruthy();

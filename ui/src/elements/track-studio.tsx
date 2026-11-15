@@ -7,7 +7,7 @@
 // the thumbnails and every media element live in this component's own state and are gone when it unmounts or the clip relocks (K4).
 
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
-import { ContrastIcon, XIcon, PauseIcon, PlayIcon, PlusIcon, Redo2Icon, RepeatIcon, ScissorsIcon, SkipBackIcon, Trash2Icon, Undo2Icon } from "lucide-react";
+import { ContrastIcon, DownloadIcon, XIcon, PauseIcon, PlayIcon, PlusIcon, Redo2Icon, RepeatIcon, ScissorsIcon, SkipBackIcon, Trash2Icon, Undo2Icon } from "lucide-react";
 import { cn, FOCUS_RING, hueTintBackground } from "@/kit/utils";
 import { useIsPhoneLayout } from "@/kit/hooks/useIsPhoneLayout";
 import { Button } from "@/kit/ui/button";
@@ -74,9 +74,12 @@ export interface TrackStudioProps {
   limits?: Partial<StudioLimits>;
   levelSteps?: readonly LevelStep[];
   exportLabel?: string;
+  exportNleLabel?: string;
   exportDisabledReason?: string;
   /** Press of Export: the plan. The Element keeps the plan after it. */
   onExport?: (plan: StudioPlan) => void;
+  /** Press of Export for editing: the same current timeline plan. */
+  onExportNle?: (plan: StudioPlan) => void;
   /** Press of an Add button: resolves with the piece to add, or null when the person cancels. Absent: the three Add buttons are not drawn. */
   onAdd?: (kind: "clip" | "voice" | "music") => Promise<StudioAdded | null>;
   makeMore?: readonly StudioMakeMore[];
@@ -446,9 +449,12 @@ function StudioBody(props: TrackStudioProps) {
       <div className="flex min-w-0 flex-col gap-3 lg:col-start-2 lg:row-start-1" data-slot="track-studio-export">
         {props.onExport ? (
           <>
-            <Button size="lg" className="rounded-full" onClick={doExport} disabled={!changed || !!props.exportDisabledReason} data-slot="track-studio-export-button">
-              {props.exportLabel ?? i18n._({ id: "ui.Export as a new clip", message: "Export as a new clip" })}
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button size="lg" className="min-h-11 rounded-full" onClick={doExport} disabled={!changed || !!props.exportDisabledReason} data-slot="track-studio-export-button">
+                {props.exportLabel ?? i18n._({ id: "ui.Export as a new clip", message: "Export as a new clip" })}
+              </Button>
+              {props.onExportNle ? <Button variant="secondary" size="lg" className="min-h-11 rounded-full" onClick={() => props.onExportNle?.(plan)} disabled={!changed || !!props.exportDisabledReason} data-slot="track-studio-export-nle-button"><DownloadIcon aria-hidden="true" />{props.exportNleLabel ?? i18n._({ id: "ui.Export for editing", message: "Export for editing" })}</Button> : null}
+            </div>
             {props.exportDisabledReason ? <p className="text-muted-foreground text-sm">{props.exportDisabledReason}</p> : !changed ? <p className="text-muted-foreground text-sm">{i18n._({ id: "ui.Change something to export it.", message: "Change something to export it." })}</p> : null}
           </>
         ) : null}
