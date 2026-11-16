@@ -61,6 +61,8 @@ export interface SettingRowProps {
   /** One extra link-style button under the row (such as "Back to Large");
    * pressing it calls `onPress`. Absent: no button. */
   action?: { label: string; onPress: () => void };
+  /** Draw "Reset to default" under a changed value. Off by default (owner ruling SETTINGS-LOOK-01: ordinary rows carry no reset, as in ChatGPT's settings); a secret always keeps it, since that is how a stored secret is cleared. The Changed view passes true. */
+  showReset?: boolean;
 }
 
 /** One settings row: the title and helper text on the left, the control for
@@ -68,7 +70,7 @@ export interface SettingRowProps {
  * from its default. Drawn as the kit's `Item size="setting"`; it goes
  * inside an `ItemGroup variant="card"` (see SettingsRenderer). A secret
  * never shows its value, only Set or Not set. */
-export function SettingRow({ setting, onChange, onReset, disabled: disabledProp, selfPersonId, people, optionsFrom, places, beforeChange, note: summary, lockedReason, action }: SettingRowProps) {
+export function SettingRow({ setting, onChange, onReset, disabled: disabledProp, selfPersonId, people, optionsFrom, places, beforeChange, note: summary, lockedReason, action, showReset = false }: SettingRowProps) {
   const disabled = disabledProp || Boolean(lockedReason);
   const { def, resolved } = setting;
   const titleId = useId();
@@ -76,7 +78,7 @@ export function SettingRow({ setting, onChange, onReset, disabled: disabledProp,
   const [editing, setEditing] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const editorRef = useRef<HTMLInputElement>(null);
-  const canReset = resolved.source === "user" && !lockedReason;
+  const canReset = resolved.source === "user" && !lockedReason && (showReset || def.secret);
 
   // The write-only secret flow. `secretEditing` reveals a masked input; the
   // value is never read back from the server (CLAUDE.md > Credentials:

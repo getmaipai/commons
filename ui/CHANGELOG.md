@@ -1,3 +1,7 @@
+## [ui-v0.5.679] - 2026-11-16
+
+- SETTINGS-CHATGPT-01: `SettingRow` no longer draws "Reset to default" unless `showReset` is passed (owner ruling SETTINGS-LOOK-01); a secret row keeps it because that is how a stored secret is cleared.
+
 ## [ui-v0.5.678] - 2026-11-16
 
 - SETTINGS-CHATGPT-01: `TabsList variant="pill"` (the active tab is a soft filled pill, the others plain text, no underline) and the Settings shell draws its page tabs with it.

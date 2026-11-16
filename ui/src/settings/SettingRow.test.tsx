@@ -515,7 +515,7 @@ describe("SettingRow - the per-key beforeChange hook", () => {
       def: { key: "network.hub_port", scope: "household", selector: "number", range: { min: 1, max: 65535 }, default: 3000, label: "Home network port", level: "expert", secret: false, lives_in: "household.network", honoured_by: ["home"] },
       resolved: { key: "network.hub_port", value: 4555, source: "user", label: "Home network port", level: "expert", secret: false },
     } as MergedSetting;
-    const { getByRole } = render(<SettingRow setting={setting} onChange={async () => true} onReset={onReset} beforeChange={beforeChange} />);
+    const { getByRole } = render(<SettingRow setting={setting} onChange={async () => true} onReset={onReset} beforeChange={beforeChange} showReset />);
     await act(async () => { fireEvent.click(getByRole("button", { name: "Reset to default" })); });
     expect(beforeChange).toHaveBeenCalledWith("network.hub_port", 3000);
     expect(onReset).toHaveBeenCalledTimes(1);
@@ -706,7 +706,7 @@ describe("SettingRow - unknown selector and reset", () => {
   });
 
   test("Reset to default wraps and carries a title, so a long translation is never clipped at 375 px", () => {
-    const { getByRole } = render(<SettingRow setting={makeSetting({ selector: "boolean", value: true, source: "user" })} onChange={async () => true} onReset={() => {}} />);
+    const { getByRole } = render(<SettingRow setting={makeSetting({ selector: "boolean", value: true, source: "user" })} onChange={async () => true} onReset={() => {}} showReset />);
     const reset = getByRole("button", { name: "Reset to default" });
     expect(reset.getAttribute("title")).toBe("Reset to default");
     expect(reset.className).toContain("whitespace-normal");
@@ -714,13 +714,15 @@ describe("SettingRow - unknown selector and reset", () => {
     expect(reset.className).not.toContain("whitespace-nowrap");
   });
 
-  test("Reset to default shows only for a changed value and calls onReset", () => {
+  test("Reset to default is off by default, shows only for a changed value when asked, and calls onReset", () => {
     const onReset = mock(() => {});
     const { getByRole, queryByRole, rerender } = render(
       <SettingRow setting={makeSetting({ selector: "boolean", value: true, source: "default" })} onChange={async () => true} onReset={onReset} />,
     );
     expect(queryByRole("button", { name: "Reset to default" })).toBeNull();
     rerender(<SettingRow setting={makeSetting({ selector: "boolean", value: true, source: "user" })} onChange={async () => true} onReset={onReset} />);
+    expect(queryByRole("button", { name: "Reset to default" })).toBeNull();
+    rerender(<SettingRow setting={makeSetting({ selector: "boolean", value: true, source: "user" })} onChange={async () => true} onReset={onReset} showReset />);
     fireEvent.click(getByRole("button", { name: "Reset to default" }));
     expect(onReset).toHaveBeenCalled();
   });
