@@ -157,7 +157,7 @@ describe("SettingsShell navigation", () => {
 });
 
 describe("SettingsShell search and title", () => {
-  test("draws accessible line tabs and reports selected tab changes", () => {
+  test("draws accessible pill tabs and reports selected tab changes", () => {
     const onTabChange = mock((_id: string) => {});
     const tabs = [{ id: "overview", label: "Overview" }, { id: "models", label: "Models" }];
     const { view } = shell({ tabs, tab: "overview", onTabChange });
