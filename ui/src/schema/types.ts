@@ -878,7 +878,7 @@ export type ImageEditorNode = z.infer<typeof ImageEditorNodeSchema>;
 
 /** VIDEO-STUDIO-04 and -05 (K3, K4): the studio (TrackStudio). Mirrors spec/ui/schema.json `studio`. */
 export const STUDIO_TOOLS = ["split", "delete", "add_clip", "add_voice", "add_music"] as const;
-export const STUDIO_PANELS = ["volume", "fades", "crossfade", "level"] as const;
+export const STUDIO_PANELS = ["volume", "fades", "crossfade", "level", "titles"] as const;
 export const StudioNodeSchema = z.object({
   type: z.literal("studio"),
   bind: BindingSchema,
@@ -892,7 +892,7 @@ export const StudioNodeSchema = z.object({
     .object({ add_clip: z.string().min(1).max(120).optional(), add_voice: z.string().min(1).max(120).optional(), add_music: z.string().min(1).max(120).optional() })
     .strict()
     .optional(),
-  panels: z.array(z.enum(STUDIO_PANELS)).max(4).refine((a) => new Set(a).size === a.length, "panels are unique").optional(),
+  panels: z.array(z.enum(STUDIO_PANELS)).max(5).refine((a) => new Set(a).size === a.length, "panels are unique").optional(),
   limits: z
     .object({
       video_pieces: z.number().int().min(1).max(24).optional(),

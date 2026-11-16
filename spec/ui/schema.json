@@ -900,9 +900,9 @@
         },
         "panels": {
           "type": "array",
-          "maxItems": 4,
+          "maxItems": 5,
           "uniqueItems": true,
-          "items": { "type": "string", "enum": ["volume", "fades", "crossfade", "level"] },
+          "items": { "type": "string", "enum": ["volume", "fades", "crossfade", "level", "titles"] },
           "description": "Which right-hand panels are drawn, in this order. Default: all four. Each has a Reset and says which piece or lane it acts on."
         },
         "limits": {
