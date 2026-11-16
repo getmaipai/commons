@@ -206,7 +206,7 @@ describe("sidebar settings variants", () => {
     const el = getByText("General")
     expect(el.getAttribute("data-size")).toBe("settings")
     expect(el.getAttribute("data-active")).not.toBeNull()
-    expect(el.className).toContain("h-[30px]")
+    expect(el.className).toContain("h-8")
     expect(el.className).toContain("rounded-[var(--settings-control-radius)]")
     expect(el.className).toContain("data-active:bg-settings-fill")
     expect(el.className).toContain("data-active:font-normal")

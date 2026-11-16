@@ -344,7 +344,7 @@ export function SectionSidebar({
           aria-current={item.active ? "page" : undefined}
           aria-describedby={item.describedBy}
         >
-          <span className={cn("relative flex shrink-0", wrapLabels && !rail && "self-start", !rail && !compact && item.icon && !item.media && "size-7 items-center justify-center rounded-lg", !rail && !compact && !item.active && item.icon && !item.media && "bg-settings-icon-tile")}>
+          <span className={cn("relative flex shrink-0", wrapLabels && !rail && "self-start", !rail && !compact && item.icon && !item.media && "size-7 items-center justify-center rounded-lg")}>
             {item.media ? <SafeImage src={item.media} alt="" aria-hidden className="size-[18px] rounded-sm object-cover" /> : <Icon aria-hidden className={cn(compact ? "size-4" : "size-[18px]", item.icon ? "text-settings-helper" : "text-settings-helper", item.active && item.icon && "text-settings-accent")} />}
             {rail && item.dot ? <span data-slot="section-sidebar-dot" aria-hidden className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-primary" /> : null}
           </span>

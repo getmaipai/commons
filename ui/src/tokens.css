@@ -1876,7 +1876,7 @@ html.dark body[class*="style-"] {
 }
 
 :root {
-  --settings-column-width: 208px;
+  --settings-column-width: 232px;
   /* The collapsed icon-only rail of SectionSidebar. */
   --settings-rail-width: 64px;
   --settings-column-title-size: 15px;
@@ -1920,7 +1920,7 @@ body {
    * area (9 px overhang above and below) tile without overlapping its
    * neighbour; a host that wants the compact ChatGPT pitch sets 1px and
    * accepts smaller touch targets. */
-  --settings-column-row-gap: 18px;
+  --settings-column-row-gap: 4px;
   /* The shell's minimum height: fills the viewport by default; a host with
    * its own chrome around the shell sets what is left. */
   --settings-shell-min-height: 100svh;

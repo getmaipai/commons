@@ -563,7 +563,7 @@ describe("SectionSidebar modern look (selected and hover rows)", () => {
     expect(saved.getAttribute("aria-current")).toBeNull();
     expect(saved.querySelector('[data-slot="section-sidebar-indicator"]')).toBeNull();
     for (const cls of ["hover:bg-foreground/5", "hover:text-foreground", "duration-150", "motion-reduce:transition-none"]) expect(classes(saved)).toContain(cls);
-    expect(classes(saved)).toContain("h-[30px]");
+    expect(classes(saved)).toContain("h-8");
   });
 
   test("the menu style uses only theme tokens", () => {

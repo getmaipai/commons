@@ -45,8 +45,8 @@ describe("SettingsShell column", () => {
     const labels = [...col.querySelectorAll("[data-slot=sidebar-group-label]")].map((e) => e.textContent);
     expect(labels).toEqual(["Chat", "Related"]);
     const generalLabel = col.querySelector('[data-slot="sidebar-menu-button"] span.flex-1')!;
-    expect(generalLabel.className).not.toContain("truncate");
-    expect(generalLabel.className).toContain("whitespace-normal");
+    // Area names are short, so a column row is one line (the default truncate stays as a last resort); wrapLabels is an opt-in of SectionSidebar.
+    expect(generalLabel.className).toContain("truncate");
   });
 
   test("hides a one-row group heading and keeps a two-row heading", () => {

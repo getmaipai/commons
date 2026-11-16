@@ -1,3 +1,7 @@
+## [ui-v0.5.680] - 2026-11-16
+
+- SETTINGS-CHATGPT-02: the Settings column is dense like ChatGPT's: 32 px rows with a 4 px gap (a 36 px pitch, was 48), plain icons with no tile, a 232 px column, and `SettingsShell` no longer wraps labels (area names are short enough for one line; `wrapLabels` stays an opt-in prop of SectionSidebar).
+
 ## [ui-v0.5.679] - 2026-11-16
 
 - SETTINGS-CHATGPT-01: `SettingRow` no longer draws "Reset to default" unless `showReset` is passed (owner ruling SETTINGS-LOOK-01); a secret row keeps it because that is how a stored secret is cleared.
