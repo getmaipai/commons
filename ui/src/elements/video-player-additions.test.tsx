@@ -85,18 +85,18 @@ describe("VideoPlayer actionItems", () => {
     expect(view.getByRole("button", { name: "Download" }).textContent).toBe("");
     expect(view.container.querySelector("[data-slot=video-player-actions]")!.getAttribute("data-variant")).toBe("icons");
   });
-  test("actionsInline keeps N inline and puts the rest in a More menu, capped at 8", async () => {
-    const many: VideoPlayerAction[] = Array.from({ length: 12 }, (_, i) => ({ label: `Act ${i + 1}`, onSelect: noop }));
+  test("actionsInline keeps N inline and puts the rest in a More menu, capped at 16", async () => {
+    const many: VideoPlayerAction[] = Array.from({ length: 20 }, (_, i) => ({ label: `Act ${i + 1}`, onSelect: noop }));
     const view = render(<VideoPlayer status="ready" prompt="x" src="/v.mp4" actionsVariant="icons" actionsInline={3} actionItems={many} />);
     const inline = Array.from(view.container.querySelectorAll("[data-slot=video-player-actions] button")).map(b => b.getAttribute("aria-label"));
     expect(inline).toEqual(["Download", "Act 1", "Act 2", "More"]);
     fireEvent.pointerDown(view.getByRole("button", { name: "More" }), { button: 0, ctrlKey: false });
     await waitFor(() => expect(document.body.querySelectorAll("[role=menuitem]").length).toBeGreaterThan(0));
     const labels = Array.from(document.body.querySelectorAll("[role=menuitem]")).map(i => i.textContent);
-    // Download + Act 1..7 are the eight drawn; three inline, five in the menu.
-    expect(labels).toHaveLength(5);
+    // Download + Act 1..15 are the sixteen drawn; three inline, thirteen in the menu.
+    expect(labels).toHaveLength(13);
     expect(labels[0]).toContain("Act 3");
-    expect(labels.some(l => l?.includes("Act 9"))).toBe(false);
+    expect(labels.some(l => l?.includes("Act 16"))).toBe(false);
   });
   test("a menu item runs its action and shows its disabled reason", async () => {
     let n = 0;

@@ -1,3 +1,7 @@
+## [ui-v0.5.673] - 2026-11-15
+
+- The video player draws up to 16 row actions (was 8), matching the feed schema limit of 16; those past `actions_inline` go in its More menu.
+
 ## [ui-v0.5.672] - 2026-11-15
 
 - VIDEO-STUDIO-NLE-01, additive. Studio can show `Export for editing`; it sends the current clip and plan to `handlers.export_nle`, downloads the returned file using its `content-disposition` filename, and defaults to `studio-timeline.zip`.
