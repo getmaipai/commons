@@ -216,7 +216,8 @@
       },
       "new": {
         "area": "settings",
-        "section": "offline-data"
+        "section": "search",
+        "tab": "books"
       }
     },
     {

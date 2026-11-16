@@ -2,7 +2,7 @@
 
 ## Settings areas, tabs and record details
 
-`areas.json` declares one central `settings` area, open to signed-in guests. Its single column has two groups: **Yours** (seven personal pages) and **The home** (nine household pages). Each section declares `scope: "person"` or `scope: "household"`; household sections require admin or narrower access, while the area itself is open and sections gate themselves. Package areas omit scope and read as person. Cards must match their section's scope, except device cards on the personal Voice page's device/robot tabs and the Apps page's robot cards.
+`areas.json` declares one central `settings` area, open to signed-in guests. Its single column has two groups: **Yours** (six personal pages) and **The home** (nine household pages). Each section declares `scope: "person"` or `scope: "household"`; household sections require admin or narrower access, while the area itself is open and sections gate themselves. Package areas omit scope and read as person. Cards must match their section's scope, except device cards on the personal Voice page's device/robot tabs and the Apps page's robot cards.
 
 The earlier separate Home and Account structure was prepared in unreleased commits and never shipped. The legacy `home`, `account`, and `chat` route ids remain reserved.
 
@@ -27,7 +27,19 @@ The page-count and per-tab basic-setting cap checks are implemented behind
 `HOUSEHOLD_CARD_ALLOWLIST`, initially `news` for the News shelf.
 
 `legacy-sections.json` maps every former central section route to its new page
-and tab, including the removed Chat area's cross-links.
+and tab, including the removed Chat area's cross-links. The former
+`home/reference-library` route maps to Search and web's `books` tab. Offline
+books are declared as the `home.reference_library` tab view, and the
+`household.reference` group appears on that tab. Blocked sites are on Privacy
+and safety's `sites` tab; the Search and web section retains its search and
+news groups. The household status group is on Advanced's Checks tab, and
+Personal Voice's Listening and playback tab contains `person.music`.
+
+The current household sections are Household and people, Privacy and safety,
+AI and models, Pictures, videos and music, Voices and commands, Search and web,
+Apps and devices, Backups, storage and updates, and Advanced. Household's
+People tab comes before The home. Cards that name a tab must name a tab on the
+same section, and registry groups remain indivisible across moves.
 
 `keys.json` is the generated-from-declarations settings index (platform
 plan 3.2 and docs/SETTINGS.md rule 5): every entry conforms to

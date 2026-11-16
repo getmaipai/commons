@@ -727,7 +727,7 @@
       "options_from": "models.router"
     },
     "default": "auto",
-    "label": "Router model choice",
+    "label": "Router",
     "help": "Choose the model for the Router role. Auto follows the selected setup plan. Only an admin can change this.",
     "copy": {
       "does": "Directs router work to its selected package."
@@ -747,7 +747,7 @@
       "options_from": "models.embed"
     },
     "default": "auto",
-    "label": "Embed model choice",
+    "label": "Search and memory",
     "help": "Choose the model for the Embed role. Auto follows the selected setup plan. Only an admin can change this.",
     "copy": {
       "does": "Directs embed work to its selected package."
@@ -767,7 +767,7 @@
       "options_from": "models.rerank"
     },
     "default": "auto",
-    "label": "Rerank model choice",
+    "label": "Rerank",
     "help": "Choose the model for the Rerank role. Auto follows the selected setup plan. Only an admin can change this.",
     "copy": {
       "does": "Directs rerank work to its selected package."
@@ -893,7 +893,7 @@
       "options_from": "models.judge"
     },
     "default": "auto",
-    "label": "Judge model choice",
+    "label": "Judge",
     "help": "Choose the model for the Judge role. Auto follows the selected setup plan. Only an admin can change this.",
     "copy": {
       "does": "Directs judge work to its selected package."
@@ -916,7 +916,7 @@
       "options_from": "models.tts"
     },
     "default": "auto",
-    "label": "Tts model choice",
+    "label": "Speaking",
     "help": "Choose the model for the Tts role. Auto follows the selected setup plan. Only an admin can change this.",
     "copy": {
       "does": "Directs tts work to its selected package.",
@@ -942,7 +942,7 @@
       "options_from": "models.stt"
     },
     "default": "auto",
-    "label": "Stt model choice",
+    "label": "Listening",
     "help": "Choose the model for the Stt role. Auto follows the selected setup plan. Only an admin can change this.",
     "copy": {
       "does": "Directs stt work to its selected package.",
@@ -965,7 +965,7 @@
       "options_from": "models.wakeword"
     },
     "default": "auto",
-    "label": "Wakeword model choice",
+    "label": "Wake word",
     "help": "Choose the model for the Wakeword role. Auto follows the selected setup plan. Only an admin can change this.",
     "copy": {
       "does": "Directs wakeword work to its selected package."
@@ -985,7 +985,7 @@
       "options_from": "models.turn_signal"
     },
     "default": "auto",
-    "label": "Turn Signal model choice",
+    "label": "Turn signal",
     "help": "Choose the model for the Turn Signal role. Auto follows the selected setup plan. Only an admin can change this.",
     "copy": {
       "does": "Directs turn signal work to its selected package."
@@ -1930,7 +1930,7 @@
     "scope": "person",
     "selector": "boolean",
     "default": false,
-    "label": "Telegram me when someone is asking for approval",
+    "label": "Someone asks for approval",
     "level": "basic",
     "secret": false,
     "lives_in": "person.telegram",
@@ -1943,7 +1943,7 @@
     "scope": "person",
     "selector": "boolean",
     "default": false,
-    "label": "Telegram me when backups start failing",
+    "label": "A backup starts failing",
     "level": "basic",
     "secret": false,
     "lives_in": "person.telegram",
@@ -1970,7 +1970,7 @@
     "scope": "person",
     "selector": "boolean",
     "default": false,
-    "label": "Telegram me when a Stack engine reports an open warning or critical problem",
+    "label": "An engine has a problem",
     "level": "basic",
     "secret": false,
     "lives_in": "person.telegram",
@@ -1983,7 +1983,7 @@
     "scope": "person",
     "selector": "boolean",
     "default": false,
-    "label": "Telegram me when a Stack engine updates",
+    "label": "An engine updates",
     "level": "basic",
     "secret": false,
     "lives_in": "person.telegram",
@@ -1996,7 +1996,7 @@
     "scope": "person",
     "selector": "boolean",
     "default": false,
-    "label": "Telegram me when a Stack engine has an update available",
+    "label": "An engine has an update available",
     "level": "basic",
     "secret": false,
     "lives_in": "person.telegram",
@@ -2009,7 +2009,7 @@
     "scope": "person",
     "selector": "boolean",
     "default": false,
-    "label": "Telegram me when a Stack engine fails to update",
+    "label": "An engine fails to update",
     "level": "basic",
     "secret": false,
     "lives_in": "person.telegram",
@@ -2039,7 +2039,7 @@
     "scope": "person",
     "selector": "boolean",
     "default": false,
-    "label": "Telegram me when someone shares a file with the household",
+    "label": "Someone shares a file with the household",
     "level": "basic",
     "secret": false,
     "lives_in": "person.telegram",
@@ -2052,7 +2052,7 @@
     "scope": "person",
     "selector": "boolean",
     "default": false,
-    "label": "Telegram me when someone shares a file with me",
+    "label": "Someone shares a file with you",
     "level": "basic",
     "secret": false,
     "lives_in": "person.telegram",
@@ -2065,7 +2065,7 @@
     "scope": "person",
     "selector": "boolean",
     "default": false,
-    "label": "Telegram me when I have trouble remembering something from our conversation",
+    "label": "Memory has a problem",
     "level": "basic",
     "secret": false,
     "lives_in": "person.telegram",
@@ -2078,7 +2078,7 @@
     "scope": "person",
     "selector": "boolean",
     "default": false,
-    "label": "Telegram me when I remember something from our conversation",
+    "label": "Home remembers something",
     "level": "basic",
     "secret": false,
     "lives_in": "person.telegram",
@@ -2091,7 +2091,7 @@
     "scope": "person",
     "selector": "boolean",
     "default": false,
-    "label": "Telegram me when a model download fails",
+    "label": "A model download fails",
     "level": "basic",
     "secret": false,
     "lives_in": "person.telegram",
@@ -2104,7 +2104,7 @@
     "scope": "person",
     "selector": "boolean",
     "default": false,
-    "label": "Telegram me when a model finishes downloading",
+    "label": "A model finishes downloading",
     "level": "basic",
     "secret": false,
     "lives_in": "person.telegram",
@@ -2117,7 +2117,7 @@
     "scope": "person",
     "selector": "boolean",
     "default": false,
-    "label": "Telegram me when a child or teen's profile band updates on a birthday",
+    "label": "A child or teen's profile changes on their birthday",
     "level": "basic",
     "secret": false,
     "lives_in": "person.telegram",
@@ -2130,7 +2130,7 @@
     "scope": "person",
     "selector": "boolean",
     "default": false,
-    "label": "Telegram me about new Repairs items",
+    "label": "A new Repairs item",
     "level": "basic",
     "secret": false,
     "lives_in": "person.telegram",
@@ -2185,7 +2185,7 @@
     "scope": "person",
     "selector": "boolean",
     "default": false,
-    "label": "Telegram me when a MaiPai Home update is available",
+    "label": "A Home update is available",
     "level": "basic",
     "secret": false,
     "lives_in": "person.telegram",
@@ -2372,7 +2372,7 @@
       ]
     },
     "default": "window",
-    "label": "Reference download time",
+    "label": "When books download",
     "help": "Choose when reference books may download. The nightly window is set in Home updates.",
     "copy": {
       "does": "Downloads reference books anytime or during the nightly window.",
@@ -2407,7 +2407,7 @@
     "scope": "household",
     "selector": "text",
     "default": "",
-    "label": "Reference library location",
+    "label": "Where offline books are kept",
     "help": "Where the household's offline knowledge archives live: a local folder, an external drive, or a NAS mount. Empty uses Home's own data folder. Moving this later moves the files and updates the library records.",
     "level": "basic",
     "secret": false,
@@ -2424,7 +2424,7 @@
       "min": 1
     },
     "default": 20,
-    "label": "Reference update speed limit (MB/s)",
+    "label": "Download speed limit",
     "help": "Maximum speed used for automatic reference library updates.",
     "level": "advanced",
     "secret": false,
@@ -2673,7 +2673,7 @@
     "scope": "household",
     "selector": "boolean",
     "default": true,
-    "label": "Robot initiative",
+    "label": "Robots may offer things on their own",
     "help": "When on, the robot may make approved offers. On by default for gestures only; spoken offers remain controlled by tiers_spoken.",
     "level": "basic",
     "secret": false,
@@ -3148,8 +3148,8 @@
     ],
     "merge": "override",
     "default": false,
-    "label": "Page text check",
-    "help": "When this is on, text MaiPai fetches from a web page is checked and cleaned before the assistant reads it. It is on by default for Kids and Teens and off for Adults. An admin can change it for everyone or for one person. A child or teen cannot turn it off.",
+    "label": "Clean up web pages before reading them",
+    "help": "Strips menus and adverts so answers quote the article, not the page.",
     "copy": {
       "does": "Checks and cleans text fetched from web pages before the assistant reads it."
     },
@@ -3797,8 +3797,8 @@
     "scope": "household",
     "selector": "boolean",
     "default": true,
-    "label": "Check whether the internet is reachable",
-    "help": "Once a minute, MaiPai looks up a neutral name and opens an empty connection to the chosen address. Turn this off to stop those checks.",
+    "label": "Is the internet reachable",
+    "help": "A tiny check so Home can say offline instead of failing quietly.",
     "level": "basic",
     "secret": false,
     "lives_in": "household.status",
@@ -3843,8 +3843,8 @@
     "scope": "household",
     "selector": "number",
     "default": 2,
-    "label": "Warn when free disk space drops below (GB)",
-    "help": "A Repairs item is raised once free space on the hub's own disk drops below this.",
+    "label": "Warn when space runs low",
+    "help": "Home tells an admin before the disk is full.",
     "level": "advanced",
     "secret": false,
     "lives_in": "household.storage",
@@ -3857,7 +3857,7 @@
     "scope": "household",
     "selector": "number",
     "default": 0,
-    "label": "Household storage cap (bytes)",
+    "label": "Storage for the whole home",
     "help": "The total bytes the whole household's files may use. 0 means no cap is set yet - the setup wizard sets this from the disk.",
     "level": "basic",
     "secret": false,
@@ -3899,7 +3899,7 @@
     "scope": "household",
     "selector": "number",
     "default": 21474836480,
-    "label": "Default per-person storage cap (bytes)",
+    "label": "Storage per person unless set",
     "help": "How many bytes each person may use for their own files, unless that person has their own override below.",
     "level": "basic",
     "secret": false,
@@ -4434,8 +4434,8 @@
     "scope": "household",
     "selector": "boolean",
     "default": true,
-    "label": "Allow vision when requested",
-    "help": "Allows a requested camera turn. Frames are never kept for a child.",
+    "label": "A robot may look when asked",
+    "help": "Someone can ask what the robot sees; it uses its camera for that one answer.",
     "level": "basic",
     "secret": false,
     "lives_in": "robot.settings",
@@ -6928,7 +6928,7 @@
       ]
     },
     "default": "standard",
-    "label": "Level when nobody says",
+    "label": "Usual quality level",
     "help": "Standard is fast. Boost has finer detail and takes longer. Anyone can pick a level for one picture.",
     "copy": {
       "does": "Picks how chat makes a picture if no level is named.",
@@ -6955,8 +6955,8 @@
       ]
     },
     "default": "standard",
-    "label": "Level when nobody says",
-    "help": "Standard is fast and has sound. Boost has a sharper picture and takes a little longer. Anyone can pick a level for one video.",
+    "label": "Usual quality level",
+    "help": "Used when the person does not pick one. Standard is everyday; Boost makes other big jobs wait.",
     "copy": {
       "does": "Picks how chat makes a video if no level is named.",
       "options": {
@@ -7056,7 +7056,7 @@
     "scope": "household",
     "selector": "boolean",
     "default": true,
-    "label": "Synths have lives",
+    "label": "Synths carry on between chats",
     "help": "Lets invented characters change over time.",
     "level": "basic",
     "secret": false,

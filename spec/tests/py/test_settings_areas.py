@@ -63,9 +63,9 @@ OLD_IDS = {
 
 def test_every_area_parses_and_page_counts_are_correct():
     assert [a["id"] for a in FILE["areas"]] == ["settings"]
-    assert len(FILE["areas"][0]["sections"]) == 16
+    assert len(FILE["areas"][0]["sections"]) == 15
     assert sum(s["scope"] == "person" for s in FILE["areas"][0]["sections"]) == 6
-    assert sum(s["scope"] == "household" for s in FILE["areas"][0]["sections"]) == 10
+    assert sum(s["scope"] == "household" for s in FILE["areas"][0]["sections"]) == 9
     for area in FILE["areas"]:
         SettingsArea.model_validate(area)
 
@@ -96,7 +96,6 @@ def test_tab_view_and_audience_constraints_and_robot_detail():
         "media",
         "home-voice",
         "search",
-        "offline-data",
         "apps",
         "backups",
         "advanced",

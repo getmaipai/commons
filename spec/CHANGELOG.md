@@ -1,3 +1,7 @@
+## [spec-v0.1.407] - 2026-11-15
+
+- SETTINGS-SPEC-03 slice 1 and SETTINGS-WORDS-01. Offline books move into Search and web, Blocked sites move to Privacy, the household status card moves to Advanced checks, and Personal Music moves to Voice playback. The removed offline-data route maps to Search / books. Section and tab labels are clarified. Settings key labels and help are updated to plain language, including Telegram event names.
+
 ## [spec-v0.1.406] - 2026-11-15
 
 - Additive: a `result_feed` takes up to 24 `actions` (was 16).

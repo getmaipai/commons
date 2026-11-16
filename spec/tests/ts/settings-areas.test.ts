@@ -16,8 +16,8 @@ const area=()=>file.areas[0]!;const page=(f:AreasFile,id:string)=>f.areas[0]!.se
 describe("single Settings area",()=>{
  test("has one guest-openable area with two exact groups and scoped page counts",()=>{
   expect(file.areas.map(a=>a.id)).toEqual(["settings"]); expect(area().audience.min_role).toBe("guest");
-  expect(area().groups).toEqual([{label:"Yours",sections:["profile","appearance","chat","voice","notifications","data"]},{label:"The home",sections:["household","privacy","ai","media","home-voice","search","offline-data","apps","backups","advanced"]}]);
-  expect(area().sections.filter(s=>s.scope==="person")).toHaveLength(6);expect(area().sections.filter(s=>s.scope==="household")).toHaveLength(10);
+  expect(area().groups).toEqual([{label:"Yours",sections:["profile","appearance","chat","voice","notifications","data"]},{label:"The home",sections:["household","privacy","ai","media","home-voice","search","apps","backups","advanced"]}]);
+  expect(area().sections.filter(s=>s.scope==="person")).toHaveLength(6);expect(area().sections.filter(s=>s.scope==="household")).toHaveLength(9);
   expect(CENTRAL_AREA_IDS).toEqual(["settings"]);expect(RESERVED_AREA_IDS).toEqual(expect.arrayContaining(["home","account","chat","settings"]));
   expect(lintManifestSettings({id:"music",contributes:{settings_area:{...area(),id:"settings"}}}).join(" ")).toMatch(/reserved/);
   expect(PAGE_COUNT_ENFORCED).toBe(true);expect(SETTINGS_CAP_ENFORCED).toBe(false);expect(checkAreas(file,registry)).toEqual([]);
@@ -48,6 +48,24 @@ describe("single Settings area",()=>{
   expect(new Set(ids).size).toBe(ids.length);expect(new Set(ids)).toEqual(expected);
   expect(entries.filter(x=>x.old.area==="chat"&&x.replacement).length).toBe(9);
   for(const row of entries){const dst=row.new??row.replacement;if(!dst){expect(row.reason).toBeTruthy();continue;}const target=area().sections.find(s=>s.id===dst.section);expect(target,JSON.stringify(row)).toBeDefined();if(row.new)expect(target!.tabs?.some(t=>t.id===dst.tab)).toBe(true);}
+ });
+ test("SETTINGS-SPEC-03 moves whole groups to their intended sections and tabs",()=>{
+  expect(area().sections.some(s=>s.id==="offline-data")).toBe(false);
+  expect(page(file,"search").tabs?.map(t=>[t.id,t.label,t.view])).toContainEqual(["books","Offline books","home.reference_library"]);
+  const legacyOffline=legacy.mappings.find((m:any)=>m.old.area==="home"&&m.old.section==="reference-library");
+  expect(legacyOffline.new).toEqual({area:"settings",section:"search",tab:"books"});
+  const locate=(scope:string,group:string)=>file.areas.flatMap(a=>a.sections.flatMap(s=>(s.cards??[]).filter(c=>c.scope===scope&&c.group===group).map(c=>[s.id,c.tab])));
+  expect(locate("household","household.reference")).toEqual([["search","books"]]);
+  expect(locate("household","household.blocked_sites")).toEqual([["privacy","sites"]]);
+  expect(page(file,"privacy").tabs?.map(t=>t.id)).toEqual(["privacy","sites"]);
+  expect(locate("household","household.status")).toEqual([["advanced","checks"]]);
+  expect(page(file,"advanced").tabs?.map(t=>t.id)).toEqual(["network","checks","developer"]);
+  expect(locate("person","person.music")).toEqual([["voice","playback"]]);
+  for(const s of area().sections){expect(new Set((s.tabs??[]).map(t=>t.id)).size).toBe(s.tabs?.length??0);for(const c of s.cards??[])if(c.tab)expect(s.tabs?.some(t=>t.id===c.tab),`${s.id}/${c.tab}`).toBe(true);}
+  expect(area().sections.filter(s=>s.scope==="person")).toHaveLength(6);expect(area().sections.filter(s=>s.scope==="household")).toHaveLength(9);
+});
+ test("household and person groups never cross onto the other scope's sections",()=>{
+  for(const section of area().sections)for(const card of section.cards??[])if(card.scope){const deviceException=card.scope==="device"&&section.id==="voice";expect(deviceException||card.scope===section.scope,`${section.id}/${card.group}`).toBe(true);}
  });
  test("registry groups remain placed once",()=>{const counts=new Map<string,number>();for(const a of file.areas)for(const s of a.sections)for(const c of s.cards??[])if(c.scope)for(const g of c.groups??(c.group?[c.group]:[])){const k=`${c.scope}:${g}`;counts.set(k,(counts.get(k)??0)+1)}for(const c of file.device_cards){const k=`${c.scope}:${c.group}`;counts.set(k,(counts.get(k)??0)+1)}const parked=new Set(file.not_placed.map(n=>`${n.scope}:${n.group}`));for(const k of new Set(registry.map(r=>`${r.scope}:${r.lives_in}`)))expect((counts.get(k)??0)+Number(parked.has(k)),k).toBe(1);});
 });
