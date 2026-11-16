@@ -1131,8 +1131,8 @@ function RowMedia({ value, kind }: { value: unknown; kind: unknown }) {
   return <SafeImage kind={pictureKind(kind)} alt="" className="size-8 shrink-0 rounded-md object-cover" />;
 }
 
-function ListNodeView({ node }: { node: ListNode }) {
-  const query = useBinding<Row[]>(node.bind);
+function ListNodeView({ node, state = {} }: { node: ListNode; state?: Row }) {
+  const query = useBinding<Row[]>(node.bind, state);
   const rowFilter = useContext(RowFilterContext);
   const filteredRows = query.data?.filter(rowFilter);
   const hasRows = (filteredRows?.length ?? 0) > 0;
@@ -2510,7 +2510,7 @@ export function NodeRenderer({ node, state = {} }: { node: UiNode; state?: Row }
     case "section":
       return <SectionNodeView node={node} state={state} />;
     case "list":
-      return <ListNodeView node={node} />;
+      return <ListNodeView node={node} state={state} />;
     case "card_grid":
       return <CardGridNodeView node={node} />;
     case "media_shelf":

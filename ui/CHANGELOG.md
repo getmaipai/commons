@@ -1,3 +1,7 @@
+## [ui-v0.5.674] - 2026-11-15
+
+- A `list` node reads page state: `$state.*` in its `bind.params` now resolves like the other bound nodes (the "How it was made" page needs it).
+
 ## [ui-v0.5.673] - 2026-11-15
 
 - The video player draws up to 16 row actions (was 8), matching the feed schema limit of 16; those past `actions_inline` go in its More menu.
