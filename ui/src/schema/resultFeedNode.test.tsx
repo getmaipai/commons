@@ -162,8 +162,8 @@ describe("result_feed poll_while", () => {
 });
 
 describe("result_feed entries", () => {
-  test("up to 16 actions pass the schema (the rest go in the More menu)", () => {
-    const many = Array.from({ length: 16 }, (_, i) => ({ label: `Action ${i}`, action: { call: { target: "/api/plugins/videos/actions/x" } } }));
+  test("up to 24 actions pass the schema (the rest go in the More menu)", () => {
+    const many = Array.from({ length: 24 }, (_, i) => ({ label: `Action ${i}`, action: { call: { target: "/api/plugins/videos/actions/x" } } }));
     expect(ResultFeedNodeSchema.safeParse({ ...(feed as object), actions: many }).success).toBe(true);
     expect(ResultFeedNodeSchema.safeParse({ ...(feed as object), actions: [...many, many[0]] }).success).toBe(false);
   });
