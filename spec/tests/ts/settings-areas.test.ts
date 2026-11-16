@@ -74,7 +74,7 @@ describe("VIDEO-SETTINGS-03: Pictures, videos and music",()=>{
  const keyOf=(k:string)=>registry.find(r=>r.key===k) as (RegistryKey&{range?:{options?:string[]};default?:unknown;secret?:boolean;copy?:{does?:string};label?:string})|undefined;
  const media=()=>page(file,"media");
  test("the area keeps its name and has the four tabs, no Media library, and no person Pictures and videos page",()=>{
-  expect(media().label).toBe("Pictures, videos and music");
+  expect(media().label).toBe("Media");
   expect(media().tabs?.map(t=>[t.id,t.label])).toEqual([["pictures","Pictures"],["videos","Videos"],["music","Music"],["styles","Styles"]]);
   expect(media().tabs?.some(t=>t.id==="media-library"||t.view==="home.media_library")).toBe(false);
   expect(area().sections.some(s=>s.id==="pictures")).toBe(false);

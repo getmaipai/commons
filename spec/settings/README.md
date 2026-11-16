@@ -35,9 +35,9 @@ and safety's `sites` tab; the Search and web section retains its search and
 news groups. The household status group is on Advanced's Checks tab, and
 Personal Voice's Listening and playback tab contains `person.music`.
 
-The current household sections are Household and people, Privacy and safety,
-AI and models, Pictures, videos and music, Voices and commands, Search and web,
-Apps and devices, Backups, storage and updates, and Advanced. Household's
+The current household sections are Household, Privacy and safety,
+AI and models, Media, Voices, Search and web,
+Apps and devices, Backups and updates, and Advanced. Household's
 People tab comes before The home. Cards that name a tab must name a tab on the
 same section, and registry groups remain indivisible across moves.
 

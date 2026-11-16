@@ -1,3 +1,7 @@
+## [spec-v0.1.408] - 2026-11-16
+
+- Settings area names are short enough for one line in the column (Profile, Chat, Your data, Household, Media, Voices, Backups and updates, and the rest unchanged).
+
 ## [spec-v0.1.407] - 2026-11-15
 
 - SETTINGS-SPEC-03 slice 1 and SETTINGS-WORDS-01. Offline books move into Search and web, Blocked sites move to Privacy, the household status card moves to Advanced checks, and Personal Music moves to Voice playback. The removed offline-data route maps to Search / books. Section and tab labels are clarified. Settings key labels and help are updated to plain language, including Telegram event names.

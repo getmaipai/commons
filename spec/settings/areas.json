@@ -36,7 +36,7 @@
       "sections": [
         {
           "id": "profile",
-          "label": "Profile and sign-in",
+          "label": "Profile",
           "icon": "user",
           "kind": "keys",
           "cards": [
@@ -92,7 +92,7 @@
         },
         {
           "id": "chat",
-          "label": "Chat and AI",
+          "label": "Chat",
           "icon": "settings",
           "kind": "keys",
           "cards": [
@@ -168,7 +168,7 @@
         },
         {
           "id": "voice",
-          "label": "Voice, sound and robot",
+          "label": "Voice and robot",
           "icon": "mic",
           "kind": "keys",
           "cards": [
@@ -281,7 +281,7 @@
         },
         {
           "id": "data",
-          "label": "Your data and apps",
+          "label": "Your data",
           "icon": "lock",
           "kind": "keys",
           "cards": [
@@ -328,7 +328,7 @@
         },
         {
           "id": "household",
-          "label": "Household and people",
+          "label": "Household",
           "icon": "settings",
           "kind": "keys",
           "cards": [
@@ -765,7 +765,7 @@
         },
         {
           "id": "media",
-          "label": "Pictures, videos and music",
+          "label": "Media",
           "icon": "camera",
           "kind": "keys",
           "cards": [
@@ -915,7 +915,7 @@
         },
         {
           "id": "home-voice",
-          "label": "Voices and commands",
+          "label": "Voices",
           "icon": "volume-2",
           "kind": "keys",
           "tabs": [
@@ -1089,7 +1089,7 @@
         },
         {
           "id": "backups",
-          "label": "Backups, storage and updates",
+          "label": "Backups and updates",
           "icon": "hard-drive",
           "kind": "keys",
           "cards": [
