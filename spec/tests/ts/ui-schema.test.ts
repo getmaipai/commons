@@ -21,7 +21,7 @@ describe("UI schema", () => {
     expect(callAction({ call: { target: "/mark", fresh_confirm: { unknown: true } } })).toBe(false);
     const node = { type: "result_feed", bind: { source: "route", path: "/results" }, fields: { words: "words", status: "status" }, actions: [{ label: "Unmark", show_when: "adult.nsfw", action: { call: { target: "/unmark", fresh_confirm: { title: "Confirm" } } } }], poll_while: { statuses: ["queued"], record: { path: "job" } } };
     expect(validate(node)).toBe(true);
-    expect(validate({ ...node, actions: Array.from({ length: 17 }, () => node.actions[0]) })).toBe(false);
+    expect(validate({ ...node, actions: Array.from({ length: 25 }, () => node.actions[0]) })).toBe(false);
     expect(validate({ ...node, actions: [{ ...node.actions[0], show_when: "" }] })).toBe(false);
   });
   test("HANDOFF-01a: play accepts an optional start position or placeholder", () => {

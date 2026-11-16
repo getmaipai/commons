@@ -25,9 +25,9 @@ const studio = (actions: unknown[]) => ({
 });
 
 describe("action caps", () => {
-  test("a feed takes 16 actions, not 17", () => {
-    expect(ResultFeedNodeSchema.safeParse(feed(many(16))).success).toBe(true);
-    expect(ResultFeedNodeSchema.safeParse(feed(many(17))).success).toBe(false);
+  test("a feed takes 24 actions, not 25", () => {
+    expect(ResultFeedNodeSchema.safeParse(feed(many(24))).success).toBe(true);
+    expect(ResultFeedNodeSchema.safeParse(feed(many(25))).success).toBe(false);
   });
   test("the Studio export card takes 3 actions, not 4", () => {
     expect(StudioNodeSchema.safeParse(studio(many(3))).success).toBe(true);

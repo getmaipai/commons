@@ -804,7 +804,7 @@ export const ResultFeedNodeSchema = z.object({
         action: ActionSchema,
       }).strict(),
     )
-    .max(16)
+    .max(24)
     .optional(),
   actions_variant: z.enum(["default", "icons"]).default("default"),
   actions_inline: z.number().int().min(1).max(8).optional(),

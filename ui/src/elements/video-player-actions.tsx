@@ -30,7 +30,7 @@ export interface VideoPlayerAction {
 }
 
 /** The most actions one row draws (inline and in More together). */
-export const VIDEO_PLAYER_ACTION_CAP = 16;
+export const VIDEO_PLAYER_ACTION_CAP = 24;
 
 /** A row entry after the Element has merged its built-in actions with the host's. */
 export interface RowAction {
