@@ -1,3 +1,7 @@
+## [ui-v0.5.677] - 2026-11-16
+
+- SETTINGS-LABELS-01 fix: a wrapped Settings column row now overrides the base menu button's `[&>span:last-child]:truncate`, so long area names really wrap (0.5.676 added the class but the base rule still won; found on the workbench).
+
 ## [ui-v0.5.676] - 2026-11-16
 
 - SETTINGS-LABELS-01: Settings column labels wrap to a second line when needed, with growing rows and top-aligned icons; other SectionSidebar columns keep truncating by default.

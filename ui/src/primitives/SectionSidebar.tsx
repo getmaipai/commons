@@ -334,7 +334,7 @@ export function SectionSidebar({
         <SidebarMenuButton
           size="settings"
           isActive={item.active === true}
-          className={cn("rounded-lg", navTransition, menuHover, menuSelected, compact && "h-8 px-2 text-[13px] before:-inset-y-1.5", wrapLabels && !rail && "h-auto min-h-12 py-2 [&>span:last-child]:[overflow-wrap:anywhere]", rail && "justify-center gap-0 px-0")}
+          className={cn("rounded-lg", navTransition, menuHover, menuSelected, compact && "h-8 px-2 text-[13px] before:-inset-y-1.5", wrapLabels && !rail && "h-auto min-h-12 py-2 [&>span:last-child]:overflow-visible [&>span:last-child]:text-clip [&>span:last-child]:whitespace-normal [&>span:last-child]:[overflow-wrap:anywhere]", rail && "justify-center gap-0 px-0")}
           render={(props) => (
             <a {...props} href={item.href ?? "#"} onClick={(event) => { item.onClick?.(event); }} title={rail ? item.label : undefined}>
               {props.children}

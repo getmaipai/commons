@@ -32,6 +32,10 @@ describe("SectionSidebar", () => {
     expect(wrappedLabel.className).toContain("whitespace-normal");
     expect(wrappedLink.className).toContain("h-auto");
     expect(wrappedLink.className).toContain("min-h-12");
+    // The base menu button forces `truncate` on its last span with `[&>span:last-child]:truncate`; a wrapped row must override it on the button itself.
+    expect(wrappedLink.className).toContain("[&>span:last-child]:whitespace-normal");
+    expect(wrappedLink.className).toContain("[&>span:last-child]:overflow-visible");
+    expect(wrappedLink.className).toContain("[&>span:last-child]:text-clip");
     expect(wrappedLink.querySelector("span.relative")?.className).toContain("self-start");
     cleanup();
 
