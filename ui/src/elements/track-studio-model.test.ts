@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import {
   dbToGain, effectiveCrossfade, envelopePoints, filmLength, findPiece, formatTime, gainAt, gainToDb, laneGain, laneOf, layoutLane, mapPiece, normalizeCrossfade, pieceAt,
-  pieceEnvelope, previewEnd, readState, rulerStep, rulerTicks, setDuck, setLaneLevel, setLaneMuted, setPieceLevel, spokenTime, type StudioPiece, type StudioState,
+  pieceEnvelope, previewEnd, readState, rulerStep, rulerTicks, setDuck, setLaneLevel, setLaneMuted, setPieceLevel, spokenTime, titleAtTime, type StudioPiece, type StudioState,
 } from "./track-studio-model";
 
 const piece = (id: string, o: Partial<StudioPiece> = {}): StudioPiece => ({ id, ref: id, src: `/f/${id}.mp4`, in_s: 0, out_s: 4, source_s: 10, at_s: 0, level_db: 0, fade_in_s: 0, fade_out_s: 0, crossfade_s: 0, duck: false, ...o });
@@ -20,6 +20,17 @@ const withX = (s: StudioState, afterId: string, x: number): StudioState => {
 const withFade = (s: StudioState, id: string, o: Partial<StudioPiece>): StudioState => mapPiece(s, id, (p) => ({ ...p, ...o }));
 
 describe("readState", () => {
+  test("bad or missing titles are empty and valid title text is capped", () => {
+    expect(readState({ lanes: [], titles: "bad" }).titles).toEqual([]);
+    expect(readState([]).titles).toEqual([]);
+    expect(readState({ lanes: [], titles: [{ text: "x".repeat(130), at_s: 0, len_s: 1, position: "bottom" }] }).titles[0]!.text).toHaveLength(120);
+  });
+  test("title timing includes its start and excludes its end", () => {
+    const titles = readState({ lanes: [{ id: "video", pieces: [piece("v", { out_s: 10 })] }], titles: [{ id: "t", text: "hello", at_s: 2, len_s: 3, position: "middle" }] }).titles;
+    expect(titleAtTime(titles, 1)).toBeNull();
+    expect(titleAtTime(titles, 2)?.text).toBe("hello");
+    expect(titleAtTime(titles, 5)).toBeNull();
+  });
   test("always has three lanes and drops a piece with no source or an empty cut", () => {
     const s = readState([{ id: "video", pieces: [{ id: "x", src: "" }, { id: "y", src: "/a.mp4", in_s: 2, out_s: 2.1 }, { id: "z", src: "/a.mp4", out_s: 5 }] }, { id: "nope", pieces: [] }]);
     expect(s.lanes.map((l) => l.id)).toEqual(["video", "voice", "music"]);

@@ -34,6 +34,13 @@ export type StudioTransitionKind = typeof STUDIO_TRANSITION_KINDS[number]["kind"
 export const LEVEL_DB_MIN = -24;
 export const LEVEL_DB_MAX = 12;
 export const FADE_MAX_S = 5;
+export const STUDIO_TITLE_MAX = 6;
+export const STUDIO_TITLE_TEXT_MAX = 120;
+export const STUDIO_TITLE_LEN_MIN_S = 0.5;
+export const STUDIO_TITLE_LEN_MAX_S = 10;
+export type StudioTitlePosition = "top" | "middle" | "bottom";
+export interface StudioTitle { id: string; text: string; at_s: number; len_s: number; position: StudioTitlePosition }
+export const titleAtTime = (titles: readonly StudioTitle[], t: number): StudioTitle | null => titles.find((title) => t >= title.at_s && t < title.at_s + title.len_s) ?? null;
 
 export interface StudioPiece {
   id: string;
@@ -76,6 +83,7 @@ export interface StudioLane {
 
 export interface StudioState {
   lanes: StudioLane[];
+  titles: StudioTitle[];
 }
 
 export const laneDefaults = (): Record<LaneId, { label: string; hue: string }> => ({
@@ -145,7 +153,8 @@ function givenPeaks(raw: RawPiece): Pick<StudioPiece, "peaks" | "peaks_url"> {
 
 /** A state with all three lanes, from the host's `lanes` array (missing lanes are empty; unknown lane ids are ignored), then each stem lane
  * the host listed (`stem-vocals`, `stem-drums`, `stem-bass`, `stem-other`), in that order. */
-export function readState(rawLanes: unknown): StudioState {
+export function readState(input: unknown): StudioState {
+  const rawLanes = Array.isArray(input) ? input : input && typeof input === "object" ? (input as { lanes?: unknown }).lanes : undefined;
   const list = Array.isArray(rawLanes) ? (rawLanes as RawLane[]) : [];
   const stems = STEM_LANE_IDS.filter((id) => list.some((l) => l && l.id === id));
   const lanes = [...LANE_IDS, ...stems].map((id): StudioLane => {
@@ -166,7 +175,17 @@ export function readState(rawLanes: unknown): StudioState {
       pieces,
     };
   });
-  return { lanes };
+  const rawTitles = input && !Array.isArray(input) && typeof input === "object" ? (input as { titles?: unknown }).titles : undefined;
+  const end = filmLength({ lanes, titles: [] });
+  const titles: StudioTitle[] = Array.isArray(rawTitles) ? rawTitles.slice(0, STUDIO_TITLE_MAX).flatMap((raw, i) => {
+    if (!raw || typeof raw !== "object") return [];
+    const item = raw as Partial<StudioTitle>;
+    if (typeof item.text !== "string" || !["top", "middle", "bottom"].includes(item.position ?? "")) return [];
+    const at_s = clamp(finite(item.at_s, 0), 0, end);
+    const len_s = clamp(finite(item.len_s, 3), STUDIO_TITLE_LEN_MIN_S, STUDIO_TITLE_LEN_MAX_S);
+    return [{ id: typeof item.id === "string" && item.id ? item.id : `title-${i + 1}`, text: item.text.slice(0, STUDIO_TITLE_TEXT_MAX), at_s: round(Math.min(at_s, Math.max(0, end - len_s))), len_s: round(Math.min(len_s, Math.max(STUDIO_TITLE_LEN_MIN_S, end - at_s))), position: item.position as StudioTitlePosition }];
+  }) : [];
+  return { lanes, titles };
 }
 
 export const laneOf = (state: StudioState, id: LaneId): StudioLane => state.lanes.find((l) => l.id === id)!;
@@ -304,10 +323,10 @@ export function normalizeCrossfade(s: number): number {
 // The setters the lane controls and the Volume panel use (VIDEO-STUDIO-04). The editing tools are in track-studio-edit.ts (VIDEO-STUDIO-05).
 
 export function mapLane(state: StudioState, id: LaneId, f: (l: StudioLane) => StudioLane): StudioState {
-  return { lanes: state.lanes.map((l) => (l.id === id ? f(l) : l)) };
+  return { ...state, lanes: state.lanes.map((l) => (l.id === id ? f(l) : l)) };
 }
 export function mapPiece(state: StudioState, pieceId: string, f: (p: StudioPiece, l: StudioLane) => StudioPiece): StudioState {
-  return { lanes: state.lanes.map((l) => (l.pieces.some((p) => p.id === pieceId) ? { ...l, pieces: l.pieces.map((p) => (p.id === pieceId ? f(p, l) : p)) } : l)) };
+  return { ...state, lanes: state.lanes.map((l) => (l.pieces.some((p) => p.id === pieceId) ? { ...l, pieces: l.pieces.map((p) => (p.id === pieceId ? f(p, l) : p)) } : l)) };
 }
 export function setPieceLevel(state: StudioState, pieceId: string, db: number): StudioState {
   return mapPiece(state, pieceId, (p) => ({ ...p, level_db: round(clamp(db, LEVEL_DB_MIN, LEVEL_DB_MAX), 1) }));

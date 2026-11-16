@@ -41,6 +41,28 @@ const pieces = (c: HTMLElement, lane: string) => c.querySelectorAll(`[data-lane=
 const playhead = (c: HTMLElement) => within(c).getByRole("slider", { name: "Playhead" });
 const key = (el: Element, k: string, init: Partial<KeyboardEventInit> = {}) => fireEvent.keyDown(el, { key: k, ...init });
 
+describe("titles panel", () => {
+  test("is opt-in and its title appears only during its time", async () => {
+    const plain = open();
+    expect(plain.queryByRole("radio", { name: "Titles" })).toBeNull();
+    cleanup(); restore(); restore = installFakeMedia(); stubMatchMedia({});
+    const titled = open({ panels: ["titles"], lanes: lanes() });
+    fireEvent.click(titled.getByRole("radio", { name: "Titles" }));
+    expect(titled.getByText("No titles yet. Add one at the playhead.")).toBeTruthy();
+    fireEvent.click(titled.getByRole("button", { name: "Add title at the playhead" }));
+    const input = titled.getByRole("textbox", { name: "Title text" }) as HTMLInputElement;
+    fireEvent.change(input, { target: { value: "x".repeat(130) } });
+    expect(input.value).toHaveLength(120);
+    await flush();
+    expect(titled.container.querySelector("[data-slot='track-studio-title']")?.textContent).toHaveLength(120);
+    await act(async () => { await titled.ctx; });
+    await act(async () => { await titled.container.querySelector("[data-slot='track-studio-title']")?.dispatchEvent(new Event("timeupdate")); });
+    const title = titled.container.querySelector("[data-slot='track-studio-title']");
+    expect(title?.getAttribute("aria-live")).toBe("off");
+    expect(title?.className).toContain("pointer-events-none");
+  });
+});
+
 describe("the leak test: a locked clip draws and loads nothing", () => {
   test("only the lock tile exists: no media element, no src, no picture, no request, none of the clip's words", async () => {
     const onExport = mock(() => undefined);

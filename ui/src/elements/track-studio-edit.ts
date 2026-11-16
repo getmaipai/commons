@@ -4,7 +4,7 @@
 import { i18n } from "@/kit/i18n"
 import {
   FADE_MAX_S, LEVEL_DB_MAX, LEVEL_DB_MIN, MIN_PIECE_S, clamp, effectiveCrossfade, filmLength, findPiece, laneOf, layoutLane, mapLane, mapPiece, normalizeCrossfade,
-  pieceAt, pieceDuration, round, isStemLane, type LaneId, type StemLaneId, type StudioPiece, type StudioState, type StudioTransitionKind,
+  pieceAt, pieceDuration, round, isStemLane, STUDIO_TITLE_MAX, STUDIO_TITLE_TEXT_MAX, STUDIO_TITLE_LEN_MIN_S, STUDIO_TITLE_LEN_MAX_S, type LaneId, type StemLaneId, type StudioPiece, type StudioState, type StudioTransitionKind, type StudioTitle, type StudioTitlePosition,
 } from "./track-studio-model";
 
 export interface StudioLimits {
@@ -13,6 +13,34 @@ export interface StudioLimits {
   film_s: number;
 }
 export const DEFAULT_LIMITS: StudioLimits = { video_pieces: 6, audio_pieces: 2, film_s: 60 };
+
+let titleCounter = 0;
+export function addTitle(state: StudioState, at_s: number): StudioState {
+  if (state.titles.length >= STUDIO_TITLE_MAX) return state;
+  const end = filmLength(state);
+  const len_s = round(Math.min(3, Math.max(STUDIO_TITLE_LEN_MIN_S, end)));
+  const start = clamp(round(Number.isFinite(at_s) ? at_s : 0), 0, Math.max(0, end - len_s));
+  titleCounter += 1;
+  const title: StudioTitle = { id: `title-${titleCounter}`, text: "Title", at_s: start, len_s, position: "bottom" };
+  return { ...state, titles: [...state.titles, title] };
+}
+export function updateTitle(state: StudioState, id: string, patch: Partial<Omit<StudioTitle, "id">>): StudioState {
+  const index = state.titles.findIndex((title) => title.id === id);
+  if (index < 0) return state;
+  const end = filmLength(state);
+  const current = state.titles[index]!;
+  const text = patch.text === undefined ? current.text : patch.text.slice(0, STUDIO_TITLE_TEXT_MAX);
+  const len_s = round(clamp(patch.len_s ?? current.len_s, STUDIO_TITLE_LEN_MIN_S, Math.min(STUDIO_TITLE_LEN_MAX_S, Math.max(STUDIO_TITLE_LEN_MIN_S, end))));
+  const at_s = round(clamp(patch.at_s ?? current.at_s, 0, Math.max(0, end - len_s)));
+  const position = patch.position && ["top", "middle", "bottom"].includes(patch.position) ? patch.position : current.position;
+  const titles = [...state.titles];
+  titles[index] = { ...current, text, at_s, len_s, position };
+  return { ...state, titles };
+}
+export function removeTitle(state: StudioState, id: string): StudioState {
+  const titles = state.titles.filter((title) => title.id !== id);
+  return titles.length === state.titles.length ? state : { ...state, titles };
+}
 
 export interface LevelStep { id: string; label: string; gain_db: number; clip_gain_db: number }
 /** The five balances of Home's `MIX_LEVELS` (the default; a page may pass its own `level_steps`). */
@@ -175,6 +203,7 @@ export function crossfadeAfter(state: StudioState, pieceId: string): number | nu
 /** The Level panel: voice and music pieces take the balance's `gain_db`, video pieces its `clip_gain_db`. */
 export function applyBalance(state: StudioState, step: LevelStep): StudioState {
   return {
+    ...state,
     lanes: state.lanes.map((l) => ({ ...l, pieces: l.pieces.map((p) => ({ ...p, level_db: round(clamp(l.id === "video" ? step.clip_gain_db : step.gain_db, LEVEL_DB_MIN, LEVEL_DB_MAX), 1) })) })),
   };
 }
@@ -241,6 +270,7 @@ export interface StudioPlan {
   music: { level_db: number; muted: boolean; pieces: PlanLanePiece[] };
   /** MP-03: an audio studio's stem lanes, present only when the studio has any (a video plan is unchanged). */
   stems?: { id: StemLaneId; level_db: number; muted: boolean; pieces: PlanLanePiece[] }[];
+  titles?: Array<{ text: string; from_s: number; to_s: number; position: StudioTitlePosition }>;
 }
 export type PlanTransition = { kind: "cut" | "crossfade" | Exclude<StudioTransitionKind, "fade">; seconds: number };
 
@@ -270,6 +300,7 @@ export function toPlan(state: StudioState): StudioPlan {
     voice: audio("voice"),
     music: audio("music"),
     ...(stemIds.length > 0 ? { stems: stemIds.map((id) => ({ id, ...audio(id) })) } : {}),
+    ...(state.titles.length > 0 ? { titles: state.titles.map(({ text, at_s, len_s, position }) => ({ text, from_s: round(at_s), to_s: round(at_s + len_s), position })) } : {}),
   };
 }
 

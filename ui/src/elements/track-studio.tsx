@@ -11,6 +11,7 @@ import { ContrastIcon, DownloadIcon, XIcon, PauseIcon, PlayIcon, PlusIcon, Redo2
 import { cn, FOCUS_RING, hueTintBackground } from "@/kit/utils";
 import { useIsPhoneLayout } from "@/kit/hooks/useIsPhoneLayout";
 import { Button } from "@/kit/ui/button";
+import { Input } from "@/kit/ui/input";
 import { Slider } from "@/kit/ui/slider";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/kit/ui/tooltip";
 import { Switch } from "@/kit/ui/switch";
@@ -27,23 +28,23 @@ import { resolveCompare, type StudioCompare } from "./track-studio-compare";
 import { StudioCompareBar } from "./track-studio-compare-bar";
 import {
   CROSSFADE_MAX_S, FADE_MAX_S, LEVEL_DB_MAX, LEVEL_DB_MIN, MIN_PIECE_S, STUDIO_TRANSITION_KINDS, STUDIO_TRANSITION_LABELS, effectiveCrossfade, filmLength, findPiece, formatTime, laneOf, layoutLane, pieceDuration, pieceEnvelope, readState, rulerTicks,
-  isStemLane, setDuck, setLaneLevel, setLaneMuted, setPieceLevel, spokenTime, type LaneId, type StudioLane, type StudioPiece, type StudioState,
+  isStemLane, setDuck, setLaneLevel, setLaneMuted, setPieceLevel, spokenTime, titleAtTime, type LaneId, type StudioLane, type StudioPiece, type StudioState,
 } from "./track-studio-model";
 import {
   DEFAULT_LEVEL_STEPS, DEFAULT_LIMITS, addPiece, applyBalance, canRedo, canUndo, crossfadeAfter, currentBalance, deletePiece, movePiece, planChanged, pushHistory, transitionKindAfter,
-  redoHistory, resetPieceFades, resetPieceVolume, setCrossfadeAfter, setTransitionKindAfter, setFadeIn, setFadeOut, snap, snapEdges, splitAt, startHistory, toPlan, trimEndBy, trimStartBy, undoHistory,
+  redoHistory, resetPieceFades, resetPieceVolume, setCrossfadeAfter, setTransitionKindAfter, setFadeIn, setFadeOut, snap, snapEdges, splitAt, startHistory, toPlan, trimEndBy, trimStartBy, undoHistory, addTitle, updateTitle, removeTitle,
   type EditResult, type History, type LevelStep, type StudioLimits, type StudioPlan,
 } from "./track-studio-edit";
 import { i18n, kitLocaleTag } from "@/kit/i18n";
 
-export type { StudioPiece, StudioLane, StudioState } from "./track-studio-model";
+export type { StudioPiece, StudioLane, StudioState, StudioTitle } from "./track-studio-model";
 export type { StudioPlan, LevelStep, StudioLimits } from "./track-studio-edit";
 export { toPlan } from "./track-studio-edit";
 export { readState, STEM_IDS, STEM_LANE_IDS, isStemLane, type StemId, type StemLaneId, type LaneId } from "./track-studio-model";
 export { EQ_BANDS_HZ, defaultEffects, readEffects, makeSelection, type StudioEffects, type CompressorSettings, type StudioSelection } from "./track-studio-fx";
 
 export type StudioTool = "split" | "delete" | "add_clip" | "add_voice" | "add_music";
-export type StudioPanel = "volume" | "fades" | "crossfade" | "level" | "eq" | "compressor";
+export type StudioPanel = "volume" | "fades" | "crossfade" | "level" | "eq" | "compressor" | "titles";
 export const ALL_TOOLS: readonly StudioTool[] = ["split", "delete", "add_clip", "add_voice", "add_music"];
 export const ALL_PANELS: readonly StudioPanel[] = ["volume", "fades", "crossfade", "level"];
 /** MP-03: what an audio studio (`kind="audio"`) shows when the host passes no `panels`. */
@@ -156,10 +157,11 @@ function StudioBody(props: TrackStudioProps) {
   const steps = props.levelSteps ?? DEFAULT_LEVEL_STEPS;
   const isPhone = useIsPhoneLayout();
   const showVideo = (props.kind ?? "video") === "video";
-  const initial = useMemo(() => readState(props.lanes), []); // eslint-disable-line react-hooks/exhaustive-deps -- one read per clip (resetKey remounts)
+  const initial = useMemo(() => readState({ lanes: props.lanes, titles: [] }), []); // eslint-disable-line react-hooks/exhaustive-deps -- one read per clip (resetKey remounts)
   const [hist, setHist] = useState<Hist>(() => ({ h: startHistory(initial), key: null, at: 0 }));
   const state = hist.h.present;
   const [selected, setSelected] = useState<string | null>(null);
+  const [selectedTitle, setSelectedTitle] = useState<string | null>(null);
   const [solo, setSolo] = useState<LaneId | null>(null);
   const [loop, setLoop] = useState(false);
   const [playing, setPlaying] = useState(false);
@@ -291,6 +293,9 @@ function StudioBody(props: TrackStudioProps) {
 
   // -- actions ---------------------------------------------------------------------------------------------------------
   const playhead = () => timeStore.get();
+  const addAtPlayhead = () => { const next = addTitle(state, playhead()); if (next !== state) { const id = next.titles[next.titles.length - 1]!.id; commit(next); setSelectedTitle(id); } };
+  const previewTime = useTime(timeStore, 0.05);
+  const titleAtPlayhead = titleAtTime(state.titles, previewTime);
   const sel = findPiece(state, selected);
   const doSplit = () => {
     const t = playhead();
@@ -439,6 +444,11 @@ function StudioBody(props: TrackStudioProps) {
       reset: () => changeFx(resetCompressor(fx)),
       body: <CompressorPanel fx={fx} change={changeFx} reason={fxReason} />,
     },
+    titles: {
+      title: i18n._({ id: "ui.Titles", message: "Titles" }),
+      reset: () => {},
+      body: <TitlesPanel state={state} selectedId={selectedTitle} setSelected={setSelectedTitle} commit={commit} add={addAtPlayhead} />,
+    },
   };
 
   return (
@@ -475,6 +485,7 @@ function StudioBody(props: TrackStudioProps) {
               <>
                 <span className="bg-background/70 text-foreground absolute top-2 right-2 rounded-full px-2 py-0.5 text-xs font-semibold">{i18n._({ id: "ui.Preview", message: "Preview" })}</span>
                 <TimeChip store={timeStore} film={film} />
+                {titleAtPlayhead ? <div data-slot="track-studio-title" aria-live="off" className={cn("bg-background/60 text-foreground pointer-events-none absolute left-1/2 max-w-[90%] -translate-x-1/2 rounded-lg px-3 py-1 text-center text-lg font-semibold", titleAtPlayhead.position === "top" ? "top-1/4" : titleAtPlayhead.position === "middle" ? "top-1/2 -translate-y-1/2" : "bottom-1/4")}>{titleAtPlayhead.text}</div> : null}
               </>
             )}
           </div>
@@ -708,6 +719,22 @@ function CrossfadePanel({ state, selected, commit }: { state: StudioState; selec
       <p className="text-muted-foreground text-sm">{i18n._({ id: "ui.Blends or wipes the two pictures where they meet. 0.3 to 1 second; 0 is a cut. The preview cuts the picture; the export shows the effect.", message: "Blends or wipes the two pictures where they meet. 0.3 to 1 second; 0 is a cut. The preview cuts the picture; the export shows the effect." })}</p>
     </>
   );
+}
+
+function TitlesPanel({ state, selectedId, setSelected, commit, add }: { state: StudioState; selectedId: string | null; setSelected: (id: string) => void; commit: (s: StudioState, key?: string) => void; add: () => void }) {
+  const selected = state.titles.find((title) => title.id === selectedId) ?? null;
+  const end = filmLength(state);
+  return <div className="flex min-w-0 flex-col gap-3">
+    {state.titles.length ? <div className="flex flex-wrap gap-2" role="group" aria-label={i18n._({ id: "ui.Titles", message: "Titles" })}>{state.titles.map((title, i) => <Button key={title.id} variant={selected?.id === title.id ? "default" : "secondary"} size="sm" className="rounded-full" aria-pressed={selected?.id === title.id} onClick={() => setSelected(title.id)}>{title.text || `${i18n._({ id: "ui.Title", message: "Title" })} ${i + 1}`}</Button>)}</div> : <p className="text-muted-foreground text-sm">{i18n._({ id: "ui.No titles yet. Add one at the playhead.", message: "No titles yet. Add one at the playhead." })}</p>}
+    {selected ? <>
+      <Input value={selected.text} maxLength={120} aria-label={i18n._({ id: "ui.Title text", message: "Title text" })} onChange={(event) => commit(updateTitle(state, selected.id, { text: event.currentTarget.value }), `title:${selected.id}`)} />
+      <Field label={i18n._({ id: "ui.Starts at", message: "Starts at" })} value={secText(selected.at_s)}><Slider min={0} max={Math.max(0, end - selected.len_s)} step={0.1} value={[selected.at_s]} aria-label={i18n._({ id: "ui.Starts at, seconds", message: "Starts at, seconds" })} onValueChange={([v]) => commit(updateTitle(state, selected.id, { at_s: v ?? 0 }), `title:${selected.id}`)} /></Field>
+      <Field label={i18n._({ id: "ui.Length", message: "Length" })} value={secText(selected.len_s)}><Slider min={0.5} max={Math.min(10, Math.max(0.5, end))} step={0.1} value={[selected.len_s]} aria-label={i18n._({ id: "ui.Length, seconds", message: "Length, seconds" })} onValueChange={([v]) => commit(updateTitle(state, selected.id, { len_s: v ?? 3 }), `title:${selected.id}`)} /></Field>
+      <div role="radiogroup" aria-label={i18n._({ id: "ui.Title position", message: "Title position" })} className="flex flex-wrap gap-2">{(["top", "middle", "bottom"] as const).map((position) => <Button key={position} type="button" size="sm" variant={selected.position === position ? "default" : "secondary"} role="radio" aria-checked={selected.position === position} className="rounded-full" onClick={() => commit(updateTitle(state, selected.id, { position }))}>{position === "top" ? i18n._({ id: "ui.Top", message: "Top" }) : position === "middle" ? i18n._({ id: "ui.Middle", message: "Middle" }) : i18n._({ id: "ui.Bottom", message: "Bottom" })}</Button>)}</div>
+      <Button type="button" variant="secondary" size="sm" className="self-start rounded-full" onClick={() => commit(removeTitle(state, selected.id))}>{i18n._({ id: "ui.Remove", message: "Remove" })}</Button>
+    </> : null}
+    <Button type="button" variant="secondary" size="sm" className="self-start rounded-full" disabled={state.titles.length >= 6 || end < 0.5} onClick={add}>{i18n._({ id: "ui.Add title at the playhead", message: "Add title at the playhead" })}</Button>
+  </div>;
 }
 
 function LevelPanel({ state, steps, commit }: { state: StudioState; steps: readonly LevelStep[]; commit: (s: StudioState, key?: string) => void }) {

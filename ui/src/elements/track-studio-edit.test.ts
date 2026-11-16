@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { filmLength, findPiece, laneOf, layoutLane, pieceDuration, pieceEnvelope, readState, gainAt, MIN_PIECE_S, type StudioPiece, type StudioState } from "./track-studio-model";
 import {
-  DEFAULT_LEVEL_STEPS, DEFAULT_LIMITS, addPiece, applyBalance, canRedo, canUndo, crossfadeAfter, currentBalance, deletePiece, movePiece, planChanged, pushHistory, redoHistory, setCrossfadeAfter, setTransitionKindAfter,
+  DEFAULT_LEVEL_STEPS, DEFAULT_LIMITS, addPiece, addTitle, applyBalance, canRedo, canUndo, crossfadeAfter, currentBalance, deletePiece, movePiece, planChanged, pushHistory, redoHistory, setCrossfadeAfter, setTransitionKindAfter, updateTitle, removeTitle,
   setFadeIn, setFadeOut, snap, splitAt, startHistory, toPlan, trimEndBy, trimStartBy, undoHistory,
 } from "./track-studio-edit";
 import { setLaneLevel, setLaneMuted, setPieceLevel } from "./track-studio-model";
@@ -73,6 +73,24 @@ describe("delete", () => {
   });
   test("a missing piece is refused with a line", () => {
     expect(deletePiece(base(), "zzz").ok).toBe(false);
+  });
+});
+
+describe("titles", () => {
+  test("add, update with limits and film end, remove, undo and redo", () => {
+    const baseState = base();
+    const added = addTitle(baseState, 99);
+    expect(added.titles[0]).toMatchObject({ text: "Title", at_s: 9, len_s: 3, position: "bottom" });
+    expect(planChanged(baseState, added)).toBe(true);
+    const history = startHistory(baseState);
+    const addedHistory = pushHistory(history, added);
+    expect(undoHistory(addedHistory).present.titles).toEqual([]);
+    expect(redoHistory(undoHistory(addedHistory)).present.titles).toEqual(added.titles);
+    const edited = updateTitle(added, added.titles[0]!.id, { text: "x".repeat(130), at_s: 99, len_s: 99 });
+    expect(edited.titles[0]).toMatchObject({ text: "x".repeat(120), at_s: 2, len_s: 10 });
+    expect(removeTitle(edited, edited.titles[0]!.id).titles).toEqual([]);
+    expect(toPlan(baseState).titles).toBeUndefined();
+    expect(toPlan(added).titles).toEqual([{ text: "Title", from_s: 9, to_s: 12, position: "bottom" }]);
   });
 });
 
