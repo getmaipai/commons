@@ -728,9 +728,9 @@
     },
     "default": "auto",
     "label": "Router",
-    "help": "Choose the model for the Router role. Auto follows the selected setup plan. Only an admin can change this.",
+    "help": "Decides which helper should handle each request. Only an admin can change this.",
     "copy": {
-      "does": "Directs router work to its selected package."
+      "does": "Decides which helper handles each request."
     },
     "level": "basic",
     "secret": false,
@@ -748,9 +748,9 @@
     },
     "default": "auto",
     "label": "Search and memory",
-    "help": "Choose the model for the Embed role. Auto follows the selected setup plan. Only an admin can change this.",
+    "help": "Finds your notes, pages and memories by meaning. Auto follows the setup plan. Only an admin can change this.",
     "copy": {
-      "does": "Directs embed work to its selected package."
+      "does": "Finds notes, pages and memories by meaning."
     },
     "level": "basic",
     "secret": false,
@@ -768,9 +768,9 @@
     },
     "default": "auto",
     "label": "Rerank",
-    "help": "Choose the model for the Rerank role. Auto follows the selected setup plan. Only an admin can change this.",
+    "help": "Puts the best search results first. Auto follows the setup plan. Only an admin can change this.",
     "copy": {
-      "does": "Directs rerank work to its selected package."
+      "does": "Puts the best search results first."
     },
     "level": "basic",
     "secret": false,
@@ -894,9 +894,9 @@
     },
     "default": "auto",
     "label": "Judge",
-    "help": "Choose the model for the Judge role. Auto follows the selected setup plan. Only an admin can change this.",
+    "help": "Checks whether an answer is good enough before it is shown. Auto follows the setup plan. Only an admin can change this.",
     "copy": {
-      "does": "Directs judge work to its selected package."
+      "does": "Checks that an answer is good enough before it is shown."
     },
     "level": "basic",
     "secret": false,
@@ -917,9 +917,9 @@
     },
     "default": "auto",
     "label": "Speaking",
-    "help": "Choose the model for the Tts role. Auto follows the selected setup plan. Only an admin can change this.",
+    "help": "Speaks answers out loud. Auto follows the setup plan. Only an admin can change this.",
     "copy": {
-      "does": "Directs tts work to its selected package.",
+      "does": "Speaks answers out loud.",
       "options": {
         "off": "Off: Home will not speak replies aloud."
       }
@@ -943,9 +943,9 @@
     },
     "default": "auto",
     "label": "Listening",
-    "help": "Choose the model for the Stt role. Auto follows the selected setup plan. Only an admin can change this.",
+    "help": "Turns what people say into text. Auto follows the setup plan. Only an admin can change this.",
     "copy": {
-      "does": "Directs stt work to its selected package.",
+      "does": "Turns what people say into text.",
       "options": {
         "off": "Off: Home will not listen to speech."
       }
@@ -966,9 +966,9 @@
     },
     "default": "auto",
     "label": "Wake word",
-    "help": "Choose the model for the Wakeword role. Auto follows the selected setup plan. Only an admin can change this.",
+    "help": "Hears the phrase that wakes Home on speakers and robots. Auto follows the setup plan. Only an admin can change this.",
     "copy": {
-      "does": "Directs wakeword work to its selected package."
+      "does": "Hears the phrase that wakes Home on speakers and robots."
     },
     "level": "basic",
     "secret": false,
@@ -986,9 +986,9 @@
     },
     "default": "auto",
     "label": "Turn signal",
-    "help": "Choose the model for the Turn Signal role. Auto follows the selected setup plan. Only an admin can change this.",
+    "help": "Notices when a person has finished speaking. Auto follows the setup plan. Only an admin can change this.",
     "copy": {
-      "does": "Directs turn signal work to its selected package."
+      "does": "Notices when a person has finished speaking."
     },
     "level": "basic",
     "secret": false,
