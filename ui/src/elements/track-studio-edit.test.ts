@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { filmLength, findPiece, laneOf, layoutLane, pieceDuration, pieceEnvelope, readState, gainAt, MIN_PIECE_S, type StudioPiece, type StudioState } from "./track-studio-model";
 import {
-  DEFAULT_LEVEL_STEPS, DEFAULT_LIMITS, addPiece, applyBalance, canRedo, canUndo, crossfadeAfter, currentBalance, deletePiece, movePiece, planChanged, pushHistory, redoHistory, setCrossfadeAfter,
+  DEFAULT_LEVEL_STEPS, DEFAULT_LIMITS, addPiece, applyBalance, canRedo, canUndo, crossfadeAfter, currentBalance, deletePiece, movePiece, planChanged, pushHistory, redoHistory, setCrossfadeAfter, setTransitionKindAfter,
   setFadeIn, setFadeOut, snap, splitAt, startHistory, toPlan, trimEndBy, trimStartBy, undoHistory,
 } from "./track-studio-edit";
 import { setLaneLevel, setLaneMuted, setPieceLevel } from "./track-studio-model";
@@ -182,6 +182,17 @@ describe("plan", () => {
     expect(plan.voice.pieces[0]).toMatchObject({ ref: "v", start_s: 2, in_s: 0, out_s: 3 });
     expect(plan.film_s).toBe(11.5);
     expect(JSON.stringify(plan)).not.toContain("/f/");
+  });
+  test("blend keeps the old plan kind and a selected wipe exports its own kind", () => {
+    const blended = setCrossfadeAfter(base(), "a", 0.5);
+    expect(toPlan(blended).video.transitions[0]).toEqual({ kind: "crossfade", seconds: 0.5 });
+    const wiped = setTransitionKindAfter(blended, "a", "wipeleft");
+    expect(toPlan(wiped).video.transitions[0]).toEqual({ kind: "wipeleft", seconds: 0.5 });
+    expect(planChanged(blended, wiped)).toBe(true);
+    expect(laneOf(setCrossfadeAfter(wiped, "a", 0), "video").pieces[1]!.transition_kind).toBeUndefined();
+  });
+  test("unknown transition kinds are ignored while reading", () => {
+    expect(laneOf(readState([{ id: "video", pieces: [piece("a"), { ...piece("b"), transition_kind: "warp" }] }]), "video").pieces[1]!.transition_kind).toBeUndefined();
   });
   test("mute and lane level ride in the plan", () => {
     const plan = toPlan(setLaneMuted(setLaneLevel(base(), "music", -3), "music", true));

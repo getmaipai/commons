@@ -26,12 +26,12 @@ import { THUMB_STEP_S, decodePeaks, fetchGivenPeaks, makeThumbnails, sliceBars }
 import { resolveCompare, type StudioCompare } from "./track-studio-compare";
 import { StudioCompareBar } from "./track-studio-compare-bar";
 import {
-  CROSSFADE_MAX_S, FADE_MAX_S, LEVEL_DB_MAX, LEVEL_DB_MIN, MIN_PIECE_S, effectiveCrossfade, filmLength, findPiece, formatTime, laneOf, layoutLane, pieceDuration, pieceEnvelope, readState, rulerTicks,
+  CROSSFADE_MAX_S, FADE_MAX_S, LEVEL_DB_MAX, LEVEL_DB_MIN, MIN_PIECE_S, STUDIO_TRANSITION_KINDS, STUDIO_TRANSITION_LABELS, effectiveCrossfade, filmLength, findPiece, formatTime, laneOf, layoutLane, pieceDuration, pieceEnvelope, readState, rulerTicks,
   isStemLane, setDuck, setLaneLevel, setLaneMuted, setPieceLevel, spokenTime, type LaneId, type StudioLane, type StudioPiece, type StudioState,
 } from "./track-studio-model";
 import {
-  DEFAULT_LEVEL_STEPS, DEFAULT_LIMITS, addPiece, applyBalance, canRedo, canUndo, crossfadeAfter, currentBalance, deletePiece, movePiece, planChanged, pushHistory,
-  redoHistory, resetPieceFades, resetPieceVolume, setCrossfadeAfter, setFadeIn, setFadeOut, snap, snapEdges, splitAt, startHistory, toPlan, trimEndBy, trimStartBy, undoHistory,
+  DEFAULT_LEVEL_STEPS, DEFAULT_LIMITS, addPiece, applyBalance, canRedo, canUndo, crossfadeAfter, currentBalance, deletePiece, movePiece, planChanged, pushHistory, transitionKindAfter,
+  redoHistory, resetPieceFades, resetPieceVolume, setCrossfadeAfter, setTransitionKindAfter, setFadeIn, setFadeOut, snap, snapEdges, splitAt, startHistory, toPlan, trimEndBy, trimStartBy, undoHistory,
   type EditResult, type History, type LevelStep, type StudioLimits, type StudioPlan,
 } from "./track-studio-edit";
 import { i18n, kitLocaleTag } from "@/kit/i18n";
@@ -420,7 +420,7 @@ function StudioBody(props: TrackStudioProps) {
       body: <FadesPanel selected={sel} state={state} commit={commit} />,
     },
     crossfade: {
-      title: i18n._({ id: "ui.Crossfade", message: "Crossfade" }),
+      title: i18n._({ id: "ui.Transition", message: "Transition" }),
       reset: () => selected && commit(setCrossfadeAfter(state, selected, 0)),
       body: <CrossfadePanel state={state} selected={sel} commit={commit} />,
     },
@@ -692,6 +692,7 @@ function FadesPanel({ state, selected, commit }: { state: StudioState; selected:
 
 function CrossfadePanel({ state, selected, commit }: { state: StudioState; selected: ReturnType<typeof findPiece>; commit: (s: StudioState, key?: string) => void }) {
   const x = selected ? crossfadeAfter(state, selected.piece.id) : null;
+  const kind = selected ? transitionKindAfter(state, selected.piece.id) : null;
   const ready = x !== null;
   return (
     <>
@@ -699,7 +700,12 @@ function CrossfadePanel({ state, selected, commit }: { state: StudioState; selec
       <Field label={i18n._({ id: "ui.Length at the seam", message: "Length at the seam" })} value={ready ? (x === 0 ? i18n._({ id: "ui.Cut", message: "Cut" }) : secText(x)) : "—"}>
         <Slider min={0} max={CROSSFADE_MAX_S} step={0.1} value={[x ?? 0]} disabled={!ready} aria-label={i18n._({ id: "ui.Crossfade length, seconds", message: "Crossfade length, seconds" })} onValueChange={([v]) => ready && commit(setCrossfadeAfter(state, selected!.piece.id, v ?? 0), `x:${selected!.piece.id}`)} />
       </Field>
-      <p className="text-muted-foreground text-sm">{i18n._({ id: "ui.Blends the two pictures and their sound where they meet. 0.3 to 1 second; 0 is a cut. The preview cuts the picture; the export dissolves it.", message: "Blends the two pictures and their sound where they meet. 0.3 to 1 second; 0 is a cut. The preview cuts the picture; the export dissolves it." })}</p>
+      <div role="radiogroup" aria-label={i18n._({ id: "ui.Transition kind", message: "Transition kind" })} className="flex flex-wrap gap-1.5">
+        {STUDIO_TRANSITION_KINDS.map(({ kind: option }) => (
+          <Button key={option} variant={kind === option ? "default" : "secondary"} size="sm" role="radio" aria-checked={kind === option} disabled={!ready || x === 0} className="rounded-full px-3" onClick={() => selected && commit(setTransitionKindAfter(state, selected.piece.id, option), `x:${selected.piece.id}`)}>{STUDIO_TRANSITION_LABELS[option]}</Button>
+        ))}
+      </div>
+      <p className="text-muted-foreground text-sm">{i18n._({ id: "ui.Blends or wipes the two pictures where they meet. 0.3 to 1 second; 0 is a cut. The preview cuts the picture; the export shows the effect.", message: "Blends or wipes the two pictures where they meet. 0.3 to 1 second; 0 is a cut. The preview cuts the picture; the export shows the effect." })}</p>
     </>
   );
 }

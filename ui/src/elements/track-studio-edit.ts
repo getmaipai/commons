@@ -4,7 +4,7 @@
 import { i18n } from "@/kit/i18n"
 import {
   FADE_MAX_S, LEVEL_DB_MAX, LEVEL_DB_MIN, MIN_PIECE_S, clamp, effectiveCrossfade, filmLength, findPiece, laneOf, layoutLane, mapLane, mapPiece, normalizeCrossfade,
-  pieceAt, pieceDuration, round, isStemLane, type LaneId, type StemLaneId, type StudioPiece, type StudioState,
+  pieceAt, pieceDuration, round, isStemLane, type LaneId, type StemLaneId, type StudioPiece, type StudioState, type StudioTransitionKind,
 } from "./track-studio-model";
 
 export interface StudioLimits {
@@ -151,7 +151,19 @@ export function setCrossfadeAfter(state: StudioState, pieceId: string, s: number
   if (!found || found.lane.id !== "video") return state;
   const next = found.lane.pieces[found.index + 1];
   if (!next) return state;
-  return mapPiece(state, next.id, (p) => ({ ...p, crossfade_s: normalizeCrossfade(s) }));
+  return mapPiece(state, next.id, (p) => { const crossfade_s = normalizeCrossfade(s); return { ...p, crossfade_s, ...(crossfade_s === 0 ? { transition_kind: undefined } : {}) }; });
+}
+/** Set the effect at the seam AFTER `pieceId`; a cut has no transition kind. */
+export function setTransitionKindAfter(state: StudioState, pieceId: string, kind: StudioTransitionKind): StudioState {
+  const found = findPiece(state, pieceId);
+  if (!found || found.lane.id !== "video" || !found.lane.pieces[found.index + 1] || found.lane.pieces[found.index + 1]!.crossfade_s === 0) return state;
+  return mapPiece(state, found.lane.pieces[found.index + 1]!.id, (p) => ({ ...p, transition_kind: kind === "fade" ? undefined : kind }));
+}
+export function transitionKindAfter(state: StudioState, pieceId: string): StudioTransitionKind | null {
+  const found = findPiece(state, pieceId);
+  if (!found || found.lane.id !== "video") return null;
+  const next = found.lane.pieces[found.index + 1];
+  return next ? next.transition_kind ?? "fade" : null;
 }
 export function crossfadeAfter(state: StudioState, pieceId: string): number | null {
   const found = findPiece(state, pieceId);
@@ -224,12 +236,13 @@ export interface PlanLanePiece { ref: string; in_s: number; out_s: number; start
 export interface StudioPlan {
   version: 1;
   film_s: number;
-  video: { level_db: number; muted: boolean; pieces: PlanPiece[]; transitions: { kind: "cut" | "crossfade"; seconds: number }[] };
+  video: { level_db: number; muted: boolean; pieces: PlanPiece[]; transitions: PlanTransition[] };
   voice: { level_db: number; muted: boolean; pieces: PlanLanePiece[] };
   music: { level_db: number; muted: boolean; pieces: PlanLanePiece[] };
   /** MP-03: an audio studio's stem lanes, present only when the studio has any (a video plan is unchanged). */
   stems?: { id: StemLaneId; level_db: number; muted: boolean; pieces: PlanLanePiece[] }[];
 }
+export type PlanTransition = { kind: "cut" | "crossfade" | Exclude<StudioTransitionKind, "fade">; seconds: number };
 
 export function toPlan(state: StudioState): StudioPlan {
   const video = laneOf(state, "video");
@@ -251,7 +264,7 @@ export function toPlan(state: StudioState): StudioPlan {
       pieces: video.pieces.map((p): PlanPiece => ({ ref: p.ref, in_s: p.in_s, out_s: p.out_s, level_db: p.level_db, fade_in_s: p.fade_in_s, fade_out_s: p.fade_out_s })),
       transitions: video.pieces.slice(1).map((p, i) => {
         const x = effectiveCrossfade(video.pieces[i]!, p);
-        return x > 0 ? { kind: "crossfade" as const, seconds: round(x, 1) } : { kind: "cut" as const, seconds: 0 };
+        return x > 0 ? { kind: (p.transition_kind === undefined || p.transition_kind === "fade" ? "crossfade" : p.transition_kind), seconds: round(x, 1) } : { kind: "cut", seconds: 0 };
       }),
     },
     voice: audio("voice"),

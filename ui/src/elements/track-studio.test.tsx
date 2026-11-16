@@ -140,9 +140,9 @@ describe("what is drawn", () => {
     expect(getByRole("button", { name: /Loop/ })).toBeTruthy();
     expect(container.querySelector(`section[aria-label="Volume"]`)).toBeTruthy();
     const panelChoice = getByRole("radiogroup", { name: "Panel" });
-    for (const panel of ["Volume", "Fades", "Crossfade", "Level"]) expect(within(panelChoice).getByRole("radio", { name: panel })).toBeTruthy();
-    fireEvent.click(within(panelChoice).getByRole("radio", { name: "Crossfade" }));
-    expect(container.querySelector(`section[aria-label="Crossfade"]`)).toBeTruthy();
+    for (const panel of ["Volume", "Fades", "Transition", "Level"]) expect(within(panelChoice).getByRole("radio", { name: panel })).toBeTruthy();
+    fireEvent.click(within(panelChoice).getByRole("radio", { name: "Transition" }));
+    expect(container.querySelector(`section[aria-label="Transition"]`)).toBeTruthy();
     expect(container.querySelector(`section[aria-label="Volume"]`)).toBeNull();
     expect(container.textContent).toContain(HELP_LINE);
     expect(container.textContent).toContain(PREVIEW_LINE);
@@ -354,10 +354,10 @@ describe("the Edit tools and panels", () => {
     expect(getByRole("slider", { name: "Fade out, seconds" }).getAttribute("aria-valuenow")).toBe("5");
     expect(container.querySelector("[data-lane='music'] [data-fades]")).toBeTruthy();
   });
-  test("Crossfade: a clip with another after it has a length; the last clip says to pick another; the plan carries the seam", async () => {
+  test("Transition: kinds are selectable and a cut disables the picker", async () => {
     const onPlanChange = mock((_p: StudioPlan, _c: boolean) => undefined);
     const { container, getByRole, getByText } = open({ onPlanChange });
-    fireEvent.click(getByRole("radio", { name: "Crossfade" }));
+    fireEvent.click(getByRole("radio", { name: "Transition" }));
     fireEvent.click(pieces(container, "video")[2]!);
     expect(getByText("Pick a clip that has another clip after it.")).toBeTruthy();
     expect((getByRole("slider", { name: "Crossfade length, seconds" }) as HTMLElement).getAttribute("aria-disabled") ?? (getByRole("slider", { name: "Crossfade length, seconds" }) as HTMLElement).getAttribute("data-disabled")).not.toBeNull();
@@ -365,8 +365,12 @@ describe("the Edit tools and panels", () => {
     const x = getByRole("slider", { name: "Crossfade length, seconds" });
     key(x, "End");
     expect(container.querySelector("[data-seam]")).toBeTruthy();
+    expect(getByRole("radio", { name: "Blend" })).toBeTruthy();
+    expect(getByRole("radio", { name: "Wipe left" })).toBeTruthy();
+    fireEvent.click(getByRole("radio", { name: "Wipe left" }));
     const plan = onPlanChange.mock.calls.at(-1)![0];
-    expect(plan.video.transitions[0]).toEqual({ kind: "crossfade", seconds: 1 });
+    expect(plan.video.transitions[0]).toEqual({ kind: "wipeleft", seconds: 1 });
+    expect(onPlanChange.mock.calls.at(-1)![1]).toBe(true);
     expect(plan.film_s).toBe(13 - 1);
   });
   test("Level: five balances; choosing one sets every piece; the chosen one is checked", async () => {

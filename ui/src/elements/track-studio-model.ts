@@ -21,6 +21,19 @@ export const MIN_PIECE_S = 0.2;
 /** A crossfade is a cut (0) or 0.3 to 1 second (the Stack's `crossfade` op). */
 export const CROSSFADE_MIN_S = 0.3;
 export const CROSSFADE_MAX_S = 1;
+export const STUDIO_TRANSITION_KINDS = [
+  { kind: "fade", label: "Blend" }, { kind: "dissolve", label: "Dissolve" }, { kind: "wipeleft", label: "Wipe left" }, { kind: "wiperight", label: "Wipe right" },
+  { kind: "wipeup", label: "Wipe up" }, { kind: "wipedown", label: "Wipe down" }, { kind: "slideleft", label: "Slide left" }, { kind: "slideright", label: "Slide right" },
+  { kind: "slideup", label: "Slide up" }, { kind: "slidedown", label: "Slide down" }, { kind: "circleopen", label: "Circle open" }, { kind: "circleclose", label: "Circle close" },
+  { kind: "fadeblack", label: "Dip to black" }, { kind: "fadewhite", label: "Dip to white" }, { kind: "zoomin", label: "Zoom in" }, { kind: "pixelize", label: "Pixelate" },
+] as const;
+export const STUDIO_TRANSITION_LABELS = {
+  fade: i18n._({ id: "ui.Blend", message: "Blend" }), dissolve: i18n._({ id: "ui.Dissolve", message: "Dissolve" }), wipeleft: i18n._({ id: "ui.Wipe left", message: "Wipe left" }), wiperight: i18n._({ id: "ui.Wipe right", message: "Wipe right" }),
+  wipeup: i18n._({ id: "ui.Wipe up", message: "Wipe up" }), wipedown: i18n._({ id: "ui.Wipe down", message: "Wipe down" }), slideleft: i18n._({ id: "ui.Slide left", message: "Slide left" }), slideright: i18n._({ id: "ui.Slide right", message: "Slide right" }),
+  slideup: i18n._({ id: "ui.Slide up", message: "Slide up" }), slidedown: i18n._({ id: "ui.Slide down", message: "Slide down" }), circleopen: i18n._({ id: "ui.Circle open", message: "Circle open" }), circleclose: i18n._({ id: "ui.Circle close", message: "Circle close" }),
+  fadeblack: i18n._({ id: "ui.Dip to black", message: "Dip to black" }), fadewhite: i18n._({ id: "ui.Dip to white", message: "Dip to white" }), zoomin: i18n._({ id: "ui.Zoom in", message: "Zoom in" }), pixelize: i18n._({ id: "ui.Pixelate", message: "Pixelate" }),
+};
+export type StudioTransitionKind = typeof STUDIO_TRANSITION_KINDS[number]["kind"];
 export const LEVEL_DB_MIN = -24;
 export const LEVEL_DB_MAX = 12;
 export const FADE_MAX_S = 5;
@@ -45,6 +58,8 @@ export interface StudioPiece {
   fade_out_s: number;
   /** Video pieces after the first: seconds this piece overlaps the one before it (0 is a cut). */
   crossfade_s: number;
+  /** Optional video transition after this piece; absent means blend (the historical crossfade). */
+  transition_kind?: StudioTransitionKind;
   /** A music piece: lower it under speech. */
   duck: boolean;
   /** Sound pieces: the host's own waveform of the whole source (0 to 1, about 400 to 800 values), so the browser need not decode it; or a JSON file of them. */
@@ -90,7 +105,7 @@ export const pieceDuration = (p: Pick<StudioPiece, "in_s" | "out_s">): number =>
 
 export interface RawPiece {
   id?: unknown; ref?: unknown; src?: unknown; label?: unknown; poster?: unknown; in_s?: unknown; out_s?: unknown; source_s?: unknown; at_s?: unknown;
-  level_db?: unknown; fade_in_s?: unknown; fade_out_s?: unknown; crossfade_s?: unknown; duck?: unknown; peaks?: unknown; peaks_url?: unknown;
+  level_db?: unknown; fade_in_s?: unknown; fade_out_s?: unknown; crossfade_s?: unknown; transition_kind?: unknown; duck?: unknown; peaks?: unknown; peaks_url?: unknown;
 }
 export interface RawLane { id?: unknown; label?: unknown; hue?: unknown; level_db?: unknown; muted?: unknown; pieces?: unknown }
 
@@ -118,6 +133,7 @@ export function readPiece(raw: RawPiece, fallbackId: string): StudioPiece | null
     fade_in_s: clamp(finite(raw.fade_in_s, 0), 0, Math.min(FADE_MAX_S, dur)),
     fade_out_s: clamp(finite(raw.fade_out_s, 0), 0, Math.min(FADE_MAX_S, dur)),
     crossfade_s: normalizeCrossfade(finite(raw.crossfade_s, 0)),
+    ...(STUDIO_TRANSITION_KINDS.some(({ kind }) => kind === raw.transition_kind) ? { transition_kind: raw.transition_kind as StudioTransitionKind } : {}),
     duck: raw.duck === true,
     ...givenPeaks(raw),
   };
@@ -143,7 +159,7 @@ export function readState(rawLanes: unknown): StudioState {
       const piece = p && typeof p === "object" ? readPiece(p, `${id}-${i + 1}`) : null;
       if (piece && !pieces.some((q) => q.id === piece.id)) pieces.push(piece);
     });
-    if (id === "video" && pieces[0]) pieces[0] = { ...pieces[0], crossfade_s: 0 };
+    if (id === "video" && pieces[0]) pieces[0] = { ...pieces[0], crossfade_s: 0, transition_kind: undefined };
     return {
       id,
       label: typeof raw?.label === "string" && raw.label ? raw.label : laneDefaults()[id].label,

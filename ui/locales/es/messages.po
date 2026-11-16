@@ -63,7 +63,7 @@ msgstr "{count, plural, one {# app} other {# apps}}"
 
 #. js-lingui-explicit-id
 #: src/elements/adult-lock.tsx:218
-#: src/elements/track-studio-model.ts:324
+#: src/elements/track-studio-model.ts:340
 #, needs-review
 msgid "ui.{count, plural, one {# minute} other {# minutes}}"
 msgstr "{count, plural, one {# minuto} other {# minutos}}"
@@ -76,7 +76,7 @@ msgstr "{count, plural, one {# notificación} other {# notificaciones}}"
 
 #. js-lingui-explicit-id
 #: src/elements/adult-lock.tsx:216
-#: src/elements/track-studio-model.ts:325
+#: src/elements/track-studio-model.ts:341
 #, needs-review
 msgid "ui.{count, plural, one {# second} other {# seconds}}"
 msgstr "{count, plural, one {# segundo} other {# segundos}}"
@@ -133,8 +133,8 @@ msgstr "{creatorName}, abre el perfil"
 
 #. js-lingui-explicit-id
 #: src/elements/question-flow.tsx:49
-#: src/elements/track-studio.tsx:766
-#: src/elements/track-studio.tsx:820
+#: src/elements/track-studio.tsx:772
+#: src/elements/track-studio.tsx:826
 #, needs-review
 msgid "ui.{current} of {total}"
 msgstr "{current} de {total}"
@@ -255,13 +255,13 @@ msgid "ui.{label}?"
 msgstr "{label}?"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:924
+#: src/elements/track-studio.tsx:930
 #, needs-review
 msgid "ui.{lane} {number}"
 msgstr "{lane} {number}"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:876
+#: src/elements/track-studio.tsx:882
 #, needs-review
 msgid "ui.{lane} level, decibels"
 msgstr "Nivel de {lane}, decibelios"
@@ -273,19 +273,19 @@ msgid "ui.{lane} piece"
 msgstr "Pieza de {lane}"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:994
+#: src/elements/track-studio.tsx:1000
 #, needs-review
 msgid "ui.{lane} piece {position} of {count}, {label}, {time}"
 msgstr "Pieza de {lane} {position} de {count}, {label}, {time}"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:994
+#: src/elements/track-studio.tsx:1000
 #, needs-review
 msgid "ui.{lane} piece {position} of {count}, {label}, {time}, selected"
 msgstr "Pieza de {lane} {position} de {count}, {label}, {time}, seleccionada"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:882
+#: src/elements/track-studio.tsx:888
 #, needs-review
 msgid "ui.{lane} pieces"
 msgstr "Piezas de {lane}"
@@ -303,7 +303,7 @@ msgid "ui.{max} characters each, {total} in all ({used} used)"
 msgstr "{max} caracteres cada uno, {total} en total ({used} usados)"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio-model.ts:326
+#: src/elements/track-studio-model.ts:342
 #, needs-review
 msgid "ui.{minutes} {seconds}"
 msgstr "{minutes} {seconds}"
@@ -604,7 +604,7 @@ msgid "ui.+{resumedTokens} tokens"
 msgstr "+{resumedTokens} tokens"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio-model.ts:74
+#: src/elements/track-studio-model.ts:89
 #, needs-review
 msgid "ui.1. Video"
 msgstr "1. Vídeo"
@@ -616,7 +616,7 @@ msgid "ui.10-Day Forecast"
 msgstr "Pronóstico a 10 días"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio-model.ts:75
+#: src/elements/track-studio-model.ts:90
 #, needs-review
 msgid "ui.2. Voice"
 msgstr "2. Voz"
@@ -628,7 +628,7 @@ msgid "ui.2x speed"
 msgstr "Velocidad 2x"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio-model.ts:76
+#: src/elements/track-studio-model.ts:91
 #, needs-review
 msgid "ui.3. Music"
 msgstr "3. Música"
@@ -1130,7 +1130,7 @@ msgid "ui.At a glance"
 msgstr "De un vistazo"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:698
+#: src/elements/track-studio.tsx:699
 #, needs-review
 msgid "ui.At the seam after {name}."
 msgstr "En la costura después de {name}."
@@ -1149,7 +1149,7 @@ msgid "ui.Attachment preview"
 msgstr "Vista previa del adjunto"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:752
+#: src/elements/track-studio.tsx:758
 msgid "ui.Attack"
 msgstr ""
 
@@ -1229,7 +1229,7 @@ msgid "ui.Band name"
 msgstr "Nombre de la banda"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio-model.ts:72
+#: src/elements/track-studio-model.ts:87
 #: src/elements/track-studio.tsx:109
 msgid "ui.Bass"
 msgstr ""
@@ -1258,10 +1258,14 @@ msgid "ui.Black or white"
 msgstr "Negro o blanco"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:702
-#, needs-review
-msgid "ui.Blends the two pictures and their sound where they meet. 0.3 to 1 second; 0 is a cut. The preview cuts the picture; the export dissolves it."
-msgstr "Mezcla las dos imágenes y su sonido donde se encuentran. De 0.3 a 1 segundo; 0 es un corte. La vista previa corta la imagen; la exportación la disuelve."
+#: src/elements/track-studio-model.ts:31
+msgid "ui.Blend"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/elements/track-studio.tsx:708
+msgid "ui.Blends or wipes the two pictures where they meet. 0.3 to 1 second; 0 is a cut. The preview cuts the picture; the export shows the effect."
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/settings/groupSettings.ts:25
@@ -1535,6 +1539,16 @@ msgid "ui.Choose who in your home can see this. Nothing is sent outside your hom
 msgstr "Elige quién en tu hogar puede ver esto. Nada se envía fuera de tu hogar y puedes detenerlo cuando quieras."
 
 #. js-lingui-explicit-id
+#: src/elements/track-studio-model.ts:33
+msgid "ui.Circle close"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/elements/track-studio-model.ts:33
+msgid "ui.Circle open"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/elements/composer-parts.tsx:533
 #: src/elements/image-editor.tsx:1224
 #: src/elements/image-editor.tsx:1254
@@ -1748,27 +1762,27 @@ msgid "ui.Compressor"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:752
+#: src/elements/track-studio.tsx:758
 msgid "ui.Compressor attack, milliseconds"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:754
+#: src/elements/track-studio.tsx:760
 msgid "ui.Compressor makeup gain, decibels"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:751
+#: src/elements/track-studio.tsx:757
 msgid "ui.Compressor ratio"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:753
+#: src/elements/track-studio.tsx:759
 msgid "ui.Compressor release, milliseconds"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:750
+#: src/elements/track-studio.tsx:756
 msgid "ui.Compressor threshold, decibels"
 msgstr ""
 
@@ -2102,13 +2116,7 @@ msgid "ui.Cropped to {width} x {height}"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:423
-#, needs-review
-msgid "ui.Crossfade"
-msgstr "Fundido cruzado"
-
-#. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:700
+#: src/elements/track-studio.tsx:701
 #, needs-review
 msgid "ui.Crossfade length, seconds"
 msgstr "Duración del fundido cruzado, segundos"
@@ -2127,7 +2135,7 @@ msgid "ui.Current temperature"
 msgstr "Temperatura actual"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:699
+#: src/elements/track-studio.tsx:700
 #, needs-review
 msgid "ui.Cut"
 msgstr "Corte"
@@ -2291,6 +2299,16 @@ msgid "ui.Digit {position} of {total}, filled"
 msgstr "Dígito {position} de {total}, lleno"
 
 #. js-lingui-explicit-id
+#: src/elements/track-studio-model.ts:34
+msgid "ui.Dip to black"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/elements/track-studio-model.ts:34
+msgid "ui.Dip to white"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/elements/album.tsx:36
 #: src/elements/band.tsx:36
 #: src/elements/song-style.tsx:20
@@ -2339,6 +2357,11 @@ msgstr "Descartar cotización"
 #, needs-review
 msgid "ui.Displays the mobile sidebar."
 msgstr "Muestra la barra lateral móvil."
+
+#. js-lingui-explicit-id
+#: src/elements/track-studio-model.ts:31
+msgid "ui.Dissolve"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/media-viewer.tsx:126
@@ -2422,7 +2445,7 @@ msgid "ui.Drag the handles at each end to trim. Press S to cut at the playhead."
 msgstr "Arrastra los tiradores en cada extremo para recortar. Pulsa S para cortar en el cabezal de reproducción."
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio-model.ts:71
+#: src/elements/track-studio-model.ts:86
 #: src/elements/track-studio.tsx:109
 msgid "ui.Drums"
 msgstr ""
@@ -2565,7 +2588,7 @@ msgid "ui.End the call"
 msgstr "Terminar la llamada"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:1020
+#: src/elements/track-studio.tsx:1026
 #, needs-review
 msgid "ui.Ends {time} into the file"
 msgstr "Termina a {time} dentro del archivo"
@@ -2619,7 +2642,7 @@ msgid "ui.EQ"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:729
+#: src/elements/track-studio.tsx:735
 msgid "ui.EQ {band}, gain in decibels"
 msgstr ""
 
@@ -2905,7 +2928,7 @@ msgid "ui.Fix light and colour for me"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:734
+#: src/elements/track-studio.tsx:740
 msgid "ui.Flat. Move a band to shape the sound. You hear it in the preview; the saved song changes when you apply it."
 msgstr ""
 
@@ -3208,7 +3231,7 @@ msgid "ui.How can I help you today?"
 msgstr "¿Cómo puedo ayudarte hoy?"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:716
+#: src/elements/track-studio.tsx:722
 #, needs-review
 msgid "ui.How loud the voice and music sit against the clip's own sound."
 msgstr "Cuánto suben la voz y la música sobre el sonido propio del clip."
@@ -3545,7 +3568,7 @@ msgid "ui.Leaf"
 msgstr "Hoja"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:699
+#: src/elements/track-studio.tsx:700
 #, needs-review
 msgid "ui.Length at the seam"
 msgstr "Longitud en la costura"
@@ -3565,7 +3588,7 @@ msgstr "Permite que las personas de este hogar adjunten fotos a un mensaje."
 #. js-lingui-explicit-id
 #: src/elements/track-studio.tsx:428
 #: src/elements/track-studio.tsx:664
-#: src/elements/track-studio.tsx:711
+#: src/elements/track-studio.tsx:717
 #, needs-review
 msgid "ui.Level"
 msgstr "Nivel"
@@ -3744,7 +3767,7 @@ msgid "ui.Look"
 msgstr "Apariencia"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:1519
+#: src/primitives/Player.tsx:1520
 #, needs-review
 msgid "ui.Looking for lyrics..."
 msgstr "Buscando letra..."
@@ -3879,7 +3902,7 @@ msgid "ui.Make the video from this"
 msgstr "Crear el video desde esto"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:754
+#: src/elements/track-studio.tsx:760
 msgid "ui.Makeup"
 msgstr ""
 
@@ -4139,7 +4162,7 @@ msgid "ui.Mute"
 msgstr "Silenciar"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:872
+#: src/elements/track-studio.tsx:878
 #, needs-review
 msgid "ui.Mute {lane}"
 msgstr "Silenciar {lane}"
@@ -4323,7 +4346,7 @@ msgid "ui.No"
 msgstr "No"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:897
+#: src/elements/track-studio.tsx:903
 msgid "ui.No {lane} yet."
 msgstr ""
 
@@ -4353,7 +4376,7 @@ msgid "ui.No chats yet"
 msgstr "Aún no hay chats"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:897
+#: src/elements/track-studio.tsx:903
 #, needs-review
 msgid "ui.No clip."
 msgstr "Sin clip."
@@ -4389,7 +4412,7 @@ msgid "ui.No matching items"
 msgstr "No hay elementos que coincidan"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:897
+#: src/elements/track-studio.tsx:903
 #, needs-review
 msgid "ui.No music yet."
 msgstr "Aún no hay música."
@@ -4489,7 +4512,7 @@ msgid "ui.No transcript for this episode yet."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:897
+#: src/elements/track-studio.tsx:903
 #, needs-review
 msgid "ui.No voice yet."
 msgstr "Aún no hay voz."
@@ -4705,7 +4728,7 @@ msgid "ui.Off"
 msgstr "Apagado"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:755
+#: src/elements/track-studio.tsx:761
 msgid "ui.Off. Raise the ratio above 1 to turn it on. You hear it in the preview; the saved song changes when you apply it."
 msgstr ""
 
@@ -4922,7 +4945,7 @@ msgid "ui.Original picture"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio-model.ts:73
+#: src/elements/track-studio-model.ts:88
 #: src/elements/track-studio.tsx:109
 msgid "ui.Other"
 msgstr ""
@@ -5106,7 +5129,7 @@ msgid "ui.pick"
 msgstr "elige"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:698
+#: src/elements/track-studio.tsx:699
 #, needs-review
 msgid "ui.Pick a clip that has another clip after it."
 msgstr "Elige un clip que tenga otro clip después."
@@ -5229,6 +5252,11 @@ msgid "ui.Pinned apps"
 msgstr "Apps fijadas"
 
 #. js-lingui-explicit-id
+#: src/elements/track-studio-model.ts:34
+msgid "ui.Pixelate"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/elements/image-editor.tsx:466
 #, needs-review
 msgid "ui.Pixels"
@@ -5324,7 +5352,7 @@ msgid "ui.Played"
 msgstr "Visto"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:816
+#: src/elements/track-studio.tsx:822
 #, needs-review
 msgid "ui.Playhead"
 msgstr "Cabezal de reproducción"
@@ -5577,7 +5605,7 @@ msgid "ui.Raise {name}"
 msgstr "Subir {name}"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:751
+#: src/elements/track-studio.tsx:757
 msgid "ui.Ratio"
 msgstr ""
 
@@ -5717,7 +5745,7 @@ msgid "ui.Related"
 msgstr "Relacionado"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:753
+#: src/elements/track-studio.tsx:759
 msgid "ui.Release"
 msgstr ""
 
@@ -6730,7 +6758,7 @@ msgid "ui.six"
 msgstr "seis"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:725
+#: src/elements/track-studio.tsx:731
 msgid "ui.Six-band equalizer"
 msgstr ""
 
@@ -6770,6 +6798,26 @@ msgid "ui.sleeping"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/elements/track-studio-model.ts:33
+msgid "ui.Slide down"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/elements/track-studio-model.ts:32
+msgid "ui.Slide left"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/elements/track-studio-model.ts:32
+msgid "ui.Slide right"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/elements/track-studio-model.ts:33
+msgid "ui.Slide up"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/primitives/ReadingSettings.tsx:57
 #, needs-review
 msgid "ui.Small"
@@ -6782,7 +6830,7 @@ msgid "ui.Soft"
 msgstr "Suave"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:874
+#: src/elements/track-studio.tsx:880
 #, needs-review
 msgid "ui.Solo {lane}"
 msgstr "Solo {lane}"
@@ -6924,7 +6972,7 @@ msgid "ui.Starting…"
 msgstr "Iniciando…"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:1019
+#: src/elements/track-studio.tsx:1025
 #, needs-review
 msgid "ui.Starts {time} into the file"
 msgstr "Empieza a {time} dentro del archivo"
@@ -7436,7 +7484,7 @@ msgid "ui.This browser cannot share its location. Choose a saved place instead."
 msgstr "Este navegador no puede compartir su ubicación. Elige un lugar guardado en su lugar."
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:698
+#: src/elements/track-studio.tsx:699
 #, needs-review
 msgid "ui.this clip"
 msgstr "este clip"
@@ -7508,7 +7556,7 @@ msgid "ui.three"
 msgstr "tres"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:750
+#: src/elements/track-studio.tsx:756
 msgid "ui.Threshold"
 msgstr ""
 
@@ -7642,13 +7690,23 @@ msgid "ui.Transcript"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:1020
+#: src/elements/track-studio.tsx:423
+msgid "ui.Transition"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/elements/track-studio.tsx:703
+msgid "ui.Transition kind"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/elements/track-studio.tsx:1026
 #, needs-review
 msgid "ui.Trim end of {label}"
 msgstr "Recortar final de {label}"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:1019
+#: src/elements/track-studio.tsx:1025
 #, needs-review
 msgid "ui.Trim start of {label}"
 msgstr "Recortar inicio de {label}"
@@ -8027,7 +8085,7 @@ msgid "ui.Visibility"
 msgstr "Visibilidad"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio-model.ts:70
+#: src/elements/track-studio-model.ts:85
 #: src/elements/track-studio.tsx:109
 msgid "ui.Vocals"
 msgstr ""
@@ -8223,6 +8281,26 @@ msgid "ui.Wind direction"
 msgstr "Dirección del viento"
 
 #. js-lingui-explicit-id
+#: src/elements/track-studio-model.ts:32
+msgid "ui.Wipe down"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/elements/track-studio-model.ts:31
+msgid "ui.Wipe left"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/elements/track-studio-model.ts:31
+msgid "ui.Wipe right"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/elements/track-studio-model.ts:32
+msgid "ui.Wipe up"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/elements/robot-face.tsx:32
 msgid "ui.working"
 msgstr ""
@@ -8302,8 +8380,8 @@ msgid "ui.you"
 msgstr "tú"
 
 #. js-lingui-explicit-id
-#: src/elements/track-studio.tsx:734
-#: src/elements/track-studio.tsx:755
+#: src/elements/track-studio.tsx:740
+#: src/elements/track-studio.tsx:761
 msgid "ui.You hear this in the preview. The saved song changes when you apply it."
 msgstr ""
 
@@ -8337,6 +8415,7 @@ msgstr "Zoom al {zoom} por ciento"
 #: src/elements/image-editor.tsx:1824
 #: src/elements/media-viewer.tsx:114
 #: src/elements/mermaid-diagram.tsx:211
+#: src/elements/track-studio-model.ts:34
 #, needs-review
 msgid "ui.Zoom in"
 msgstr "Acercar"
