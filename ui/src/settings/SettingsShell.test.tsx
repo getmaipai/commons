@@ -44,6 +44,9 @@ describe("SettingsShell column", () => {
     expect(search.getAttribute("data-variant")).toBe("pill");
     const labels = [...col.querySelectorAll("[data-slot=sidebar-group-label]")].map((e) => e.textContent);
     expect(labels).toEqual(["Chat", "Related"]);
+    const generalLabel = col.querySelector('[data-slot="sidebar-menu-button"] span.flex-1')!;
+    expect(generalLabel.className).not.toContain("truncate");
+    expect(generalLabel.className).toContain("whitespace-normal");
   });
 
   test("hides a one-row group heading and keeps a two-row heading", () => {

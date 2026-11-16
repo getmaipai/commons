@@ -15,6 +15,7 @@ const demoArea = (): SettingsAreaDef => ({
   groups: [
     { label: i18n._({ id: "ui.Personal", message: "Personal" }), sections: ["general", "notifications", "profile", "appearance"] },
     { label: i18n._({ id: "ui.Integrations", message: "Integrations" }), sections: ["plugins", "account"] },
+    { label: "More settings", sections: ["backups"] },
   ],
   sections: [
     { id: "general", label: i18n._({ id: "ui.General", message: "General" }), icon: "settings", kind: "keys", cards: [{ label: i18n._({ id: "ui.Chat", message: "Chat" }), group: "demo.chat", scope: "person" }] },
@@ -23,6 +24,7 @@ const demoArea = (): SettingsAreaDef => ({
     { id: "appearance", label: i18n._({ id: "ui.Appearance", message: "Appearance" }), icon: "palette", kind: "keys", cards: [{ label: i18n._({ id: "ui.Look", message: "Look" }), group: "demo.look", scope: "person" }] },
     { id: "plugins", label: i18n._({ id: "ui.Plugins", message: "Plugins" }), icon: "plug", kind: "keys", cards: [{ label: i18n._({ id: "ui.Plugins", message: "Plugins" }), group: "demo.plugins", scope: "person" }] },
     { id: "account", label: i18n._({ id: "ui.Account", message: "Account" }), icon: "user-round", kind: "link", href: "/account" },
+    { id: "backups", label: "Backups, storage and updates", icon: "database", kind: "keys", cards: [{ label: "Backups", group: "demo.backups", scope: "person" }] },
   ],
 });
 

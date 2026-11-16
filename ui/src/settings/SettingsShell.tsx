@@ -175,6 +175,7 @@ export function SettingsShell({
         />
       ) : null}
       <SectionSidebar
+        wrapLabels
         sidebarProps={{
           id: "settings-column",
           "data-slot": "settings-column",

@@ -122,6 +122,8 @@ export interface SectionSidebarProps {
   collapseShortcut?: { label: string; keys: string };
   /** "compact" is the Chat column's 36 px rows with no gap. Default "comfortable" (the settings column's rows). */
   density?: "comfortable" | "compact";
+  /** Let row labels wrap and grow the row to fit. Defaults to truncation for existing columns. */
+  wrapLabels?: boolean;
   /** Placed first in the header: a collapse button, a back link. */
   headerTop?: ReactNode;
   /** The column's title; omit it when the host draws its own. */
@@ -175,6 +177,7 @@ export function SectionSidebar({
   collapseLabels,
   collapseShortcut,
   density = "comfortable",
+  wrapLabels = false,
   contentClassName,
   standalone,
   sidebarProps,
@@ -331,7 +334,7 @@ export function SectionSidebar({
         <SidebarMenuButton
           size="settings"
           isActive={item.active === true}
-          className={cn("rounded-lg", navTransition, menuHover, menuSelected, compact && "h-8 px-2 text-[13px] before:-inset-y-1.5", rail && "justify-center gap-0 px-0")}
+          className={cn("rounded-lg", navTransition, menuHover, menuSelected, compact && "h-8 px-2 text-[13px] before:-inset-y-1.5", wrapLabels && !rail && "h-auto min-h-12 py-2 [&>span:last-child]:[overflow-wrap:anywhere]", rail && "justify-center gap-0 px-0")}
           render={(props) => (
             <a {...props} href={item.href ?? "#"} onClick={(event) => { item.onClick?.(event); }} title={rail ? item.label : undefined}>
               {props.children}
@@ -341,11 +344,11 @@ export function SectionSidebar({
           aria-current={item.active ? "page" : undefined}
           aria-describedby={item.describedBy}
         >
-          <span className={cn("relative flex shrink-0", !rail && !compact && item.icon && !item.media && "size-7 items-center justify-center rounded-lg", !rail && !compact && !item.active && item.icon && !item.media && "bg-settings-icon-tile")}>
+          <span className={cn("relative flex shrink-0", wrapLabels && !rail && "self-start", !rail && !compact && item.icon && !item.media && "size-7 items-center justify-center rounded-lg", !rail && !compact && !item.active && item.icon && !item.media && "bg-settings-icon-tile")}>
             {item.media ? <SafeImage src={item.media} alt="" aria-hidden className="size-[18px] rounded-sm object-cover" /> : <Icon aria-hidden className={cn(compact ? "size-4" : "size-[18px]", item.icon ? "text-settings-helper" : "text-settings-helper", item.active && item.icon && "text-settings-accent")} />}
             {rail && item.dot ? <span data-slot="section-sidebar-dot" aria-hidden className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-primary" /> : null}
           </span>
-          <span className={cn("flex-1 truncate", rail && "sr-only")}>{item.label}</span>
+          <span className={cn("flex-1", wrapLabels ? "min-w-0 whitespace-normal break-words" : "truncate", rail && "sr-only")}>{item.label}</span>
           {rail ? null : item.trailing}
         </SidebarMenuButton>
       </SidebarMenuItem>

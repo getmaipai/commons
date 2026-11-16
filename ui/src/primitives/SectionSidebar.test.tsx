@@ -23,6 +23,22 @@ function column(over: Partial<SectionSidebarProps> = {}) {
 }
 
 describe("SectionSidebar", () => {
+  test("wrapLabels wraps rows while the default keeps labels truncated", () => {
+    const label = "Backups, storage and updates";
+    const wrapped = column({ wrapLabels: true, groups: [{ id: "long", items: [{ id: "long-label", label, icon: "settings" }] }] });
+    const wrappedLink = wrapped.getByRole("link", { name: label });
+    const wrappedLabel = wrappedLink.querySelector("span.flex-1")!;
+    expect(wrappedLabel.className).not.toContain("truncate");
+    expect(wrappedLabel.className).toContain("whitespace-normal");
+    expect(wrappedLink.className).toContain("h-auto");
+    expect(wrappedLink.className).toContain("min-h-12");
+    expect(wrappedLink.querySelector("span.relative")?.className).toContain("self-start");
+    cleanup();
+
+    const truncated = column({ groups: [{ id: "long", items: [{ id: "long-label", label, icon: "settings" }] }] });
+    expect(truncated.getByRole("link", { name: label }).querySelector("span.flex-1")!.className).toContain("truncate");
+  });
+
   test("draws groups of link rows with labels, the current one marked, and a group label only when it has one", () => {
     const { container } = column();
     const today = screen.getByRole("link", { name: "Today" });

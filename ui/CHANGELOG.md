@@ -1,3 +1,7 @@
+## [ui-v0.5.676] - 2026-11-16
+
+- SETTINGS-LABELS-01: Settings column labels wrap to a second line when needed, with growing rows and top-aligned icons; other SectionSidebar columns keep truncating by default.
+
 ## [ui-v0.5.675] - 2026-11-15
 
 - The feed and the video player take up to 24 row actions (was 16); extras go in the player More menu.
