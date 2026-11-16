@@ -585,4 +585,14 @@ describe("Player", () => {
       expect(view.container.querySelector("[data-slot=player]")!.className).not.toContain("sticky");
     });
   });
+
+describe("Player audio spectrum", () => {
+  test("draws the spectrum band in the audio layout when a host gives levels, and not otherwise", () => {
+    const withIt = render(<Player src="/a" kind="audio" layout="audio" title="Song" spectrum={{ levels: () => [0.5, 0.2] }} />);
+    expect(withIt.container.querySelector("[data-slot=player-spectrum-band] [data-slot=player-spectrum]")).not.toBeNull();
+    withIt.unmount();
+    const without = render(<Player src="/a" kind="audio" layout="audio" title="Song" />);
+    expect(without.container.querySelector("[data-slot=player-spectrum-band]")).toBeNull();
+  });
+});
 });

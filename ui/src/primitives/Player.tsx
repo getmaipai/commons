@@ -275,7 +275,7 @@ export interface PlayerProps {
   /** MUSIC-KIT-01: in the `mini` layout, dragging up on the bar (touch or pen) calls `onExpand`, like tapping it. The
    * bar keeps its horizontal scroll; the swipe never fires a tap. Default off. */
   swipeUpToExpand?: boolean;
-  /** In the `mini` layout, a faint live spectrum behind the whole bar: bars rise from the bottom edge across the full width,
+  /** In the `mini` layout, and in the `audio` layout behind the lower part (under the controls), a faint live spectrum: bars rise from the bottom edge across the full width,
    * drawn in the accent token at low opacity. `levels()` returns 0..1 values (one per bar) each frame; the host owns the
    * analyser, the kit does no audio analysis. Draws only while playing and the page is visible, once under reduced motion.
    * Absent: nothing is drawn and nothing runs. */
@@ -1513,6 +1513,7 @@ export function Player(props: PlayerProps) {
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <div ref={rootRef} data-slot="player" data-layout="audio" onKeyDown={onKeyDown} className={cn("relative isolate w-full", audioLayout === "container" && "@container/player")}>
       <ArtGradient art={poster} className="h-full" />
+      {spectrum ? <div aria-hidden data-slot="player-spectrum-band" className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-1/2"><PlayerSpectrum levels={spectrum.levels} active={playing} /></div> : null}
       <MediaController key="controller" ref={controllerRef as never} audio noHotkeys autohide="-1" defaultStreamType="on-demand" style={audioVars}>
         {mediaElement}
         <div className={audioLayout === "container" ? "grid w-full gap-8 @md/player:grid-cols-2 @md/player:items-center" : "grid w-full gap-8 sm:grid-cols-2 sm:items-center"}>
