@@ -162,7 +162,7 @@ describe("SettingsShell search and title", () => {
     const tabs = [{ id: "overview", label: "Overview" }, { id: "models", label: "Models" }];
     const { view } = shell({ tabs, tab: "overview", onTabChange });
     const list = view.getByRole("tablist", { name: "General sections" });
-    expect(list.getAttribute("data-variant")).toBe("line");
+    expect(list.getAttribute("data-variant")).toBe("pill");
     expect(view.getByRole("tab", { name: "Overview" }).getAttribute("aria-selected")).toBe("true");
     fireEvent.mouseDown(view.getByRole("tab", { name: "Models" }), { button: 0, ctrlKey: false });
     expect(onTabChange).toHaveBeenCalledWith("models");

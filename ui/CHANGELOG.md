@@ -1,3 +1,7 @@
+## [ui-v0.5.678] - 2026-11-16
+
+- SETTINGS-CHATGPT-01: `TabsList variant="pill"` (the active tab is a soft filled pill, the others plain text, no underline) and the Settings shell draws its page tabs with it.
+
 ## [ui-v0.5.677] - 2026-11-16
 
 - SETTINGS-LABELS-01 fix: a wrapped Settings column row now overrides the base menu button's `[&>span:last-child]:truncate`, so long area names really wrap (0.5.676 added the class but the base rule still won; found on the workbench).
