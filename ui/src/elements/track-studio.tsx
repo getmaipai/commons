@@ -31,7 +31,7 @@ import {
   isStemLane, setDuck, setLaneLevel, setLaneMuted, setPieceLevel, spokenTime, titleAtTime, type LaneId, type StudioLane, type StudioPiece, type StudioState,
 } from "./track-studio-model";
 import {
-  DEFAULT_LEVEL_STEPS, DEFAULT_LIMITS, addPiece, applyBalance, canRedo, canUndo, crossfadeAfter, currentBalance, deletePiece, movePiece, planChanged, pushHistory, transitionKindAfter,
+  DEFAULT_LEVEL_STEPS, DEFAULT_LIMITS, addPiece, applyBalance, canRedo, canUndo, crossfadeAfter, currentBalance, deletePiece, movePiece, planChanged, pushHistory, transitionKindAfter, setAudioLeadAfter,
   redoHistory, resetPieceFades, resetPieceVolume, setCrossfadeAfter, setTransitionKindAfter, setFadeIn, setFadeOut, snap, snapEdges, splitAt, startHistory, toPlan, trimEndBy, trimStartBy, undoHistory, addTitle, updateTitle, removeTitle,
   type EditResult, type History, type LevelStep, type StudioLimits, type StudioPlan,
 } from "./track-studio-edit";
@@ -322,7 +322,7 @@ function StudioBody(props: TrackStudioProps) {
       if (!added) return;
       const piece: StudioPiece = {
         id: `${kind}-${added.ref}`, ref: added.ref, src: added.src, label: added.label, poster: added.poster, in_s: 0, out_s: added.duration_s, source_s: added.duration_s,
-        at_s: 0, level_db: 0, fade_in_s: 0, fade_out_s: 0, crossfade_s: 0, duck: false,
+        at_s: 0, level_db: 0, fade_in_s: 0, fade_out_s: 0, crossfade_s: 0, audio_lead_s: 0, duck: false,
       };
       apply(addPiece(stateRef.current, kind === "clip" ? "video" : kind, piece, playhead(), limits));
     } catch (e) {
@@ -704,6 +704,7 @@ function FadesPanel({ state, selected, commit }: { state: StudioState; selected:
 function CrossfadePanel({ state, selected, commit }: { state: StudioState; selected: ReturnType<typeof findPiece>; commit: (s: StudioState, key?: string) => void }) {
   const x = selected ? crossfadeAfter(state, selected.piece.id) : null;
   const kind = selected ? transitionKindAfter(state, selected.piece.id) : null;
+  const lead = selected && x !== null ? laneOf(state, "video").pieces[laneOf(state, "video").pieces.findIndex((p) => p.id === selected.piece.id) + 1]?.audio_lead_s ?? 0 : 0;
   const ready = x !== null;
   return (
     <>
@@ -715,6 +716,13 @@ function CrossfadePanel({ state, selected, commit }: { state: StudioState; selec
         {STUDIO_TRANSITION_KINDS.map(({ kind: option }) => (
           <Button key={option} variant={kind === option ? "default" : "secondary"} size="sm" role="radio" aria-checked={kind === option} disabled={!ready || x === 0} className="rounded-full px-3" onClick={() => selected && commit(setTransitionKindAfter(state, selected.piece.id, option), `x:${selected.piece.id}`)}>{STUDIO_TRANSITION_LABELS[option]}</Button>
         ))}
+      </div>
+      <div className="border-border flex flex-col gap-2 border-t pt-3">
+        <Field label={i18n._({ id: "ui.Sound lead", message: "Sound lead" })} value={lead > 0 ? i18n._({ id: "ui.Sound starts {seconds} s early", message: "Sound starts {seconds} s early", values: { seconds: lead.toFixed(1) } }) : lead < 0 ? i18n._({ id: "ui.Sound carries {seconds} s over", message: "Sound carries {seconds} s over", values: { seconds: Math.abs(lead).toFixed(1) } }) : i18n._({ id: "ui.In step", message: "In step" })}>
+          <Slider min={-2} max={2} step={0.1} value={[lead]} disabled={!ready} aria-label={i18n._({ id: "ui.Sound leads the picture", message: "Sound leads the picture" })} onValueChange={([v]) => ready && commit(setAudioLeadAfter(state, selected!.piece.id, v ?? 0), `audio-lead:${selected!.piece.id}`)} />
+        </Field>
+        <div className="text-muted-foreground flex justify-between text-xs"><span>{i18n._({ id: "ui.L cut", message: "L cut" })}</span><span>{i18n._({ id: "ui.J cut", message: "J cut" })}</span></div>
+        <p className="text-muted-foreground text-sm">{i18n._({ id: "ui.A lead clears the crossfade; a crossfade clears the lead. The preview plays in step; the export applies the lead.", message: "A lead clears the crossfade; a crossfade clears the lead. The preview plays in step; the export applies the lead." })}</p>
       </div>
       <p className="text-muted-foreground text-sm">{i18n._({ id: "ui.Blends or wipes the two pictures where they meet. 0.3 to 1 second; 0 is a cut. The preview cuts the picture; the export shows the effect.", message: "Blends or wipes the two pictures where they meet. 0.3 to 1 second; 0 is a cut. The preview cuts the picture; the export shows the effect." })}</p>
     </>
@@ -956,6 +964,7 @@ function PieceView({ lane, state, index, start, piece, pps, hue, selected, count
   const name = laneWord()[lane.id];
   const label = piece.label ?? i18n._({ id: "ui.{lane} {number}", message: "{lane} {number}", values: { lane: name, number: index + 1 } });
   const seam = lane.id === "video" && index > 0 ? effectiveCrossfade(lane.pieces[index - 1]!, piece) : 0;
+  const audioLead = lane.id === "video" && index > 0 ? piece.audio_lead_s ?? 0 : 0;
   const origin = useRef<StudioState | null>(null);
 
   // Drag the piece (voice and music only: video pieces keep their order and ripple).
@@ -1046,6 +1055,7 @@ function PieceView({ lane, state, index, start, piece, pps, hue, selected, count
         <FadeRamps env={env} width={width} piece={piece} fadeIn={fadeIn} fadeOut={fadeOut} />
         <span className="bg-background/70 text-foreground pointer-events-none absolute top-0.5 left-1 max-w-[calc(100%-8px)] truncate rounded px-1 text-[11px] leading-4 font-semibold">{label}</span>
         {seam > 0 ? <span aria-hidden="true" data-seam className="border-primary pointer-events-none absolute inset-y-0 left-0 border-r bg-[repeating-linear-gradient(135deg,var(--primary)_0_2px,transparent_2px_5px)] opacity-70" style={{ width: Math.min(width, seam * pps) }} /> : null}
+        {audioLead !== 0 ? <span aria-hidden="true" data-slot="track-studio-lead" className="bg-primary pointer-events-none absolute top-0 left-0 z-[1] h-0.5 w-full" /> : null}
       </button>
       {selected && hasPrev ? (
         <>

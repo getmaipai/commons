@@ -395,6 +395,18 @@ describe("the Edit tools and panels", () => {
     expect(onPlanChange.mock.calls.at(-1)![1]).toBe(true);
     expect(plan.film_s).toBe(13 - 1);
   });
+  test("Transition: sound lead words update and the marker appears", async () => {
+    const { container, getByRole, getByText } = open();
+    fireEvent.click(getByRole("radio", { name: "Transition" }));
+    fireEvent.click(pieces(container, "video")[0]!);
+    const lead = getByRole("slider", { name: "Sound leads the picture" });
+    expect(getByText("In step")).toBeTruthy();
+    key(lead, "ArrowRight"); key(lead, "ArrowRight"); key(lead, "ArrowRight"); key(lead, "ArrowRight"); key(lead, "ArrowRight");
+    expect(getByText("Sound starts 0.5 s early")).toBeTruthy();
+    expect(container.querySelector('[data-slot="track-studio-lead"]')).toBeTruthy();
+    key(lead, "ArrowLeft"); key(lead, "ArrowLeft"); key(lead, "ArrowLeft"); key(lead, "ArrowLeft"); key(lead, "ArrowLeft"); key(lead, "ArrowLeft"); key(lead, "ArrowLeft"); key(lead, "ArrowLeft"); key(lead, "ArrowLeft"); key(lead, "ArrowLeft");
+    expect(getByText("Sound carries 0.5 s over")).toBeTruthy();
+  });
   test("Level: five balances; choosing one sets every piece; the chosen one is checked", async () => {
     const onPlanChange = mock((_p: StudioPlan, _c: boolean) => undefined);
     const { getByRole } = open({ onPlanChange });

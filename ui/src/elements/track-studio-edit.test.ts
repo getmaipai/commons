@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { filmLength, findPiece, laneOf, layoutLane, pieceDuration, pieceEnvelope, readState, gainAt, MIN_PIECE_S, type StudioPiece, type StudioState } from "./track-studio-model";
 import {
-  DEFAULT_LEVEL_STEPS, DEFAULT_LIMITS, addPiece, addTitle, applyBalance, canRedo, canUndo, crossfadeAfter, currentBalance, deletePiece, movePiece, planChanged, pushHistory, redoHistory, setCrossfadeAfter, setTransitionKindAfter, updateTitle, removeTitle,
+  DEFAULT_LEVEL_STEPS, DEFAULT_LIMITS, addPiece, addTitle, applyBalance, canRedo, canUndo, crossfadeAfter, currentBalance, deletePiece, movePiece, planChanged, pushHistory, redoHistory, setCrossfadeAfter, setTransitionKindAfter, updateTitle, removeTitle, setAudioLeadAfter,
   setFadeIn, setFadeOut, snap, splitAt, startHistory, toPlan, trimEndBy, trimStartBy, undoHistory,
 } from "./track-studio-edit";
 import { setLaneLevel, setLaneMuted, setPieceLevel } from "./track-studio-model";
@@ -224,6 +224,22 @@ describe("plan", () => {
 });
 
 describe("crossfade and fades as edits", () => {
+  test("audio lead is bounded by both pieces, conflicts clear, and history can undo and redo", () => {
+    const baseState = base();
+    const set = setAudioLeadAfter(baseState, "a", 0.56);
+    expect(laneOf(set, "video").pieces[1]!.audio_lead_s).toBe(0.6);
+    expect(toPlan(set).video.transitions[0]).toEqual({ kind: "cut", seconds: 0, audio_lead_s: 0.6 });
+    expect(planChanged(baseState, set)).toBe(true);
+    let history = pushHistory(startHistory(baseState), set);
+    expect(undoHistory(history).present).toEqual(baseState);
+    history = redoHistory(undoHistory(history));
+    expect(history.present).toEqual(set);
+    const crossed = setCrossfadeAfter(set, "a", 0.5);
+    expect(laneOf(crossed, "video").pieces[1]!.audio_lead_s).toBe(0);
+    const lead = setAudioLeadAfter(crossed, "a", -9);
+    expect(laneOf(lead, "video").pieces[1]!.crossfade_s).toBe(0);
+    expect(laneOf(lead, "video").pieces[1]!.audio_lead_s).toBe(-2);
+  });
   test("a crossfade is set on the seam after a piece, overlaps the pieces and shortens the film by its length", () => {
     const s = setCrossfadeAfter(base(), "a", 0.5);
     expect(layoutLane(laneOf(s, "video")).map((p) => [p.start, p.end])).toEqual([[0, 4], [3.5, 8.5], [8.5, 11.5]]);

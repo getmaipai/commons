@@ -7320,3 +7320,43 @@ msgstr ""
 #: src/elements/image.tsx:330
 msgid "ui.Zoomed image"
 msgstr ""
+
+#. js-lingui-explicit-id
+#: src/elements/track-studio.tsx:725
+msgid "ui.A lead clears the crossfade; a crossfade clears the lead. The preview plays in step; the export applies the lead."
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/elements/track-studio.tsx:721
+msgid "ui.In step"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/elements/track-studio.tsx:724
+msgid "ui.J cut"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/elements/track-studio.tsx:724
+msgid "ui.L cut"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/elements/track-studio.tsx:721
+msgid "ui.Sound carries {seconds} s over"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/elements/track-studio.tsx:721
+msgid "ui.Sound lead"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/elements/track-studio.tsx:722
+msgid "ui.Sound leads the picture"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/elements/track-studio.tsx:721
+msgid "ui.Sound starts {seconds} s early"
+msgstr ""

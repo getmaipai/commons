@@ -21,6 +21,7 @@ export const MIN_PIECE_S = 0.2;
 /** A crossfade is a cut (0) or 0.3 to 1 second (the Stack's `crossfade` op). */
 export const CROSSFADE_MIN_S = 0.3;
 export const CROSSFADE_MAX_S = 1;
+export const STUDIO_AUDIO_LEAD_MAX_S = 2;
 export const STUDIO_TRANSITION_KINDS = [
   { kind: "fade" }, { kind: "dissolve" }, { kind: "wipeleft" }, { kind: "wiperight" }, { kind: "wipeup" }, { kind: "wipedown" }, { kind: "slideleft" }, { kind: "slideright" }, { kind: "slideup" }, { kind: "slidedown" }, { kind: "circleopen" }, { kind: "circleclose" }, { kind: "fadeblack" }, { kind: "fadewhite" }, { kind: "zoomin" }, { kind: "pixelize" },
 ] as const;
@@ -62,6 +63,8 @@ export interface StudioPiece {
   fade_out_s: number;
   /** Video pieces after the first: seconds this piece overlaps the one before it (0 is a cut). */
   crossfade_s: number;
+  /** Audio offset at the seam before this piece. Positive starts this piece's sound early; negative carries the prior sound over. */
+  audio_lead_s?: number;
   /** Optional video transition after this piece; absent means blend (the historical crossfade). */
   transition_kind?: StudioTransitionKind;
   /** A music piece: lower it under speech. */
@@ -110,7 +113,7 @@ export const pieceDuration = (p: Pick<StudioPiece, "in_s" | "out_s">): number =>
 
 export interface RawPiece {
   id?: unknown; ref?: unknown; src?: unknown; label?: unknown; poster?: unknown; in_s?: unknown; out_s?: unknown; source_s?: unknown; at_s?: unknown;
-  level_db?: unknown; fade_in_s?: unknown; fade_out_s?: unknown; crossfade_s?: unknown; transition_kind?: unknown; duck?: unknown; peaks?: unknown; peaks_url?: unknown;
+  level_db?: unknown; fade_in_s?: unknown; fade_out_s?: unknown; crossfade_s?: unknown; audio_lead_s?: unknown; transition_kind?: unknown; duck?: unknown; peaks?: unknown; peaks_url?: unknown;
 }
 export interface RawLane { id?: unknown; label?: unknown; hue?: unknown; level_db?: unknown; muted?: unknown; pieces?: unknown }
 
@@ -138,6 +141,7 @@ export function readPiece(raw: RawPiece, fallbackId: string): StudioPiece | null
     fade_in_s: clamp(finite(raw.fade_in_s, 0), 0, Math.min(FADE_MAX_S, dur)),
     fade_out_s: clamp(finite(raw.fade_out_s, 0), 0, Math.min(FADE_MAX_S, dur)),
     crossfade_s: normalizeCrossfade(finite(raw.crossfade_s, 0)),
+    audio_lead_s: round(clamp(finite(raw.audio_lead_s, 0), -STUDIO_AUDIO_LEAD_MAX_S, STUDIO_AUDIO_LEAD_MAX_S), 1),
     ...(STUDIO_TRANSITION_KINDS.some(({ kind }) => kind === raw.transition_kind) ? { transition_kind: raw.transition_kind as StudioTransitionKind } : {}),
     duck: raw.duck === true,
     ...givenPeaks(raw),
@@ -165,7 +169,10 @@ export function readState(input: unknown): StudioState {
       const piece = p && typeof p === "object" ? readPiece(p, `${id}-${i + 1}`) : null;
       if (piece && !pieces.some((q) => q.id === piece.id)) pieces.push(piece);
     });
-    if (id === "video" && pieces[0]) pieces[0] = { ...pieces[0], crossfade_s: 0, transition_kind: undefined };
+    if (id === "video") {
+      if (pieces[0]) pieces[0] = { ...pieces[0], crossfade_s: 0, audio_lead_s: 0, transition_kind: undefined };
+      for (let i = 1; i < pieces.length; i++) if (pieces[i]!.crossfade_s > 0) pieces[i] = { ...pieces[i]!, audio_lead_s: 0 };
+    }
     return {
       id,
       label: typeof raw?.label === "string" && raw.label ? raw.label : laneDefaults()[id].label,

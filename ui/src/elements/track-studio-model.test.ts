@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import {
   dbToGain, effectiveCrossfade, envelopePoints, filmLength, findPiece, formatTime, gainAt, gainToDb, laneGain, laneOf, layoutLane, mapPiece, normalizeCrossfade, pieceAt,
-  pieceEnvelope, previewEnd, readState, rulerStep, rulerTicks, setDuck, setLaneLevel, setLaneMuted, setPieceLevel, spokenTime, titleAtTime, type StudioPiece, type StudioState,
+  pieceEnvelope, previewEnd, readState, rulerStep, rulerTicks, setDuck, setLaneLevel, setLaneMuted, setPieceLevel, spokenTime, titleAtTime, type StudioPiece, type StudioState, STUDIO_AUDIO_LEAD_MAX_S,
 } from "./track-studio-model";
 
 const piece = (id: string, o: Partial<StudioPiece> = {}): StudioPiece => ({ id, ref: id, src: `/f/${id}.mp4`, in_s: 0, out_s: 4, source_s: 10, at_s: 0, level_db: 0, fade_in_s: 0, fade_out_s: 0, crossfade_s: 0, duck: false, ...o });
@@ -44,6 +44,11 @@ describe("readState", () => {
     expect(p.out_s).toBe(10);
     expect(p.level_db).toBe(12);
     expect(p.fade_in_s).toBe(5);
+  });
+  test("audio lead is bounded and rounded to tenths, and the first video piece has none", () => {
+    const s = readState([{ id: "video", pieces: [piece("a", { audio_lead_s: 1.37 } as never), piece("b", { audio_lead_s: 9 } as never)] }]);
+    expect(STUDIO_AUDIO_LEAD_MAX_S).toBe(2);
+    expect(laneOf(s, "video").pieces.map((p) => p.audio_lead_s)).toEqual([0, 2]);
   });
 });
 
