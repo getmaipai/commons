@@ -22,10 +22,7 @@ export const MIN_PIECE_S = 0.2;
 export const CROSSFADE_MIN_S = 0.3;
 export const CROSSFADE_MAX_S = 1;
 export const STUDIO_TRANSITION_KINDS = [
-  { kind: "fade", label: "Blend" }, { kind: "dissolve", label: "Dissolve" }, { kind: "wipeleft", label: "Wipe left" }, { kind: "wiperight", label: "Wipe right" },
-  { kind: "wipeup", label: "Wipe up" }, { kind: "wipedown", label: "Wipe down" }, { kind: "slideleft", label: "Slide left" }, { kind: "slideright", label: "Slide right" },
-  { kind: "slideup", label: "Slide up" }, { kind: "slidedown", label: "Slide down" }, { kind: "circleopen", label: "Circle open" }, { kind: "circleclose", label: "Circle close" },
-  { kind: "fadeblack", label: "Dip to black" }, { kind: "fadewhite", label: "Dip to white" }, { kind: "zoomin", label: "Zoom in" }, { kind: "pixelize", label: "Pixelate" },
+  { kind: "fade" }, { kind: "dissolve" }, { kind: "wipeleft" }, { kind: "wiperight" }, { kind: "wipeup" }, { kind: "wipedown" }, { kind: "slideleft" }, { kind: "slideright" }, { kind: "slideup" }, { kind: "slidedown" }, { kind: "circleopen" }, { kind: "circleclose" }, { kind: "fadeblack" }, { kind: "fadewhite" }, { kind: "zoomin" }, { kind: "pixelize" },
 ] as const;
 export const STUDIO_TRANSITION_LABELS = {
   fade: i18n._({ id: "ui.Blend", message: "Blend" }), dissolve: i18n._({ id: "ui.Dissolve", message: "Dissolve" }), wipeleft: i18n._({ id: "ui.Wipe left", message: "Wipe left" }), wiperight: i18n._({ id: "ui.Wipe right", message: "Wipe right" }),
