@@ -8117,6 +8117,12 @@
       ],
       "multiple": true
     },
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "union",
     "default": [],
     "label": "Content filters",
     "help": "Choose more kinds of content to hold back. The kinds this level already holds back stay on, and an admin's choices stay until the admin changes them.",
@@ -8142,13 +8148,7 @@
     "lives_in": "person.allowance",
     "honoured_by": [
       "home"
-    ],
-    "layers": [
-      "band",
-      "household",
-      "person"
-    ],
-    "merge": "union"
+    ]
   },
   {
     "key": "content.policy.chat",
