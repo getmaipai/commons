@@ -62,7 +62,6 @@
   "safety.alarm.sensors",
   "safety.alarm.voice",
   "safety.alarm.volume",
-  "search.safe_search",
   "status.internet_probe.enabled",
   "storage.household.cap_bytes",
   "storage.person.default_cap_bytes",

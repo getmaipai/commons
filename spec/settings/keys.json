@@ -3129,13 +3129,22 @@
     "merge": "override",
     "default": "default",
     "label": "Safe search level",
-    "help": "How strictly web search filters results for you. \"Default\" follows your age: strict for a child, moderate for a teen, off for an adult. A child's is always strict. A teen can make theirs stricter but never lower than moderate. An adult can change their own.",
+    "help": "How strictly web search filters results for you. Default means the mode your content level gives: strict at G, moderate from PG to R, off at X. You can pick a stricter mode than that, never a looser one.",
     "level": "basic",
     "secret": false,
     "lives_in": "person.search",
     "honoured_by": [
       "home"
-    ]
+    ],
+    "copy": {
+      "does": "Picks how strictly web results are filtered, never looser than your content level gives.",
+      "options": {
+        "default": "The mode your content level gives.",
+        "off": "No engine filtering, only where your level is X.",
+        "moderate": "Hides the most explicit results.",
+        "strict": "Hides anything not clearly fine to show."
+      }
+    }
   },
   {
     "key": "search.page_text_cleaning",
