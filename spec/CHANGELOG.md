@@ -1,3 +1,7 @@
+## [spec-v0.1.415] - 2026-11-17
+
+- The settings registry (`settings/keys.json`) is regenerated from Home's declarations so the pinned tag matches what Home ships (the picture and video tier keys, the Telegram channel toggles, the reference library keys, the storage caps and the rest listed by Home's drift check). No shape changed.
+
 ## [spec-v0.1.414] - 2026-11-17
 
 - MODE-GUEST-01: `Person.controls` (`child`, `teen`, `adult` or null): the controls a guest is on, chosen by the admin who adds the guest. Meaningful only for the guest role; null means child controls. Additive; the first slice of the modes record.
