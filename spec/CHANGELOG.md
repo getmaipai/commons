@@ -1,3 +1,7 @@
+## [spec-v0.1.413] - 2026-11-17
+
+- RATING-SPEC-01: the content rating scale (G, PG, PG-13, R, X, Prohibited, Unrated), the stamp (ContentRating), the rater shape (ContentRater), the reasons taken from the content-policy kinds, and the map from the outside labels Home ingests today, under spec/ratings/ and spec/vocab/content-ratings.json. Additive; content-ceiling is unchanged.
+
 ## [spec-v0.1.412] - 2026-11-16
 
 - The package version matches its tag again. Tags `spec-v0.1.409`, `spec-v0.1.410` and `spec-v0.1.411` were cut without the version bump, so a consumer whose gate checks the version against the tag must pin 0.1.412 or later. No shape changed since 0.1.411.

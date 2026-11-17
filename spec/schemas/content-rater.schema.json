@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/content-rater.schema.json",
+  "title": "ContentRater",
+  "description": "A small unit that rates one or more kinds of content.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$" },
+    "version": { "type": "integer", "minimum": 1 },
+    "rates": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "enum": ["film", "show", "song", "podcast", "article", "web_page", "picture", "clip", "reply"] } },
+    "priority": { "type": "integer", "minimum": 1, "description": "1 is tried first." },
+    "source": { "type": "string", "enum": ["given", "declared", "worked_out"], "description": "What kind of stamp this rater produces." },
+    "reaches_internet": { "type": "boolean", "description": "True needs a privacy row like any outside connection (Home docs/PRIVACY.md)." }
+  },
+  "required": ["id", "version", "rates", "priority", "source", "reaches_internet"]
+}

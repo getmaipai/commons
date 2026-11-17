@@ -17,4 +17,7 @@ export const STACK_SCHEMA_NAMES: ReadonlySet<string> = new Set([
   "token-count-request.schema.json",
   "token-count-response.schema.json",
   "turn-stream-event.schema.json",
+  // These hand-written mirrors carry if/then rules the generators drop.
+  "content-rating.schema.json",
+  "content-rater.schema.json",
 ]);
