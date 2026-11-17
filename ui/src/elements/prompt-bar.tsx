@@ -497,6 +497,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
                   {currentMode.presets ? <div className="ml-auto shrink-0"><ComposerPresetsButton presets={currentMode.presets} /></div> : null}
                 </div>
               </ComposerModeZone>
+              {fieldsRow}
               <div data-slot="prompt-bar-mode-field" data-mode={currentMode.id} className="flex min-w-0 items-start gap-1">
                 <div className="min-w-0 flex-1">{textbox(5, "min-h-[4.5rem] resize-none px-1 text-xl leading-8 md:text-xl placeholder:text-muted-foreground")}</div>
                 <ComposerFieldTools tools={tools} hasText={!empty} reasons={currentMode.toolDisabledReasons} onTool={(tool) => { if (currentMode.onTool) currentMode.onTool(tool); else if (tool === "clear") { onValueChange(""); field.current?.focus(); } }} />

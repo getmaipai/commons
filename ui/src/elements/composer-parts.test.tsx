@@ -168,6 +168,14 @@ describe("unified panel look", () => {
 });
 
 describe("fixes from use", () => {
+  test("recipe fields draw inside the modes composer and write their value", () => {
+    const values: string[] = [];
+    const view = render(<PromptBar label="Describe" value="" onValueChange={() => {}} onSubmit={() => {}} modes={modes()} mode="image" onModeChange={() => {}} fields={[{ id: "blank_subject", label: "Subject", placeholder: "a cat", value: "", onValueChange: (next) => values.push(next) }]} />);
+    const input = view.getByRole("textbox", { name: "Subject" }) as HTMLInputElement;
+    expect(input.getAttribute("placeholder")).toBe("a cat");
+    fireEvent.change(input, { target: { value: "fox" } });
+    expect(values).toEqual(["fox"]);
+  });
   test("allowEmpty lets a mode submit from its chips alone; other modes still need words", () => {
     let made = 0;
     const list = modes();
