@@ -1,3 +1,7 @@
+## [ui-v0.5.688] - 2026-11-17
+
+- `PromptBar`: when a recipe field is shown (`fields` is not empty) the submit button works with an empty main box, so a template can be made from its examples or the typed fields alone. Without fields the box still needs text.
+
 ## [ui-v0.5.687] - 2026-11-17
 
 - The package version matches its tag again. Tags `ui-v0.5.681` to `ui-v0.5.686` were cut without the version bump (the package stayed at 0.5.680), so a consumer whose gate checks the version against the tag must pin 0.5.687 or later. No kit part changed since 0.5.686.

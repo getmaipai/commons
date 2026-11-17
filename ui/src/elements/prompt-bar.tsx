@@ -241,8 +241,10 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
   const blocked = busy || Boolean(disabledReason);
   const empty = value.trim() === "";
   const emptyOk = Boolean((modes?.find((item) => item.id === selectedMode) ?? modes?.[0])?.allowEmpty);
-  const ready = !blocked && (!empty || emptyOk);
-  const canChatSubmit = !busy && (!empty || emptyOk);
+  // A recipe (fields shown above the box) can be made from its examples alone, so the box may stay empty while a field is shown.
+  const emptyAllowed = emptyOk || fields.length > 0;
+  const ready = !blocked && (!empty || emptyAllowed);
+  const canChatSubmit = !busy && (!empty || emptyAllowed);
   // Engine availability disables the submit action, not composition. People can draft words and
   // choose settings while an engine is stopped or being installed.
   const locked = false;

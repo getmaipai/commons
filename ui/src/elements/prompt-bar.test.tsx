@@ -21,6 +21,19 @@ describe("PromptBar", () => {
     expect(getByRole("button", { name: "Make" })).toHaveClass("rounded-full", "bg-primary");
   });
 
+  test("a recipe with a field shown can be made with an empty box; without a field it still needs text", () => {
+    let made = 0;
+    const base = { label: "Describe", value: "", onValueChange: () => {}, onSubmit: () => { made += 1; } };
+    const plain = render(<PromptBar {...base} />);
+    expect(plain.getByRole("button", { name: "Make" })).toBeDisabled();
+    plain.unmount();
+    const recipe = render(<PromptBar {...base} fields={[{ id: "blank_subject", label: "Who and what", placeholder: "a baker", value: "", onValueChange: () => {} }]} />);
+    const make = recipe.getByRole("button", { name: "Make" });
+    expect(make).not.toBeDisabled();
+    act(() => { fireEvent.click(make); });
+    expect(made).toBe(1);
+  });
+
   test("Make stays off until there is text, then submits once", () => {
     let made = 0;
     const { getByRole, rerender } = render(<PromptBar label="Describe" value="" onValueChange={() => {}} onSubmit={() => { made += 1; }} />);
