@@ -1,0 +1,10 @@
+{
+  "code": "not_on_this_model",
+  "line": "That model cannot swap a face. Home can use Clip model A instead.",
+  "alternatives": [
+    {
+      "part": "clip-model-a",
+      "label": "Clip model A"
+    }
+  ]
+}

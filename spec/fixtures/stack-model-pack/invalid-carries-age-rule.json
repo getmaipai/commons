@@ -1,0 +1,49 @@
+{
+  "id": "pack-picture-b",
+  "version": "2.1.0",
+  "part": "picture-model-b",
+  "jobs": [
+    {
+      "job": "picture",
+      "limits": {
+        "max_words": 40,
+        "shapes": {
+          "square": {
+            "standard": {
+              "width": 1024,
+              "height": 1024
+            },
+            "boost": {
+              "width": 1536,
+              "height": 1536
+            },
+            "max": {
+              "width": 2048,
+              "height": 2048
+            }
+          }
+        }
+      },
+      "audiences": [
+        "adult",
+        "minor"
+      ],
+      "capabilities": {
+        "text": true,
+        "end_picture": false,
+        "sound": false,
+        "keeps_likeness": false
+      },
+      "recipe": "recipes/picture.md",
+      "peaks": [
+        {
+          "shape": "square",
+          "level": "standard",
+          "bytes": 9000000000,
+          "status": "measured"
+        }
+      ],
+      "min_age": 13
+    }
+  ]
+}

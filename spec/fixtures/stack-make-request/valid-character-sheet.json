@@ -1,0 +1,10 @@
+{
+  "job": "character_sheet",
+  "audience": "adult",
+  "references": [
+    "media-6",
+    "media-7"
+  ],
+  "kind": "pet",
+  "level": "standard"
+}

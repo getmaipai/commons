@@ -1,0 +1,5 @@
+{
+  "code": "too_long",
+  "line": "This model makes clips up to 8 seconds.",
+  "limit": 8
+}

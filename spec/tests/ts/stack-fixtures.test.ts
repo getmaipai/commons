@@ -43,6 +43,10 @@ import { StackPartChoices } from "../../stack/ts/stack-part-choices";
 import { StackStatus } from "../../stack/ts/stack-status";
 import { StackSizing } from "../../stack/ts/stack-sizing";
 
+import { StackModelPack } from "../../stack/ts/stack-model-pack";
+import { StackMakeRequest, StackMakeResult, StackMakeRefusal } from "../../stack/ts/stack-make";
+import { StackJobsCatalog } from "../../stack/ts/stack-jobs-catalog";
+
 const SPEC = join(import.meta.dir, "..", "..");
 const ajv = new Ajv2020({ strict: false, allErrors: true });
 addFormats(ajv);
@@ -72,6 +76,11 @@ const SHAPES: Array<{ name: string; zod: ZodType }> = [
   { name: "stack-part-choices", zod: StackPartChoices },
   { name: "stack-status", zod: StackStatus },
   { name: "stack-sizing", zod: StackSizing },
+  { name: "stack-model-pack", zod: StackModelPack },
+  { name: "stack-make-request", zod: StackMakeRequest },
+  { name: "stack-make-result", zod: StackMakeResult },
+  { name: "stack-make-refusal", zod: StackMakeRefusal },
+  { name: "stack-jobs-catalog", zod: StackJobsCatalog },
 ];
 
 for (const shape of SHAPES) {

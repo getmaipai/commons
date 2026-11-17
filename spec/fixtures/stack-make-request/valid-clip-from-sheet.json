@@ -1,0 +1,10 @@
+{
+  "job": "clip_from_sheet",
+  "audience": "adult",
+  "sheet": "media-4",
+  "description": "she waves",
+  "shape": "landscape",
+  "level": "max",
+  "seconds": 6,
+  "part": "clip-model-a"
+}

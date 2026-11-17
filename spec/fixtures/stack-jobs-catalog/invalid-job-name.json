@@ -1,0 +1,65 @@
+{
+  "audience": "adult",
+  "jobs": [
+    {
+      "job": "poem",
+      "label": "clip",
+      "available": true,
+      "part": {
+        "id": "clip-model-a",
+        "label": "Clip model A"
+      },
+      "limits": {
+        "levels": [
+          "standard",
+          "boost"
+        ],
+        "max_seconds": {
+          "standard": 5,
+          "boost": 8
+        },
+        "max_references": 0,
+        "shapes": {
+          "landscape": {
+            "standard": {
+              "width": 768,
+              "height": 448
+            },
+            "boost": {
+              "width": 1280,
+              "height": 704
+            }
+          }
+        }
+      },
+      "capabilities": {
+        "text": false,
+        "end_picture": true,
+        "sound": true,
+        "keeps_likeness": false
+      },
+      "styles": {
+        "bases": [
+          {
+            "id": "base-a",
+            "label": "Clip base A"
+          }
+        ],
+        "max": 2
+      },
+      "restyles": [
+        {
+          "name": "ink",
+          "label": "Ink drawing"
+        }
+      ],
+      "why_not": null,
+      "alternatives": [
+        {
+          "part": "clip-model-b",
+          "label": "Clip model B"
+        }
+      ]
+    }
+  ]
+}

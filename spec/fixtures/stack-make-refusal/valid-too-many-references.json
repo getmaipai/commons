@@ -1,0 +1,5 @@
+{
+  "code": "too_many_references",
+  "line": "This model takes up to 3 photos.",
+  "limit": 3
+}

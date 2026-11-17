@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/stack-make-refusal.schema.json",
+  "title": "StackMakeRefusal",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "enum": [
+            "too_many_references",
+            "too_long"
+          ]
+        },
+        "line": {
+          "type": "string",
+          "minLength": 1
+        },
+        "limit": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "code",
+        "line",
+        "limit"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "enum": [
+            "shape_not_served",
+            "level_not_served"
+          ]
+        },
+        "line": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "code",
+        "line"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "enum": [
+            "not_on_this_model"
+          ]
+        },
+        "line": {
+          "type": "string",
+          "minLength": 1
+        },
+        "alternatives": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "part": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^[a-z0-9][a-z0-9._-]*$"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "part",
+              "label"
+            ]
+          }
+        }
+      },
+      "required": [
+        "code",
+        "line",
+        "alternatives"
+      ]
+    }
+  ]
+}

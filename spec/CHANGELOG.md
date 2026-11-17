@@ -1,3 +1,7 @@
+## [spec-v0.1.423] - 2026-11-17
+
+- MODELPACK-SPEC-01: the model pack and the generic jobs, under spec/stack/. `StackModelPack` (`stack-model-pack`): one model's knowledge as data (id, version, part, jobs with limits, audiences, capabilities, recipe, optional adapter and peaks; style bases, field map, notes; never an age rule, a household choice, a person's words or a download link). `StackMakeRequest` and `StackMakeResult` (`stack-make-request`, `stack-make-result`): the eight jobs (picture, picture_edit, clip, clip_from_sheet, restyle, swap, character_sheet, contact_sheet) with `made_with`, `panels[]` and `tiles[]`. `StackMakeRefusal`: too_many_references, too_long, shape_not_served, level_not_served, not_on_this_model with alternatives[]. `StackJobsCatalog`: the adult shape and the minor shape (no why_not, no alternatives). No shape names a model; part ids are opaque. Hand-written mirrors, outside codegen. Additive. Not tagged.
+
 ## [spec-v0.1.417] - 2026-11-17
 
 - OVERRIDES-01: the content filter's role defaults and overrides as settings keys: `content.ceiling` and `content.ceiling.<kind>` (chat, web, news, library, made), `content.unrated` and `content.unrated.<kind>`, a person's own lowering (`content.own_ceiling`, `content.own_ceiling.<kind>`, `content.own_unrated`), and the access items `access.thinking`, `access.tier.boost` and `access.tier.max`. Role defaults are the band defaults (child G, teen PG-13, adult X). Additive.

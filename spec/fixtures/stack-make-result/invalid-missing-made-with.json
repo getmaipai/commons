@@ -1,0 +1,11 @@
+{
+  "id": "job-1",
+  "job": "clip",
+  "state": "done",
+  "percent": 100,
+  "status": "Done",
+  "files": [
+    "media-9"
+  ],
+  "poster": "media-10"
+}

@@ -1,0 +1,10 @@
+{
+  "id": "job-1",
+  "job": "restyle",
+  "state": "running",
+  "percent": 40,
+  "status": "Restyling",
+  "files": [],
+  "poster": "media-10",
+  "made_with": null
+}

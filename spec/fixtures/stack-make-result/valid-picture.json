@@ -1,0 +1,20 @@
+{
+  "id": "job-1",
+  "job": "picture",
+  "state": "done",
+  "percent": 100,
+  "status": "Done",
+  "files": [
+    "media-9"
+  ],
+  "poster": null,
+  "made_with": {
+    "part": "picture-model-b",
+    "label": "Picture model B",
+    "pack_version": "2.1.0",
+    "shape": "square",
+    "seconds": null,
+    "sound": false,
+    "notes": []
+  }
+}

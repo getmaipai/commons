@@ -20,4 +20,10 @@ export const STACK_SCHEMA_NAMES: ReadonlySet<string> = new Set([
   // These hand-written mirrors carry if/then rules the generators drop.
   "content-rating.schema.json",
   "content-rater.schema.json",
+  // MODELPACK-SPEC-01: hand-written mirrors (oneOf unions the generators flatten).
+  "stack-model-pack.schema.json",
+  "stack-make-request.schema.json",
+  "stack-make-result.schema.json",
+  "stack-make-refusal.schema.json",
+  "stack-jobs-catalog.schema.json",
 ]);

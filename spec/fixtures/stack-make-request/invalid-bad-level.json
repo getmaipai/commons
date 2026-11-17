@@ -1,0 +1,13 @@
+{
+  "job": "picture",
+  "audience": "adult",
+  "description": "a red kite over a beach",
+  "words": "OPEN",
+  "shape": "landscape",
+  "level": "ultra",
+  "count": 2,
+  "styles": [
+    "watercolor"
+  ],
+  "seed": 7
+}

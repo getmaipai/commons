@@ -1,0 +1,11 @@
+{
+  "job": "picture_edit",
+  "audience": "adult",
+  "picture": "media-1",
+  "description": "make the sky pink",
+  "references": [
+    "media-2"
+  ],
+  "mask": "media-3",
+  "level": "boost"
+}

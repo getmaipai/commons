@@ -1,0 +1,423 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/stack-make-result.schema.json",
+  "title": "StackMakeResult",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "job": {
+          "enum": [
+            "picture",
+            "picture_edit",
+            "clip",
+            "clip_from_sheet",
+            "restyle",
+            "swap"
+          ]
+        },
+        "state": {
+          "enum": [
+            "queued",
+            "running",
+            "waiting_for_you",
+            "paused",
+            "stalled",
+            "done",
+            "failed",
+            "cancelled"
+          ]
+        },
+        "percent": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "status": {
+          "type": "string"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "poster": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "made_with": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "part": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "^[a-z0-9][a-z0-9._-]*$"
+                },
+                "label": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pack_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "shape": {
+                  "oneOf": [
+                    {
+                      "enum": [
+                        "landscape",
+                        "portrait",
+                        "square"
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "seconds": {
+                  "oneOf": [
+                    {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "sound": {
+                  "type": "boolean"
+                },
+                "notes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              "required": [
+                "part",
+                "label",
+                "pack_version",
+                "shape",
+                "seconds",
+                "sound",
+                "notes"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "job",
+        "state",
+        "percent",
+        "status",
+        "files",
+        "poster",
+        "made_with"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "job": {
+          "const": "character_sheet"
+        },
+        "state": {
+          "enum": [
+            "queued",
+            "running",
+            "waiting_for_you",
+            "paused",
+            "stalled",
+            "done",
+            "failed",
+            "cancelled"
+          ]
+        },
+        "percent": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "status": {
+          "type": "string"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "poster": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "made_with": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "part": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "^[a-z0-9][a-z0-9._-]*$"
+                },
+                "label": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pack_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "shape": {
+                  "oneOf": [
+                    {
+                      "enum": [
+                        "landscape",
+                        "portrait",
+                        "square"
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "seconds": {
+                  "oneOf": [
+                    {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "sound": {
+                  "type": "boolean"
+                },
+                "notes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              "required": [
+                "part",
+                "label",
+                "pack_version",
+                "shape",
+                "seconds",
+                "sound",
+                "notes"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "panels": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "id",
+        "job",
+        "state",
+        "percent",
+        "status",
+        "files",
+        "poster",
+        "made_with",
+        "panels"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "job": {
+          "const": "contact_sheet"
+        },
+        "state": {
+          "enum": [
+            "queued",
+            "running",
+            "waiting_for_you",
+            "paused",
+            "stalled",
+            "done",
+            "failed",
+            "cancelled"
+          ]
+        },
+        "percent": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "status": {
+          "type": "string"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "poster": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "made_with": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "part": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "^[a-z0-9][a-z0-9._-]*$"
+                },
+                "label": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pack_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "shape": {
+                  "oneOf": [
+                    {
+                      "enum": [
+                        "landscape",
+                        "portrait",
+                        "square"
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "seconds": {
+                  "oneOf": [
+                    {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "sound": {
+                  "type": "boolean"
+                },
+                "notes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              "required": [
+                "part",
+                "label",
+                "pack_version",
+                "shape",
+                "seconds",
+                "sound",
+                "notes"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tiles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "id",
+        "job",
+        "state",
+        "percent",
+        "status",
+        "files",
+        "poster",
+        "made_with",
+        "tiles"
+      ]
+    }
+  ]
+}
