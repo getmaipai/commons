@@ -18,6 +18,7 @@ const entry = z.object({
   capabilities: StackJobCapabilities,
   styles: z.object({ bases: z.array(z.object({ id: StackPartId, label: text }).strict()), max: z.number().int().min(0) }).strict(),
   restyles: z.array(z.object({ name: text, label: text }).strict()),
+  stems: z.array(z.object({ name: text, label: text }).strict()).optional(),
 });
 export const StackAdultJobEntry = entry.extend({ why_not: text.nullable(), alternatives: z.array(Alt) }).strict();
 export const StackMinorJobEntry = entry.strict();

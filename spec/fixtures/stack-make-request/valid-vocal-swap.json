@@ -1,0 +1,9 @@
+{
+  "job": "vocal_swap",
+  "audience": "adult",
+  "vocal": "media-4",
+  "references": [
+    "media-5"
+  ],
+  "description": "keep the timing"
+}

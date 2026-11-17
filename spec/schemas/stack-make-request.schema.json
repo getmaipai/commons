@@ -452,6 +452,328 @@
         "count",
         "level"
       ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "job": {
+          "const": "song"
+        },
+        "audience": {
+          "enum": [
+            "adult",
+            "minor"
+          ]
+        },
+        "part": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9._-]*$"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "lyrics": {
+          "type": "string",
+          "minLength": 1
+        },
+        "style_words": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "level": {
+          "enum": [
+            "standard",
+            "boost",
+            "max"
+          ]
+        },
+        "seed": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "job",
+        "audience",
+        "description",
+        "seconds"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "job": {
+          "const": "song_edit"
+        },
+        "audience": {
+          "enum": [
+            "adult",
+            "minor"
+          ]
+        },
+        "part": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9._-]*$"
+        },
+        "song": {
+          "type": "string",
+          "minLength": 1
+        },
+        "change": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "cover"
+                },
+                "strength": {
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "maximum": 1
+                },
+                "style_words": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "repaint"
+                },
+                "from_seconds": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "to_seconds": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "description": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "lyrics": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "kind",
+                "from_seconds",
+                "to_seconds"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "extend"
+                },
+                "add_seconds": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "at": {
+                  "enum": [
+                    "start",
+                    "end"
+                  ]
+                }
+              },
+              "required": [
+                "kind",
+                "add_seconds"
+              ]
+            }
+          ]
+        },
+        "level": {
+          "enum": [
+            "standard",
+            "boost",
+            "max"
+          ]
+        }
+      },
+      "required": [
+        "job",
+        "audience",
+        "song",
+        "change"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "job": {
+          "const": "sound_effect"
+        },
+        "audience": {
+          "enum": [
+            "adult",
+            "minor"
+          ]
+        },
+        "part": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9._-]*$"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "required": [
+        "job",
+        "audience",
+        "description",
+        "seconds"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "job": {
+          "const": "stems"
+        },
+        "audience": {
+          "enum": [
+            "adult",
+            "minor"
+          ]
+        },
+        "part": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9._-]*$"
+        },
+        "song": {
+          "type": "string",
+          "minLength": 1
+        },
+        "stems": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "job",
+        "audience",
+        "song",
+        "stems"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "job": {
+          "const": "vocal_swap"
+        },
+        "audience": {
+          "enum": [
+            "adult",
+            "minor"
+          ]
+        },
+        "part": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9._-]*$"
+        },
+        "vocal": {
+          "type": "string",
+          "minLength": 1
+        },
+        "references": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "job",
+        "audience",
+        "vocal",
+        "references"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "job": {
+          "const": "lyric_timing"
+        },
+        "audience": {
+          "enum": [
+            "adult",
+            "minor"
+          ]
+        },
+        "part": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9._-]*$"
+        },
+        "song": {
+          "type": "string",
+          "minLength": 1
+        },
+        "lyrics": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "job",
+        "audience",
+        "song",
+        "lyrics"
+      ]
     }
   ]
 }

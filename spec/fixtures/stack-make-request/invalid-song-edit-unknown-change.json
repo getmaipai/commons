@@ -1,0 +1,10 @@
+{
+  "job": "song_edit",
+  "audience": "adult",
+  "song": "media-3",
+  "change": {
+    "kind": "trim",
+    "from_seconds": 1,
+    "to_seconds": 5
+  }
+}

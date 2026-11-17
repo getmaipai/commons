@@ -1,0 +1,11 @@
+{
+  "job": "stems",
+  "audience": "adult",
+  "song": "media-3",
+  "stems": [
+    "vocals",
+    "drums",
+    "bass",
+    "other"
+  ]
+}

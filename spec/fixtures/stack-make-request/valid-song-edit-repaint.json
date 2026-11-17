@@ -1,0 +1,11 @@
+{
+  "job": "song_edit",
+  "audience": "adult",
+  "song": "media-3",
+  "change": {
+    "kind": "repaint",
+    "from_seconds": 20,
+    "to_seconds": 35,
+    "lyrics": "[Chorus]\nHome again"
+  }
+}

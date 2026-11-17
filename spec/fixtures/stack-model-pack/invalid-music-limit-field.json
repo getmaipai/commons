@@ -1,0 +1,28 @@
+{
+  "id": "pack-music-a",
+  "version": "1.0.0",
+  "part": "music-model-a",
+  "jobs": [
+    {
+      "job": "song",
+      "limits": {
+        "max_seconds": {
+          "standard": 120
+        },
+        "max_bpm": 300
+      },
+      "audiences": [
+        "adult",
+        "minor"
+      ],
+      "capabilities": {
+        "text": true,
+        "end_picture": false,
+        "sound": true,
+        "keeps_likeness": false
+      },
+      "recipe": "recipes/song.md",
+      "peaks": []
+    }
+  ]
+}

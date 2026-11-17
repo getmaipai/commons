@@ -1,0 +1,35 @@
+{
+  "audience": "minor",
+  "jobs": [
+    {
+      "job": "stems",
+      "label": "split a song into parts",
+      "available": true,
+      "part": {
+        "id": "stems-model-a",
+        "label": "Stem splitter"
+      },
+      "limits": {
+        "levels": [
+          "standard"
+        ]
+      },
+      "capabilities": {
+        "text": false,
+        "end_picture": false,
+        "sound": true,
+        "keeps_likeness": false
+      },
+      "styles": {
+        "bases": [],
+        "max": 0
+      },
+      "restyles": [],
+      "stems": [
+        {
+          "name": "vocals"
+        }
+      ]
+    }
+  ]
+}

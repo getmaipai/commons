@@ -1,0 +1,77 @@
+{
+  "id": "pack-music-a",
+  "version": "1.0.0",
+  "part": "music-model-a",
+  "jobs": [
+    {
+      "job": "song",
+      "limits": {
+        "max_seconds": {
+          "standard": 120,
+          "boost": 240,
+          "max": 240
+        },
+        "max_words": 700
+      },
+      "audiences": [
+        "adult",
+        "minor"
+      ],
+      "capabilities": {
+        "text": true,
+        "end_picture": false,
+        "sound": true,
+        "keeps_likeness": false
+      },
+      "recipe": "recipes/song.md",
+      "peaks": [
+        {
+          "level": "standard",
+          "bytes": 12000000000,
+          "status": "unverified"
+        }
+      ]
+    },
+    {
+      "job": "song_edit",
+      "limits": {
+        "max_seconds": {
+          "standard": 120,
+          "boost": 240
+        }
+      },
+      "audiences": [
+        "adult",
+        "minor"
+      ],
+      "capabilities": {
+        "text": true,
+        "end_picture": false,
+        "sound": true,
+        "keeps_likeness": false
+      },
+      "recipe": "recipes/song-edit.md",
+      "peaks": []
+    },
+    {
+      "job": "sound_effect",
+      "limits": {
+        "max_seconds": {
+          "standard": 30
+        }
+      },
+      "audiences": [
+        "adult",
+        "minor"
+      ],
+      "capabilities": {
+        "text": false,
+        "end_picture": false,
+        "sound": true,
+        "keeps_likeness": false
+      },
+      "recipe": "recipes/sound-effect.md",
+      "peaks": []
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "job": "song",
+  "audience": "adult",
+  "description": "a slow song",
+  "seconds": 60,
+  "model": "acestep"
+}

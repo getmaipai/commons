@@ -18,7 +18,11 @@
             "clip",
             "clip_from_sheet",
             "restyle",
-            "swap"
+            "swap",
+            "song",
+            "song_edit",
+            "sound_effect",
+            "vocal_swap"
           ]
         },
         "state": {
@@ -417,6 +421,312 @@
         "poster",
         "made_with",
         "tiles"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "job": {
+          "const": "stems"
+        },
+        "state": {
+          "enum": [
+            "queued",
+            "running",
+            "waiting_for_you",
+            "paused",
+            "stalled",
+            "done",
+            "failed",
+            "cancelled"
+          ]
+        },
+        "percent": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "status": {
+          "type": "string"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "poster": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "made_with": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "part": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "^[a-z0-9][a-z0-9._-]*$"
+                },
+                "label": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pack_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "shape": {
+                  "oneOf": [
+                    {
+                      "enum": [
+                        "landscape",
+                        "portrait",
+                        "square"
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "seconds": {
+                  "oneOf": [
+                    {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "sound": {
+                  "type": "boolean"
+                },
+                "notes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              "required": [
+                "part",
+                "label",
+                "pack_version",
+                "shape",
+                "seconds",
+                "sound",
+                "notes"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "stems": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "file": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "name",
+              "file"
+            ]
+          }
+        }
+      },
+      "required": [
+        "id",
+        "job",
+        "state",
+        "percent",
+        "status",
+        "files",
+        "poster",
+        "made_with",
+        "stems"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "job": {
+          "const": "lyric_timing"
+        },
+        "state": {
+          "enum": [
+            "queued",
+            "running",
+            "waiting_for_you",
+            "paused",
+            "stalled",
+            "done",
+            "failed",
+            "cancelled"
+          ]
+        },
+        "percent": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "status": {
+          "type": "string"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "poster": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "made_with": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "part": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "^[a-z0-9][a-z0-9._-]*$"
+                },
+                "label": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pack_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "shape": {
+                  "oneOf": [
+                    {
+                      "enum": [
+                        "landscape",
+                        "portrait",
+                        "square"
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "seconds": {
+                  "oneOf": [
+                    {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "sound": {
+                  "type": "boolean"
+                },
+                "notes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              "required": [
+                "part",
+                "label",
+                "pack_version",
+                "shape",
+                "seconds",
+                "sound",
+                "notes"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "timings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "start_seconds": {
+                "type": "number",
+                "minimum": 0
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "start_seconds",
+              "text"
+            ]
+          }
+        }
+      },
+      "required": [
+        "id",
+        "job",
+        "state",
+        "percent",
+        "status",
+        "files",
+        "poster",
+        "made_with",
+        "timings"
       ]
     }
   ]

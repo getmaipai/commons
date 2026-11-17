@@ -1,0 +1,63 @@
+{
+  "id": "pack-stems-a",
+  "version": "1.0.0",
+  "part": "stems-model-a",
+  "jobs": [
+    {
+      "job": "stems",
+      "limits": {},
+      "audiences": [
+        "adult",
+        "minor"
+      ],
+      "capabilities": {
+        "text": false,
+        "end_picture": false,
+        "sound": true,
+        "keeps_likeness": false
+      },
+      "recipe": "recipes/stems.md",
+      "peaks": [
+        {
+          "bytes": 3000000000,
+          "status": "measured",
+          "measured_on": "2026-11-17"
+        }
+      ]
+    },
+    {
+      "job": "lyric_timing",
+      "limits": {},
+      "audiences": [
+        "adult",
+        "minor"
+      ],
+      "capabilities": {
+        "text": true,
+        "end_picture": false,
+        "sound": true,
+        "keeps_likeness": false
+      },
+      "recipe": "recipes/lyric-timing.md",
+      "peaks": []
+    },
+    {
+      "job": "vocal_swap",
+      "limits": {
+        "max_references": 1
+      },
+      "audiences": [
+        "adult",
+        "minor"
+      ],
+      "capabilities": {
+        "text": false,
+        "end_picture": false,
+        "sound": true,
+        "keeps_likeness": true
+      },
+      "recipe": "recipes/vocal-swap.md",
+      "peaks": []
+    }
+  ]
+}

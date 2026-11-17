@@ -25,7 +25,13 @@
                   "restyle",
                   "swap",
                   "character_sheet",
-                  "contact_sheet"
+                  "contact_sheet",
+                  "song",
+                  "song_edit",
+                  "sound_effect",
+                  "stems",
+                  "vocal_swap",
+                  "lyric_timing"
                 ]
               },
               "label": {
@@ -411,6 +417,27 @@
                     "label"
                   ]
                 }
+              },
+              "stems": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "label": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "label"
+                  ]
+                }
               }
             },
             "required": [
@@ -455,7 +482,13 @@
                   "restyle",
                   "swap",
                   "character_sheet",
-                  "contact_sheet"
+                  "contact_sheet",
+                  "song",
+                  "song_edit",
+                  "sound_effect",
+                  "stems",
+                  "vocal_swap",
+                  "lyric_timing"
                 ]
               },
               "label": {
@@ -789,6 +822,27 @@
                 ]
               },
               "restyles": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "label": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "label"
+                  ]
+                }
+              },
+              "stems": {
                 "type": "array",
                 "items": {
                   "type": "object",

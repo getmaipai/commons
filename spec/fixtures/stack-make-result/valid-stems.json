@@ -1,0 +1,31 @@
+{
+  "id": "job-2",
+  "job": "stems",
+  "state": "done",
+  "percent": 100,
+  "status": "Done",
+  "files": [
+    "media-9",
+    "media-10"
+  ],
+  "poster": null,
+  "made_with": {
+    "part": "stems-model-a",
+    "label": "Stem splitter A",
+    "pack_version": "1.0.0",
+    "shape": null,
+    "seconds": null,
+    "sound": true,
+    "notes": []
+  },
+  "stems": [
+    {
+      "name": "vocals",
+      "file": "media-9"
+    },
+    {
+      "name": "drums",
+      "file": "media-10"
+    }
+  ]
+}

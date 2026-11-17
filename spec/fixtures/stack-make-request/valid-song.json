@@ -1,0 +1,14 @@
+{
+  "job": "song",
+  "audience": "adult",
+  "description": "a slow song about rain on a tin roof",
+  "lyrics": "[Verse]\nRain on the roof",
+  "style_words": [
+    "folk",
+    "warm",
+    "acoustic guitar"
+  ],
+  "seconds": 60,
+  "level": "boost",
+  "seed": 7
+}

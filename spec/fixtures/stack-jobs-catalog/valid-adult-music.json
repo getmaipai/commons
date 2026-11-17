@@ -1,0 +1,113 @@
+{
+  "audience": "adult",
+  "jobs": [
+    {
+      "job": "song",
+      "label": "song",
+      "available": true,
+      "part": {
+        "id": "music-model-a",
+        "label": "Music maker"
+      },
+      "limits": {
+        "levels": [
+          "standard",
+          "boost"
+        ],
+        "max_seconds": {
+          "standard": 120,
+          "boost": 240
+        },
+        "max_words": 700
+      },
+      "capabilities": {
+        "text": true,
+        "end_picture": false,
+        "sound": true,
+        "keeps_likeness": false
+      },
+      "styles": {
+        "bases": [],
+        "max": 0
+      },
+      "restyles": [],
+      "why_not": null,
+      "alternatives": []
+    },
+    {
+      "job": "stems",
+      "label": "split a song into parts",
+      "available": true,
+      "part": {
+        "id": "stems-model-a",
+        "label": "Stem splitter"
+      },
+      "limits": {
+        "levels": [
+          "standard"
+        ]
+      },
+      "capabilities": {
+        "text": false,
+        "end_picture": false,
+        "sound": true,
+        "keeps_likeness": false
+      },
+      "styles": {
+        "bases": [],
+        "max": 0
+      },
+      "restyles": [],
+      "stems": [
+        {
+          "name": "vocals",
+          "label": "Vocals"
+        },
+        {
+          "name": "drums",
+          "label": "Drums"
+        },
+        {
+          "name": "bass",
+          "label": "Bass"
+        },
+        {
+          "name": "other",
+          "label": "Everything else"
+        }
+      ],
+      "why_not": null,
+      "alternatives": []
+    },
+    {
+      "job": "vocal_swap",
+      "label": "swap a singing voice",
+      "available": false,
+      "part": null,
+      "limits": {
+        "levels": [
+          "standard"
+        ],
+        "max_references": 1
+      },
+      "capabilities": {
+        "text": false,
+        "end_picture": false,
+        "sound": true,
+        "keeps_likeness": true
+      },
+      "styles": {
+        "bases": [],
+        "max": 0
+      },
+      "restyles": [],
+      "why_not": "No installed model changes a singing voice.",
+      "alternatives": [
+        {
+          "part": "music-model-b",
+          "label": "Voice maker"
+        }
+      ]
+    }
+  ]
+}

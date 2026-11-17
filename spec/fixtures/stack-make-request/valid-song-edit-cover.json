@@ -1,0 +1,13 @@
+{
+  "job": "song_edit",
+  "audience": "adult",
+  "song": "media-3",
+  "change": {
+    "kind": "cover",
+    "strength": 0.6,
+    "style_words": [
+      "jazz"
+    ]
+  },
+  "level": "standard"
+}

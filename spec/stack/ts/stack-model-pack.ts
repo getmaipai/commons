@@ -5,7 +5,7 @@ import { z } from "zod";
 
 import { StackPartId } from "./stack-part";
 
-export const StackJobName = z.enum(["picture", "picture_edit", "clip", "clip_from_sheet", "restyle", "swap", "character_sheet", "contact_sheet"]);
+export const StackJobName = z.enum(["picture", "picture_edit", "clip", "clip_from_sheet", "restyle", "swap", "character_sheet", "contact_sheet", "song", "song_edit", "sound_effect", "stems", "vocal_swap", "lyric_timing"]);
 export type StackJobName = z.infer<typeof StackJobName>;
 export const StackJobShape = z.enum(["landscape", "portrait", "square"]);
 export const StackJobLevel = z.enum(["standard", "boost", "max"]);
@@ -29,7 +29,7 @@ const PackJob = z.object({
   capabilities: StackJobCapabilities,
   recipe: text,
   adapter: text.optional(),
-  peaks: z.array(z.object({ shape: StackJobShape, level: StackJobLevel.optional(), bytes: z.number().int().min(0), status: z.enum(["measured", "unverified"]), measured_on: text.optional() }).strict()),
+  peaks: z.array(z.object({ shape: StackJobShape.optional(), level: StackJobLevel.optional(), bytes: z.number().int().min(0), status: z.enum(["measured", "unverified"]), measured_on: text.optional() }).strict()),
 }).strict();
 
 export const StackModelPack = z.object({

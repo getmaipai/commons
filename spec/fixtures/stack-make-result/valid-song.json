@@ -1,0 +1,20 @@
+{
+  "id": "job-2",
+  "job": "song",
+  "state": "done",
+  "percent": 100,
+  "status": "Done",
+  "files": [
+    "media-9"
+  ],
+  "poster": null,
+  "made_with": {
+    "part": "music-model-a",
+    "label": "Music model A",
+    "pack_version": "1.0.0",
+    "shape": null,
+    "seconds": 60,
+    "sound": true,
+    "notes": []
+  }
+}

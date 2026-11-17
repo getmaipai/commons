@@ -1,6 +1,6 @@
 // Hand-written Zod mirror of ../schemas/stack-make-request.schema.json,
 // stack-make-result.schema.json and stack-make-refusal.schema.json.
-// MODELPACK-SPEC-01: the eight generic jobs. A request names a job and its
+// MODELPACK-SPEC-01: the generic jobs (eight picture and clip jobs, six music jobs). A request names a job and its
 // inputs; it may name a `part` only with an opaque id the Stack gave it.
 import { z } from "zod";
 
@@ -12,6 +12,13 @@ const secs = z.number().positive();
 const common = { audience: StackJobAudience, part: StackPartId.optional() };
 const req = <J extends string, T extends z.ZodRawShape>(job: J, shape: T) => z.object({ job: z.literal(job), ...common, ...shape }).strict();
 
+// What song_edit changes. Trim, fade and loudness run no model, so no pack serves them and they are not here.
+export const StackSongChange = z.discriminatedUnion("kind", [
+  z.object({ kind: z.literal("cover"), strength: z.number().positive().max(1).optional(), style_words: z.array(text).optional() }).strict(),
+  z.object({ kind: z.literal("repaint"), from_seconds: z.number().min(0), to_seconds: secs, description: text.optional(), lyrics: text.optional() }).strict(),
+  z.object({ kind: z.literal("extend"), add_seconds: secs, at: z.enum(["start", "end"]).optional() }).strict(),
+]);
+
 export const StackMakeRequest = z.discriminatedUnion("job", [
   req("picture", { description: text, words: text.optional(), shape: StackJobShape, level: StackJobLevel, count: z.number().int().min(1).optional(), styles: z.array(text).optional(), seed: z.number().int().optional() }),
   req("picture_edit", { picture: text, description: text, words: text.optional(), references: z.array(text).optional(), mask: text.optional(), level: StackJobLevel, styles: z.array(text).optional() }),
@@ -21,6 +28,13 @@ export const StackMakeRequest = z.discriminatedUnion("job", [
   req("swap", { clip: text, references: z.array(text).min(1), description: text.optional(), start_seconds: z.number().min(0).optional(), seconds: secs, level: StackJobLevel }),
   req("character_sheet", { references: z.array(text).min(1), description: text.optional(), kind: z.enum(["person", "object", "pet"]), level: StackJobLevel }),
   req("contact_sheet", { references: z.array(text).min(1), description: text.optional(), count: z.number().int().min(1), level: StackJobLevel }),
+  // The music family. Ids are opaque, as above; the words are the person's own (never logged by the pack).
+  req("song", { description: text, lyrics: text.optional(), style_words: z.array(text).optional(), seconds: secs, level: StackJobLevel.optional(), seed: z.number().int().min(0).optional() }),
+  req("song_edit", { song: text, change: StackSongChange, level: StackJobLevel.optional() }),
+  req("sound_effect", { description: text, seconds: secs }),
+  req("stems", { song: text, stems: z.array(text).min(1) }),
+  req("vocal_swap", { vocal: text, references: z.array(text).min(1), description: text.optional() }),
+  req("lyric_timing", { song: text, lyrics: text }),
 ]);
 export type StackMakeRequest = z.infer<typeof StackMakeRequest>;
 
@@ -28,11 +42,13 @@ export const StackMadeWith = z.object({ part: StackPartId, label: text, pack_ver
 export type StackMadeWith = z.infer<typeof StackMadeWith>;
 
 const resBase = { id: text, state: z.enum(["queued", "running", "waiting_for_you", "paused", "stalled", "done", "failed", "cancelled"]), percent: z.number().int().min(0).max(100), status: z.string(), files: z.array(text), poster: text.nullable(), made_with: StackMadeWith.nullable() };
-const plainJobs = z.enum(["picture", "picture_edit", "clip", "clip_from_sheet", "restyle", "swap"]);
+const plainJobs = z.enum(["picture", "picture_edit", "clip", "clip_from_sheet", "restyle", "swap", "song", "song_edit", "sound_effect", "vocal_swap"]);
 export const StackMakeResult = z.union([
   z.object({ ...resBase, job: plainJobs }).strict(),
   z.object({ ...resBase, job: z.literal("character_sheet"), panels: z.array(text) }).strict(),
   z.object({ ...resBase, job: z.literal("contact_sheet"), tiles: z.array(text) }).strict(),
+  z.object({ ...resBase, job: z.literal("stems"), stems: z.array(z.object({ name: text, file: text }).strict()) }).strict(),
+  z.object({ ...resBase, job: z.literal("lyric_timing"), timings: z.array(z.object({ start_seconds: z.number().min(0), text }).strict()) }).strict(),
 ]);
 export type StackMakeResult = z.infer<typeof StackMakeResult>;
 

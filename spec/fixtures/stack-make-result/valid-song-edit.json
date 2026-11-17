@@ -1,0 +1,22 @@
+{
+  "id": "job-2",
+  "job": "song_edit",
+  "state": "done",
+  "percent": 100,
+  "status": "Done",
+  "files": [
+    "media-9"
+  ],
+  "poster": null,
+  "made_with": {
+    "part": "music-model-a",
+    "label": "Music model A",
+    "pack_version": "1.0.0",
+    "shape": null,
+    "seconds": 80,
+    "sound": true,
+    "notes": [
+      "The song was extended by 20 seconds."
+    ]
+  }
+}
