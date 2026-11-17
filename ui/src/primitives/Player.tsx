@@ -28,7 +28,7 @@ import {
   MediaVolumeRange,
 } from "media-chrome/react";
 import { getIcon } from "@/kit/icons";
-import { AmbientGlow } from "@/kit/primitives/AmbientGlow";
+import { AmbientGlow, loadArtColors, meanColor } from "@/kit/primitives/AmbientGlow";
 import { LyricsList, type TimedLyricLine } from "@/kit/elements/lyrics-list";
 import { SafeImage } from "@/kit/primitives/SafeImage";
 import { Badge } from "@/kit/ui/badge";
@@ -808,6 +808,16 @@ export function Player(props: PlayerProps) {
     return () => clearTimeout(id);
   }, [countdown, upNext, onNext]);
 
+  // ---- Cover color (audio layout accent) ----
+  const [artTint, setArtTint] = useState<string | null>(null);
+  useEffect(() => {
+    setArtTint(null);
+    if (layout !== "audio" || !poster) return;
+    let dead = false;
+    void loadArtColors(poster).then((colors) => { if (!dead && colors) setArtTint(meanColor(colors)); });
+    return () => { dead = true; };
+  }, [layout, poster]);
+
   // ---- Media Session ----
   useEffect(() => {
     if (!mediaSession || !playing || typeof navigator === "undefined" || !("mediaSession" in navigator)) return;
@@ -1423,6 +1433,9 @@ export function Player(props: PlayerProps) {
   // The audio and mini layouts read the page's own tokens (no picture under them), so they follow the theme.
   const audioVars = {
     ...controllerStyle,
+    // The bar and volume follow the cover's main color, mixed toward the foreground so they stay readable on any art;
+    // with no cover, or one that cannot be read, they keep the theme's accent.
+    ...(artTint ? { "--progress-accent": `color-mix(in oklab, ${artTint} 70%, var(--foreground))`, "--media-range-bar-color": "var(--progress-accent)", "--media-range-thumb-background": "var(--progress-accent)" } : {}),
     "--media-primary-color": "var(--foreground)",
     "--media-text-color": "var(--foreground)",
     "--media-icon-color": "var(--foreground)",
