@@ -1,3 +1,7 @@
+## [ui-v0.5.687] - 2026-11-17
+
+- The package version matches its tag again. Tags `ui-v0.5.681` to `ui-v0.5.686` were cut without the version bump (the package stayed at 0.5.680), so a consumer whose gate checks the version against the tag must pin 0.5.687 or later. No kit part changed since 0.5.686.
+
 ## [ui-v0.5.680] - 2026-11-16
 
 - SETTINGS-CHATGPT-02: the Settings column is dense like ChatGPT's: 32 px rows with a 4 px gap (a 36 px pitch, was 48), plain icons with no tile, a 232 px column, and `SettingsShell` no longer wraps labels (area names are short enough for one line; `wrapLabels` stays an opt-in prop of SectionSidebar).
