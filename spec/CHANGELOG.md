@@ -1,3 +1,7 @@
+## [spec-v0.1.412] - 2026-11-16
+
+- The package version matches its tag again. Tags `spec-v0.1.409`, `spec-v0.1.410` and `spec-v0.1.411` were cut without the version bump, so a consumer whose gate checks the version against the tag must pin 0.1.412 or later. No shape changed since 0.1.411.
+
 ## [spec-v0.1.411] - 2026-11-16
 
 - PARTS-SPEC-02: add chat turn capabilities to part records and list rows,
