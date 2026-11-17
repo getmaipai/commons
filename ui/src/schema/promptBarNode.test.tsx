@@ -84,6 +84,16 @@ describe("prompt_bar node", () => {
     expect(view.getByRole("textbox", { name: "Subject" }).getAttribute("placeholder")).toBe("Who or what?");
   });
 
+  test("a shown field's typed words ride with the submit, and an empty box still submits", async () => {
+    const recipe = { ...cardsNode, fields: [{ state: "blank_subject", label: "Subject" }, { state: "blank_other", label: "Other", when: { state: "blank_subject", equals: "never" } }], submit: { call: { target: "/api/plugins/videos/make", args: { prompt: "{prompt}", blank_subject: "{blank_subject}", blank_other: "{blank_other}" } } } } as UiNode;
+    const { view } = drawWith(recipe, { blank_subject: "a red fox", blank_other: "hidden words" });
+    fireEvent.click(view.getByRole("button", { name: "Make" }));
+    await waitFor(() => expect(calls.length).toBe(1));
+    const body = calls[0]!.body as Record<string, unknown>;
+    expect(body.blank_subject).toBe("a red fox");
+    expect(body.blank_other).not.toBe("hidden words");
+  });
+
   test("fields schema enforces bounds and absent fields remain absent", () => {
     const base = { type: "prompt_bar", label: "Describe", submit: { call: { target: "/make" } } };
     expect(PageNodeSchema.parse({ type: "page", id: "x", title: "X", body: [base] }).body[0]).toBeTruthy();

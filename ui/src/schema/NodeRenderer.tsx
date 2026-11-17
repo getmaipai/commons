@@ -900,6 +900,8 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
 
   function submit() {
     const item: Record<string, unknown> = { ...picked, [promptKey]: text.trim() };
+    // A recipe field shown above the box rides with the submit under its own state name, so a `{blank_x}` argument fills with what was typed.
+    for (const field of visibleFields) { const typed = state[field.state]; if (typeof typed === "string" && typed.trim()) item[field.state] = typed.trim(); }
     // VIDEO-LORA-09: a chip that cannot be used at the chosen level sends nothing.
     for (const chip of chips) if (chipUnusable(chip, tier)) delete item[chip.state];
     if (node.tier) item[node.tier.state] = tier;

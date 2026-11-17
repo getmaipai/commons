@@ -1,3 +1,7 @@
+## [ui-v0.5.689] - 2026-11-17
+
+- `prompt_bar`: a recipe field that is shown sends what was typed with the submit under its own state name, so a `{blank_subject}` argument fills (before, it reached the server unfilled, so a template's typed words were dropped).
+
 ## [ui-v0.5.688] - 2026-11-17
 
 - `PromptBar`: when a recipe field is shown (`fields` is not empty) the submit button works with an empty main box, so a template can be made from its examples or the typed fields alone. Without fields the box still needs text.
