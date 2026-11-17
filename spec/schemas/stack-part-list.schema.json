@@ -1,0 +1,29 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "audience": {
+      "description": "Audience receiving this list.",
+      "type": "string",
+      "enum": [
+        "adult",
+        "minor"
+      ]
+    },
+    "parts": {
+      "description": "Part rows.",
+      "type": "array",
+      "items": {
+        "$ref": "https://getmaipai.github.io/shared/spec/schemas/stack-part-view.schema.json"
+      }
+    }
+  },
+  "required": [
+    "audience",
+    "parts"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/stack-part-list.schema.json",
+  "title": "StackPartList",
+  "description": "Parts list response for the Stack API."
+}

@@ -36,6 +36,12 @@ import { SttTranscribeResponse } from "../../stack/ts/stt-transcribe-response";
 import { StackJob } from "../../stack/ts/stack-job";
 import { TurnStreamEvent } from "../../stack/ts/turn-stream-event";
 import { TokenCountRequest, TokenCountResponse } from "../../stack/ts/token-count";
+import { StackPart } from "../../stack/ts/stack-part";
+import { StackPartView } from "../../stack/ts/stack-part-view";
+import { StackPartList } from "../../stack/ts/stack-part-list";
+import { StackPartChoices } from "../../stack/ts/stack-part-choices";
+import { StackStatus } from "../../stack/ts/stack-status";
+import { StackSizing } from "../../stack/ts/stack-sizing";
 
 const SPEC = join(import.meta.dir, "..", "..");
 const ajv = new Ajv2020({ strict: false, allErrors: true });
@@ -43,6 +49,7 @@ addFormats(ajv);
 // turn-stream-event's `block` event $refs the AnswerBlock schema by its relative id.
 ajv.addSchema(JSON.parse(readFileSync(join(SPEC, "schemas", "answer-block.schema.json"), "utf8")));
 ajv.addSchema(JSON.parse(readFileSync(join(SPEC, "schemas", "stack-job.schema.json"), "utf8")));
+ajv.addSchema(JSON.parse(readFileSync(join(SPEC, "schemas", "stack-part-view.schema.json"), "utf8")));
 
 const SHAPES: Array<{ name: string; zod: ZodType }> = [
   { name: "role-request", zod: RoleRequest },
@@ -58,6 +65,12 @@ const SHAPES: Array<{ name: string; zod: ZodType }> = [
   { name: "turn-stream-event", zod: TurnStreamEvent },
   { name: "token-count-request", zod: TokenCountRequest },
   { name: "token-count-response", zod: TokenCountResponse },
+  { name: "stack-part", zod: StackPart },
+  { name: "stack-part-view", zod: StackPartView },
+  { name: "stack-part-list", zod: StackPartList },
+  { name: "stack-part-choices", zod: StackPartChoices },
+  { name: "stack-status", zod: StackStatus },
+  { name: "stack-sizing", zod: StackSizing },
 ];
 
 for (const shape of SHAPES) {

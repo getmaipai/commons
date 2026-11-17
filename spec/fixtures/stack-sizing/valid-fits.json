@@ -1,0 +1,27 @@
+{
+  "percent": 80,
+  "budget_bytes": 800,
+  "categories": [
+    {
+      "category": "chat",
+      "tiers": {
+        "standard": {
+          "part_id": "tiny-chat",
+          "fits": true,
+          "reason": null
+        },
+        "boost": {
+          "part_id": "tiny-chat",
+          "fits": true,
+          "reason": null
+        },
+        "max": {
+          "part_id": "tiny-chat",
+          "fits": true,
+          "reason": null
+        }
+      },
+      "line": "Chat fits."
+    }
+  ]
+}

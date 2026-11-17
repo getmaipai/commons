@@ -1,3 +1,9 @@
+## [spec-v0.1.410] - 2026-11-16
+
+- PARTS-SPEC-01: define Catalog part records and the Stack's parts list,
+  household choices, status, and sizing wire shapes with JSON Schemas,
+  hand-written Zod mirrors, and fixtures checked by both validators.
+
 ## [spec-v0.1.408] - 2026-11-16
 
 - Settings area names are short enough for one line in the column (Profile, Chat, Your data, Household, Media, Voices, Backups and updates, and the rest unchanged).

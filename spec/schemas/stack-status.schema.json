@@ -1,0 +1,223 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "health": {
+      "description": "Stack health.",
+      "type": "string",
+      "enum": [
+        "ok",
+        "degraded",
+        "down",
+        "updating"
+      ]
+    },
+    "busy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "running": {
+          "description": "Running work count.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "waiting": {
+          "description": "Waiting work count.",
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "running",
+        "waiting"
+      ]
+    },
+    "using": {
+      "description": "Parts currently in use.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "part_id": {
+            "description": "Opaque part key.",
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "bytes": {
+            "description": "Memory bytes in use.",
+            "type": "integer",
+            "minimum": 0
+          },
+          "job_id": {
+            "description": "Associated job id, if any.",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "part_id",
+          "bytes",
+          "job_id"
+        ]
+      }
+    },
+    "memory": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "total_bytes": {
+          "description": "Total memory bytes.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "free_bytes": {
+          "description": "Free memory bytes.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "budget_bytes": {
+          "description": "Memory budget bytes.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "pressure": {
+          "description": "Memory pressure.",
+          "type": "string",
+          "enum": [
+            "normal",
+            "warn",
+            "critical"
+          ]
+        }
+      },
+      "required": [
+        "total_bytes",
+        "free_bytes",
+        "budget_bytes",
+        "pressure"
+      ]
+    },
+    "jobs": {
+      "description": "Current and recent jobs.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "Job id.",
+            "type": "string"
+          },
+          "kind": {
+            "description": "Job kind.",
+            "type": "string"
+          },
+          "part_id": {
+            "description": "Related part id, if any.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "state": {
+            "description": "Job state.",
+            "type": "string",
+            "enum": [
+              "running",
+              "waiting",
+              "failed",
+              "done"
+            ]
+          },
+          "reason": {
+            "description": "Reason, if any.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "percent": {
+            "description": "Progress percent, if known.",
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "part_id",
+          "state",
+          "reason",
+          "percent"
+        ]
+      }
+    },
+    "problems": {
+      "description": "Current problems and their remedies.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "description": "Problem code.",
+            "type": "string",
+            "minLength": 1
+          },
+          "part_id": {
+            "description": "Related part id, if any.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "plain": {
+            "description": "Plain language problem.",
+            "type": "string",
+            "minLength": 1
+          },
+          "fix": {
+            "description": "Suggested fix.",
+            "type": "string",
+            "minLength": 1
+          },
+          "since": {
+            "description": "When the problem began. None",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "part_id",
+          "plain",
+          "fix",
+          "since"
+        ]
+      }
+    }
+  },
+  "required": [
+    "health",
+    "busy",
+    "using",
+    "memory",
+    "jobs",
+    "problems"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/stack-status.schema.json",
+  "title": "StackStatus",
+  "description": "Status response for GET /stack/v1/status."
+}

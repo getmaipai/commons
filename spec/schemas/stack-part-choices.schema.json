@@ -1,0 +1,45 @@
+{
+  "type": "object",
+  "additionalProperties": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "order": {
+        "description": "Part ids in chosen order.",
+        "type": "array",
+        "items": {
+          "description": "Opaque part key.",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9._-]*$"
+        },
+        "uniqueItems": true
+      },
+      "off": {
+        "description": "Part ids switched off.",
+        "type": "array",
+        "items": {
+          "description": "Opaque part key.",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9._-]*$"
+        },
+        "uniqueItems": true
+      }
+    },
+    "required": [
+      "order",
+      "off"
+    ]
+  },
+  "properties": {},
+  "required": [],
+  "propertyNames": {
+    "minLength": 1,
+    "description": "A non-empty category name."
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/stack-part-choices.schema.json",
+  "title": "StackPartChoices",
+  "description": "Household choices for category part ordering and enabled parts."
+}

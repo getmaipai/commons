@@ -1,0 +1,34 @@
+{
+  "audience": "minor",
+  "parts": [
+    {
+      "id": "tiny-chat",
+      "kind": "model",
+      "category": "chat",
+      "priority": 1,
+      "label": "Tiny Chat",
+      "description": "",
+      "enabled": true,
+      "state": "ready",
+      "size_bytes": 100,
+      "download_bytes": 100,
+      "percent": null,
+      "fits": {
+        "standard": true,
+        "boost": true,
+        "max": true,
+        "reason": null
+      },
+      "can_install": true,
+      "install_block": null,
+      "can_uninstall": true,
+      "uninstall_block": null,
+      "licence_needed": false,
+      "required_by": [],
+      "update": {
+        "available": false,
+        "version": null
+      }
+    }
+  ]
+}

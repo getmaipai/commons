@@ -1,0 +1,16 @@
+{
+  "health": "ok",
+  "busy": {
+    "running": 0,
+    "waiting": 0
+  },
+  "using": [],
+  "memory": {
+    "total_bytes": 1000,
+    "free_bytes": 900,
+    "budget_bytes": 800,
+    "pressure": "high"
+  },
+  "jobs": [],
+  "problems": []
+}

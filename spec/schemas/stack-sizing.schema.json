@@ -1,0 +1,170 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "percent": {
+      "description": "Requested memory budget percentage.",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100
+    },
+    "budget_bytes": {
+      "description": "Memory budget in bytes.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "categories": {
+      "description": "Per-category sizing choices.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "description": "Open category name.",
+            "type": "string",
+            "minLength": 1
+          },
+          "tiers": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "standard": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "part_id": {
+                    "description": "Selected part id, if any.",
+                    "anyOf": [
+                      {
+                        "description": "Opaque part key.",
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "^[a-z0-9][a-z0-9._-]*$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "fits": {
+                    "description": "Whether this tier fits.",
+                    "type": "boolean"
+                  },
+                  "reason": {
+                    "description": "Reason, if it does not fit.",
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "required": [
+                  "part_id",
+                  "fits",
+                  "reason"
+                ]
+              },
+              "boost": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "part_id": {
+                    "description": "Selected part id, if any.",
+                    "anyOf": [
+                      {
+                        "description": "Opaque part key.",
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "^[a-z0-9][a-z0-9._-]*$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "fits": {
+                    "description": "Whether this tier fits.",
+                    "type": "boolean"
+                  },
+                  "reason": {
+                    "description": "Reason, if it does not fit.",
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "required": [
+                  "part_id",
+                  "fits",
+                  "reason"
+                ]
+              },
+              "max": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "part_id": {
+                    "description": "Selected part id, if any.",
+                    "anyOf": [
+                      {
+                        "description": "Opaque part key.",
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "^[a-z0-9][a-z0-9._-]*$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "fits": {
+                    "description": "Whether this tier fits.",
+                    "type": "boolean"
+                  },
+                  "reason": {
+                    "description": "Reason, if it does not fit.",
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "required": [
+                  "part_id",
+                  "fits",
+                  "reason"
+                ]
+              }
+            },
+            "required": [
+              "standard",
+              "boost",
+              "max"
+            ]
+          },
+          "line": {
+            "description": "Human-readable sizing summary.",
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "category",
+          "tiers",
+          "line"
+        ]
+      }
+    }
+  },
+  "required": [
+    "percent",
+    "budget_bytes",
+    "categories"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/stack-sizing.schema.json",
+  "title": "StackSizing",
+  "description": "Sizing response for GET /stack/v1/sizing?percent=N."
+}

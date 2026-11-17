@@ -1,0 +1,232 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "description": "Opaque part key.",
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$"
+    },
+    "kind": {
+      "description": "The installable part kind.",
+      "type": "string",
+      "enum": [
+        "model",
+        "tool",
+        "engine"
+      ]
+    },
+    "category": {
+      "description": "Open category name.",
+      "type": "string",
+      "minLength": 1
+    },
+    "priority": {
+      "description": "Shipped order within the category.",
+      "type": "integer",
+      "minimum": 1
+    },
+    "label": {
+      "description": "True name shown to adults.",
+      "type": "string",
+      "minLength": 1
+    },
+    "neutral_label": {
+      "description": "Name served to a child or teen.",
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "description": "Plain one-line description.",
+      "type": "string",
+      "minLength": 1
+    },
+    "adult_only": {
+      "description": "Whether this part is only available to adults.",
+      "type": "boolean"
+    },
+    "version": {
+      "description": "Part version.",
+      "type": "string",
+      "minLength": 1
+    },
+    "files": {
+      "description": "Files that make up the installable part.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "description": "HTTPS download URL.",
+            "type": "string",
+            "pattern": "^https://",
+            "format": "uri"
+          },
+          "sha256": {
+            "description": "Lowercase SHA-256 digest.",
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "bytes": {
+            "description": "File size in bytes.",
+            "type": "integer",
+            "minimum": 0
+          },
+          "path": {
+            "description": "Optional install path.",
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "url",
+          "sha256",
+          "bytes"
+        ]
+      },
+      "minItems": 1
+    },
+    "licence": {
+      "description": "License name and notice reference.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "description": "License name.",
+          "type": "string",
+          "minLength": 1
+        },
+        "notice_id": {
+          "description": "Notice identifier, if any.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "notice_id"
+      ]
+    },
+    "runner": {
+      "description": "Engine part id that runs this part, or null for an engine.",
+      "anyOf": [
+        {
+          "description": "Opaque part key.",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9._-]*$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "requires": {
+      "description": "Required part ids.",
+      "type": "array",
+      "items": {
+        "description": "Opaque part key.",
+        "type": "string",
+        "minLength": 1,
+        "pattern": "^[a-z0-9][a-z0-9._-]*$"
+      },
+      "uniqueItems": true
+    },
+    "builds": {
+      "description": "Available tiered builds.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "tier": {
+            "description": "Build tier.",
+            "type": "string",
+            "enum": [
+              "standard",
+              "boost",
+              "max"
+            ]
+          },
+          "options": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {}
+          }
+        },
+        "required": [
+          "tier",
+          "options"
+        ]
+      }
+    },
+    "peaks": {
+      "description": "Memory peak measurements.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "options": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {}
+          },
+          "bytes": {
+            "description": "Peak memory in bytes.",
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "description": "Measurement status.",
+            "type": "string",
+            "enum": [
+              "measured",
+              "unverified"
+            ]
+          },
+          "measured_on": {
+            "description": "Measurement date or note.",
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "options",
+          "bytes",
+          "status"
+        ]
+      }
+    },
+    "min_stack": {
+      "description": "Minimum compatible Stack version.",
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "id",
+    "kind",
+    "category",
+    "priority",
+    "label",
+    "neutral_label",
+    "description",
+    "adult_only",
+    "version",
+    "files",
+    "licence",
+    "runner",
+    "requires",
+    "peaks",
+    "min_stack"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/stack-part.schema.json",
+  "title": "StackPart",
+  "description": "Catalog data for one installable model, tool, or engine."
+}

@@ -1,0 +1,193 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "description": "Opaque part key.",
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$"
+    },
+    "kind": {
+      "description": "The installable part kind.",
+      "type": "string",
+      "enum": [
+        "model",
+        "tool",
+        "engine"
+      ]
+    },
+    "category": {
+      "description": "Open category name.",
+      "type": "string",
+      "minLength": 1
+    },
+    "priority": {
+      "description": "Shipped order within the category.",
+      "type": "integer",
+      "minimum": 1
+    },
+    "label": {
+      "description": "True name shown to adults.",
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "description": "Plain one-line description.",
+      "type": "string",
+      "minLength": 0
+    },
+    "enabled": {
+      "description": "Whether this part is enabled.",
+      "type": "boolean"
+    },
+    "state": {
+      "description": "Current install state.",
+      "type": "string",
+      "enum": [
+        "ready",
+        "missing",
+        "installing",
+        "updating",
+        "failed",
+        "unsupported"
+      ]
+    },
+    "size_bytes": {
+      "description": "Installed size in bytes.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "download_bytes": {
+      "description": "Download size in bytes.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "percent": {
+      "description": "Current operation percent, if any.",
+      "anyOf": [
+        {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "fits": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "standard": {
+          "description": "Fits standard tier.",
+          "type": "boolean"
+        },
+        "boost": {
+          "description": "Fits boost tier.",
+          "type": "boolean"
+        },
+        "max": {
+          "description": "Fits max tier.",
+          "type": "boolean"
+        },
+        "reason": {
+          "description": "Reason it does not fit, if any.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "standard",
+        "boost",
+        "max",
+        "reason"
+      ]
+    },
+    "can_install": {
+      "description": "Whether installation is available.",
+      "type": "boolean"
+    },
+    "install_block": {
+      "description": "Why installation is blocked, if any.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "can_uninstall": {
+      "description": "Whether uninstall is available.",
+      "type": "boolean"
+    },
+    "uninstall_block": {
+      "description": "Why uninstall is blocked, if any.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "licence_needed": {
+      "description": "Whether a license notice needs acknowledgment.",
+      "type": "boolean"
+    },
+    "required_by": {
+      "description": "Part ids that require this part.",
+      "type": "array",
+      "items": {
+        "description": "Opaque part key.",
+        "type": "string",
+        "minLength": 1,
+        "pattern": "^[a-z0-9][a-z0-9._-]*$"
+      }
+    },
+    "update": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "available": {
+          "description": "Whether an update is available.",
+          "type": "boolean"
+        },
+        "version": {
+          "description": "Available version, if any.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "available",
+        "version"
+      ]
+    }
+  },
+  "required": [
+    "id",
+    "kind",
+    "category",
+    "priority",
+    "label",
+    "description",
+    "enabled",
+    "state",
+    "size_bytes",
+    "download_bytes",
+    "percent",
+    "fits",
+    "can_install",
+    "install_block",
+    "can_uninstall",
+    "uninstall_block",
+    "licence_needed",
+    "required_by",
+    "update"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/stack-part-view.schema.json",
+  "title": "StackPartView",
+  "description": "One row returned by GET /stack/v1/parts."
+}
