@@ -31,7 +31,8 @@ describe("select + multiple keys", () => {
       expect(Array.isArray(e.default), e.key).toBe(true);
       const def = e.default as string[];
       // MINOR-SEARCH-01e-1: no blocked-site list is checked for adults until a parent picks one.
-      if (e.key !== "search.blocklists.adult" && e.key !== "search.blocklists") expect(def.length, e.key).toBeGreaterThan(0);
+      // content.filters is the kinds a person adds on top of their level: empty by design (CONTENT-POLICY-05).
+      if (e.key !== "search.blocklists.adult" && e.key !== "search.blocklists" && e.key !== "content.filters") expect(def.length, e.key).toBeGreaterThan(0);
       for (const v of def) expect(options, e.key).toContain(v);
       expect(new Set(def).size, e.key).toBe(def.length);
     }
