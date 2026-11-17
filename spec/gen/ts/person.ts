@@ -135,6 +135,18 @@ export const Person = z
         "Meaningful only when role is guest (enforced in lib/personShape.ts's candidate parser, the same convention scope/person conditionals use elsewhere in this spec, since no generator here preserves JSON Schema conditionals). Past this timestamp a guest profile stops signing in on its own, the same way `enabled: false` does, without a household member having to remember to remove it.",
       )
       .default(null),
+    /**MODE-GUEST-01 (Home docs/design/modes-and-child-protections-2026-10-17.md, amended by content-ratings-and-access-2026-11-16.md): the controls a guest is on, chosen by the admin who adds the guest (child, teen or adult; teen preselected). Meaningful only when role is guest (enforced in lib/personShape.ts, the same convention guest_expires_at uses); null on every other role, whose controls are their role. A guest with no value is on child controls. The first slice of the Person.controls record; the other roles move onto it under MODE-NAMING-01.*/
+    controls: z
+      .union([
+        z.literal("child"),
+        z.literal("teen"),
+        z.literal("adult"),
+        z.literal(null),
+      ])
+      .describe(
+        "MODE-GUEST-01 (Home docs/design/modes-and-child-protections-2026-10-17.md, amended by content-ratings-and-access-2026-11-16.md): the controls a guest is on, chosen by the admin who adds the guest (child, teen or adult; teen preselected). Meaningful only when role is guest (enforced in lib/personShape.ts, the same convention guest_expires_at uses); null on every other role, whose controls are their role. A guest with no value is on child controls. The first slice of the Person.controls record; the other roles move onto it under MODE-NAMING-01.",
+      )
+      .default(null),
     /**Set once, never cleared: a read-only profile (BACKLOG.md's 'memorialise (read-only profile, PIN cleared, sessions revoked, export offered)'). The action that sets this also clears personCredentials, passkeys and every device token/session for the person - lib/personLifecycle.ts's memorializePerson(), not this field alone.*/
     memorialized_at: z
       .union([

@@ -1,3 +1,7 @@
+## [spec-v0.1.414] - 2026-11-17
+
+- MODE-GUEST-01: `Person.controls` (`child`, `teen`, `adult` or null): the controls a guest is on, chosen by the admin who adds the guest. Meaningful only for the guest role; null means child controls. Additive; the first slice of the modes record.
+
 ## [spec-v0.1.413] - 2026-11-17
 
 - RATING-SPEC-01: the content rating scale (G, PG, PG-13, R, X, Prohibited, Unrated), the stamp (ContentRating), the rater shape (ContentRater), the reasons taken from the content-policy kinds, and the map from the outside labels Home ingests today, under spec/ratings/ and spec/vocab/content-ratings.json. Additive; content-ceiling is unchanged.
