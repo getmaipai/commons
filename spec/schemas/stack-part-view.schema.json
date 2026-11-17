@@ -22,6 +22,18 @@
       "type": "string",
       "minLength": 1
     },
+    "chat": {
+      "description": "Chat turn capabilities, present for chat models only.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sampling": { "$ref": "model-capabilities.schema.json#/properties/sampling" },
+        "thinking_mode": { "$ref": "model-capabilities.schema.json#/properties/thinking_mode" },
+        "image_input": { "$ref": "model-capabilities.schema.json#/properties/image_input" },
+        "turn_budget": { "$ref": "model-capabilities.schema.json#/$defs/turn_budget" },
+        "model_cutoff": { "$ref": "model-capabilities.schema.json#/properties/model_cutoff" }
+      }
+    },
     "priority": {
       "description": "Shipped order within the category.",
       "type": "integer",

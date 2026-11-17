@@ -267,6 +267,24 @@ class DiffusionSizing(BaseModel):
     )
 
 
+class ImageInput(BaseModel):
+    """
+    VISION-01a: present when this model file is proven to read pictures, and absent for a text-only model. It names the multimodal projector the engine loads beside the weights (llama-server's --mmproj), so declaring image input without its projector cannot validate. A host offers picture input only when the role's selected model carries this field and the role is healthy, never by model id (Home rule 8).
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    projector: Component
+
+
+class ModelCutoff(RootModel[date]):
+    root: date = Field(
+        ...,
+        description="Last date represented in this model's training data, when the model publisher provides one.",
+    )
+
+
 class Role(
     RootModel[
         Literal[
@@ -308,15 +326,11 @@ class Role(
     )
 
 
-class ImageInput(BaseModel):
-    """
-    VISION-01a: present when this model file is proven to read pictures, and absent for a text-only model. It names the multimodal projector the engine loads beside the weights (llama-server's --mmproj), so declaring image input without its projector cannot validate. A host offers picture input only when the role's selected model carries this field and the role is healthy, never by model id (Home rule 8).
-    """
-
-    model_config = ConfigDict(
-        extra='forbid',
+class ThinkingMode(RootModel[Literal['switchable', 'none', 'always']]):
+    root: Literal['switchable', 'none', 'always'] = Field(
+        ...,
+        description="VISION-02a: whether this model can reason before it answers, declared by the record and never inferred from a model id (Home rule 8). 'switchable' means a turn can ask for thinking or not (Qwen3's hybrid template); 'none' means the model has no thinking mode (an Instruct edition such as Qwen3-VL-8B-Instruct), so a host offers no thinking control and never asks for it; 'always' means the template opens a reasoning block on every turn (a Thinking edition) and a request cannot turn it off. Absent on a record written before this field: the turn budget's thinking_budget_tokens_toggled decides (above 0 reads as switchable, 0 or no budget as none).",
     )
-    projector: Component
 
 
 class Sizing(RootModel[TransformerGgufSizing | DiffusionSizing]):

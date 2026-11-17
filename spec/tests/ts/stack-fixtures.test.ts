@@ -50,6 +50,7 @@ addFormats(ajv);
 ajv.addSchema(JSON.parse(readFileSync(join(SPEC, "schemas", "answer-block.schema.json"), "utf8")));
 ajv.addSchema(JSON.parse(readFileSync(join(SPEC, "schemas", "stack-job.schema.json"), "utf8")));
 ajv.addSchema(JSON.parse(readFileSync(join(SPEC, "schemas", "stack-part-view.schema.json"), "utf8")));
+ajv.addSchema(JSON.parse(readFileSync(join(SPEC, "schemas", "model-capabilities.schema.json"), "utf8")));
 
 const SHAPES: Array<{ name: string; zod: ZodType }> = [
   { name: "role-request", zod: RoleRequest },

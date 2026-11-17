@@ -1,0 +1,41 @@
+{
+  "id": "child-only-engine",
+  "kind": "engine",
+  "category": "runtime",
+  "priority": 1,
+  "label": "Child Runtime",
+  "neutral_label": "Chat helper",
+  "description": "A small chat model.",
+  "adult_only": false,
+  "version": "1.0.0",
+  "files": [
+    {
+      "url": "https://example.com/model.gguf",
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "bytes": 100,
+      "path": "models/tiny.gguf"
+    }
+  ],
+  "licence": {
+    "name": "Apache-2.0",
+    "notice_id": null
+  },
+  "runner": "engine-local",
+  "requires": [],
+  "builds": [
+    {
+      "tier": "standard",
+      "options": {}
+    }
+  ],
+  "peaks": [
+    {
+      "options": {},
+      "bytes": 50,
+      "status": "measured",
+      "measured_on": "2026-11-16"
+    }
+  ],
+  "min_stack": "1.0.0",
+  "minor_only": true
+}

@@ -3,9 +3,12 @@
 
 from __future__ import annotations
 
+from datetime import date
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, confloat, conint, constr
+
+from . import model_capabilities_schema
 
 
 class Fits(BaseModel):
@@ -26,6 +29,27 @@ class Update(BaseModel):
     version: str | None = Field(..., description='Available version, if any.')
 
 
+class Chat(BaseModel):
+    """
+    Chat turn capabilities, present for chat models only.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    sampling: model_capabilities_schema.Sampling | None = None
+    thinking_mode: Literal['switchable', 'none', 'always'] | None = Field(
+        None,
+        description="VISION-02a: whether this model can reason before it answers, declared by the record and never inferred from a model id (Home rule 8). 'switchable' means a turn can ask for thinking or not (Qwen3's hybrid template); 'none' means the model has no thinking mode (an Instruct edition such as Qwen3-VL-8B-Instruct), so a host offers no thinking control and never asks for it; 'always' means the template opens a reasoning block on every turn (a Thinking edition) and a request cannot turn it off. Absent on a record written before this field: the turn budget's thinking_budget_tokens_toggled decides (above 0 reads as switchable, 0 or no budget as none).",
+    )
+    image_input: model_capabilities_schema.ImageInput | None = None
+    turn_budget: model_capabilities_schema.TurnBudget | None = None
+    model_cutoff: date | None = Field(
+        None,
+        description="Last date represented in this model's training data, when the model publisher provides one.",
+    )
+
+
 class StackPartView(BaseModel):
     """
     One row returned by GET /stack/v1/parts.
@@ -41,6 +65,9 @@ class StackPartView(BaseModel):
         ..., description='The installable part kind.'
     )
     category: constr(min_length=1) = Field(..., description='Open category name.')
+    chat: Chat | None = Field(
+        None, description='Chat turn capabilities, present for chat models only.'
+    )
     priority: conint(ge=1) = Field(
         ..., description='Shipped order within the category.'
     )

@@ -1,3 +1,8 @@
+## [spec-v0.1.411] - 2026-11-16
+
+- PARTS-SPEC-02: add chat turn capabilities to part records and list rows,
+  and a `minor_only` mark for parts served only to children and teens.
+
 ## [spec-v0.1.410] - 2026-11-16
 
 - PARTS-SPEC-01: define Catalog part records and the Stack's parts list,

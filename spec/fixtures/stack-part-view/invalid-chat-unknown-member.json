@@ -1,0 +1,67 @@
+{
+  "id": "tiny-chat",
+  "kind": "model",
+  "category": "chat",
+  "priority": 1,
+  "label": "Tiny Chat",
+  "description": "A small chat model.",
+  "enabled": true,
+  "state": "ready",
+  "size_bytes": 100,
+  "download_bytes": 100,
+  "percent": null,
+  "fits": {
+    "standard": true,
+    "boost": true,
+    "max": true,
+    "reason": null
+  },
+  "can_install": true,
+  "install_block": null,
+  "can_uninstall": true,
+  "uninstall_block": null,
+  "licence_needed": false,
+  "required_by": [],
+  "update": {
+    "available": false,
+    "version": null
+  },
+  "chat": {
+    "sampling": {
+      "temperature": 0.7,
+      "top_p": 0.8,
+      "source": "ARCH-MEASURE-01, 2026-09-22"
+    },
+    "thinking_mode": "switchable",
+    "turn_budget": {
+      "rounds": 1,
+      "tools_offered": [
+        "recall",
+        "remember",
+        "remind",
+        "timer",
+        "weather",
+        "websearch"
+      ],
+      "always_search": true,
+      "model_transitions": true,
+      "context_tokens": 4000,
+      "thinking_budget_tokens": 0,
+      "thinking_budget_tokens_toggled": 512,
+      "thinking_for_minors": false,
+      "reply_ceiling_tokens": 1536,
+      "deadlines_ms": {
+        "model": 20000,
+        "tool": 10000,
+        "total": 45000
+      },
+      "measured": {
+        "false_call_rate": 0,
+        "inverse_miss_rate": 0.62,
+        "rewrite_pass_rate": 0,
+        "on": "ARCH-MEASURE-01 tool-calling bench, 2026-09-22, 50 repeats (0 false calls in 50, 19 fitting searches in 50); rewrite_pass_rate not yet measured for this model, recorded 0 pending the query-rewrite bench"
+      }
+    },
+    "unknown": true
+  }
+}

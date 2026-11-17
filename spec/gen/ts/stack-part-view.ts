@@ -19,6 +19,231 @@ export const StackPartView = z
       .describe("The installable part kind."),
     /**Open category name.*/
     category: z.string().min(1).describe("Open category name."),
+    /**Chat turn capabilities, present for chat models only.*/
+    chat: z
+      .object({
+        /**MODEL-ADD-01 and design rule 3: the sampling this model runs on. Every field but source is optional and a missing field sends nothing, so the engine's own default applies. 'source' names where the values came from.*/
+        sampling: z
+          .object({
+            temperature: z.number().gte(0).lte(2).optional(),
+            top_p: z.number().gte(0).lte(1).optional(),
+            top_k: z.number().int().gte(0).optional(),
+            min_p: z.number().gte(0).lte(1).optional(),
+            presence_penalty: z.number().gte(-2).lte(2).optional(),
+            xtc_probability: z.number().gte(0).lte(1).optional(),
+            xtc_threshold: z.number().gte(0).lte(1).optional(),
+            dry_multiplier: z.number().gte(0).optional(),
+            dry_base: z.number().gte(0).optional(),
+            dry_allowed_length: z.number().int().gte(0).optional(),
+            source: z.string().min(1),
+          })
+          .strict()
+          .describe(
+            "MODEL-ADD-01 and design rule 3: the sampling this model runs on. Every field but source is optional and a missing field sends nothing, so the engine's own default applies. 'source' names where the values came from.",
+          )
+          .optional(),
+        /**VISION-02a: whether this model can reason before it answers, declared by the record and never inferred from a model id (Home rule 8). 'switchable' means a turn can ask for thinking or not (Qwen3's hybrid template); 'none' means the model has no thinking mode (an Instruct edition such as Qwen3-VL-8B-Instruct), so a host offers no thinking control and never asks for it; 'always' means the template opens a reasoning block on every turn (a Thinking edition) and a request cannot turn it off. Absent on a record written before this field: the turn budget's thinking_budget_tokens_toggled decides (above 0 reads as switchable, 0 or no budget as none).*/
+        thinking_mode: z
+          .enum(["switchable", "none", "always"])
+          .describe(
+            "VISION-02a: whether this model can reason before it answers, declared by the record and never inferred from a model id (Home rule 8). 'switchable' means a turn can ask for thinking or not (Qwen3's hybrid template); 'none' means the model has no thinking mode (an Instruct edition such as Qwen3-VL-8B-Instruct), so a host offers no thinking control and never asks for it; 'always' means the template opens a reasoning block on every turn (a Thinking edition) and a request cannot turn it off. Absent on a record written before this field: the turn budget's thinking_budget_tokens_toggled decides (above 0 reads as switchable, 0 or no budget as none).",
+          )
+          .optional(),
+        /**VISION-01a: present when this model file is proven to read pictures, and absent for a text-only model. It names the multimodal projector the engine loads beside the weights (llama-server's --mmproj), so declaring image input without its projector cannot validate. A host offers picture input only when the role's selected model carries this field and the role is healthy, never by model id (Home rule 8).*/
+        image_input: z
+          .object({
+            /**One file a model needs beside its weights, pinned by URL, sha256 and size; never selectable alone.*/
+            projector: z
+              .object({
+                /**The file name as published, e.g. 'mmproj-Qwen3VL-4B-Instruct-Q8_0.gguf'.*/
+                file: z
+                  .string()
+                  .min(1)
+                  .describe(
+                    "The file name as published, e.g. 'mmproj-Qwen3VL-4B-Instruct-Q8_0.gguf'.",
+                  ),
+                download: z
+                  .object({
+                    url: z.string().url(),
+                    sha256: z.string().regex(new RegExp("^[a-f0-9]{64}$")),
+                    approx_bytes: z.number().int().gte(1),
+                  })
+                  .strict(),
+              })
+              .strict()
+              .describe(
+                "One file a model needs beside its weights, pinned by URL, sha256 and size; never selectable alone.",
+              ),
+          })
+          .strict()
+          .describe(
+            "VISION-01a: present when this model file is proven to read pictures, and absent for a text-only model. It names the multimodal projector the engine loads beside the weights (llama-server's --mmproj), so declaring image input without its projector cannot validate. A host offers picture input only when the role's selected model carries this field and the role is healthy, never by model id (Home rule 8).",
+          )
+          .optional(),
+        /**U2's per-model tool-calling budget (home/docs/plans/turn-machine-state-record-2026-09-22.md, 'The budget record'): how many tool rounds the model may take, the maximum number of measured tools Home may offer, whether the always-search interim rule is on, whether the model may drive a second machine transition (false on the robot's Pi), the context and thinking-token allowances, each node's deadline, and the measured numbers ARCH-MEASURE-01 records this budget under. Absent for a chat model with no measured record yet; turnNext.ts then runs it with model_transitions false.*/
+        turn_budget: z
+          .object({
+            /**Tool rounds the model may take in one turn (turn-machine-state-record-2026-09-22.md's TurnBudget.rounds).*/
+            rounds: z
+              .union([z.literal(0), z.literal(1), z.literal(2)])
+              .describe(
+                "Tool rounds the model may take in one turn (turn-machine-state-record-2026-09-22.md's TurnBudget.rounds).",
+              ),
+            /**RESEARCH-TIER-01: tool rounds an adult's written turn may take when the person picked Thinking for that message. Absent means the model has no Thinking research depth and the turn keeps `rounds`.*/
+            rounds_thinking: z
+              .number()
+              .int()
+              .gte(0)
+              .lte(12)
+              .describe(
+                "RESEARCH-TIER-01: tool rounds an adult's written turn may take when the person picked Thinking for that message. Absent means the model has no Thinking research depth and the turn keeps `rounds`.",
+              )
+              .optional(),
+            /**RESEARCH-TIER-01: tool rounds an adult's written turn may take when the person picked Max for that message. Absent means the model has no Max research depth and the turn keeps `rounds` (or `rounds_thinking` when Thinking is also on).*/
+            rounds_max: z
+              .number()
+              .int()
+              .gte(0)
+              .lte(12)
+              .describe(
+                "RESEARCH-TIER-01: tool rounds an adult's written turn may take when the person picked Max for that message. Absent means the model has no Max research depth and the turn keeps `rounds` (or `rounds_thinking` when Thinking is also on).",
+              )
+              .optional(),
+            /**TOOL-OFFER-01: maximum measured tool definitions this model may receive in one adult written turn. Home fails closed when the derived offer set exceeds this cap; it never trims the set silently.*/
+            max_tools: z
+              .number()
+              .int()
+              .gte(0)
+              .lte(16)
+              .describe(
+                "TOOL-OFFER-01: maximum measured tool definitions this model may receive in one adult written turn. Home fails closed when the derived offer set exceeds this cap; it never trims the set silently.",
+              )
+              .optional(),
+            /**Deprecated by TOOL-OFFER-01. Retained as optional migration compatibility only; Home derives tool offers from installed manifests and max_tools.*/
+            tools_offered: z
+              .array(z.string())
+              .describe(
+                "Deprecated by TOOL-OFFER-01. Retained as optional migration compatibility only; Home derives tool offers from installed manifests and max_tools.",
+              )
+              .optional(),
+            /**MODEL-BG-SPEC-01: whether the model may run unattended background turns (the heartbeat, errands, price watches), the ones no person is waiting on. Optional, and absent means false. A model with no record, or a record with no turn_budget, is treated as false too (org rule 8, fail safe): an unattended turn never starts on a model nobody has measured.*/
+            background_turns: z
+              .boolean()
+              .describe(
+                "MODEL-BG-SPEC-01: whether the model may run unattended background turns (the heartbeat, errands, price watches), the ones no person is waiting on. Optional, and absent means false. A model with no record, or a record with no turn_budget, is treated as false too (org rule 8, fail safe): an unattended turn never starts on a model nobody has measured.",
+              )
+              .default(false),
+            /**The interim rule (simple-turn-pipeline-2026-09-22.md point 3): a question whose target is the world runs the model call with tool_choice required over the search tool.*/
+            always_search: z
+              .boolean()
+              .describe(
+                "The interim rule (simple-turn-pipeline-2026-09-22.md point 3): a question whose target is the world runs the model call with tool_choice required over the search tool.",
+              ),
+            /**Whether the model may drive the machine's second transition (a tool round). False on the robot's Pi and any model with no measured record; the model node then runs with tool_choice none and the machine goes straight to answer.*/
+            model_transitions: z
+              .boolean()
+              .describe(
+                "Whether the model may drive the machine's second transition (a tool round). False on the robot's Pi and any model with no measured record; the model node then runs with tool_choice none and the machine goes straight to answer.",
+              ),
+            context_tokens: z.number().int().gt(0),
+            /**THINK-DEFAULT-01 (home/docs/dev.md 'U6 rerun ruling' (b) 1): the default for an ordinary turn - 0 on every real budget, so thinking is off unless the person turns it on for that turn (RESP-04's composer toggle). Reasoning is a second output, never the budget's own default.*/
+            thinking_budget_tokens: z
+              .number()
+              .int()
+              .gte(0)
+              .describe(
+                "THINK-DEFAULT-01 (home/docs/dev.md 'U6 rerun ruling' (b) 1): the default for an ordinary turn - 0 on every real budget, so thinking is off unless the person turns it on for that turn (RESP-04's composer toggle). Reasoning is a second output, never the budget's own default.",
+              ),
+            /**THINK-DEFAULT-01: the value used for a turn where the person explicitly toggled thinking on (the composer's RESP-04 toggle, the old path's own `thinking` request field, mirrored onto the new path's RunTurnNextOpts.thinking). Kept as its own field, per model, rather than a single hardcoded constant, since a different chat model may reason usefully at a different token count.*/
+            thinking_budget_tokens_toggled: z
+              .number()
+              .int()
+              .gte(0)
+              .describe(
+                "THINK-DEFAULT-01: the value used for a turn where the person explicitly toggled thinking on (the composer's RESP-04 toggle, the old path's own `thinking` request field, mirrored onto the new path's RunTurnNextOpts.thinking). Kept as its own field, per model, rather than a single hardcoded constant, since a different chat model may reason usefully at a different token count.",
+              ),
+            /**GROUND-01 (home/docs/plans/turn-machine-state-record-2026-09-22.md, 'Reasoning is a second output'): whether the model node even asks the engine to think on a minor's turn - false by default, so a minor's turn sends thinking:false regardless of thinking_budget_tokens. This is a cost control, not the safety gate: a minor's turn never emits or persists reasoning either way (context.ts's decideReasoning() forces reasoning.emit false from the age band alone), so turning this on only spends the tokens on a span the household will never see or keep.*/
+            thinking_for_minors: z
+              .boolean()
+              .describe(
+                "GROUND-01 (home/docs/plans/turn-machine-state-record-2026-09-22.md, 'Reasoning is a second output'): whether the model node even asks the engine to think on a minor's turn - false by default, so a minor's turn sends thinking:false regardless of thinking_budget_tokens. This is a cost control, not the safety gate: a minor's turn never emits or persists reasoning either way (context.ts's decideReasoning() forces reasoning.emit false from the age band alone), so turning this on only spends the tokens on a span the household will never see or keep.",
+              ),
+            /**The reply floor (home/docs/plans/turn-machine-state-record-2026-09-22.md, 'The reply floor', owner's rule 2026-09-23): the most visible tokens one written adult reply may take - a guard against a reply that never stops, never a length target (the written plan's own length numbers, register.ts's writtenBudgetFor, are room the model's own end-of-reply decides inside, not a ceiling read out in full every time). Per model, since how long a reply may run before it has plainly run away depends on the model, not the turn; sized so this ceiling plus thinking_budget_tokens_toggled (when the person turns thinking on) still fits inside context_tokens alongside the prompt. The spoken and glance classes, and a child's turn, keep their own act-and-word-based caps instead - the floor is a written-class-only, adult-only backstop, the same role FORCED-CALL-01's own cap plays for a runaway forced call.*/
+            reply_ceiling_tokens: z
+              .number()
+              .int()
+              .gte(1)
+              .describe(
+                "The reply floor (home/docs/plans/turn-machine-state-record-2026-09-22.md, 'The reply floor', owner's rule 2026-09-23): the most visible tokens one written adult reply may take - a guard against a reply that never stops, never a length target (the written plan's own length numbers, register.ts's writtenBudgetFor, are room the model's own end-of-reply decides inside, not a ceiling read out in full every time). Per model, since how long a reply may run before it has plainly run away depends on the model, not the turn; sized so this ceiling plus thinking_budget_tokens_toggled (when the person turns thinking on) still fits inside context_tokens alongside the prompt. The spoken and glance classes, and a child's turn, keep their own act-and-word-based caps instead - the floor is a written-class-only, adult-only backstop, the same role FORCED-CALL-01's own cap plays for a runaway forced call.",
+              ),
+            /**Per-node deadlines in milliseconds (simple-turn-pipeline-2026-09-22.md section 11: 'every node has a deadline, and it can be cut').*/
+            deadlines_ms: z
+              .object({
+                model: z.number().int().gt(0),
+                tool: z.number().int().gt(0),
+                total: z.number().int().gt(0),
+              })
+              .strict()
+              .describe(
+                "Per-node deadlines in milliseconds (simple-turn-pipeline-2026-09-22.md section 11: 'every node has a deadline, and it can be cut').",
+              ),
+            /**ARCH-MEASURE-01's numbers for this model, recorded with the budget they set.*/
+            measured: z
+              .object({
+                /**Fraction of negative-corpus turns the model called a tool on when it should not have.*/
+                false_call_rate: z
+                  .number()
+                  .gte(0)
+                  .lte(1)
+                  .describe(
+                    "Fraction of negative-corpus turns the model called a tool on when it should not have.",
+                  ),
+                /**Fraction of world-question turns the model answered from memory instead of a fitting search.*/
+                inverse_miss_rate: z
+                  .number()
+                  .gte(0)
+                  .lte(1)
+                  .describe(
+                    "Fraction of world-question turns the model answered from memory instead of a fitting search.",
+                  ),
+                /**Query-rewrite bench pass rate: the model's own search words carry the referent from a pronoun in the second turn.*/
+                rewrite_pass_rate: z
+                  .number()
+                  .gte(0)
+                  .lte(1)
+                  .describe(
+                    "Query-rewrite bench pass rate: the model's own search words carry the referent from a pronoun in the second turn.",
+                  ),
+                /**What corpus, date, and repeat count the measured numbers are from, e.g. 'ARCH-MEASURE-01, tool-calling bench, 2026-09-22, 50 repeats'.*/
+                on: z
+                  .string()
+                  .min(1)
+                  .describe(
+                    "What corpus, date, and repeat count the measured numbers are from, e.g. 'ARCH-MEASURE-01, tool-calling bench, 2026-09-22, 50 repeats'.",
+                  ),
+              })
+              .strict()
+              .describe(
+                "ARCH-MEASURE-01's numbers for this model, recorded with the budget they set.",
+              ),
+          })
+          .strict()
+          .describe(
+            "U2's per-model tool-calling budget (home/docs/plans/turn-machine-state-record-2026-09-22.md, 'The budget record'): how many tool rounds the model may take, the maximum number of measured tools Home may offer, whether the always-search interim rule is on, whether the model may drive a second machine transition (false on the robot's Pi), the context and thinking-token allowances, each node's deadline, and the measured numbers ARCH-MEASURE-01 records this budget under. Absent for a chat model with no measured record yet; turnNext.ts then runs it with model_transitions false.",
+          )
+          .optional(),
+        /**Last date represented in this model's training data, when the model publisher provides one.*/
+        model_cutoff: z
+          .string()
+          .date()
+          .describe(
+            "Last date represented in this model's training data, when the model publisher provides one.",
+          )
+          .optional(),
+      })
+      .strict()
+      .describe("Chat turn capabilities, present for chat models only.")
+      .optional(),
     /**Shipped order within the category.*/
     priority: z
       .number()

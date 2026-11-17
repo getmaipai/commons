@@ -11,7 +11,8 @@ STACK-13a: the unit of work Home submits, watches, cancels and reads),
 and the token count (`TokenCountRequest` and `TokenCountResponse`,
 STACK-TOKENIZE-01: `POST /v1/tokenize`, the chat engine's own count on
 its own template render, never an estimate), the installable part record
-(`StackPart`), the parts list row and response (`StackPartView` and
+(`StackPart`, including optional chat turn fields for sampling, thinking mode,
+image input, turn budget and model cutoff), the parts list row and response (`StackPartView` and
 `StackPartList`), household part choices (`StackPartChoices`), status
 (`StackStatus`), and sizing (`StackSizing`).
 

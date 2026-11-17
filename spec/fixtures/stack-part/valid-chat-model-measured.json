@@ -1,0 +1,78 @@
+{
+  "id": "invented-chat-measured",
+  "kind": "model",
+  "category": "chat",
+  "priority": 1,
+  "label": "Example Measured Chat",
+  "neutral_label": "Chat helper",
+  "description": "A small chat model.",
+  "adult_only": false,
+  "version": "1.0.0",
+  "files": [
+    {
+      "url": "https://example.com/model.gguf",
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "bytes": 100,
+      "path": "models/tiny.gguf"
+    }
+  ],
+  "licence": {
+    "name": "Apache-2.0",
+    "notice_id": null
+  },
+  "runner": "engine-local",
+  "requires": [],
+  "builds": [
+    {
+      "tier": "standard",
+      "options": {}
+    }
+  ],
+  "peaks": [
+    {
+      "options": {},
+      "bytes": 50,
+      "status": "measured",
+      "measured_on": "2026-11-16"
+    }
+  ],
+  "min_stack": "1.0.0",
+  "chat": {
+    "turn_budget": {
+      "rounds": 1,
+      "tools_offered": [
+        "recall",
+        "remember",
+        "remind",
+        "timer",
+        "weather",
+        "websearch"
+      ],
+      "always_search": true,
+      "model_transitions": true,
+      "context_tokens": 4000,
+      "thinking_budget_tokens": 0,
+      "thinking_budget_tokens_toggled": 512,
+      "thinking_for_minors": false,
+      "reply_ceiling_tokens": 1536,
+      "deadlines_ms": {
+        "model": 20000,
+        "tool": 10000,
+        "total": 45000
+      },
+      "measured": {
+        "false_call_rate": 0,
+        "inverse_miss_rate": 0.62,
+        "rewrite_pass_rate": 0,
+        "on": "ARCH-MEASURE-01 tool-calling bench, 2026-09-22, 50 repeats (0 false calls in 50, 19 fitting searches in 50); rewrite_pass_rate not yet measured for this model, recorded 0 pending the query-rewrite bench"
+      }
+    },
+    "sampling": {
+      "temperature": 0.7,
+      "top_p": 0.8,
+      "source": "ARCH-MEASURE-01, 2026-09-22"
+    },
+    "thinking_mode": "switchable",
+    "model_cutoff": "2025-04-01"
+  }
+}

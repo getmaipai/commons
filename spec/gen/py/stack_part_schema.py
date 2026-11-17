@@ -3,9 +3,16 @@
 
 from __future__ import annotations
 
+from datetime import date
 from typing import Any, Literal
 
 from pydantic import AnyUrl, BaseModel, ConfigDict, Field, RootModel, conint, constr
+
+from . import model_capabilities_schema
+
+
+class StackPart1(BaseModel):
+    category: Literal['chat']
 
 
 class File(BaseModel):
@@ -62,7 +69,28 @@ class Peak(BaseModel):
     )
 
 
-class StackPart(BaseModel):
+class Chat(BaseModel):
+    """
+    Chat turn capabilities for chat models.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    sampling: model_capabilities_schema.Sampling | None = None
+    thinking_mode: Literal['switchable', 'none', 'always'] | None = Field(
+        None,
+        description="VISION-02a: whether this model can reason before it answers, declared by the record and never inferred from a model id (Home rule 8). 'switchable' means a turn can ask for thinking or not (Qwen3's hybrid template); 'none' means the model has no thinking mode (an Instruct edition such as Qwen3-VL-8B-Instruct), so a host offers no thinking control and never asks for it; 'always' means the template opens a reasoning block on every turn (a Thinking edition) and a request cannot turn it off. Absent on a record written before this field: the turn budget's thinking_budget_tokens_toggled decides (above 0 reads as switchable, 0 or no budget as none).",
+    )
+    image_input: model_capabilities_schema.ImageInput | None = None
+    turn_budget: model_capabilities_schema.TurnBudget | None = None
+    model_cutoff: date | None = Field(
+        None,
+        description="Last date represented in this model's training data, when the model publisher provides one.",
+    )
+
+
+class StackPart2(BaseModel):
     """
     Catalog data for one installable model, tool, or engine.
     """
@@ -90,6 +118,13 @@ class StackPart(BaseModel):
     adult_only: bool = Field(
         ..., description='Whether this part is only available to adults.'
     )
+    minor_only: bool = Field(
+        False,
+        description="Served only in a minor's list and never in an adult's. For the one case where children and teens run on a part adults do not use.",
+    )
+    chat: Chat | None = Field(
+        None, description='Chat turn capabilities for chat models.'
+    )
     version: constr(min_length=1) = Field(..., description='Part version.')
     files: list[File] = Field(
         ..., description='Files that make up the installable part.', min_length=1
@@ -105,4 +140,69 @@ class StackPart(BaseModel):
     peaks: list[Peak] = Field(..., description='Memory peak measurements.')
     min_stack: constr(min_length=1) = Field(
         ..., description='Minimum compatible Stack version.'
+    )
+
+
+class StackPart3(StackPart1, StackPart2):
+    """
+    Catalog data for one installable model, tool, or engine.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: constr(pattern=r'^[a-z0-9][a-z0-9._-]*$', min_length=1) = Field(
+        ..., description='Opaque part key.'
+    )
+    kind: Literal['model', 'tool', 'engine'] = Field(
+        ..., description='The installable part kind.'
+    )
+    category: constr(min_length=1) = Field(..., description='Open category name.')
+    priority: conint(ge=1) = Field(
+        ..., description='Shipped order within the category.'
+    )
+    label: constr(min_length=1) = Field(..., description='True name shown to adults.')
+    neutral_label: constr(min_length=1) = Field(
+        ..., description='Name served to a child or teen.'
+    )
+    description: constr(min_length=1) = Field(
+        ..., description='Plain one-line description.'
+    )
+    adult_only: bool = Field(
+        ..., description='Whether this part is only available to adults.'
+    )
+    minor_only: bool = Field(
+        False,
+        description="Served only in a minor's list and never in an adult's. For the one case where children and teens run on a part adults do not use.",
+    )
+    chat: Chat | None = Field(
+        None, description='Chat turn capabilities for chat models.'
+    )
+    version: constr(min_length=1) = Field(..., description='Part version.')
+    files: list[File] = Field(
+        ..., description='Files that make up the installable part.', min_length=1
+    )
+    licence: Licence = Field(..., description='License name and notice reference.')
+    runner: constr(pattern=r'^[a-z0-9][a-z0-9._-]*$', min_length=1) | None = Field(
+        ..., description='Engine part id that runs this part, or null for an engine.'
+    )
+    requires: list[constr(pattern=r'^[a-z0-9][a-z0-9._-]*$', min_length=1)] = Field(
+        ..., description='Required part ids.'
+    )
+    builds: list[Build] | None = Field(None, description='Available tiered builds.')
+    peaks: list[Peak] = Field(..., description='Memory peak measurements.')
+    min_stack: constr(min_length=1) = Field(
+        ..., description='Minimum compatible Stack version.'
+    )
+
+
+class StackPart(RootModel[StackPart3]):
+    """
+    Catalog data for one installable model, tool, or engine.
+    """
+
+    root: StackPart3 = Field(
+        ...,
+        description='Catalog data for one installable model, tool, or engine.',
+        title='StackPart',
     )

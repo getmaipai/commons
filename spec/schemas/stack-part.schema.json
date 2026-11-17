@@ -46,6 +46,33 @@
       "description": "Whether this part is only available to adults.",
       "type": "boolean"
     },
+    "minor_only": {
+      "description": "Served only in a minor's list and never in an adult's. For the one case where children and teens run on a part adults do not use.",
+      "type": "boolean",
+      "default": false
+    },
+    "chat": {
+      "description": "Chat turn capabilities for chat models.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sampling": {
+          "$ref": "model-capabilities.schema.json#/properties/sampling"
+        },
+        "thinking_mode": {
+          "$ref": "model-capabilities.schema.json#/properties/thinking_mode"
+        },
+        "image_input": {
+          "$ref": "model-capabilities.schema.json#/properties/image_input"
+        },
+        "turn_budget": {
+          "$ref": "model-capabilities.schema.json#/$defs/turn_budget"
+        },
+        "model_cutoff": {
+          "$ref": "model-capabilities.schema.json#/properties/model_cutoff"
+        }
+      }
+    },
     "version": {
       "description": "Part version.",
       "type": "string",
@@ -224,6 +251,45 @@
     "requires",
     "peaks",
     "min_stack"
+  ],
+  "allOf": [
+    {
+      "not": {
+        "properties": {
+          "adult_only": {
+            "const": true
+          },
+          "minor_only": {
+            "const": true
+          }
+        },
+        "required": [
+          "adult_only",
+          "minor_only"
+        ]
+      }
+    },
+    {
+      "anyOf": [
+        {
+          "properties": {
+            "category": {
+              "const": "chat"
+            }
+          },
+          "required": [
+            "category"
+          ]
+        },
+        {
+          "not": {
+            "required": [
+              "chat"
+            ]
+          }
+        }
+      ]
+    }
   ],
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://getmaipai.github.io/shared/spec/schemas/stack-part.schema.json",
