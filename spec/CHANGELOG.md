@@ -1,3 +1,7 @@
+## [spec-v0.1.417] - 2026-11-17
+
+- OVERRIDES-01: the content filter's role defaults and overrides as settings keys: `content.ceiling` and `content.ceiling.<kind>` (chat, web, news, library, made), `content.unrated` and `content.unrated.<kind>`, a person's own lowering (`content.own_ceiling`, `content.own_ceiling.<kind>`, `content.own_unrated`), and the access items `access.thinking`, `access.tier.boost` and `access.tier.max`. Role defaults are the band defaults (child G, teen PG-13, adult X). Additive.
+
 ## [spec-v0.1.416] - 2026-11-17
 
 - SETTINGS-AUDIT-01: `SettingsChange`, one record of an owner or admin changing a safety-relevant setting (key, scope, actor role, value, previous, direction, when). It names no person (rule 6a). Additive.

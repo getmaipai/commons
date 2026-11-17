@@ -7179,5 +7179,928 @@
       "teen": [],
       "adult": []
     }
+  },
+  {
+    "key": "access.thinking",
+    "scope": "person",
+    "selector": "boolean",
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "override",
+    "default": true,
+    "label": "Thinking before answering",
+    "help": "Lets Home think longer before it answers.",
+    "copy": {
+      "does": "Lets Home think longer before it answers."
+    },
+    "band_default": {
+      "child": false,
+      "teen": false,
+      "adult": true
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.allowance",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "access.tier.boost",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "chat",
+        "image",
+        "video",
+        "music",
+        "voice"
+      ],
+      "multiple": true
+    },
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "override",
+    "default": [
+      "chat",
+      "image",
+      "video",
+      "music",
+      "voice"
+    ],
+    "label": "Boost for",
+    "help": "Which kinds of work may use Boost. Uses more of the home's power for a faster or better result.",
+    "copy": {
+      "does": "Uses more of the home's power for a faster or better result.",
+      "options": {
+        "chat": "Chat replies with extra power.",
+        "image": "Pictures with extra power.",
+        "video": "Videos with extra power.",
+        "music": "Music with extra power.",
+        "voice": "Voices with extra power."
+      },
+      "option_labels": {
+        "chat": "Chat",
+        "image": "Pictures",
+        "video": "Videos",
+        "music": "Music",
+        "voice": "Voice"
+      }
+    },
+    "band_default": {
+      "child": [],
+      "teen": [
+        "chat",
+        "image",
+        "video",
+        "music",
+        "voice"
+      ],
+      "adult": [
+        "chat",
+        "image",
+        "video",
+        "music",
+        "voice"
+      ]
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.allowance",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "access.tier.max",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "chat",
+        "image",
+        "video",
+        "music",
+        "voice"
+      ],
+      "multiple": true
+    },
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "override",
+    "default": [
+      "chat",
+      "image",
+      "video",
+      "music",
+      "voice"
+    ],
+    "label": "Max for",
+    "help": "Which kinds of work may use Max. Uses the most of the home's power for one big job.",
+    "copy": {
+      "does": "Uses the most of the home's power for one big job.",
+      "options": {
+        "chat": "Chat replies with full power.",
+        "image": "Pictures with full power.",
+        "video": "Videos with full power.",
+        "music": "Music with full power.",
+        "voice": "Voices with full power."
+      },
+      "option_labels": {
+        "chat": "Chat",
+        "image": "Pictures",
+        "video": "Videos",
+        "music": "Music",
+        "voice": "Voice"
+      }
+    },
+    "band_default": {
+      "child": [],
+      "teen": [],
+      "adult": []
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.allowance",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "content.ceiling",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "G",
+        "PG",
+        "PG-13",
+        "R",
+        "X"
+      ]
+    },
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "override",
+    "default": "X",
+    "label": "Content level",
+    "help": "The most grown-up things this person can see anywhere in Home. The household's role default applies until an admin changes it.",
+    "copy": {
+      "does": "Sets how grown-up the things shown anywhere in Home may be.",
+      "options": {
+        "G": "Gentle, for the youngest.",
+        "PG": "Mild, with a little that is grown-up.",
+        "PG-13": "Some grown-up themes, nothing explicit.",
+        "R": "Strong language and themes.",
+        "X": "Everything, with nothing held back."
+      }
+    },
+    "band_default": {
+      "child": "G",
+      "teen": "PG-13",
+      "adult": "X"
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.allowance",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "content.ceiling.chat",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "default",
+        "G",
+        "PG",
+        "PG-13",
+        "R",
+        "X"
+      ]
+    },
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "override",
+    "default": "default",
+    "label": "Content level for chat replies",
+    "help": "The most grown-up things this person can see in chat replies. Default follows the content level above.",
+    "copy": {
+      "does": "How grown-up answers may be, or default to the main setting.",
+      "options": {
+        "default": "Follows the main setting.",
+        "G": "Gentle, for the youngest.",
+        "PG": "Mild, with a little that is grown-up.",
+        "PG-13": "Some grown-up themes, nothing explicit.",
+        "R": "Strong language and themes.",
+        "X": "Everything, with nothing held back."
+      }
+    },
+    "band_default": {
+      "child": "default",
+      "teen": "default",
+      "adult": "default"
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.allowance",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "content.ceiling.library",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "default",
+        "G",
+        "PG",
+        "PG-13",
+        "R",
+        "X"
+      ]
+    },
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "override",
+    "default": "default",
+    "label": "Content level for the library",
+    "help": "The most grown-up things this person can see in the library. Default follows the content level above.",
+    "copy": {
+      "does": "How grown-up saved shows and songs may be, or default to the main setting.",
+      "options": {
+        "default": "Follows the main setting.",
+        "G": "Gentle, for the youngest.",
+        "PG": "Mild, with a little that is grown-up.",
+        "PG-13": "Some grown-up themes, nothing explicit.",
+        "R": "Strong language and themes.",
+        "X": "Everything, with nothing held back."
+      }
+    },
+    "band_default": {
+      "child": "default",
+      "teen": "default",
+      "adult": "default"
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.allowance",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "content.ceiling.made",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "default",
+        "G",
+        "PG",
+        "PG-13",
+        "R",
+        "X"
+      ]
+    },
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "override",
+    "default": "default",
+    "label": "Content level for things Home makes",
+    "help": "The most grown-up things this person can see in things Home makes. Default follows the content level above.",
+    "copy": {
+      "does": "How grown-up pictures, clips and songs may be, or default to the main setting.",
+      "options": {
+        "default": "Follows the main setting.",
+        "G": "Gentle, for the youngest.",
+        "PG": "Mild, with a little that is grown-up.",
+        "PG-13": "Some grown-up themes, nothing explicit.",
+        "R": "Strong language and themes.",
+        "X": "Everything, with nothing held back."
+      }
+    },
+    "band_default": {
+      "child": "default",
+      "teen": "default",
+      "adult": "default"
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.allowance",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "content.ceiling.news",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "default",
+        "G",
+        "PG",
+        "PG-13",
+        "R",
+        "X"
+      ]
+    },
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "override",
+    "default": "default",
+    "label": "Content level for News",
+    "help": "The most grown-up things this person can see in News. Default follows the content level above.",
+    "copy": {
+      "does": "How grown-up the news may be, or default to the main setting.",
+      "options": {
+        "default": "Follows the main setting.",
+        "G": "Gentle, for the youngest.",
+        "PG": "Mild, with a little that is grown-up.",
+        "PG-13": "Some grown-up themes, nothing explicit.",
+        "R": "Strong language and themes.",
+        "X": "Everything, with nothing held back."
+      }
+    },
+    "band_default": {
+      "child": "default",
+      "teen": "default",
+      "adult": "default"
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.allowance",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "content.ceiling.web",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "default",
+        "G",
+        "PG",
+        "PG-13",
+        "R",
+        "X"
+      ]
+    },
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "override",
+    "default": "default",
+    "label": "Content level for web search",
+    "help": "The most grown-up things this person can see in web search. Default follows the content level above.",
+    "copy": {
+      "does": "How grown-up searching the web may be, or default to the main setting.",
+      "options": {
+        "default": "Follows the main setting.",
+        "G": "Gentle, for the youngest.",
+        "PG": "Mild, with a little that is grown-up.",
+        "PG-13": "Some grown-up themes, nothing explicit.",
+        "R": "Strong language and themes.",
+        "X": "Everything, with nothing held back."
+      }
+    },
+    "band_default": {
+      "child": "default",
+      "teen": "default",
+      "adult": "default"
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.allowance",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "content.own_ceiling",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "default",
+        "G",
+        "PG",
+        "PG-13",
+        "R",
+        "X"
+      ]
+    },
+    "layers": [
+      "person"
+    ],
+    "merge": "override",
+    "default": "default",
+    "label": "Your content level",
+    "help": "Lower it any time; it never goes above what your household gives you.",
+    "copy": {
+      "does": "Lowers what you see any time, never above what the household gives.",
+      "options": {
+        "default": "Follows the main setting.",
+        "G": "Gentle, for the youngest.",
+        "PG": "Mild, with a little that is grown-up.",
+        "PG-13": "Some grown-up themes, nothing explicit.",
+        "R": "Strong language and themes.",
+        "X": "Everything, with nothing held back."
+      }
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.allowance",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "content.own_ceiling.chat",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "default",
+        "G",
+        "PG",
+        "PG-13",
+        "R",
+        "X"
+      ]
+    },
+    "layers": [
+      "person"
+    ],
+    "merge": "override",
+    "default": "default",
+    "label": "Your content level for chat replies",
+    "help": "Lower it any time; it never goes above what your household gives you for chat replies.",
+    "copy": {
+      "does": "Lowers what you see in answers any time.",
+      "options": {
+        "default": "Follows the main setting.",
+        "G": "Gentle, for the youngest.",
+        "PG": "Mild, with a little that is grown-up.",
+        "PG-13": "Some grown-up themes, nothing explicit.",
+        "R": "Strong language and themes.",
+        "X": "Everything, with nothing held back."
+      }
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.allowance",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "content.own_ceiling.library",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "default",
+        "G",
+        "PG",
+        "PG-13",
+        "R",
+        "X"
+      ]
+    },
+    "layers": [
+      "person"
+    ],
+    "merge": "override",
+    "default": "default",
+    "label": "Your content level for the library",
+    "help": "Lower it any time; it never goes above what your household gives you for the library.",
+    "copy": {
+      "does": "Lowers what you see in saved shows and songs any time.",
+      "options": {
+        "default": "Follows the main setting.",
+        "G": "Gentle, for the youngest.",
+        "PG": "Mild, with a little that is grown-up.",
+        "PG-13": "Some grown-up themes, nothing explicit.",
+        "R": "Strong language and themes.",
+        "X": "Everything, with nothing held back."
+      }
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.allowance",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "content.own_ceiling.made",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "default",
+        "G",
+        "PG",
+        "PG-13",
+        "R",
+        "X"
+      ]
+    },
+    "layers": [
+      "person"
+    ],
+    "merge": "override",
+    "default": "default",
+    "label": "Your content level for things Home makes",
+    "help": "Lower it any time; it never goes above what your household gives you for things Home makes.",
+    "copy": {
+      "does": "Lowers what you see in pictures, clips and songs any time.",
+      "options": {
+        "default": "Follows the main setting.",
+        "G": "Gentle, for the youngest.",
+        "PG": "Mild, with a little that is grown-up.",
+        "PG-13": "Some grown-up themes, nothing explicit.",
+        "R": "Strong language and themes.",
+        "X": "Everything, with nothing held back."
+      }
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.allowance",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "content.own_ceiling.news",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "default",
+        "G",
+        "PG",
+        "PG-13",
+        "R",
+        "X"
+      ]
+    },
+    "layers": [
+      "person"
+    ],
+    "merge": "override",
+    "default": "default",
+    "label": "Your content level for News",
+    "help": "Lower it any time; it never goes above what your household gives you for News.",
+    "copy": {
+      "does": "Lowers what you see in the news any time.",
+      "options": {
+        "default": "Follows the main setting.",
+        "G": "Gentle, for the youngest.",
+        "PG": "Mild, with a little that is grown-up.",
+        "PG-13": "Some grown-up themes, nothing explicit.",
+        "R": "Strong language and themes.",
+        "X": "Everything, with nothing held back."
+      }
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.allowance",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "content.own_ceiling.web",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "default",
+        "G",
+        "PG",
+        "PG-13",
+        "R",
+        "X"
+      ]
+    },
+    "layers": [
+      "person"
+    ],
+    "merge": "override",
+    "default": "default",
+    "label": "Your content level for web search",
+    "help": "Lower it any time; it never goes above what your household gives you for web search.",
+    "copy": {
+      "does": "Lowers what you see in searching the web any time.",
+      "options": {
+        "default": "Follows the main setting.",
+        "G": "Gentle, for the youngest.",
+        "PG": "Mild, with a little that is grown-up.",
+        "PG-13": "Some grown-up themes, nothing explicit.",
+        "R": "Strong language and themes.",
+        "X": "Everything, with nothing held back."
+      }
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.allowance",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "content.own_unrated",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "default",
+        "no"
+      ]
+    },
+    "layers": [
+      "person"
+    ],
+    "merge": "override",
+    "default": "default",
+    "label": "Hide unrated items",
+    "help": "Choose no to hide anything that has not been rated. Default follows your household.",
+    "copy": {
+      "does": "Keeps anything nothing has rated yet out of what you see.",
+      "options": {
+        "default": "Follows the household.",
+        "no": "Keeps out anything nothing has rated yet."
+      }
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.allowance",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "content.unrated",
+    "scope": "person",
+    "selector": "boolean",
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "override",
+    "default": true,
+    "label": "Unrated items",
+    "help": "Lets through things that nothing could rate. Children and teens do not see them until an admin allows it.",
+    "copy": {
+      "does": "Lets through things nothing has rated yet."
+    },
+    "band_default": {
+      "child": false,
+      "teen": false,
+      "adult": true
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.allowance",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "content.unrated.chat",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "default",
+        "yes",
+        "no"
+      ]
+    },
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "override",
+    "default": "default",
+    "label": "Unrated items in chat replies",
+    "help": "Whether things nobody has rated yet show in chat replies. Default follows the setting above.",
+    "copy": {
+      "does": "Shows or hides unrated answers, or follows the main setting.",
+      "options": {
+        "default": "Follows the main setting.",
+        "yes": "Shows what nothing has rated yet.",
+        "no": "Hides what nothing has rated yet."
+      }
+    },
+    "band_default": {
+      "child": "default",
+      "teen": "default",
+      "adult": "default"
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.allowance",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "content.unrated.library",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "default",
+        "yes",
+        "no"
+      ]
+    },
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "override",
+    "default": "default",
+    "label": "Unrated items in the library",
+    "help": "Whether things nobody has rated yet show in the library. Default follows the setting above.",
+    "copy": {
+      "does": "Shows or hides unrated saved shows and songs, or follows the main setting.",
+      "options": {
+        "default": "Follows the main setting.",
+        "yes": "Shows what nothing has rated yet.",
+        "no": "Hides what nothing has rated yet."
+      }
+    },
+    "band_default": {
+      "child": "default",
+      "teen": "default",
+      "adult": "default"
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.allowance",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "content.unrated.made",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "default",
+        "yes",
+        "no"
+      ]
+    },
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "override",
+    "default": "default",
+    "label": "Unrated items in things Home makes",
+    "help": "Whether things nobody has rated yet show in things Home makes. Default follows the setting above.",
+    "copy": {
+      "does": "Shows or hides unrated pictures, clips and songs, or follows the main setting.",
+      "options": {
+        "default": "Follows the main setting.",
+        "yes": "Shows what nothing has rated yet.",
+        "no": "Hides what nothing has rated yet."
+      }
+    },
+    "band_default": {
+      "child": "default",
+      "teen": "default",
+      "adult": "default"
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.allowance",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "content.unrated.news",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "default",
+        "yes",
+        "no"
+      ]
+    },
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "override",
+    "default": "default",
+    "label": "Unrated items in News",
+    "help": "Whether things nobody has rated yet show in News. Default follows the setting above.",
+    "copy": {
+      "does": "Shows or hides unrated the news, or follows the main setting.",
+      "options": {
+        "default": "Follows the main setting.",
+        "yes": "Shows what nothing has rated yet.",
+        "no": "Hides what nothing has rated yet."
+      }
+    },
+    "band_default": {
+      "child": "default",
+      "teen": "default",
+      "adult": "default"
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.allowance",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "content.unrated.web",
+    "scope": "person",
+    "selector": "select",
+    "range": {
+      "options": [
+        "default",
+        "yes",
+        "no"
+      ]
+    },
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "override",
+    "default": "default",
+    "label": "Unrated items in web search",
+    "help": "Whether things nobody has rated yet show in web search. Default follows the setting above.",
+    "copy": {
+      "does": "Shows or hides unrated searching the web, or follows the main setting.",
+      "options": {
+        "default": "Follows the main setting.",
+        "yes": "Shows what nothing has rated yet.",
+        "no": "Hides what nothing has rated yet."
+      }
+    },
+    "band_default": {
+      "child": "default",
+      "teen": "default",
+      "adult": "default"
+    },
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.allowance",
+    "honoured_by": [
+      "home"
+    ]
   }
 ]
