@@ -7361,7 +7361,7 @@
     "copy": {
       "does": "Sets how grown-up the things shown anywhere in Home may be.",
       "options": {
-        "G": "Gentle, for the youngest.",
+        "G": "Gentle, nothing beyond G.",
         "PG": "Mild, with a little that is grown-up.",
         "PG-13": "Some grown-up themes, nothing explicit.",
         "R": "Strong language and themes.",
@@ -7407,7 +7407,7 @@
       "does": "How grown-up answers may be, or default to the main setting.",
       "options": {
         "default": "Follows the main setting.",
-        "G": "Gentle, for the youngest.",
+        "G": "Gentle, nothing beyond G.",
         "PG": "Mild, with a little that is grown-up.",
         "PG-13": "Some grown-up themes, nothing explicit.",
         "R": "Strong language and themes.",
@@ -7453,7 +7453,7 @@
       "does": "How grown-up saved shows and songs may be, or default to the main setting.",
       "options": {
         "default": "Follows the main setting.",
-        "G": "Gentle, for the youngest.",
+        "G": "Gentle, nothing beyond G.",
         "PG": "Mild, with a little that is grown-up.",
         "PG-13": "Some grown-up themes, nothing explicit.",
         "R": "Strong language and themes.",
@@ -7499,7 +7499,7 @@
       "does": "How grown-up pictures, clips and songs may be, or default to the main setting.",
       "options": {
         "default": "Follows the main setting.",
-        "G": "Gentle, for the youngest.",
+        "G": "Gentle, nothing beyond G.",
         "PG": "Mild, with a little that is grown-up.",
         "PG-13": "Some grown-up themes, nothing explicit.",
         "R": "Strong language and themes.",
@@ -7545,7 +7545,7 @@
       "does": "How grown-up the news may be, or default to the main setting.",
       "options": {
         "default": "Follows the main setting.",
-        "G": "Gentle, for the youngest.",
+        "G": "Gentle, nothing beyond G.",
         "PG": "Mild, with a little that is grown-up.",
         "PG-13": "Some grown-up themes, nothing explicit.",
         "R": "Strong language and themes.",
@@ -7591,7 +7591,7 @@
       "does": "How grown-up searching the web may be, or default to the main setting.",
       "options": {
         "default": "Follows the main setting.",
-        "G": "Gentle, for the youngest.",
+        "G": "Gentle, nothing beyond G.",
         "PG": "Mild, with a little that is grown-up.",
         "PG-13": "Some grown-up themes, nothing explicit.",
         "R": "Strong language and themes.",
@@ -7635,7 +7635,7 @@
       "does": "Lowers what you see any time, never above what the household gives.",
       "options": {
         "default": "Follows the main setting.",
-        "G": "Gentle, for the youngest.",
+        "G": "Gentle, nothing beyond G.",
         "PG": "Mild, with a little that is grown-up.",
         "PG-13": "Some grown-up themes, nothing explicit.",
         "R": "Strong language and themes.",
@@ -7674,7 +7674,7 @@
       "does": "Lowers what you see in answers any time.",
       "options": {
         "default": "Follows the main setting.",
-        "G": "Gentle, for the youngest.",
+        "G": "Gentle, nothing beyond G.",
         "PG": "Mild, with a little that is grown-up.",
         "PG-13": "Some grown-up themes, nothing explicit.",
         "R": "Strong language and themes.",
@@ -7713,7 +7713,7 @@
       "does": "Lowers what you see in saved shows and songs any time.",
       "options": {
         "default": "Follows the main setting.",
-        "G": "Gentle, for the youngest.",
+        "G": "Gentle, nothing beyond G.",
         "PG": "Mild, with a little that is grown-up.",
         "PG-13": "Some grown-up themes, nothing explicit.",
         "R": "Strong language and themes.",
@@ -7752,7 +7752,7 @@
       "does": "Lowers what you see in pictures, clips and songs any time.",
       "options": {
         "default": "Follows the main setting.",
-        "G": "Gentle, for the youngest.",
+        "G": "Gentle, nothing beyond G.",
         "PG": "Mild, with a little that is grown-up.",
         "PG-13": "Some grown-up themes, nothing explicit.",
         "R": "Strong language and themes.",
@@ -7791,7 +7791,7 @@
       "does": "Lowers what you see in the news any time.",
       "options": {
         "default": "Follows the main setting.",
-        "G": "Gentle, for the youngest.",
+        "G": "Gentle, nothing beyond G.",
         "PG": "Mild, with a little that is grown-up.",
         "PG-13": "Some grown-up themes, nothing explicit.",
         "R": "Strong language and themes.",
@@ -7830,7 +7830,7 @@
       "does": "Lowers what you see in searching the web any time.",
       "options": {
         "default": "Follows the main setting.",
-        "G": "Gentle, for the youngest.",
+        "G": "Gentle, nothing beyond G.",
         "PG": "Mild, with a little that is grown-up.",
         "PG-13": "Some grown-up themes, nothing explicit.",
         "R": "Strong language and themes.",
@@ -8113,14 +8113,13 @@
         "drugs",
         "gambling",
         "gore",
-        "sexual",
-        "minor_line"
+        "sexual"
       ],
       "multiple": true
     },
     "default": [],
     "label": "Content filters",
-    "help": "Choose more kinds of content to hold back. The filters this level already has stay on.",
+    "help": "Choose more kinds of content to hold back. The kinds this level already holds back stay on, and an admin's choices stay until the admin changes them.",
     "copy": {
       "does": "Holds back more kinds of content on top of the level's own.",
       "options": {
@@ -8128,16 +8127,14 @@
         "drugs": "Holds back drug and alcohol content.",
         "gambling": "Holds back gambling content.",
         "gore": "Holds back gory violence.",
-        "sexual": "Holds back sexual content.",
-        "minor_line": "Holds back anything that sexualizes a minor."
+        "sexual": "Holds back sexual content."
       },
       "option_labels": {
         "swearing": "Swearing",
         "drugs": "Drugs and alcohol",
         "gambling": "Gambling",
         "gore": "Gore",
-        "sexual": "Sexual content",
-        "minor_line": "Minors"
+        "sexual": "Sexual content"
       }
     },
     "level": "basic",
@@ -8145,7 +8142,13 @@
     "lives_in": "person.allowance",
     "honoured_by": [
       "home"
-    ]
+    ],
+    "layers": [
+      "band",
+      "household",
+      "person"
+    ],
+    "merge": "union"
   },
   {
     "key": "content.policy.chat",
