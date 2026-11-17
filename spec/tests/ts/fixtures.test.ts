@@ -917,3 +917,18 @@ describe("page-context and ambient quick actions", () => {
     expect(() => QuickAction.parse("unknown")).toThrow();
   });
 });
+
+describe("settings-change (SETTINGS-AUDIT-01: one record of an admin changing a safety-relevant setting)", async () => {
+  const { SettingsChange } = await import("../../gen/ts/settings-change.js");
+  test("the example validates and names no person", () => {
+    const example = loadFixture("settings-change.example.json") as Record<string, unknown>;
+    expect(SettingsChange.safeParse(example).success).toBe(true);
+    expect(Object.keys(example).some((key) => /person|actor_id|name/.test(key))).toBe(false);
+  });
+  test("a person id, a bad role or a stray field is refused", () => {
+    const example = loadFixture("settings-change.example.json") as Record<string, unknown>;
+    expect(SettingsChange.safeParse({ ...example, actor_role: "teen" }).success).toBe(false);
+    expect(SettingsChange.safeParse({ ...example, person_id: "person-abc123" }).success).toBe(false);
+    expect(SettingsChange.safeParse({ ...example, scope: "device" }).success).toBe(false);
+  });
+});

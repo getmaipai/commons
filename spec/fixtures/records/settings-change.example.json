@@ -1,0 +1,11 @@
+{
+  "id": "schg-7f3k2m",
+  "key": "search.web.child_mode",
+  "scope": "household",
+  "actor_role": "admin",
+  "value": true,
+  "previous": false,
+  "direction": "widens",
+  "changed_at": "2026-11-17T08:00:00Z",
+  "hlc": "1794900000000:0:hub001"
+}

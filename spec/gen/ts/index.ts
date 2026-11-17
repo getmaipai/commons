@@ -92,6 +92,7 @@ export * from "./session-sign-in-source.js";
 export * from "./setting-value.js";
 export * from "./settings-area.js";
 export * from "./settings-areas.js";
+export * from "./settings-change.js";
 export * from "./settings-delta.js";
 export * from "./settings-key.js";
 export * from "./setup-state.js";

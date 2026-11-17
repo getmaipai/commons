@@ -1,3 +1,7 @@
+## [spec-v0.1.416] - 2026-11-17
+
+- SETTINGS-AUDIT-01: `SettingsChange`, one record of an owner or admin changing a safety-relevant setting (key, scope, actor role, value, previous, direction, when). It names no person (rule 6a). Additive.
+
 ## [spec-v0.1.415] - 2026-11-17
 
 - The settings registry (`settings/keys.json`) is regenerated from Home's declarations so the pinned tag matches what Home ships (the picture and video tier keys, the Telegram channel toggles, the reference library keys, the storage caps and the rest listed by Home's drift check). No shape changed.
