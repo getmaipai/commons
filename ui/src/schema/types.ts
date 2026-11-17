@@ -540,6 +540,16 @@ export const PromptBarNodeSchema = z.object({
   placeholder: z.string().min(1).max(120).optional(),
   prompt_state: z.string().regex(/^[a-z][a-z0-9_]*$/).max(40).optional(),
   max_length: z.number().int().min(1).max(4000).optional(),
+  fields: z.array(z.object({
+    state: z.string().regex(/^[a-z][a-z0-9_]*$/).max(40),
+    label: z.string().min(1).max(40),
+    placeholder: z.string().min(1).max(120).optional(),
+    max_length: z.number().int().min(1).max(300).optional(),
+    when: z.object({
+      state: z.string().regex(/^[a-z][a-z0-9_]*$/).max(40),
+      equals: z.union([z.string(), z.number()]),
+    }).strict().optional(),
+  }).strict()).max(80).optional(),
   chips: z
     .array(
       z.object({

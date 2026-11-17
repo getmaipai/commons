@@ -813,6 +813,7 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
   const { dispatch, lastError } = useDispatchAction();
   const promptKey = node.prompt_state ?? "prompt";
   const chips = node.chips ?? [];
+  const visibleFields = (node.fields ?? []).filter((item) => !item.when || state[item.when.state] === item.when.equals);
   const initial: Record<string, string | number> = {};
   for (const chip of chips) {
     const fromState = state[chip.state];
@@ -998,6 +999,14 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
       label={node.label}
       placeholder={node.placeholder}
       maxLength={node.max_length}
+      fields={visibleFields.map((item) => ({
+        id: item.state,
+        label: item.label,
+        placeholder: item.placeholder,
+        maxLength: item.max_length,
+        value: typeof state[item.state] === "string" ? state[item.state] as string : "",
+        onValueChange: (next) => writer?.merge({ [item.state]: next }),
+      }))}
       value={text}
       onValueChange={setText}
       submitLabel={node.submit_label}

@@ -10,6 +10,7 @@ import { Drawer, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle } from "
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Textarea } from "../ui/textarea";
+import { Input } from "../ui/input";
 import { useIsPhoneLayout } from "../hooks/useIsPhoneLayout";
 import { useSplitViewLayout } from "../primitives/SplitView";
 import { OptionCards, OptionThumb, isLockedOption, type LockedOptionCard } from "./option-cards";
@@ -147,6 +148,7 @@ export interface PromptBarProps {
   value: string;
   onValueChange: (text: string) => void;
   maxLength?: number;
+  fields?: readonly { id: string; label: string; placeholder?: string; maxLength?: number; value: string; onValueChange: (value: string) => void }[];
   chips?: readonly PromptBarChip[];
   /** VIDEO-COMPOSER-03: the media kind selector built into the same Chat-style composer toolbar. */
   modeSelector?: PromptBarModeSelector;
@@ -227,7 +229,7 @@ function ChipCards({ chip, locked, columns }: { chip: PromptBarChip; locked: boo
 
 /** The prompt box of a make flow: a text box, chips that each choose one value, the Standard, Boost, Max segment and one Make button.
  * It holds no state of its own. Videos Create draws it through the `prompt_bar` schema node and the chat video card draws it directly. */
-export function PromptBar({ label, placeholder, value, onValueChange, maxLength, chips = [], modeSelector, modes, mode: selectedMode, onModeChange, quality, references = [], tier, submitLabel = i18n._({ id: "ui.Make", message: "Make" }), fieldSize = "default", submitDetailPlacement = "below", onSubmit, busy = false, disabledReason, leading, error, className, placement = "inline", layout: barLayout = "block", chatDistribution, suggestions = [], submitDetail, optionsLabel = i18n._({ id: "ui.Options", message: "Options" }), foldLabel = i18n._({ id: "ui.More settings", message: "More settings" }), suggestedStyles = [], onDismissSuggestion, shape = "default", accent }: PromptBarProps) {
+export function PromptBar({ label, placeholder, value, onValueChange, maxLength, fields = [], chips = [], modeSelector, modes, mode: selectedMode, onModeChange, quality, references = [], tier, submitLabel = i18n._({ id: "ui.Make", message: "Make" }), fieldSize = "default", submitDetailPlacement = "below", onSubmit, busy = false, disabledReason, leading, error, className, placement = "inline", layout: barLayout = "block", chatDistribution, suggestions = [], submitDetail, optionsLabel = i18n._({ id: "ui.Options", message: "Options" }), foldLabel = i18n._({ id: "ui.More settings", message: "More settings" }), suggestedStyles = [], onDismissSuggestion, shape = "default", accent }: PromptBarProps) {
   const layout = useSplitViewLayout();
   const phone = useIsPhoneLayout();
   const mode: Mode = placement === "panel" && layout ? (layout === "side" ? "panel" : "dock") : "inline";
@@ -440,6 +442,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
     </>;
   };
   const inButton = submitDetailPlacement === "in_button" && Boolean(submitDetail);
+  const fieldsRow = fields.length > 0 ? <div data-slot="prompt-bar-fields" className="flex min-w-0 flex-col gap-2">{fields.map((item) => <label key={item.id} className="flex min-w-0 flex-col gap-1 text-sm">{item.label}<Input aria-label={item.label} placeholder={item.placeholder} maxLength={item.maxLength} value={item.value} onChange={(event) => item.onValueChange(event.currentTarget.value)} /></label>)}</div> : null;
 
   // VIDEO-UI-12: the label and the time as two lines inside the button. The button keeps its own name (the label); the time is its description.
   const buttonFace = (
@@ -526,6 +529,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
         <form data-slot="prompt-bar" data-layout={barLayout} className={cn("flex w-full min-w-0 flex-col gap-2", className)} onSubmit={(e) => { e.preventDefault(); trySubmit(); }}>
           {errorRow}
           <div data-slot="prompt-bar-composer" data-chat-input={inChat ? "true" : undefined} className={cn("flex min-w-0 flex-col rounded-2xl border border-input bg-background p-2 shadow-sm transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/30", inChat ? "gap-1" : "gap-2")}>
+            {fieldsRow}
             {refsRow(rowRefs)}
             {inChat && inField?.value ? <InFieldThumb reference={inField} locked={locked} compact /> : null}
             {fieldBox(5, false)}
@@ -585,6 +589,7 @@ export function PromptBar({ label, placeholder, value, onValueChange, maxLength,
         onSubmit={(e) => { e.preventDefault(); trySubmit(); }}
       >
         {errorRow}
+        {fieldsRow}
         {fieldBox(8, false)}
         {suggestionRow}
         {suggestedRow}

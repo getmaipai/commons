@@ -70,6 +70,28 @@ describe("prompt_bar node", () => {
     expect(composer.querySelector('button[type="submit"]')).toBeTruthy();
   });
 
+  test("fields draw, write page state, and follow their when condition", () => {
+    const fieldsNode = { ...cardsNode, fields: [
+      { state: "subject", label: "Subject", placeholder: "Who or what?" },
+      { state: "detail", label: "Detail", when: { state: "subject", equals: "fox" } },
+    ] } as UiNode;
+    const { view, update } = drawWith(fieldsNode, { subject: "", detail: "keep me" });
+    expect(view.getByRole("textbox", { name: "Subject" })).toBeTruthy();
+    expect(view.queryByRole("textbox", { name: "Detail" })).toBeNull();
+    fireEvent.change(view.getByRole("textbox", { name: "Subject" }), { target: { value: "fox" } });
+    update({ subject: "fox", detail: "keep me" });
+    expect(view.getByRole("textbox", { name: "Detail" })).toBeTruthy();
+    expect(view.getByRole("textbox", { name: "Subject" }).getAttribute("placeholder")).toBe("Who or what?");
+  });
+
+  test("fields schema enforces bounds and absent fields remain absent", () => {
+    const base = { type: "prompt_bar", label: "Describe", submit: { call: { target: "/make" } } };
+    expect(PageNodeSchema.parse({ type: "page", id: "x", title: "X", body: [base] }).body[0]).toBeTruthy();
+    expect(PageNodeSchema.safeParse({ type: "page", id: "x", title: "X", body: [{ ...base, fields: Array.from({ length: 81 }, () => ({ state: "a", label: "A" })) }] }).success).toBe(false);
+    expect(PageNodeSchema.safeParse({ type: "page", id: "x", title: "X", body: [{ ...base, fields: [{ state: "Bad", label: "A" }] }] }).success).toBe(false);
+    expect(PageNodeSchema.safeParse({ type: "page", id: "x", title: "X", body: [{ ...base, fields: [{ state: "a", label: "A", max_length: 301 }] }] }).success).toBe(false);
+  });
+
   test("Make sends prompt, shape, length, tier and recipe in one call with their types", async () => {
     const view = draw();
     const make = view.getByRole("button", { name: "Make" }) as HTMLButtonElement;
