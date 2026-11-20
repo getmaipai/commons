@@ -122,6 +122,57 @@ function ActionButton({ action, icons }: { action: RowAction; icons: boolean }) 
   );
 }
 
+/** The glass the overlay pills sit on: the page background at 60% with a 10px blur, tokens only. */
+export const OVERLAY_GLASS = "bg-[color-mix(in_oklab,var(--background)_60%,transparent)] backdrop-blur-[10px]";
+
+function OverlayPill({ action }: { action: RowAction }) {
+  const blocked = Boolean(action.disabledReason) || Boolean(action.busy);
+  const hint = action.disabledReason ?? action.note;
+  return (
+    // eslint-disable-next-line jsx-a11y/role-supports-aria-props -- aria-description is ARIA 1.3 and the lint rule predates it; screen readers announce it
+    <button
+      type="button"
+      data-slot="video-player-pill"
+      data-busy={action.busy ? "" : undefined}
+      data-starts={action.starts}
+      aria-label={action.label}
+      aria-disabled={blocked ? true : undefined}
+      aria-busy={action.busy ? true : undefined}
+      aria-pressed={action.pressed === undefined ? undefined : action.pressed}
+      // The reason shows on hover (title) and is announced (aria-description); aria-disabled, not disabled, keeps the pill focusable so a keyboard user reaches it.
+      title={hint}
+      aria-description={hint}
+      onClick={() => { if (!blocked) action.onSelect(); }}
+      className={cn(
+        OVERLAY_GLASS,
+        "text-foreground border-border/60 inline-flex min-h-12 min-w-12 items-center justify-center gap-2 rounded-full border px-3 text-sm font-medium outline-none sm:px-4",
+        "focus-visible:ring-[3px] focus-visible:ring-ring/50 motion-safe:transition-colors [&_svg]:size-4 [&_svg]:shrink-0",
+        blocked ? "cursor-not-allowed opacity-60" : "hover:bg-[color-mix(in_oklab,var(--background)_75%,transparent)]",
+        action.pressed && "border-foreground/40",
+      )}
+    >
+      {action.busy ? <Loader2Icon aria-hidden className="motion-safe:animate-spin" /> : action.icon}
+      <span className={action.icon || action.busy ? "hidden sm:inline" : undefined}>{action.label}</span>
+    </button>
+  );
+}
+
+/**
+ * The actions of a clip as floating glass pills at the top end of its picture (VideoPlayer `overlayActions`). They wrap and take at most 80%
+ * of the picture's width. Each is a real button with a visible label; on a phone the label hides behind its icon and stays as the aria-label.
+ * A `disabledReason` (or `note`) sits in `title` and `aria-description`. `slot` and `trailing` (Favorite) draw after the pills.
+ */
+export function OverlayPills({ actions, slot, trailing, className }: { actions: RowAction[]; slot?: ReactNode; trailing?: ReactNode; className?: string }) {
+  const capped = actions.slice(0, VIDEO_PLAYER_ACTION_CAP);
+  return (
+    <div data-slot="video-player-overlay-pills" className={cn("absolute end-3 top-12 z-10 flex max-w-[80%] flex-wrap justify-end gap-2", className)}>
+      {capped.map(action => <OverlayPill key={action.key} action={action} />)}
+      {slot}
+      {trailing ? <span className={cn(OVERLAY_GLASS, "inline-flex items-center rounded-full")}>{trailing}</span> : null}
+    </div>
+  );
+}
+
 /**
  * The row of actions under a clip. `inline` is how many draw as buttons; the rest go behind a More menu
  * (never more than VIDEO_PLAYER_ACTION_CAP in all). `trailing` (the Favorite toggle) always stays outside the menu.

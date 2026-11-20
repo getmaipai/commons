@@ -6,6 +6,7 @@ import { Button } from "../ui/button";
 import { i18n } from "@/kit/i18n"
 import { AnswerStyleSelect } from "./answer-style-select";
 import { getIcon } from "../icons";
+import { FactsLine } from "./facts-line";
 
 export type TierId = "standard" | "boost" | "max";
 
@@ -46,10 +47,12 @@ export interface TierSegmentProps {
   details?: Readonly<Record<string, string>>;
   /** VIDEO-COMPOSER-02: compact toolbar layout without the per-tier hint line. */
   density?: "default" | "compact";
+  /** One server-supplied line under the control in the mono face, muted ("Full HD · 5 s · 1920×1088 · about 8 min"): one line on a desktop, wraps on a phone. Draws nothing when empty. */
+  facts?: string;
 }
 
 /** The Standard, Boost, Max choice on a picture, video or song card, beside Make another. A tier with a `confirm` line asks once before it applies. */
-export function TierSegment({ value, onValueChange, tiers = defaultTiers(), confirmLabel = i18n._({ id: "ui.Continue", message: "Continue" }), cancelLabel = i18n._({ id: "ui.Cancel", message: "Cancel" }), label = i18n._({ id: "ui.Quality", message: "Quality" }), className, presentation = "segment", details, density = "default" }: TierSegmentProps) {
+export function TierSegment({ value, onValueChange, tiers = defaultTiers(), confirmLabel = i18n._({ id: "ui.Continue", message: "Continue" }), cancelLabel = i18n._({ id: "ui.Cancel", message: "Cancel" }), label = i18n._({ id: "ui.Quality", message: "Quality" }), className, presentation = "segment", details, density = "default", facts }: TierSegmentProps) {
   const [pending, setPending] = useState<TierOptionDef | null>(null);
   const shown = tiers.find((t) => t.id === value);
   const note = pending?.confirm ?? undefined;
@@ -92,6 +95,7 @@ export function TierSegment({ value, onValueChange, tiers = defaultTiers(), conf
         }}
       />
       {confirmBlock}
+      <FactsLine>{facts}</FactsLine>
     </div>;
   }
   if (presentation === "cards") {
@@ -125,6 +129,7 @@ export function TierSegment({ value, onValueChange, tiers = defaultTiers(), conf
           })}
         </div>
         {confirmBlock}
+        <FactsLine>{facts}</FactsLine>
       </div>
     );
   }
@@ -159,6 +164,7 @@ export function TierSegment({ value, onValueChange, tiers = defaultTiers(), conf
           {shown?.disabledReason ?? ([shown?.hint, shown ? timeOf(shown) : undefined].filter(Boolean).join(" · ") || " ")}
         </p>
       ))}
+      <FactsLine>{facts}</FactsLine>
     </div>
   );
 }

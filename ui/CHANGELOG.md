@@ -1,3 +1,7 @@
+## [ui-v0.5.693] - 2026-11-20
+
+- `VideoPlayer`: `overlayActions` draws the row actions as floating glass pills on the picture (wrapping, at most 80% wide, each a real button with a visible label that hides to an icon on a phone). `creation-header`: a `display` variant with the serif display title, an eyebrow and a subtitle. A `facts` line slot (monospace, muted, one line from the server) on `creation-header` and `TierSegment` (VIDEO-KIT-01).
+
 ## [ui-v0.5.692] - 2026-11-20
 
 - `VideoPlayer`: a `retake_from` action reports the scrubbed time through `onRetakeFrom(timeSec)`, marks that moment on the scrub bar, and says why when it is not available; every action can carry a one-line `note` (what it keeps and how long it takes) and a `busy` state, for another take, extend and enhance (VIDEO-KIT-01).

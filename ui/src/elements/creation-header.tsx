@@ -9,6 +9,7 @@ import { VisibilityChip, type VisibilityChipProps } from "./visibility-chip";
 import { diceBearAvatarUri } from "../primitives/Avatar";
 import { SafeImage } from "../primitives/SafeImage";
 import { Cover } from "../ui/media-tiles";
+import { FactsLine } from "./facts-line";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { i18n } from "@/kit/i18n"
 
@@ -19,7 +20,7 @@ export interface CreationHeaderProps {
   description?: string | null;
   headingLevel?: "h1" | "h2";
   visibility: Omit<VisibilityChipProps, "onOpen"> & { onOpen: () => void };
-  variant?: "full" | "byline" | "collection" | "studio" | "hero";
+  variant?: "full" | "byline" | "collection" | "studio" | "hero" | "display";
   art?: string | null;
   meta?: string | null;
   primary?: { label: string; icon?: string; onSelect: () => void };
@@ -31,6 +32,10 @@ export interface CreationHeaderProps {
   secondary?: { label: string; icon?: string; onSelect: () => void };
   /** VIDEO-STUDIO-03 (`variant: "studio"` only): draw no art, eyebrow or title (an adult-only item while the lock is on); the actions stay. */
   locked?: boolean;
+  /** `variant: "display"` only: one quiet line under the title. */
+  subtitle?: string | null;
+  /** One server-supplied line in the mono face, muted ("Full HD · 5 s · 1920×1088 · about 8 min"). One line on a desktop, wraps on a phone. Draws nothing when empty. */
+  facts?: string | null;
   stats?: { label: string; value: string }[];
   accent?: string;
 }
@@ -47,7 +52,7 @@ function formattedDate(value?: string | null) {
   return absoluteTime(value);
 }
 
-export function CreationHeader({ title, creator, madeAt, description, headingLevel = "h1", visibility, variant = "full", art, meta, primary, shuffle, more = [], eyebrow, secondary, locked = false, stats, accent = "var(--accent-hero)" }: CreationHeaderProps) {
+export function CreationHeader({ title, creator, madeAt, description, headingLevel = "h1", visibility, variant = "full", art, meta, primary, shuffle, more = [], eyebrow, secondary, locked = false, subtitle, facts, stats, accent = "var(--accent-hero)" }: CreationHeaderProps) {
   const [expanded, setExpanded] = useState(false);
   const homeLabel = plain(creator?.label, i18n._({ id: "ui.Made at home", message: "Made at home" }));
   const creatorName = plain(creator?.name, homeLabel);
@@ -57,6 +62,18 @@ export function CreationHeader({ title, creator, madeAt, description, headingLev
   const Heading = headingLevel;
   const date = formattedDate(madeAt);
   const detail = description?.trim() && !/\{[^{}]+\}/.test(description) ? description.trim() : null;
+  if (variant === "display") {
+    const eyebrowText = eyebrow?.trim() && !/\{[^{}]+\}/.test(eyebrow) ? eyebrow.trim() : null;
+    const subtitleText = subtitle?.trim() && !/\{[^{}]+\}/.test(subtitle) ? subtitle.trim() : null;
+    return (
+      <header data-slot="creation-header" data-variant="display" className="flex min-w-0 flex-col gap-2">
+        {eyebrowText ? <span data-slot="creation-header-eyebrow" className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">{eyebrowText}</span> : null}
+        <Heading data-slot="creation-header-display-title" className="text-foreground m-0 min-w-0 font-[family-name:var(--font-display)] text-[28px] leading-[1.1] font-semibold tracking-tight break-words md:text-[44px]">{plain(title, i18n._({ id: "ui.Untitled", message: "Untitled" }))}</Heading>
+        {subtitleText ? <p data-slot="creation-header-subtitle" className="text-muted-foreground m-0 text-base">{subtitleText}</p> : null}
+        <FactsLine>{facts}</FactsLine>
+      </header>
+    );
+  }
   if (variant === "hero") {
     const artSrc = art && !/\{[^{}]+\}/.test(art) ? art : null;
     const HeroShuffle = shuffle ? getIcon(shuffle.icon ?? "shuffle") : null;
@@ -69,6 +86,7 @@ export function CreationHeader({ title, creator, madeAt, description, headingLev
         {eyebrow ? <span className="text-[13px] text-[color:var(--art-foreground)]/75">{eyebrow}</span> : null}
         <Heading className="text-[length:var(--font-size-hero)] font-[var(--font-weight-hero)] tracking-tight text-[color:var(--art-foreground)]">{plain(title, i18n._({ id: "ui.Untitled", message: "Untitled" }))}</Heading>
         {creatorLine ? <p className="text-sm text-[color:var(--art-foreground)]/75">{creatorLine}</p> : null}
+        <FactsLine className="text-[color:var(--art-foreground)]/75">{facts}</FactsLine>
         <div className="flex flex-wrap items-center gap-2">
           {primary ? <Button type="button" variant="inverse" shape="pill" onClick={primary.onSelect}>{primary.icon ? (() => { const ActionIcon = getIcon(primary.icon); return <ActionIcon aria-hidden className="size-4" />; })() : null}{primary.label}</Button> : null}
           {shuffle && HeroShuffle ? <Button type="button" variant="glass" size="icon-control" aria-label={shuffle.label} onClick={shuffle.onSelect}><HeroShuffle aria-hidden /></Button> : null}
@@ -92,6 +110,7 @@ export function CreationHeader({ title, creator, madeAt, description, headingLev
           <div className="flex min-w-0 flex-1 basis-60 flex-col gap-1">
             {eyebrowText ? <span data-slot="creation-header-eyebrow" className="text-muted-foreground text-xs font-semibold">{eyebrowText}</span> : null}
             <Heading className="text-foreground min-w-0 text-2xl leading-tight font-semibold tracking-tight break-words sm:text-3xl">{plain(title, i18n._({ id: "ui.Untitled", message: "Untitled" }))}</Heading>
+            <FactsLine>{facts}</FactsLine>
           </div>
         )}
         {primary || secondary ? <div data-slot="creation-header-actions" className="ms-auto flex flex-wrap items-center gap-2">{secondary ? pill(secondary, "secondary") : null}{primary ? pill(primary, "default") : null}</div> : null}
@@ -107,6 +126,7 @@ export function CreationHeader({ title, creator, madeAt, description, headingLev
           {creatorHref && !isHome ? <Link to={creatorHref} aria-label={plain(creator?.linkLabel, i18n._({ id: "ui.{creatorName}, open profile", message: "{creatorName}, open profile", values: { creatorName } }))} className="rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring">{creatorName}</Link> : <span>{creatorName}</span>}
         </span>
         {meta ? <p className="text-sm text-muted-foreground">{meta}</p> : null}
+        <FactsLine>{facts}</FactsLine>
         <VisibilityChip {...visibility} />
         {detail ? <div><div className={expanded ? "text-base text-muted-foreground" : "line-clamp-3 text-base text-muted-foreground"}><LightMarkdown text={detail} /></div><Button type="button" variant="link" height="auto" aria-expanded={expanded} onClick={() => setExpanded(value => !value)}>{expanded ? i18n._({ id: "ui.Show less", message: "Show less" }) : i18n._({ id: "ui.Show more", message: "Show more" })}</Button></div> : null}
         <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
@@ -136,6 +156,7 @@ export function CreationHeader({ title, creator, madeAt, description, headingLev
   return (
     <header data-slot="creation-header" data-variant={variant} className="grid gap-3">
       {variant === "full" ? <Heading className="text-3xl font-bold tracking-tight">{plain(title, i18n._({ id: "ui.Untitled", message: "Untitled" }))}</Heading> : null}
+      <FactsLine>{facts}</FactsLine>
       <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2">
         <span className="inline-flex min-w-0 items-center gap-2 text-sm text-muted-foreground">
           {creatorHref && !isHome ? <Link to={creatorHref} aria-label={plain(creator?.linkLabel, i18n._({ id: "ui.{creatorName}, open profile", message: "{creatorName}, open profile", values: { creatorName } }))} className="inline-flex min-w-0 items-center gap-2 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring">{identity}</Link> : identity}

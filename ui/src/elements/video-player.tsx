@@ -29,6 +29,7 @@ import { LockTile } from "./adult-lock";
 import { PendingActions, type PendingAction } from "./pending-actions";
 import {
   ActionRow,
+  OverlayPills,
   RetakeBar,
   VIDEO_PLAYER_ACTION_CAP,
   iconFor,
@@ -220,6 +221,7 @@ function VideoPlayerBody({
   actionsInline,
   actionsReveal = "always",
   chrome = "default",
+  overlayActions = false,
   caption = true,
   tracks,
   badges,
@@ -305,6 +307,12 @@ function VideoPlayerBody({
   /** VIDEO-UI-14: `overlay` draws Favorite, a Play button and the icon row over a `ready` or `draft` picture on `--art-overlay` and
    * `--art-foreground`, instead of in a row under it. Other statuses keep their row under the picture. Default `default`. */
   chrome?: "default" | "overlay";
+  /** `true` draws the row actions (built-ins, `actionItems`, `actions` and Favorite) as floating glass pills at the top end of a `ready` or
+   * `draft` picture instead of a row under it. They wrap and take at most 80% of the picture's width; each is a real button with a visible
+   * label (hidden on a phone behind its icon, then the aria-label). A `disabledReason` shows in `title` and `aria-description`, a busy action
+   * shows a spinner, and every action draws (`actionsInline` and `actionsVariant` do not apply). With `chrome="overlay"` these pills replace
+   * its action box. Other statuses keep their row. Default false. */
+  overlayActions?: boolean;
   /** VIDEO-UI-14: false leaves out the prompt caption under the clip (the host prints the words once itself). The prompt is still the
    * clip's accessible name. Default true. */
   caption?: boolean;
@@ -343,6 +351,7 @@ function VideoPlayerBody({
   // VIDEO-UI-14: the overlay chrome and the hover reveal reach only a clip with a picture (`ready` with a source, or `draft`).
   const hasPicture = status === "draft" || (status === "ready" && Boolean(src));
   const overlay = chrome === "overlay" && hasPicture;
+  const pills = overlayActions && hasPicture;
   const reveal = actionsReveal === "hover" && (status === "ready" || status === "draft");
   const tags = (badges ?? []).filter(Boolean);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -498,7 +507,7 @@ function VideoPlayerBody({
 
   const REVEAL = "motion-safe:transition-opacity [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover/player:opacity-100 group-focus-within/player:opacity-100";
   const rowHasContent = rowActions.length > 0 || Boolean(actions);
-  const framed = overlay || tags.length > 0 ? (
+  const framed = overlay || pills || tags.length > 0 ? (
     <div data-slot="video-player-picture" className="relative">
       {picture}
       {tags.length > 0 ? (
@@ -522,7 +531,10 @@ function VideoPlayerBody({
           <PlayIcon aria-hidden className="size-5 fill-current" />
         </button>
       ) : null}
-      {overlay && rowHasContent ? (
+      {pills && (rowHasContent || favoriteButton) ? (
+        <OverlayPills actions={rowActions} slot={actions} trailing={overlay ? null : favoriteButton} className={cn(overlay && favoriteButton && "end-14", reveal && REVEAL)} />
+      ) : null}
+      {overlay && !pills && rowHasContent ? (
         <div
           data-slot="video-player-overlay-actions"
           className={cn(
@@ -556,7 +568,7 @@ function VideoPlayerBody({
           onClear={() => { setArmedOwn(null); }}
         />
       ) : null}
-      {overlay && !notice && !(caption && prompt) ? null : <CardContent className="flex flex-col gap-3 py-3">
+      {(overlay || pills) && !notice && !(caption && prompt) ? null : <CardContent className="flex flex-col gap-3 py-3">
         {live ? (
           <>
             <Progress value={value} aria-label={text.generating} aria-valuetext={startedAt ? i18n._({ id: "ui.{value} percent, {time} so far", message: "{value} percent, {time} so far", values: { value, time: formatClock(elapsedMs) } }) : i18n._({ id: "ui.{value} percent", message: "{value} percent", values: { value } })} />
@@ -584,7 +596,7 @@ function VideoPlayerBody({
         ) : null}
         {status === "cancelled" ? <p className="text-muted-foreground text-sm">{text.stopped}</p> : null}
         {notice ? <p data-slot="video-player-notice" className="text-muted-foreground text-xs">{notice}</p> : null}
-        {!overlay && (status === "draft" || status === "ready" || status === "failed" || status === "cancelled") ? (
+        {!overlay && !pills && (status === "draft" || status === "ready" || status === "failed" || status === "cancelled") ? (
           <ActionRow actions={rowActions} icons={icons} inline={actionsInline} moreLabel={text.more} slot={actions} trailing={favoriteButton} className={reveal ? REVEAL : undefined} />
         ) : null}
         {(status === "ready" || status === "draft") && prompt && caption ? <p className="text-muted-foreground line-clamp-2 text-xs">{prompt}</p> : null}
