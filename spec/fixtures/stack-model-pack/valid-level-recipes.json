@@ -62,11 +62,27 @@
           },
           "finish": [
             {
+              "op": "crop",
+              "params": {
+                "from_width": 1920,
+                "from_height": 1088,
+                "width": 1920,
+                "height": 1080
+              }
+            },
+            {
               "op": "unsharp",
               "params": {
                 "luma_x": 5,
                 "luma_y": 5,
                 "amount": 0.4
+              }
+            },
+            {
+              "op": "audio_lead_in",
+              "params": {
+                "mute_ms": 130,
+                "fade_ms": 50
               }
             }
           ],

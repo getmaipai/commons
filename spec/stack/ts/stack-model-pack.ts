@@ -41,7 +41,9 @@ export type StackOperationRow = z.infer<typeof StackOperationRow>;
 
 // VF-PROFILE-01: the real recipe of one level, as values the runner reads. `level` stays the only quality key on the wire; `profile`
 // ("preview" or "quality") is only a name for a group of levels. A `size` names a native size other than the level's default shape size.
-export const StackFinishOp = z.enum(["lanczos_scale", "unsharp", "model_upscale", "loudness"]);
+// VF-FINISH-01: `crop` (params width, height, from_width, from_height: a centered crop that applies only to a clip of exactly from_width by from_height) and
+// `audio_lead_in` (params mute_ms, fade_ms: silence the first mute_ms of sound, then fade in over fade_ms; hides the noise burst H3 opens a clip with).
+export const StackFinishOp = z.enum(["lanczos_scale", "unsharp", "model_upscale", "loudness", "crop", "audio_lead_in"]);
 export const StackFinishStep = z.object({ op: StackFinishOp, params: z.record(text, z.union([z.number(), text])).optional() }).strict();
 export const StackLevelRecipe = z.object({
   level: StackJobLevel,

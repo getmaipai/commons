@@ -440,7 +440,9 @@
                           "lanczos_scale",
                           "unsharp",
                           "model_upscale",
-                          "loudness"
+                          "loudness",
+                          "crop",
+                          "audio_lead_in"
                         ]
                       },
                       "params": {
