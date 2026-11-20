@@ -3196,6 +3196,20 @@ html:has([data-slot="phone-nav"][data-floating]) [data-slot="action-bar"][data-s
   [data-slot="media-stage-loop"], [data-slot="media-stage-progress-fill"] { transition: none; }
 }
 
+/* A11Y-DEBT-01: the 48 px touch floor, for every control the kit or a page draws. The default look scales spacing by --density-scale (0.9), so a
+ * 48 px class (size-12) paints 43 px and a rail row paints 46; the audit measures real geometry. One transparent ::after, at zero specificity, grows
+ * only the TAPPABLE area to 48 px (it is a no-op when the control is already 48 or more: min() keeps the inset at 0), so the drawn size and the look
+ * do not change. Anything with its own ::after (a class, a rule) or its own position wins, because :where() adds no specificity; a control that
+ * already carries its own hit-area layer (button.tsx, switch, checkbox, slider) is untouched. `data-touch-target-exempt` opts out. */
+:where(button, a[href], [role="button"], [role="link"], [role="checkbox"], [role="radio"], [role="switch"], [role="tab"], [role="menuitem"], [tabindex]:not([tabindex="-1"]):not(input, select, textarea)):not([data-touch-target-exempt], [data-touch-target-exempt] *) { position: relative; }
+:where(button, a[href], [role="button"], [role="link"], [role="checkbox"], [role="radio"], [role="switch"], [role="tab"], [role="menuitem"], [tabindex]:not([tabindex="-1"]):not(input, select, textarea)):not([data-touch-target-exempt], [data-touch-target-exempt] *)::after {
+  content: "";
+  position: absolute;
+  inset: min(0px, calc((100% - 49px) / 2));
+}
+/* A text field cannot carry a pseudo-element, so it is drawn 48 px tall (the default look's density scale turned a 48 px class into 43). */
+:where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="hidden"], [type="file"], [type="color"]), select, textarea):not([data-touch-target-exempt], [data-touch-target-exempt] *) { min-height: 48px; }
+
 /* LOOKS-GENERATED:BEGIN (ui/scripts/gen-looks.ts, from spec/ui/looks.json; do not edit) */
 :root body.style-neutral {
   --font-sans: "Inter Variable", Inter, ui-sans-serif, system-ui, sans-serif;

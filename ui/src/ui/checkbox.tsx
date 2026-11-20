@@ -15,7 +15,7 @@ function Checkbox({
         // Visual size stays 16px; the tap area is stretched to the kit's
         // 48px minimum with a transparent pseudo-element (docs/UI.md,
         // WCAG 2.2 AA 2.5.5), the same fix applied to Switch's track.
-        "peer relative size-4 shrink-0 rounded-[4px] border border-input outline-none after:absolute after:-inset-4 after:content-[''] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground data-[state=indeterminate]:border-primary data-[state=indeterminate]:bg-primary data-[state=indeterminate]:text-primary-foreground dark:bg-input/30 dark:aria-invalid:ring-destructive/40 dark:data-[state=checked]:bg-primary dark:data-[state=indeterminate]:bg-primary",
+        "peer relative size-4 shrink-0 rounded-[4px] border border-input outline-none after:absolute after:inset-[min(0px,calc((100%-49px)/2))] after:content-[''] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground data-[state=indeterminate]:border-primary data-[state=indeterminate]:bg-primary data-[state=indeterminate]:text-primary-foreground dark:bg-input/30 dark:aria-invalid:ring-destructive/40 dark:data-[state=checked]:bg-primary dark:data-[state=indeterminate]:bg-primary",
         className
       )}
       {...props}

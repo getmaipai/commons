@@ -18,9 +18,9 @@ function trigger(size: "default" | "sm" | "lg") {
 
 describe("ModelSelectorTrigger hit area", () => {
   test.each([
-    ["default", "h-9", "before:-inset-3"],
-    ["sm", "h-8", "before:-inset-3"],
-    ["lg", "h-10", "before:-inset-2"],
+    ["default", "h-9", "before:inset-[min(0px,calc((100%-49px)/2))]"],
+    ["sm", "h-8", "before:inset-[min(0px,calc((100%-49px)/2))]"],
+    ["lg", "h-10", "before:inset-[min(0px,calc((100%-49px)/2))]"],
   ] as const)("%s keeps %s and extends the hit area", (size, height, inset) => {
     const el = trigger(size);
     expect(el.className).toContain(height);

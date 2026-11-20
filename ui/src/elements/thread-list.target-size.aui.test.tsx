@@ -40,7 +40,7 @@ describe("ThreadList 48px target floor", () => {
     const view = render(<Harness threads={[]} />);
     const button = view.getByRole("button", { name: "New chat" });
     expect(button.className).toContain("h-8");
-    expect(button.className).toContain("before:-inset-2");
+    expect(button.className).toContain("before:inset-[min(0px,calc((100%-49px)/2))]");
   });
 
   test("More options keeps its 24px icon and adds the kit's 12px hit overhang", async () => {
@@ -48,13 +48,13 @@ describe("ThreadList 48px target floor", () => {
     await view.findByText("Weekend plans");
     const button = view.container.querySelector('[data-slot="aui_thread-list-item-more"]')!;
     expect(button.className).toContain("size-6");
-    expect(button.className).toContain("before:-inset-3");
+    expect(button.className).toContain("before:inset-[min(0px,calc((100%-49px)/2))]");
   });
 
   test("history row title keeps its compact height and adds the kit's 16px vertical hit overhang", async () => {
     const view = render(<Harness threads={[{ remoteId: "thread-1", title: "Weekend plans" }]} />);
     const button = await view.findByRole("button", { name: "Weekend plans" });
     expect(button.className).toContain("h-full");
-    expect(button.className).toContain("before:-inset-2");
+    expect(button.className).toContain("before:inset-[min(0px,calc((100%-49px)/2))]");
   });
 });

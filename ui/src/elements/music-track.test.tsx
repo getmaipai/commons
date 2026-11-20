@@ -118,7 +118,7 @@ describe("MusicTrack compact card", () => {
       const card = container.querySelector('[data-slot="music-track"]')!;
       expect(card.className).toContain("overflow-hidden");
       expect(card.querySelector(".min-w-0")).toBeTruthy();
-      expect((card.querySelector('[aria-label="Download"]') as HTMLElement).className).toContain("before:-inset-3");
+      expect((card.querySelector('[aria-label="Download"]') as HTMLElement).className).toContain("before:inset-[min(0px,calc((100%-49px)/2))]");
     });
   });
 

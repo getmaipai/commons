@@ -33,13 +33,16 @@ export const FOCUS_RING_INSET =
 //
 // Written as three full literal strings (not a template with a variable
 // inside the class name) so Tailwind's scanner sees them.
+/** The shared 48 px hit layer: a transparent `::before` that grows the tappable box to 48 px (aimed at 49 so sub-pixel rounding never leaves it just under) in each direction it falls short, never beyond. */
+export const HIT_FLOOR =
+  "relative before:absolute before:inset-[min(0px,calc((100%-49px)/2))] before:content-['']";
+
 export function hitArea(insetStep: 1 | 2 | 3): string {
-  const steps: Record<1 | 2 | 3, string> = {
-    1: "relative before:absolute before:-inset-1 before:content-['']",
-    2: "relative before:absolute before:-inset-2 before:content-['']",
-    3: "relative before:absolute before:-inset-3 before:content-['']",
-  };
-  return steps[insetStep];
+  // A11Y-DEBT-01: spacing classes scale with the look's density (0.9 in the default look), so `before:-inset-3` on a 24 px control
+  // reached only 43 px. The layer now reaches exactly 48 px whatever the density or the painted size (a no-op at 48 or more).
+  // `insetStep` is kept so every caller and its meaning stay the same.
+  void insetStep;
+  return HIT_FLOOR;
 }
 
 /** The 48 px touch floor for the 28 px `size="row"` controls (settings
@@ -47,8 +50,7 @@ export function hitArea(insetStep: 1 | 2 | 3): string {
  * below (28 + 20 = 48) and 4 px each side (so two controls 8 px apart touch
  * but never overlap); the painted box stays 28 px. Always on, for a mouse
  * too: the audit measures the real hit area, not the pointer type. */
-export const HIT_AREA_ROW =
-  "relative before:absolute before:-inset-y-2.5 before:-inset-x-1 before:content-['']";
+export const HIT_AREA_ROW = HIT_FLOOR;
 
 // A raw `var(--hue-*)` text color fails WCAG AA on every hue against
 // both a plain panel and a 15%-tinted pill of the same hue, in both

@@ -138,7 +138,7 @@ export const ProjectIconPicker: FC<{
           data-slot="project-icon-picker-trigger"
           aria-label={text.open}
           disabled={disabled}
-          className="border-input hover:bg-accent focus-visible:ring-ring/50 relative flex size-9 shrink-0 items-center justify-center rounded-lg border outline-none focus-visible:ring-3 disabled:pointer-events-none disabled:opacity-50 before:absolute before:-inset-1.5 before:content-['']"
+          className="border-input hover:bg-accent focus-visible:ring-ring/50 relative flex size-9 shrink-0 items-center justify-center rounded-lg border outline-none focus-visible:ring-3 disabled:pointer-events-none disabled:opacity-50 before:absolute before:inset-[min(0px,calc((100%-49px)/2))] before:content-['']"
         >
           <ProjectMark icon={icon} color={color} size="md" />
         </button>

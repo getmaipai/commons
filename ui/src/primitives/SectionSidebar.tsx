@@ -319,7 +319,7 @@ export function SectionSidebar({
               onCollapsedChange(peeking ? false : !collapsed);
             }}
             className={cn(
-              "relative inline-flex shrink-0 items-center justify-center rounded-[var(--settings-control-radius)] text-settings-helper outline-none before:absolute before:-inset-1.5 before:content-[''] hover:bg-settings-fill/60 hover:text-sidebar-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring",
+              "relative inline-flex shrink-0 items-center justify-center rounded-[var(--settings-control-radius)] text-settings-helper outline-none before:absolute before:inset-[min(0px,calc((100%-49px)/2))] before:content-[''] hover:bg-settings-fill/60 hover:text-sidebar-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring",
               compact ? "size-6" : "size-9",
             )}
           >
@@ -334,7 +334,7 @@ export function SectionSidebar({
         <SidebarMenuButton
           size="settings"
           isActive={item.active === true}
-          className={cn("rounded-lg", navTransition, menuHover, menuSelected, compact && "h-8 px-2 text-[13px] before:-inset-y-1.5", wrapLabels && !rail && "h-auto min-h-12 py-2 [&>span:last-child]:overflow-visible [&>span:last-child]:text-clip [&>span:last-child]:whitespace-normal [&>span:last-child]:[overflow-wrap:anywhere]", rail && "justify-center gap-0 px-0")}
+          className={cn("rounded-lg", navTransition, menuHover, menuSelected, compact && "h-8 px-2 text-[13px] before:inset-[min(0px,calc((100%-49px)/2))]", wrapLabels && !rail && "h-auto min-h-12 py-2 [&>span:last-child]:overflow-visible [&>span:last-child]:text-clip [&>span:last-child]:whitespace-normal [&>span:last-child]:[overflow-wrap:anywhere]", rail && "justify-center gap-0 px-0")}
           render={(props) => (
             <a {...props} href={item.href ?? "#"} onClick={(event) => { item.onClick?.(event); }} title={rail ? item.label : undefined}>
               {props.children}
@@ -393,7 +393,7 @@ export function SectionSidebar({
                         if (collapsed && onCollapsedChange) onCollapsedChange(false);
                         setSearchOpen(true);
                       }}
-                      className="relative inline-flex size-6 shrink-0 items-center justify-center rounded-[var(--settings-control-radius)] text-settings-helper outline-none before:absolute before:-inset-1.5 before:content-[''] hover:bg-settings-fill/60 hover:text-sidebar-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+                      className="relative inline-flex size-6 shrink-0 items-center justify-center rounded-[var(--settings-control-radius)] text-settings-helper outline-none before:absolute before:inset-[min(0px,calc((100%-49px)/2))] before:content-[''] hover:bg-settings-fill/60 hover:text-sidebar-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring"
                     >
                       <SearchIcon aria-hidden className="size-4.5" />
                     </button>
@@ -424,7 +424,7 @@ export function SectionSidebar({
             aria-label={search.label}
             title={search.label}
             onClick={() => onCollapsedChange?.(false)}
-            className="relative inline-flex size-9 items-center justify-center rounded-full bg-settings-fill text-settings-helper outline-none before:absolute before:-inset-1.5 before:content-[''] focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+            className="relative inline-flex size-9 items-center justify-center rounded-full bg-settings-fill text-settings-helper outline-none before:absolute before:inset-[min(0px,calc((100%-49px)/2))] before:content-[''] focus-visible:ring-2 focus-visible:ring-sidebar-ring"
           >
             <SearchIcon aria-hidden className="size-4" />
           </button>
@@ -580,7 +580,7 @@ export function SectionSidebarShowButton({ onClick, label = i18n._({ id: "ui.Sho
         if (column && event.relatedTarget instanceof Node && column.contains(event.relatedTarget)) return;
         tell(false);
       }}
-      className="relative inline-flex size-9 shrink-0 items-center justify-center rounded-[var(--settings-control-radius)] text-settings-helper outline-none before:absolute before:-inset-1.5 before:content-[''] hover:bg-settings-fill/60 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+      className="relative inline-flex size-9 shrink-0 items-center justify-center rounded-[var(--settings-control-radius)] text-settings-helper outline-none before:absolute before:inset-[min(0px,calc((100%-49px)/2))] before:content-[''] hover:bg-settings-fill/60 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
     >
       <ShowIcon aria-hidden className="size-[18px]" />
     </button>

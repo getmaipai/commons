@@ -357,22 +357,22 @@ describe("thread grouping export", () => {
 describe("TooltipIconButton hitArea48", () => {
   test("adds the 48px pseudo-element hit area only when asked", () => {
     const off = render(<ElementTooltipIconButton tooltip="Copy">c</ElementTooltipIconButton>).getByRole("button");
-    expect(off.className).not.toContain("before:-inset-3");
+    expect(off.className).not.toContain("before:inset-[min(0px,calc((100%-49px)/2))]");
     cleanup();
     const on = render(<ElementTooltipIconButton tooltip="Copy" hitArea48>c</ElementTooltipIconButton>).getByRole("button");
-    expect(on.className).toContain("before:-inset-3");
+    expect(on.className).toContain("before:inset-[min(0px,calc((100%-49px)/2))]");
     expect(on.className).toContain("size-6");
     cleanup();
     // The enhanced copy already carries the 48px floor by default.
-    expect(render(<TooltipIconButton tooltip="Copy">c</TooltipIconButton>).getByRole("button").className).toContain("before:-inset-3");
+    expect(render(<TooltipIconButton tooltip="Copy">c</TooltipIconButton>).getByRole("button").className).toContain("before:inset-[min(0px,calc((100%-49px)/2))]");
   });
   test("legacy re-export: hitArea48 defaults on, false opts out, className is untouched", () => {
     const on = render(<TooltipIconButton tooltip="Copy" hitArea48>c</TooltipIconButton>).getByRole("button");
-    expect(on.className).toContain("before:-inset-3");
+    expect(on.className).toContain("before:inset-[min(0px,calc((100%-49px)/2))]");
     expect(on.className).toContain("size-6");
     cleanup();
     const off = render(<TooltipIconButton tooltip="Copy" hitArea48={false} className="extra">c</TooltipIconButton>).getByRole("button");
-    expect(off.className).not.toContain("before:-inset-3");
+    expect(off.className).not.toContain("before:inset-[min(0px,calc((100%-49px)/2))]");
     expect(off.className).toContain("size-6");
     expect(off.className).toContain("extra");
     expect(off.hasAttribute("hitarea48")).toBe(false);
@@ -382,12 +382,12 @@ describe("TooltipIconButton hitArea48", () => {
 describe("File.Download hitArea48", () => {
   test("adds a 48px pseudo-element target only when requested", () => {
     const off = render(<File.Download data="https://example.test/file" sourceType="url" mimeType="application/pdf" filename="file.pdf" />).getByRole("link");
-    expect(off.className).not.toContain("before:-inset-3");
+    expect(off.className).not.toContain("before:inset-[min(0px,calc((100%-49px)/2))]");
     expect(off.hasAttribute("hitArea48")).toBe(false);
     cleanup();
 
     const on = render(<File.Download data="https://example.test/file" sourceType="url" mimeType="application/pdf" filename="file.pdf" hitArea48 />).getByRole("link");
-    expect(on.className).toContain("before:-inset-3");
+    expect(on.className).toContain("before:inset-[min(0px,calc((100%-49px)/2))]");
     expect(on.className).toContain("relative");
     expect(on.hasAttribute("hitArea48")).toBe(false);
   });

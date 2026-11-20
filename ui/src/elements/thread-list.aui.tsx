@@ -592,7 +592,7 @@ const ThreadListProjectsSection: FC<{
             data-slot="aui_thread-list-section-action"
             aria-label={labels.newProject}
             // A 24px box with a 12px transparent overhang: the 48px touch floor.
-            className="relative size-6 p-0 before:absolute before:-inset-3 before:content-['']"
+            className="relative size-6 p-0 before:absolute before:inset-[min(0px,calc((100%-49px)/2))] before:content-['']"
             onClick={() => setCreating(true)}
           >
             <PlusIcon className="size-3.5" />
@@ -827,7 +827,7 @@ const ThreadListProjectRow: FC<{
                 variant="ghost"
                 size="icon"
                 data-slot="aui_thread-list-project-more"
-                className="data-[state=open]:bg-accent absolute end-1.5 top-1/2 size-6 -translate-y-1/2 p-0 opacity-0 group-hover:opacity-100 group-has-focus-visible:opacity-100 data-[state=open]:opacity-100 before:absolute before:-inset-3 before:content-['']"
+                className="data-[state=open]:bg-accent absolute end-1.5 top-1/2 size-6 -translate-y-1/2 p-0 opacity-0 group-hover:opacity-100 group-has-focus-visible:opacity-100 data-[state=open]:opacity-100 before:absolute before:inset-[min(0px,calc((100%-49px)/2))] before:content-['']"
               >
                 <MoreHorizontalIcon className="size-3.5" />
                 <span className="sr-only">{labels.projectOptions}</span>
@@ -958,7 +958,7 @@ export const ThreadListNew = forwardRef<
         className={cn(
           "hover:bg-muted data-active:bg-muted justify-start text-sm font-normal",
           density === "compact"
-            ? "relative h-9 min-h-9 gap-2.5 rounded-lg border-0 bg-transparent px-2.5 shadow-none before:absolute before:-inset-y-1.5 before:inset-x-0 before:content-['']"
+            ? "relative h-9 min-h-9 gap-2.5 rounded-lg border-0 bg-transparent px-2.5 shadow-none before:absolute before:inset-[min(0px,calc((100%-49px)/2))] before:content-['']"
             : cn("h-8 gap-2 rounded-md px-2.5", hitArea(2)),
           className,
         )}
@@ -1061,7 +1061,7 @@ export const ThreadListItem: FC = () => {
             "focus-visible:ring-ring/50 flex h-full min-w-0 flex-1 items-center px-2.5 text-start text-sm outline-none group-hover:pe-9 group-has-focus-visible:pe-9 group-has-data-[state=open]:pe-9 group-data-active:pe-9 focus-visible:ring-1",
             density === "compact" ? "rounded-lg" : "rounded-md",
             pageRow && "gap-3 py-2",
-            density === "compact" ? "before:-inset-y-1.5 before:inset-x-0" : hitArea(2),
+            density === "compact" ? "before:inset-[min(0px,calc((100%-49px)/2))]" : hitArea(2),
           )}
         >
           {pageRow?.projectIcon ? <ProjectMark icon={pageRow.projectIcon.icon} color={pageRow.projectIcon.color} /> : null}
@@ -1190,7 +1190,7 @@ const ThreadListItemMore: FC<{ onRename: () => void }> = ({ onRename }) => {
           variant="ghost"
           size="icon"
           data-slot="aui_thread-list-item-more"
-          className="data-[state=open]:bg-accent absolute end-1.5 top-1/2 size-6 -translate-y-1/2 p-0 opacity-0 group-hover:opacity-100 group-has-focus-visible:opacity-100 group-data-active:opacity-100 data-[state=open]:opacity-100 before:absolute before:-inset-3 before:content-['']"
+          className="data-[state=open]:bg-accent absolute end-1.5 top-1/2 size-6 -translate-y-1/2 p-0 opacity-0 group-hover:opacity-100 group-has-focus-visible:opacity-100 group-data-active:opacity-100 data-[state=open]:opacity-100 before:absolute before:inset-[min(0px,calc((100%-49px)/2))] before:content-['']"
         >
           <MoreHorizontalIcon className="size-3.5" />
           <span className="sr-only">{i18n._({ id: "ui.More options", message: "More options" })}</span>

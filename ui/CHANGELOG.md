@@ -1,3 +1,8 @@
+## [ui-v0.5.702] - 2026-11-20
+
+- Touch floor (A11Y-DEBT-01, Home issue 322): every control now has a 48 px tappable area without changing how big it is drawn. The default look scales spacing by 0.9, so a 48 px class painted 43 px and a rail row 46 px; one zero-specificity `::after` in `tokens.css` (buttons, links and the ARIA button-like roles) grows only the hit area to 48 px, and the shared hit layer (`HIT_FLOOR`, used by `hitArea()`, the `control` and `icon-control` Button sizes, the thread list, the section sidebar, file tiles and the like) reaches 48 px at any density instead of a fixed spacing step. Text fields, which cannot carry a pseudo-element, are 48 px tall at minimum. `data-touch-target-exempt` still opts out. Home's own accessibility check went from 950 touch-target findings on 44 pages to none.
+- `ItemGroup` (a plain list): its `Item` rows now say `role="listitem"`, so the list has the children a list needs (the critical `aria-required-children` finding on Home).
+
 ## [ui-v0.5.701] - 2026-11-20
 
 - Media tiles hold their title on pale and light covers: the tile label now draws a real bottom scrim (the old class set a background colour from a gradient, so no scrim was ever painted) from the new `--art-scrim-strong` token, and a generated cover dims or scrims under its title (`--art-dim`, `--art-scrim-strong`; theme tokens in both the PRO and the default art sets). The kind icon on a fallback cover moves to the top corner so the scrim does not dim it (VIDEO-KIT-01).

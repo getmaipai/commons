@@ -133,7 +133,7 @@ describe("FileTile", () => {
   test("the select box keeps a 48 px hit area and is revealed on hover, focus and in selection mode", () => {
     const idle = render(<FileTile id="a" name="Fox" kind="image" onToggleSelect={() => {}} />);
     const box = idle.getByRole("checkbox");
-    expect(box.className).toContain("after:-inset-4");
+    expect(box.className).toContain("after:inset-[min(0px,calc((100%-49px)/2))]");
     const holder = box.parentElement!;
     expect(holder.className).toContain("opacity-0");
     expect(holder.className).toContain("pointer-events-none");
@@ -148,7 +148,7 @@ describe("FileTile", () => {
     const onActions = mock(() => {});
     const { getByRole, queryByRole } = render(<FileTile id="a" name="Fox" kind="image" onActionsClick={onActions} />);
     const button = getByRole("button", { name: "Actions for Fox" });
-    expect(button.className).toContain("before:-inset-2");
+    expect(button.className).toContain("before:inset-[min(0px,calc((100%-49px)/2))]");
     expect(button.className).toContain("size-8");
     fireEvent.click(button);
     expect(onActions).toHaveBeenCalledTimes(1);

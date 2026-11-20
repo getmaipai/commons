@@ -11,6 +11,8 @@ import { Separator } from "./separator"
 const ItemSizeContext = React.createContext<string | undefined>(undefined)
 const useIsSetting = () => React.useContext(ItemSizeContext) === "setting"
 const useIsStory = () => React.useContext(ItemSizeContext) === "story"
+// A11Y-DEBT-01: a plain ItemGroup is role="list", and a list may only hold list items, so an Item inside it says role="listitem".
+const ItemListContext = React.createContext(false)
 
 function ItemGroup({
   className,
@@ -21,7 +23,8 @@ function ItemGroup({
    * rows flush with no gap. Unset keeps the plain stack. */
   variant?: "card"
 }) {
-  return (
+  const isList = variant !== "card" && props.role === undefined
+  const group = (
     <div
       // The card holds inset separators and a collapsible fold, which are
       // not list items, so a card is a plain group; the unset stack keeps
@@ -38,6 +41,7 @@ function ItemGroup({
       {...props}
     />
   )
+  return isList ? <ItemListContext.Provider value>{group}</ItemListContext.Provider> : group
 }
 
 function ItemSeparator({
@@ -100,11 +104,13 @@ function Item({
   render,
   ...props
 }: useRender.ComponentProps<"div"> & VariantProps<typeof itemVariants>) {
+  const inList = React.useContext(ItemListContext)
   const element = useRender({
     defaultTagName: "div",
     props: mergeProps<"div">(
       {
         className: cn(itemVariants({ variant, size, className })),
+        ...(inList ? { role: "listitem" } : {}),
       },
       props
     ),

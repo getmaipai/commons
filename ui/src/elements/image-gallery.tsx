@@ -263,7 +263,7 @@ export function ImageGallery({
                 side="top"
                 data-image-edit="true"
                 className={cn(
-                  "absolute start-2 top-2 z-10 size-6 rounded-full bg-background/70! text-foreground after:absolute after:-inset-1.5 hover:bg-background/90! hover:text-foreground! active:scale-[0.96]",
+                  "absolute start-2 top-2 z-10 size-6 rounded-full bg-background/70! text-foreground after:absolute after:inset-[min(0px,calc((100%-49px)/2))] hover:bg-background/90! hover:text-foreground! active:scale-[0.96]",
                   editAlwaysVisible ? "size-12" : "",
                   editAlwaysVisible ? "opacity-100" : imageEditRevealClass,
                 )}

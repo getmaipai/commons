@@ -130,14 +130,14 @@ describe("grouped expanding AppRail", () => {
     const classes = (value: Element | null) => (value?.getAttribute("class") ?? "").split(/\s+/);
     expect(classes(search)).toContain("hover:bg-foreground/10");
     expect(classes(search)).toContain("focus-visible:ring-2");
-    expect(classes(search)).toContain("before:-inset-2");
+    expect(classes(search)).toContain("before:inset-[min(0px,calc((100%-49px)/2))]");
     expect(classes(search)).toContain("h-[var(--rail-row-height,32px)]");
     expect(classes(search)).toContain("px-[var(--rail-padding,12px)]");
     expect(search?.querySelector("svg")?.getAttribute("class")).toContain("size-[var(--rail-icon-size,16px)]");
     expect(classes(search)).toContain("justify-center");
     expect(classes(chat)).toContain("hover:bg-foreground/10");
     expect(classes(chat)).toContain("focus-visible:ring-2");
-    expect(classes(chat)).toContain("before:-inset-2");
+    expect(classes(chat)).toContain("before:inset-[min(0px,calc((100%-49px)/2))]");
     expect(classes(chat)).toContain("justify-center");
     expect(changed).toEqual([]);
   });

@@ -24,7 +24,7 @@ describe("EmptyStateSuggestion", () => {
   test("keeps a 48px touch target around the 36px chip through a pseudo-element", () => {
     const { getByRole } = render(<EmptyStateSuggestion>Plan a week of dinners</EmptyStateSuggestion>);
     const chip = getByRole("button", { name: "Plan a week of dinners" });
-    expect(chip.className).toContain("before:-inset-y-1.5");
+    expect(chip.className).toContain("before:inset-[min(0px,calc((100%-49px)/2))]");
     expect(chip.className).toContain("relative");
   });
 });

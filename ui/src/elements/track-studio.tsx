@@ -946,7 +946,7 @@ function LaneRow({ lane, state, pps, labelW, timeW, selected, solo, media, selec
 
 function LaneToggle({ label, text, on, onClick }: { label: string; text: string; on: boolean; onClick: () => void }) {
   return (
-    <button type="button" aria-label={label} aria-pressed={on} onClick={onClick} className={cn("relative flex size-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold before:absolute before:-inset-3 before:content-['']", on ? "bg-primary text-primary-foreground" : "bg-muted text-foreground", FOCUS_RING)}>{text}</button>
+    <button type="button" aria-label={label} aria-pressed={on} onClick={onClick} className={cn("relative flex size-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold before:absolute before:inset-[min(0px,calc((100%-49px)/2))] before:content-['']", on ? "bg-primary text-primary-foreground" : "bg-muted text-foreground", FOCUS_RING)}>{text}</button>
   );
 }
 
@@ -1079,7 +1079,7 @@ function TrimHandle({ side, label, valueText, now, min, max, ...rest }: { side: 
       aria-valuenow={Math.round(now * 10) / 10}
       aria-valuetext={valueText}
       data-handle={side}
-      className={cn("bg-primary absolute inset-y-0 z-10 w-2.5 cursor-ew-resize touch-none before:absolute before:-inset-x-3 before:inset-y-0 before:content-[''] after:bg-primary-foreground after:absolute after:inset-y-3 after:left-1/2 after:w-px", side === "start" ? "-left-1 rounded-l-md" : "-right-1 rounded-r-md", FOCUS_RING)}
+      className={cn("bg-primary absolute inset-y-0 z-10 w-2.5 cursor-ew-resize touch-none before:absolute before:inset-[min(0px,calc((100%-49px)/2))] before:inset-y-0 before:content-[''] after:bg-primary-foreground after:absolute after:inset-y-3 after:left-1/2 after:w-px", side === "start" ? "-left-1 rounded-l-md" : "-right-1 rounded-r-md", FOCUS_RING)}
       {...rest}
     />
   );

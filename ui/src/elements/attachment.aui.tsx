@@ -269,7 +269,7 @@ const AttachmentEdit: FC = () => {
       side="top"
       data-image-edit="true"
       className={cn(
-        "aui-attachment-tile-edit absolute start-1 top-1 z-10 size-5 rounded-full bg-background/70! text-foreground after:absolute after:-inset-1.5 hover:bg-background/90! hover:text-foreground! active:scale-[0.96]",
+        "aui-attachment-tile-edit absolute start-1 top-1 z-10 size-5 rounded-full bg-background/70! text-foreground after:absolute after:inset-[min(0px,calc((100%-49px)/2))] hover:bg-background/90! hover:text-foreground! active:scale-[0.96]",
         edit.editAlwaysVisible ? "size-12" : "",
         edit.editAlwaysVisible ? "opacity-100" : imageEditRevealClass,
       )}
@@ -289,7 +289,7 @@ const AttachmentRemove: FC = () => {
     <AttachmentPrimitive.Remove asChild>
       <TooltipIconButton
         tooltip={i18n._({ id: "ui.Remove file", message: "Remove file" })}
-        className="aui-attachment-tile-remove absolute end-1 top-1 size-5 rounded-full bg-background/70! text-foreground after:absolute after:-inset-1.5 hover:bg-background/90! hover:text-foreground! active:scale-[0.96] motion-reduce:transition-none"
+        className="aui-attachment-tile-remove absolute end-1 top-1 size-5 rounded-full bg-background/70! text-foreground after:absolute after:inset-[min(0px,calc((100%-49px)/2))] hover:bg-background/90! hover:text-foreground! active:scale-[0.96] motion-reduce:transition-none"
         side="top"
       >
         <XIcon className="aui-attachment-remove-icon size-3 stroke-[2.5]" />

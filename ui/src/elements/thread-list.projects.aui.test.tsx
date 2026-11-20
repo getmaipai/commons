@@ -282,9 +282,9 @@ describe("ThreadList projects mode", () => {
   test("the + and the project menu button carry the 48px touch overhang", async () => {
     const view = render(<Harness projects={{ folders, canManage: true, onCreate: async () => {}, onRename: async () => {} }} seeds={[{ remoteId: "a", title: "Alpha" }]} />);
     const plus = await view.findByLabelText("New project");
-    expect(plus.className).toContain("before:-inset-3");
+    expect(plus.className).toContain("before:inset-[min(0px,calc((100%-49px)/2))]");
     const more = (await projectRow(view, "Garden")).querySelector("[data-slot=aui_thread-list-project-more]") as HTMLElement;
-    expect(more.className).toContain("before:-inset-3");
+    expect(more.className).toContain("before:inset-[min(0px,calc((100%-49px)/2))]");
   });
 
   test("+ makes a project from an inline field", async () => {

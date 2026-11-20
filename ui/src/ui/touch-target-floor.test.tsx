@@ -40,7 +40,7 @@ describe("touch-target and type floor (docs/UI.md)", () => {
     const { getByRole } = render(<Button size="sm">Save</Button>);
     const el = getByRole("button");
     expect(el.className).toContain("relative");
-    expect(el.className).toMatch(/before:-inset-/);
+    expect(el.className).toMatch(/before:inset-\[min/);
   });
 
   test("Input is 48px tall with no desktop demotion of its text size", () => {
@@ -55,7 +55,7 @@ describe("touch-target and type floor (docs/UI.md)", () => {
     const { getByRole } = render(<Checkbox />);
     const el = getByRole("checkbox");
     expect(el.className).toContain("relative");
-    expect(el.className).toContain("after:-inset-4");
+    expect(el.className).toContain("after:inset-[min(0px,calc((100%-49px)/2))]");
   });
 
   test("Toggle's default size clears 48px; sm/lg keep a pseudo-element hit area", () => {
@@ -65,7 +65,7 @@ describe("touch-target and type floor (docs/UI.md)", () => {
     cleanup();
 
     const bySm = render(<Toggle size="sm" aria-label="bold" />);
-    expect(bySm.getByRole("button").className).toMatch(/before:-inset-/);
+    expect(bySm.getByRole("button").className).toMatch(/before:inset-\[min/);
   });
 
   test("Label reads at the 16px body-text floor", () => {
@@ -105,7 +105,7 @@ describe("touch-target and type floor (docs/UI.md)", () => {
         </TabsList>
       </Tabs>,
     );
-    expect(getByRole("tab").className).toMatch(/before:-inset-y-3\.5/);
+    expect(getByRole("tab").className).toMatch(/before:inset-\[min/);
   });
 
   test("SelectTrigger's default size is 48px with 16px text", () => {

@@ -73,8 +73,8 @@ describe("DataTable selection", () => {
   test("every row gets a box named for its first column, with a 48 px hit area", () => {
     const view = render(<Harness />);
     for (const row of rows) expect(rowBox(view, row.name)).toBeTruthy();
-    expect(rowBox(view, "Alfred").className).toContain("after:-inset-4");
-    expect(header(view).getByRole("checkbox", { name: "Select all rows" }).className).toContain("after:-inset-4");
+    expect(rowBox(view, "Alfred").className).toContain("after:inset-[min(0px,calc((100%-49px)/2))]");
+    expect(header(view).getByRole("checkbox", { name: "Select all rows" }).className).toContain("after:inset-[min(0px,calc((100%-49px)/2))]");
   });
 
   test("a click selects and clears one row, and the row says so with aria-selected", () => {

@@ -85,11 +85,11 @@ describe("Button glass and control options (PRO-LOOK-KIT-01a)", () => {
   test("control and icon-control sizes keep the 48px hit area", () => {
     const control = cls(render(<Button size="control">Save</Button>).getByRole("button"));
     expect(control).toContain("h-[var(--control-height)]");
-    expect(control).toContain("before:-inset-0.5");
+    expect(control).toContain("before:inset-[min(0px,calc((100%-49px)/2))]");
     cleanup();
     const icon = cls(render(<Button size="icon-control" aria-label="Search" />).getByRole("button"));
     expect(icon).toContain("size-[var(--control-height)]");
-    expect(icon).toContain("before:-inset-0.5");
+    expect(icon).toContain("before:inset-[min(0px,calc((100%-49px)/2))]");
   });
 
   test("default options retain their previous classes", () => {

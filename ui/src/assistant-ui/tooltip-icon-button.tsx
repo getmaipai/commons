@@ -34,7 +34,7 @@ export const TooltipIconButton = forwardRef<
             size="icon"
             {...rest}
             className={cn(
-              // `relative before:-inset-3`: the touch-target floor
+              // `relative before:inset-[min(0px,calc((100%-49px)/2))]`: the touch-target floor
               // (docs/UI.md, BACKLOG.md lane 8 item 1, 2026-09-13) - this
               // component's own default box is `size-6` (24px), which a
               // live measurement caught unfixed across the message
@@ -45,7 +45,7 @@ export const TooltipIconButton = forwardRef<
               // buttons' own `size-9` + `-inset-1.5`) supplies its own
               // pseudo classes after this one, which win the merge.
               hitArea48
-                ? "aui-button-icon relative size-6 p-1 before:absolute before:-inset-3 before:content-[''] active:scale-90"
+                ? "aui-button-icon relative size-6 p-1 before:absolute before:inset-[min(0px,calc((100%-49px)/2))] before:content-[''] active:scale-90"
                 : "aui-button-icon size-6 p-1 active:scale-90",
               className,
             )}

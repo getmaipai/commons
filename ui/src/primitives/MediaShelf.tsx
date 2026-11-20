@@ -535,7 +535,7 @@ function TileFrame({ onPlay, playLabel, favorite, children }: { onPlay?: () => v
           onClick={() => { if (!favorite.on) likeHaptic(); favorite.onToggle(); }}
           className={cn(
             "absolute end-2 top-2 flex size-9 items-center justify-center rounded-full bg-[var(--art-overlay)] text-[var(--art-foreground)]",
-            "before:absolute before:-inset-1 before:content-['']",
+            "before:absolute before:inset-[min(0px,calc((100%-49px)/2))] before:content-['']",
             "motion-safe:transition-transform motion-safe:active:scale-90",
             FOCUS_RING,
           )}

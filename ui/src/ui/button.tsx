@@ -1,7 +1,7 @@
 // Copied by the shadcn registry for MaiPai Stack dashboard.
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
-import { cn, hitArea } from "@/kit/utils"
+import { cn, hitArea, HIT_FLOOR } from "@/kit/utils"
 import { Slot } from "radix-ui"
 
 const buttonVariants = cva(
@@ -44,8 +44,8 @@ const buttonVariants = cva(
         sm: `h-8 gap-1.5 px-3 ${hitArea(2)} has-[>svg]:px-2.5`,
         lg: "h-14 px-6 text-lg has-[>svg]:px-4",
         icon: "size-12",
-        control: "h-[var(--control-height)] px-5 text-base has-[>svg]:px-4 relative before:absolute before:-inset-0.5 before:content-['']",
-        "icon-control": "size-[var(--control-height)] relative before:absolute before:-inset-0.5 before:content-['']",
+        control: `h-[var(--control-height)] px-5 text-base has-[>svg]:px-4 ${HIT_FLOOR}`,
+        "icon-control": `size-[var(--control-height)] ${HIT_FLOOR}`,
         "icon-xs": `size-6 ${hitArea(3)} [&_svg:not([class*='size-'])]:size-3`,
         "icon-sm": `size-8 ${hitArea(2)}`,
         "icon-lg": `size-10 ${hitArea(1)}`,
