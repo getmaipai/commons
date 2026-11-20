@@ -1,0 +1,11 @@
+{
+  "job": "character_sheet",
+  "audience": "adult",
+  "references": [
+    "media-6",
+    "media-7"
+  ],
+  "kind": "room",
+  "level": "standard",
+  "compose": true
+}

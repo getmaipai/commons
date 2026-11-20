@@ -48,7 +48,7 @@ export const StackMakeRequest = z.discriminatedUnion("job", [
   req("clip_from_sheet", { sheet: text, description: text, shape: StackJobShape, level: StackJobLevel, seconds: secs }),
   req("restyle", { clip: text, restyle: text, description: text.optional() }),
   req("swap", { clip: text, references: z.array(text).min(1), kind: StackSwapKind.optional(), description: text.optional(), start_seconds: z.number().min(0).optional(), seconds: secs, level: StackJobLevel }),
-  req("character_sheet", { references: z.array(text).min(1), description: text.optional(), kind: z.enum(["person", "object", "pet"]), level: StackJobLevel }),
+  req("character_sheet", { references: z.array(text).min(1), description: text.optional(), kind: z.enum(["person", "object", "pet", "place"]), compose: z.boolean().optional(), level: StackJobLevel }),
   req("contact_sheet", { references: z.array(text).min(1), description: text.optional(), count: z.number().int().min(1), level: StackJobLevel }),
   // The music family. Ids are opaque, as above; the words are the person's own (never logged by the pack).
   req("song", { description: text, lyrics: text.optional(), style_words: z.array(text).optional(), seconds: secs, level: StackJobLevel.optional(), seed: z.number().int().min(0).optional(), bpm: z.number().positive().optional(), key: text.optional(), language: text.optional() }),
@@ -71,7 +71,7 @@ const madeJobs = { ...resBase, made_with: StackMadeWith };
 export const StackMakeResult = z.union([
   z.object({ ...resBase, job: plainJobs }).strict(),
   z.object({ ...madeJobs, job: z.enum(["song", "song_edit"]) }).strict(),
-  z.object({ ...resBase, job: z.literal("character_sheet"), panels: z.array(text) }).strict(),
+  z.object({ ...resBase, job: z.literal("character_sheet"), panels: z.array(text), composed: text.optional() }).strict(),
   z.object({ ...resBase, job: z.literal("contact_sheet"), tiles: z.array(text) }).strict(),
   z.object({ ...madeJobs, job: z.literal("stems"), stems: z.array(z.object({ name: text, file: text }).strict()) }).strict(),
   z.object({ ...resBase, job: z.literal("lyric_timing"), timings: z.array(z.object({ start_seconds: z.number().min(0), text }).strict()) }).strict(),

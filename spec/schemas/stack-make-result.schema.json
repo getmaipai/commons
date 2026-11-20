@@ -446,6 +446,10 @@
             "type": "string",
             "minLength": 1
           }
+        },
+        "composed": {
+          "type": "string",
+          "minLength": 1
         }
       },
       "required": [

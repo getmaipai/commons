@@ -593,8 +593,12 @@
           "enum": [
             "person",
             "object",
-            "pet"
+            "pet",
+            "place"
           ]
+        },
+        "compose": {
+          "type": "boolean"
         },
         "level": {
           "enum": [

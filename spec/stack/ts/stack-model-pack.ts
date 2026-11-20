@@ -95,6 +95,9 @@ const PackJob = z.object({
   // ceiling, never from age) and, for an engine that takes a negative prompt, the terms it always receives. The Stack applies them; a caller cannot ask for less.
   minor_recipes: z.object({ G: text.optional(), "PG-13": text.optional() }).strict().refine((v) => v.G !== undefined || v["PG-13"] !== undefined).optional(),
   negative_prompt: z.array(text).min(1).optional(),
+  // PLACE-SHEET-01: the panel instructions of a reference sheet, per kind (the pack holds every word), and the layout numbers of the one composed sheet the engine takes (sizes in pixels).
+  sheet_angles: z.object({ person: z.array(text).min(1).optional(), object: z.array(text).min(1).optional(), pet: z.array(text).min(1).optional(), place: z.array(text).min(1).optional() }).strict().optional(),
+  sheet_layout: z.object({ width: z.number().int().min(1), height: z.number().int().min(1), place_width: z.number().int().min(1), gap: z.number().int().min(0), max_places: z.number().int().min(1) }).strict().optional(),
   peaks: z.array(z.object({ shape: StackJobShape.optional(), level: StackJobLevel.optional(), bytes: z.number().int().min(0), status: z.enum(["measured", "unverified"]), measured_on: text.optional() }).strict()),
 }).strict();
 

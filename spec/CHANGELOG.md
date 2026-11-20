@@ -1,3 +1,7 @@
+## [spec-v0.1.471] - 2026-11-20
+
+- `character_sheet`: `kind` gains `place` (`object` stays the prop kind); optional request `compose` asks for one composed sheet picture as well; the result gains optional `composed` (that picture's file) beside `panels`. Model pack: a job may carry `sheet_angles` (the panel instructions per kind) and `sheet_layout` (the composed sheet's width, height, place panel width, gap and place cap) (PLACE-SHEET-01).
+
 ## [spec-v0.1.470] - 2026-11-20
 
 - `prompt_bar.references[].kind` takes `prop` (an Element of kind prop, picked from the same Cast picker as `character` and `place`); `place` and `prop` slots honor `max` like `character` (VIDEO-KIT-01).

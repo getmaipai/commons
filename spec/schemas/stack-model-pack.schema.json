@@ -782,6 +782,77 @@
               "type": "string",
               "minLength": 1
             }
+          },
+          "sheet_angles": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "person": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "object": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "pet": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "place": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          },
+          "sheet_layout": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "width": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "height": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "place_width": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "gap": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "max_places": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "width",
+              "height",
+              "place_width",
+              "gap",
+              "max_places"
+            ]
           }
         },
         "required": [
