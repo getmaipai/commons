@@ -254,6 +254,10 @@
             "new_shot"
           ]
         },
+        "look": {
+          "type": "string",
+          "minLength": 1
+        },
         "quiet_seconds": {
           "type": "integer",
           "minimum": 20,

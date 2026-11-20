@@ -1,0 +1,12 @@
+{
+  "job": "clip",
+  "audience": "minor",
+  "description": "a kite flying",
+  "shape": "portrait",
+  "level": "standard",
+  "seconds": 5,
+  "start_picture": "media-1",
+  "end_picture": "media-2",
+  "seed": 3,
+  "look": "Naturalistic digital drama at dusk, cool light from the window, cream walls and walnut trim."
+}

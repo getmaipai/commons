@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "job_id": "job-1",
+  "operation": "swap",
+  "made_at": "2026-11-20T10:00:00Z",
+  "runtime": {
+    "id": "engine-a",
+    "revision": "b82b97e"
+  },
+  "model": {
+    "id": "model-a",
+    "build": "bf16",
+    "quantization": null
+  },
+  "steps": {
+    "count": null,
+    "schedule": "8+3"
+  },
+  "adapter": {
+    "id": "adapter-a",
+    "strength": 1.0,
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "inputs": [
+    {
+      "role": "start",
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "bytes": 1234
+    }
+  ],
+  "requested": {
+    "width": 1920,
+    "height": 1088,
+    "frames": 121,
+    "seconds": 5
+  },
+  "native": {
+    "width": 1920,
+    "height": 1088,
+    "frames": 121,
+    "fps": 24,
+    "seconds": 5.04,
+    "audio": true,
+    "bytes": 9000000
+  },
+  "delivered": {
+    "width": 1920,
+    "height": 1088,
+    "frames": 121,
+    "fps": 24,
+    "seconds": 5.04,
+    "audio": true,
+    "bytes": 9000000
+  },
+  "delivered_is": "native",
+  "seed": null,
+  "phases": [
+    {
+      "name": "generate",
+      "ms": 480000
+    }
+  ],
+  "peak_memory_bytes": null,
+  "finish": [],
+  "prompt": {
+    "bytes": 120,
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "writer": {
+      "id": "h3-sectioned",
+      "version": "1"
+    },
+    "hints": [
+      "negation_removed:1",
+      "start_picture_mouth_closed_advised"
+    ]
+  }
+}
