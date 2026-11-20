@@ -1,3 +1,6 @@
+## [ui-v0.5.694] - 2026-11-20
+
+- New `MediaStage` (`elements/media-stage`, VIDEO-KIT-01, K9): a big picture stage in two sizes, `hero` (the composer sits on the picture) and `stage` (a player or progress stage). A still with a slow drift or a muted loop, a token scrim, an eyebrow, display title and subtitle, floating `pills`, a `titlePill`, a bottom `overlay` with `MediaStageProgress`, an optional centered play button, and the states idle, looping, paused, loading, waiting and error. The drift is off under reduced motion and while a loop plays. `option-cards` now exports its `useMatches` hook.
 ## [ui-v0.5.693] - 2026-11-20
 
 - `VideoPlayer`: `overlayActions` draws the row actions as floating glass pills on the picture (wrapping, at most 80% wide, each a real button with a visible label that hides to an icon on a phone). `creation-header`: a `display` variant with the serif display title, an eyebrow and a subtitle. A `facts` line slot (monospace, muted, one line from the server) on `creation-header` and `TierSegment` (VIDEO-KIT-01).

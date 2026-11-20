@@ -36,7 +36,7 @@ export interface OptionCardsProps {
   columns?: "auto" | "three" | "six";
 }
 
-function useMatches(query: string): boolean {
+export function useMatches(query: string): boolean {
   const [matches, setMatches] = useState(false);
   useEffect(() => {
     if (typeof window === "undefined" || typeof window.matchMedia !== "function") return;
@@ -51,10 +51,10 @@ function useMatches(query: string): boolean {
 
 const isVideo = (src: string) => /\.(mp4|m4v|webm)(\?|#|$)/i.test(src);
 
-function play(el: HTMLVideoElement | null) {
+export function play(el: HTMLVideoElement | null) {
   try { void el?.play?.()?.catch?.(() => {}); } catch { /* a refused play leaves the first frame showing */ }
 }
-function rewind(el: HTMLVideoElement | null) {
+export function rewind(el: HTMLVideoElement | null) {
   if (!el) return;
   try { el.pause?.(); el.currentTime = 0; } catch { /* nothing to rewind yet */ }
 }
