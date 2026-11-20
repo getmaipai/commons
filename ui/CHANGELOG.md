@@ -1,3 +1,7 @@
+## [ui-v0.5.724] - 2026-11-20
+
+- A vertical `media_shelf` row keeps its `row_actions` words visible under the PRO look (outline pills with their label, for example Keep, Skip, Make again); rails and grids keep the icon-only ghost buttons (VIDEO-KIT-01).
+
 ## [ui-v0.5.723] - 2026-11-20
 
 - `ResultFeed`: a `cancelled` entry is one compact line (its words and "Stopped. Nothing was kept."), no player card, in every look. `MediaShelf` density `compact`: rail tiles 140 px wide (sm and up keep their share), grid 3 columns on a phone, 4 from sm, 6 from lg. The reference slot row of the Create and chat composers wraps instead of scrolling, so no slot is cut mid-word (VIDEO-KIT-01).
