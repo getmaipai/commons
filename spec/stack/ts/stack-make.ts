@@ -27,7 +27,8 @@ export const StackClipInputRole = z.enum(["identity", "wardrobe", "voice_referen
 // `derived_start` (VF-ROUTE-DERIVE-01): the resend after a `needs_start_picture` answer, whose start picture the caller made through one generic `picture` job. The Stack records it in the receipt; a request that carries a start picture is never answered `needs_start_picture` again.
 export const StackClipIntent = z.enum(["open_on_picture", "new_shot", "derived_start"]);
 // The operations a clip job may be asked for beyond a plain take; each needs its own row before a pack serves it.
-export const StackVideoOperation = z.enum(["retake_from", "extend", "enhance"]);
+// `clip_film_shot` (VF-ROUTE-01 follow-up): the clip is a film shot. The Stack, never the caller, chooses the recipe from the operation and what this computer can hold (full HD at Max when admitted, else the next recipe down); there is no size field.
+export const StackVideoOperation = z.enum(["retake_from", "extend", "enhance", "clip_film_shot"]);
 // VF-ROUTE-01: the way the Stack holds a clip's pictures, chosen by the Stack from the serving pack's capability rows (never by the caller): from words alone, from a
 // start picture (alone or with an end picture), or from identity reference pictures. `route_reason` is one plain line saying why.
 export const StackClipRoute = z.enum(["words", "start_picture", "start_end_pictures", "references"]);
