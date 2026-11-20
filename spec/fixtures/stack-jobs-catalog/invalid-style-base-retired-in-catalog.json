@@ -1,0 +1,133 @@
+{
+  "audience": "adult",
+  "jobs": [
+    {
+      "job": "clip",
+      "label": "clip",
+      "available": true,
+      "part": {
+        "id": "clip-model-a",
+        "label": "Clip model A"
+      },
+      "limits": {
+        "levels": [
+          "standard",
+          "boost"
+        ],
+        "max_seconds": {
+          "standard": 5,
+          "boost": 8
+        },
+        "max_references": 0,
+        "shapes": {
+          "landscape": {
+            "standard": {
+              "width": 768,
+              "height": 448
+            },
+            "boost": {
+              "width": 1280,
+              "height": 704
+            }
+          }
+        }
+      },
+      "capabilities": {
+        "text": false,
+        "end_picture": true,
+        "sound": true,
+        "keeps_likeness": false
+      },
+      "styles": {
+        "bases": [
+          {
+            "id": "base-a",
+            "label": "Clip base A, the whole name",
+            "short": "Base A",
+            "media": "video",
+            "civitai_labels": [
+              "Clip Base A",
+              "Clip Base A 1.1"
+            ],
+            "text_patterns": [
+              "clip-a",
+              "clip base a"
+            ],
+            "generic_labels": [
+              "ClipBaseA"
+            ],
+            "retired": {
+              "mark": "m"
+            }
+          }
+        ],
+        "max": 2
+      },
+      "restyles": [
+        {
+          "name": "ink",
+          "label": "Ink drawing"
+        }
+      ],
+      "why_not": null,
+      "alternatives": [
+        {
+          "part": "clip-model-b",
+          "label": "Clip model B"
+        }
+      ]
+    },
+    {
+      "job": "swap",
+      "label": "swap",
+      "available": false,
+      "part": null,
+      "limits": {
+        "levels": [
+          "standard",
+          "boost"
+        ],
+        "max_seconds": {
+          "standard": 5,
+          "boost": 8
+        },
+        "max_references": 0,
+        "shapes": {
+          "landscape": {
+            "standard": {
+              "width": 768,
+              "height": 448
+            },
+            "boost": {
+              "width": 1280,
+              "height": 704
+            }
+          }
+        }
+      },
+      "capabilities": {
+        "text": false,
+        "end_picture": true,
+        "sound": true,
+        "keeps_likeness": false
+      },
+      "styles": {
+        "bases": [
+          {
+            "id": "base-a",
+            "label": "Clip base A"
+          }
+        ],
+        "max": 2
+      },
+      "restyles": [
+        {
+          "name": "ink",
+          "label": "Ink drawing"
+        }
+      ],
+      "why_not": "No video model that can swap a face is turned on. An admin can add one in Settings, AI and models.",
+      "alternatives": []
+    }
+  ]
+}
