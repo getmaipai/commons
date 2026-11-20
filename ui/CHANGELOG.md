@@ -1,3 +1,7 @@
+## [ui-v0.5.717] - 2026-11-20
+
+- Submenus on a phone (VF-EDIT-04 fix): the kit's `DropdownMenuSub` is an inline accordion below 640 px (the fly-out opened beside its parent, off the left edge and taller than the screen, so nothing showed by touch). The trigger toggles on tap, Enter or Space, ArrowRight opens and ArrowLeft closes, `aria-expanded` follows, and the group's items sit indented right under it inside the same menu, each at 48 px. From 640 px up it stays a fly-out. This covers every grouped menu: the clip row's More menu, the overlay pills' More pill and the media tile menu. The duplicate arrow on grouped triggers in the clip menu is gone (the trigger draws its own chevron). Opened in a browser: at 375 touch the four items are visible at left 63, 48 px apart; at 1280 the fly-out is visible (VIDEO-KIT-01).
+
 ## [ui-v0.5.716] - 2026-11-20
 
 - `TrackStudio` (VF-EDIT-01, spec 0.1.464): trim handles are a visible grip, at least 40 px tall and 12 px wide (16 px on a phone) with three grip dots and a 48 px hit layer from the shared floor formula; fit-to-film zoom uses the film length (at least about 2 s) so a 3 s clip fills the ruler, user zoom still overrides; new `exportPlacement` (`top` | `auto` | `bottom`, `studio.export_placement`): the export actions as a sticky bar above the phone's bottom bar, and on a phone the order is preview, transport in flow, tracks, panels.
