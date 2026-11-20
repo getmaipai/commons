@@ -1,3 +1,7 @@
+## [ui-v0.5.716] - 2026-11-20
+
+- `TrackStudio` (VF-EDIT-01, spec 0.1.464): trim handles are a visible grip, at least 40 px tall and 12 px wide (16 px on a phone) with three grip dots and a 48 px hit layer from the shared floor formula; fit-to-film zoom uses the film length (at least about 2 s) so a 3 s clip fills the ruler, user zoom still overrides; new `exportPlacement` (`top` | `auto` | `bottom`, `studio.export_placement`): the export actions as a sticky bar above the phone's bottom bar, and on a phone the order is preview, transport in flow, tracks, panels.
+
 ## [ui-v0.5.715] - 2026-11-20
 
 - `result_feed` actions with a `group` (spec 0.1.463): the clip row's More menu shows each group as one submenu item (ArrowRight opens, Escape closes) holding its actions with their icons, disabled reasons and `starts`; with `overlay_actions` the grouped ones are never pills and open from one "More" pill. `VideoPlayer` `actionItems` take `group` too. Ungrouped actions are unchanged (VIDEO-KIT-01, VF-EDIT-04).

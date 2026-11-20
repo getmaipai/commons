@@ -1,3 +1,7 @@
+## [spec-v0.1.464] - 2026-11-20
+
+- `studio` takes an optional `export_placement` (`top` default, `auto`, `bottom`): where the export actions sit. `bottom` always uses a sticky bottom bar above the phone's bottom bar, `auto` uses it below the lg breakpoint only, `top` keeps today's layout (VIDEO-KIT-01, VF-EDIT-01).
+
 ## [spec-v0.1.463] - 2026-11-20
 
 - `result_feed.actions[]` takes an optional `group` (1 to 40 characters), like `media_shelf.row_actions`: actions sharing a group open in one submenu named by it, in the row's More menu and in the overlay pills' More pill; ungrouped actions stay at the first level and behave as before (VIDEO-KIT-01, VF-EDIT-04).
