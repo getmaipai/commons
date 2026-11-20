@@ -1,6 +1,10 @@
-## [spec-v0.1.442] - 2026-11-20
+## [spec-v0.1.443] - 2026-11-20
 
 - UI schema additions (VIDEO-KIT-01), all additive: new blocks `job_progress` (bound per-shot rows: id, label, state queued|running|done|held|failed, progress, eta seconds, thumb, note, held reason, failure message and actions; shared file `spec/fixtures/job-progress-shots/valid-five-shots.json`) and `clip_compare` (before and after, side by side or wipe); `retake_from` on the player action list; `time` per level and `facts` on the quality choice; `facts` and `variant: "display"` on `creation_header`; optional storyboard_player row keys `framing`, `place`, `room_sound`, `changed_by`, `reading_index` and `reading_count`, and block paths `bed_note`, `note` and `affected`.
+
+## [spec-v0.1.442] - 2026-11-20
+
+- VF-PROFILE-01: a level label and one plain description line on a recipe and on an operation row of the Stack jobs catalog and model pack (another session; this entry was added when 0.1.443 took the next number).
 
 ## [spec-v0.1.441] - 2026-11-20
 

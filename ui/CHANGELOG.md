@@ -1,6 +1,6 @@
 ## [ui-v0.5.699] - 2026-11-20
 
-- The UI schema renders `job_progress` and `clip_compare`, the player's `retake_from` action, `time` and `facts` on the quality choice, `facts` and the display variant on `creation_header`, and the optional storyboard fields (shot framing and place line under the shot number, a note sentence, shots being redone) (spec 0.1.442, VIDEO-KIT-01).
+- The UI schema renders `job_progress` and `clip_compare`, the player's `retake_from` action, `time` and `facts` on the quality choice, `facts` and the display variant on `creation_header`, and the optional storyboard fields (shot framing and place line under the shot number, a note sentence, shots being redone) (spec 0.1.443, VIDEO-KIT-01).
 
 ## [ui-v0.5.698] - 2026-11-20
 
