@@ -1,3 +1,7 @@
+## [spec-v0.1.425] - 2026-11-20
+
+- DISK-GUARD-01: `spec/stack/ts/disk-levels.ts`, one pure `diskLines`/`diskLevel` (warn: larger of 30 GB and 10 percent free; critical: larger of 10 GB and 3 percent; hysteresis 1 percent of the drive) used by the Stack and Home, and the household key `storage.warn_free_gb`; `storage.critical_free_gb` now defaults to 0 (use the rule).
+
 ## [spec-v0.1.424] - 2026-11-17
 
 - MODELPACK-SPEC-02: the music jobs in the model pack and the make shapes, under spec/stack/. Six generic jobs join the eight, each with opaque part ids and no model names: `song` (description, lyrics, style_words, seconds, level, seed), `song_edit` (a song plus one `change`: cover, repaint or extend), `sound_effect` (description, seconds), `stems` (a song plus the stem names wanted, from the catalog), `vocal_swap` (a vocal plus reference voices) and `lyric_timing` (a song plus lyrics). `StackJobName` and the catalog's job enum list them; `StackMakeResult` gains `stems[]` ({name, file}) and `timings[]` ({start_seconds, text}). Additive: `StackJobsCatalog` entries may carry `stems[]` ({name, label}), and a pack's `peaks[].shape` is now optional (a song has no picture shape). The `limits` vocabulary is unchanged (max_seconds, max_references, max_words). Trim, fade and loudness (no model) are not jobs. Not tagged.
