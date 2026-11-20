@@ -676,7 +676,7 @@ export function MediaTileOverlay({ progress = 0, badge, meta, label, hasSafeImag
   return (
     <>
       {loop ? <TileLoop src={loop} /> : null}
-      {label && !hasSafeImageLabel ? <span data-slot="media-tile-label" className="pointer-events-none absolute inset-x-0 bottom-0 truncate bg-[var(--art-scrim)] px-3 pb-2 pt-6 text-left text-base leading-5 text-[var(--art-foreground)]" style={{ fontSize: "16px", fontWeight: "var(--look-weight-section, 500)", letterSpacing: "var(--look-tracking-section, normal)" }}>{label}</span> : null}
+      {label && !hasSafeImageLabel ? <span data-slot="media-tile-label" className="pointer-events-none absolute inset-x-0 bottom-0 truncate bg-[image:var(--art-scrim-strong)] px-3 pb-2 pt-8 text-left text-base leading-5 text-[var(--art-foreground)]" style={{ fontSize: "16px", fontWeight: "var(--look-weight-section, 500)", letterSpacing: "var(--look-tracking-section, normal)" }}>{label}</span> : null}
       {badge ? <span className={cn("absolute start-2 top-2 flex", badgeStyle === "mono" && "rounded-md bg-[var(--art-overlay)] px-1.5 py-1 font-mono text-[length:var(--font-size-badge)] font-semibold text-[var(--art-foreground)] backdrop-blur-sm")} data-slot="media-tile-badge">{badge}</span> : null}
       {meta ? (
         <span

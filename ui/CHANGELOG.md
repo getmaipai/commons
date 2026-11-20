@@ -1,3 +1,7 @@
+## [ui-v0.5.701] - 2026-11-20
+
+- Media tiles hold their title on pale and light covers: the tile label now draws a real bottom scrim (the old class set a background colour from a gradient, so no scrim was ever painted) from the new `--art-scrim-strong` token, and a generated cover dims or scrims under its title (`--art-dim`, `--art-scrim-strong`; theme tokens in both the PRO and the default art sets). The kind icon on a fallback cover moves to the top corner so the scrim does not dim it (VIDEO-KIT-01).
+
 ## [ui-v0.5.700] - 2026-11-20
 
 - `MediaStage`: in `waiting` and `error` the stage keeps its aspect ratio and grows with its overlay, so the eyebrow, title and facts line can no longer spill out of the top over the block above (an explicit min-height had replaced the browser's content minimum). On a phone the error message no longer takes a fixed 14 rem. `aspect: "short"` is now a 21 / 6 banner on a wide screen (16 / 9 on a phone) (VIDEO-KIT-01).

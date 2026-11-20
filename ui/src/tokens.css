@@ -2205,6 +2205,8 @@ html[data-pro-look] body {
   --art-foreground-muted: color-mix(in srgb, #f8fafc 72%, transparent);
   --art-track: color-mix(in srgb, #f8fafc 28%, transparent);
   --art-scrim: linear-gradient(to top, color-mix(in srgb, #000000 55%, transparent), transparent);
+  --art-scrim-strong: linear-gradient(to top, color-mix(in srgb, #000000 82%, transparent) 0%, color-mix(in srgb, #000000 58%, transparent) 55%, transparent 100%);
+  --art-dim: color-mix(in srgb, #000000 30%, transparent);
   --art-overlay: color-mix(in srgb, #000000 55%, transparent);
 }
 html[data-pro-look] {
@@ -2213,6 +2215,8 @@ html[data-pro-look] {
   --art-foreground-muted: color-mix(in srgb, #f8fafc 72%, transparent);
   --art-track: color-mix(in srgb, #f8fafc 28%, transparent);
   --art-scrim: linear-gradient(to top, color-mix(in srgb, #000000 55%, transparent), transparent);
+  --art-scrim-strong: linear-gradient(to top, color-mix(in srgb, #000000 82%, transparent) 0%, color-mix(in srgb, #000000 58%, transparent) 55%, transparent 100%);
+  --art-dim: color-mix(in srgb, #000000 30%, transparent);
   --art-overlay: color-mix(in srgb, #000000 55%, transparent);
 }
 @media (min-width: 720px) {
@@ -2805,6 +2809,9 @@ html[data-ease-motion="calm"] [data-slot="weather-sky"] [data-weather-group] { a
   --art-track: color-mix(in srgb, var(--foreground) 30%, transparent);
   /* The bottom gradient that keeps controls readable over any picture. */
   --art-scrim: linear-gradient(to top, color-mix(in srgb, var(--background) 78%, transparent), transparent);
+  /* The label on a tile: strong enough at the foot to hold the title on a pale or light cover. */
+  --art-scrim-strong: linear-gradient(to top, color-mix(in srgb, var(--background) 92%, transparent) 0%, color-mix(in srgb, var(--background) 66%, transparent) 55%, transparent 100%);
+  --art-dim: color-mix(in srgb, var(--background) 30%, transparent);
   /* A chip or panel over art (running time, the resume line, Up next). */
   --art-overlay: color-mix(in srgb, var(--background) 62%, transparent);
   --art-radius: var(--radius-md);

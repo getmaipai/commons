@@ -94,9 +94,9 @@ export function SafeImage({ src, alt = "", kind = "picture", fallbackContent, fa
       >
           {tintSeed ? <GeneratedCover title={tintSeed} hash={seedHash} /> : null}
           <span aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_22%_20%,color-mix(in_oklab,var(--art-tint-b)_48%,transparent),transparent_72%)]" />
-          {fallbackContent ?? <Icon data-slot="safe-image-icon" aria-hidden className="absolute bottom-2 right-2 size-[clamp(14px,16%,28px)] opacity-75" />}
+          {fallbackContent ?? <Icon data-slot="safe-image-icon" aria-hidden className="absolute right-2 top-2 size-[clamp(14px,16%,28px)] opacity-75" />}
           {fallbackAfterIcon}
-          {label ? <span data-slot="safe-image-label" className="absolute inset-x-0 bottom-0 truncate bg-[var(--art-scrim)] px-3 pb-2 pt-6 text-left text-base font-medium leading-5 text-[var(--art-foreground)]">{label}</span> : null}
+          {label ? <span data-slot="safe-image-label" className="absolute inset-x-0 bottom-0 truncate bg-[image:var(--art-scrim-strong)] px-3 pb-2 pt-6 text-left text-base font-medium leading-5 text-[var(--art-foreground)]">{label}</span> : null}
       </span>
     );
   }

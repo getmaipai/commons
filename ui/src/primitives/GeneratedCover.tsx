@@ -94,6 +94,7 @@ export function GeneratedCover({ title, hash }: GeneratedCoverProps) {
     body = (<>
       <div aria-hidden className={fill} style={{ background: `linear-gradient(${rotation}deg, ${tints[0]}, ${tints[2]})` }} />
       {[0, 1, 2, 3].map(blob)}
+      <div aria-hidden className={fill} style={{ background: "var(--art-dim)" }} />
       <div className="absolute inset-0 flex items-center justify-center" style={{ padding: "9%" }}>
         {name ? <span data-slot="generated-cover-title" data-title={name} style={heading} /> : null}
       </div>
@@ -102,6 +103,7 @@ export function GeneratedCover({ title, hash }: GeneratedCoverProps) {
     body = (<>
       <div aria-hidden className={fill} style={{ background: tints[0] }} />
       <Glyph index={(seed >>> 6) % COVER_GLYPHS} />
+      <div aria-hidden className={fill} style={{ background: "var(--art-scrim-strong)" }} />
       {name ? <div className="absolute inset-x-0 bottom-0" style={{ padding: "6%" }}><span data-slot="generated-cover-title" data-title={name} style={{ ...heading, fontSize: `${Math.min(coverTitleSize(length), 9)}cqw`, textAlign: "left", display: "block" }} /></div> : null}
     </>);
   }

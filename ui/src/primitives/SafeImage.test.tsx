@@ -102,7 +102,7 @@ describe("art covers keep the kind icon (KIT-QA-01)", () => {
     expect(tile.className).toContain("@container/safe-art");
     const icon = tile.querySelector('[data-slot="safe-image-icon"]')!;
     expect(icon).not.toBeNull();
-    expect(icon.getAttribute("class")).toContain("bottom-2");
+    expect(icon.getAttribute("class")).toContain("top-2");
     expect(tile.querySelector('[data-slot="safe-image-initials"]')).toBeNull();
   });
   test("a podcast placeholder is a mic", () => {
