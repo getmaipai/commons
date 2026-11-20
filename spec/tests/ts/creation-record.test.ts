@@ -88,6 +88,32 @@ describe("CREATOR-01 additions to existing records", () => {
     expect(both(schema, MediaTemplate, alfred)).toEqual([true, true]);
   });
 
+  test("TEMPLATE-02: a saved template carries its owner, a household share flag and the content-rating stamp; its cast is cast_* blanks only", () => {
+    const { $id: _id, ...schema } = read("schemas/media-template.schema.json");   // a copy without its id: the fragment test above already added this schema to the validator
+    const saved = read("fixtures/records/media-template.saved.example.json");
+    const priv = read("fixtures/records/media-template.saved-private.example.json");
+    expect(both(schema, MediaTemplate, saved)).toEqual([true, true]);
+    expect(both(schema, MediaTemplate, priv)).toEqual([true, true]);
+    expect(validateMediaTemplate(saved)).toEqual([]);
+    // the bundled shape is unchanged: no owner, no stamp, audience only
+    expect(both(schema, MediaTemplate, read("fixtures/records/media-template.alfred.example.json"))).toEqual([true, true]);
+    // closed record: a model id, a bare rating and any unknown field are refused
+    expect(both(schema, MediaTemplate, { ...saved, model: "model-a" })).toEqual([false, false]);
+    expect(both(schema, MediaTemplate, { ...saved, rating: "G" })).toEqual([false, false]);
+    expect(both(schema, MediaTemplate, { ...saved, whatever: 1 })).toEqual([false, false]);
+    // a saved template stores no Library files and no styles
+    expect(ajv.validate(schema, { ...saved, references: ["file-alfred01"] })).toBe(false);
+    expect(validateMediaTemplate({ ...saved, references: ["file-alfred01"] })).toHaveLength(1);   // the Zod mirror drops if/then; the reader rule says it
+    expect(ajv.validate(schema, { ...saved, styles: ["lora-abcdef1"] })).toBe(false);
+    expect(validateMediaTemplate({ ...saved, styles: ["lora-abcdef1"] })).toHaveLength(1);
+    // owner and share shapes
+    expect(both(schema, MediaTemplate, { ...saved, owner_person_id: "household" })).toEqual([false, false]);
+    expect(both(schema, MediaTemplate, { ...saved, shared_with: "person-sage0001" })).toEqual([false, false]);
+    // the stamp is the shared content-rating shape
+    expect(both(schema, MediaTemplate, { ...saved, content_rating: { level: "Z" } })).toEqual([false, false]);
+    expect(both(schema, MediaTemplate, { ...saved, content_rating: { ...saved.content_rating, level: "X", reasons: ["sexual"] }, audience: "adult-only" })).toEqual([true, true]);
+  });
+
   test("media-production scene takes optional act and sequence labels", () => {
     const schema = read("schemas/media-production.schema.json");
     const prod = read("fixtures/records/media-production.bruno.example.json");

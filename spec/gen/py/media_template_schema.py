@@ -5,7 +5,15 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, RootModel, constr
+from pydantic import (
+    AwareDatetime,
+    BaseModel,
+    ConfigDict,
+    Field,
+    RootModel,
+    conint,
+    constr,
+)
 
 
 class Reference(RootModel[constr(pattern=r'^file-[a-z0-9]{6,}$')]):
@@ -16,9 +24,62 @@ class Style(RootModel[constr(pattern=r'^lora-[a-z0-9]{6,}$')]):
     root: constr(pattern=r'^lora-[a-z0-9]{6,}$')
 
 
+class Label(BaseModel):
+    """
+    The outside label this stamp was mapped from.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    system: constr(min_length=1)
+    value: constr(min_length=1)
+
+
+class ContentRating(BaseModel):
+    """
+    The one stamp every rated item and result carries. It sits beside content-ceiling.schema.json, which governs the register of a generated reply per band and is unchanged. A viewer's ceiling is a rank from 0 to 4 in Home's design.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    level: Literal['G', 'PG', 'PG-13', 'R', 'X', 'Prohibited', 'Unrated']
+    source: Literal['given', 'declared', 'worked_out'] = Field(
+        ...,
+        description='given means an outside label such as a film rating, explicit flag, or site list; declared means the feature that made the content says what it can only make; worked_out means one of our own raters decided.',
+    )
+    rater: constr(pattern=r'^[a-z0-9][a-z0-9._-]*$') = Field(
+        ..., description='The rater id.'
+    )
+    rater_version: conint(ge=1)
+    rated_at: AwareDatetime
+    reasons: (
+        list[
+            Literal[
+                'swearing',
+                'drugs',
+                'gambling',
+                'gore',
+                'sexual',
+                'minor_line',
+                'scary',
+                'self_harm',
+            ]
+        ]
+        | None
+    ) = Field(
+        None,
+        description="The first six are Home's content-policy protection kinds; scary and self_harm come from the design note.",
+    )
+    label: Label | None = Field(
+        None, description='The outside label this stamp was mapped from.'
+    )
+
+
 class MediaTemplate(BaseModel):
     """
-    MEDIA-01. A reusable picture or video prompt skeleton. Blanks are filled when a creation is made; references are Library file ids. CREATOR-01: kind "fragment" is a short English prompt fragment (a camera, lens, light, grade and so on, in `prompt`, with its `group`) that the shot-card chips and the prompt builder read; it is not a template a person starts from. Reader rule: every template reader (the template list, the Create and Studio template pickers, the check.sh template validation) MUST skip fragment records, and only the fragment readers read them.
+    MEDIA-01. A reusable picture or video prompt skeleton. Blanks are filled when a creation is made; references are Library file ids. CREATOR-01: kind "fragment" is a short English prompt fragment (a camera, lens, light, grade and so on, in `prompt`, with its `group`) that the shot-card chips and the prompt builder read; it is not a template a person starts from. Reader rule: every template reader (the template list, the Create and Studio template pickers, the check.sh template validation) MUST skip fragment records, and only the fragment readers read them. TEMPLATE-02: a template a person saved carries owner_person_id (private unless shared_with is "household"), a content_rating stamp (the shared content-rating shape, copied here as a local definition like the other records) and an audience set from it by the Home side (X means adult-only, anything else all-ages); its cast is stored as cast_* blanks in the prompt only: references and styles stay empty and no model id is stored (the record is closed).
     """
 
     model_config = ConfigDict(
@@ -55,6 +116,15 @@ class MediaTemplate(BaseModel):
     audience: Literal['all-ages', 'adult-only'] = Field(
         ..., description='Strictest intended audience wins.'
     )
+    owner_person_id: constr(pattern=r'^person-[a-z0-9]{6,}$') | None = Field(
+        None,
+        description='TEMPLATE-02. The one person who saved this template. Absent on a bundled template. A saved template is private to its owner unless shared_with says otherwise.',
+    )
+    shared_with: Literal['household'] | None = Field(
+        None,
+        description='TEMPLATE-02. Who else may use this saved template: the literal "household" (the same value the share record uses). Absent means private to owner_person_id.',
+    )
+    content_rating: ContentRating | None = None
     prompt: constr(min_length=1, max_length=10000) = Field(
         ..., description='Prompt skeleton with named blanks in braces.'
     )

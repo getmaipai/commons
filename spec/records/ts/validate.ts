@@ -686,9 +686,18 @@ export function validateCreationRecord(record: { made_audience?: string; lock?: 
   return [];
 }
 
-/** CREATOR-01: a fragment template names its shot-card group (the generators drop the if/then rule). */
-export function validateMediaTemplate(template: { kind: string; group?: string }): Problems {
-  return template.kind === "fragment" && template.group === undefined ? ["group is required when kind is fragment"] : [];
+/**
+ * CREATOR-01: a fragment template names its shot-card group; TEMPLATE-02: a template a person saved (it has an owner) stores no Library files and no styles
+ * (its cast is cast_* blanks in the prompt). The generators drop both if/then rules, so the readers run this.
+ */
+export function validateMediaTemplate(template: { kind: string; group?: string; owner_person_id?: string; references?: readonly string[]; styles?: readonly string[] }): Problems {
+  const problems: Problems = [];
+  if (template.kind === "fragment" && template.group === undefined) problems.push("group is required when kind is fragment");
+  if (template.owner_person_id !== undefined) {
+    if ((template.references ?? []).length > 0) problems.push("a saved template stores no references (its cast is cast_* blanks)");
+    if ((template.styles ?? []).length > 0) problems.push("a saved template stores no styles");
+  }
+  return problems;
 }
 
 /** Cross-field time and operation rules for CAPTION-01a. */
