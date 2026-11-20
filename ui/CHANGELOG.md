@@ -1,3 +1,7 @@
+## [ui-v0.5.723] - 2026-11-20
+
+- `ResultFeed`: a `cancelled` entry is one compact line (its words and "Stopped. Nothing was kept."), no player card, in every look. `MediaShelf` density `compact`: rail tiles 140 px wide (sm and up keep their share), grid 3 columns on a phone, 4 from sm, 6 from lg. The reference slot row of the Create and chat composers wraps instead of scrolling, so no slot is cut mid-word (VIDEO-KIT-01).
+
 ## [ui-v0.5.722] - 2026-11-20
 
 - `prompt_bar` reference slots take kind `prop` (Box icon, asks the host for a prop); `place` and `prop` slots honor `max` (VIDEO-KIT-01).
