@@ -1,3 +1,7 @@
+## [spec-v0.1.444] - 2026-11-20
+
+- `media.rough_cut` request: optional `caption` per shot (1 to 200 characters), the words shown for the whole shot when it has no voiced line, so Home can ask for the silent animatic. Additive.
+
 ## [spec-v0.1.443] - 2026-11-20
 
 - UI schema additions (VIDEO-KIT-01), all additive: new blocks `job_progress` (bound per-shot rows: id, label, state queued|running|done|held|failed, progress, eta seconds, thumb, note, held reason, failure message and actions; shared file `spec/fixtures/job-progress-shots/valid-five-shots.json`) and `clip_compare` (before and after, side by side or wipe); `retake_from` on the player action list; `time` per level and `facts` on the quality choice; `facts` and `variant: "display"` on `creation_header`; optional storyboard_player row keys `framing`, `place`, `room_sound`, `changed_by`, `reading_index` and `reading_count`, and block paths `bed_note`, `note` and `affected`.

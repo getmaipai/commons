@@ -12,7 +12,7 @@ import { StackJobAudience } from "./stack-model-pack";
 const text = z.string().min(1);
 const id = z.string().min(1).max(60).regex(/^[A-Za-z0-9._-]+$/);
 
-export const StackRoughCutShot = z.object({ id, picture: text, seconds: z.number().positive().max(60), motion: text.optional() }).strict();
+export const StackRoughCutShot = z.object({ id, picture: text, seconds: z.number().positive().max(60), motion: text.optional(), caption: z.string().min(1).max(200).optional() }).strict();
 // A line names its shot by wrapping the spec's dialogue shape, never by copying its fields.
 export const StackRoughCutLine = z.object({ shot_id: id, line: StackClipDialogue }).strict();
 export const StackRoughCutVoice = z.object({ speaker: text, voice_address: text.optional(), minor: z.boolean().optional() }).strict();

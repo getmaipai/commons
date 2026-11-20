@@ -5,7 +5,8 @@
       "id": "shot-1",
       "picture": "/media/film/still-1.png",
       "seconds": 5,
-      "motion": "zoom in"
+      "motion": "zoom in",
+      "caption": "The light came on at six."
     },
     {
       "id": "shot-2",

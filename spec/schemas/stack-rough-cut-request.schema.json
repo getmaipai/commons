@@ -38,6 +38,12 @@
           "motion": {
             "type": "string",
             "minLength": 1
+          },
+          "caption": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "Words shown at the bottom for the whole shot when the shot has no voiced line (the silent animatic's look). A voiced line is captioned with its own text."
           }
         },
         "required": [
