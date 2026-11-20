@@ -1,3 +1,7 @@
+## [ui-v0.5.709] - 2026-11-20
+
+- `SchemaPage`: the page body's bottom padding is the phone bar's inset (`--phone-nav-offset`, 0 from 640 px up) plus 1 rem, so the last item of a long page scrolls clear of the floating bottom bar (it ended 63 px under it at 360, 375 and 402 wide once the sections left the phone layout). A page with no bar keeps 1 rem as before; `floatingBar` keeps its fixed 6 rem (PHONE-07).
+
 ## [ui-v0.5.708] - 2026-11-20
 
 - `Page`: the root is `flex-1 min-h-0` as well as `h-full`. Under a row in a flex column (a package app's section tabs on a phone) it was as tall as the whole column, so its scroller ended one row (about 69 px at 375 wide) below the screen and hid the last lines; it now takes only the room that is left. Parents that are not a flex column are unchanged (PHONE-07).
