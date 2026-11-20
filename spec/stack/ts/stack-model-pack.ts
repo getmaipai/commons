@@ -24,10 +24,10 @@ export const StackJobLimitsBase = {
 
 // VF-CAPS-01: one row per video operation and level, built by the Stack from its validators and measured tables (one source). Home may
 // filter on input combinations only; whether a job fits in memory or how long it takes is the Stack's `available` answer (rule E4).
-export const StackVideoOperation = z.enum(["clip_text", "clip_start_picture", "clip_start_end_pictures", "clip_sheet", "clip_references", "clip_film_shot", "extend", "retake", "swap", "enhance"]);
-export type StackVideoOperation = z.infer<typeof StackVideoOperation>;
+export const StackCapabilityOperation = z.enum(["clip_text", "clip_start_picture", "clip_start_end_pictures", "clip_sheet", "clip_references", "clip_film_shot", "extend", "retake", "swap", "enhance"]);
+export type StackCapabilityOperation = z.infer<typeof StackCapabilityOperation>;
 export const StackOperationRow = z.object({
-  operation: StackVideoOperation,
+  operation: StackCapabilityOperation,
   level: StackJobLevel,
   available: z.boolean(),
   unavailable_reason: text.optional(),
@@ -49,7 +49,7 @@ export const StackLevelRecipe = z.object({
   size: Pixels.optional(),
   // The Stack picks the recipe (the caller never names pixels): among the recipes of a level whose `operations` include the request's
   // operation (absent means every operation), the largest whose `memory_floor_bytes` the machine admits; the receipt says which ran.
-  operations: z.array(StackVideoOperation).optional(),
+  operations: z.array(StackCapabilityOperation).optional(),
   memory_floor_bytes: z.number().int().min(0).optional(),
   steps: z.number().int().min(1),
   checkpoint: text,
