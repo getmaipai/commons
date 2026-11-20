@@ -1,7 +1,56 @@
 [
-  { "id": "s1", "label": "1 · Juniper at the window", "state": "done", "progress": 100, "thumb": "/media/film/s1.jpg", "note": "Fixed on its own: a small noise at the start was trimmed." },
-  { "id": "s2", "label": "2 · Atlas opens the shed", "state": "running", "progress": 45, "thumb": "/media/film/s2.jpg" },
-  { "id": "s3", "label": "3 · The hill behind the house", "state": "queued", "thumb": "/media/film/s3.jpg", "etaSeconds": 600 },
-  { "id": "s4", "label": "4 · Willow arrives", "state": "held", "heldReason": "Waiting for another job" },
-  { "id": "s5", "label": "5 · Sage lights the lantern", "state": "failed", "failure": { "message": "This shot did not finish. Try it again, or use the best take so far.", "actions": [ { "label": "Try again", "action": "retry_shot" }, { "label": "Use the best take", "action": "keep_best_take" } ] } }
+  {
+    "id": "s1",
+    "label": "1 \u00b7 Juniper at the window",
+    "state": "done",
+    "progress": 100,
+    "thumb": "/media/film/s1.jpg",
+    "note": "Fixed on its own: a small noise at the start was trimmed."
+  },
+  {
+    "id": "s2",
+    "label": "2 \u00b7 Atlas opens the shed",
+    "state": "running",
+    "progress": 45,
+    "thumb": "/media/film/s2.jpg"
+  },
+  {
+    "id": "s3",
+    "label": "3 \u00b7 The hill behind the house",
+    "state": "queued",
+    "thumb": "/media/film/s3.jpg",
+    "etaSeconds": 600
+  },
+  {
+    "id": "s4",
+    "label": "4 \u00b7 Willow arrives",
+    "state": "held",
+    "heldReason": "Waiting for another job"
+  },
+  {
+    "id": "s5",
+    "label": "5 \u00b7 Sage lights the lantern",
+    "state": "failed",
+    "failure": {
+      "message": "This shot did not finish. Try it again, or use the best take so far.",
+      "actions": [
+        {
+          "label": "Try again",
+          "action": {
+            "call": {
+              "target": "/api/films/shots/{id}/retry"
+            }
+          }
+        },
+        {
+          "label": "Use the best take",
+          "action": {
+            "call": {
+              "target": "/api/films/shots/{id}/keep-best"
+            }
+          }
+        }
+      ]
+    }
+  }
 ]

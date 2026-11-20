@@ -12,8 +12,6 @@
     { "$ref": "#/$defs/form" },
     { "$ref": "#/$defs/empty_state" },
     { "$ref": "#/$defs/progress" },
-    { "$ref": "#/$defs/job_progress" },
-    { "$ref": "#/$defs/clip_compare" },
     { "$ref": "#/$defs/list" },
     { "$ref": "#/$defs/card_grid" },
     { "$ref": "#/$defs/media_shelf" },
@@ -43,7 +41,9 @@
     { "$ref": "#/$defs/action_bar" },
     { "$ref": "#/$defs/proposal_card" },
     { "$ref": "#/$defs/voice_line" },
-    { "$ref": "#/$defs/media_stage" }
+    { "$ref": "#/$defs/media_stage" },
+    { "$ref": "#/$defs/job_progress" },
+    { "$ref": "#/$defs/clip_compare" }
   ],
   "$defs": {
     "binding": {
@@ -354,8 +354,8 @@
         "type": { "const": "job_progress" }, "bind": { "$ref": "#/$defs/binding" },
         "title": { "type": "string", "minLength": 1 }, "overall_eta_seconds": { "type": "string", "minLength": 1, "description": "Dotted path in the first bound row to the overall ETA in seconds." },
         "cancel": { "$ref": "#/$defs/action", "description": "Fired with the bound shot rows." },
-        "item_fields": { "type": "object", "additionalProperties": false, "required": ["shot_id", "label", "state", "progress", "eta_seconds", "thumb", "note", "held_reason", "failure_message", "failure_actions"], "properties": {
-          "shot_id": { "type": "string" }, "label": { "type": "string" }, "state": { "type": "string", "enum": ["queued", "running", "done", "held", "failed"] },
+        "item_fields": { "type": "object", "additionalProperties": false, "required": ["shot_id", "label", "state"], "properties": {
+          "shot_id": { "type": "string" }, "label": { "type": "string" }, "state": { "type": "string", "description": "Dotted path to the shot state: queued, running, done, held or failed." },
           "progress": { "type": "string", "description": "Dotted path to a number from 0 to 1 (or 0 to 100)." }, "eta_seconds": { "type": "string" }, "thumb": { "type": "string", "description": "Same-origin image path." }, "note": { "type": "string" }, "held_reason": { "type": "string" }, "failure_message": { "type": "string" },
           "failure_actions": { "type": "string", "description": "Dotted path to an optional array of {label, action}; actions dispatch with their shot row." }
         } }
