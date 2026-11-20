@@ -1,3 +1,7 @@
+## [spec-v0.1.463] - 2026-11-20
+
+- `result_feed.actions[]` takes an optional `group` (1 to 40 characters), like `media_shelf.row_actions`: actions sharing a group open in one submenu named by it, in the row's More menu and in the overlay pills' More pill; ungrouped actions stay at the first level and behave as before (VIDEO-KIT-01, VF-EDIT-04).
+
 ## [spec-v0.1.461] - 2026-11-20
 
 - `media_shelf.row_actions` are now drawn on every orientation (VIDEO-KIT-01): vertical rows keep their labelled pills, rail and grid tiles open the same actions from a corner "⋮" menu with words. The package check no longer refuses `row_actions` on a non-vertical shelf (spec 0.1.457 and 0.1.460 carried that refusal; pin this tag or later, never those). New optional `row_actions[].group` (at most 40 characters): actions sharing a group open in one submenu named by it.

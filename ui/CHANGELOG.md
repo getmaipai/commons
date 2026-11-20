@@ -1,3 +1,7 @@
+## [ui-v0.5.715] - 2026-11-20
+
+- `result_feed` actions with a `group` (spec 0.1.463): the clip row's More menu shows each group as one submenu item (ArrowRight opens, Escape closes) holding its actions with their icons, disabled reasons and `starts`; with `overlay_actions` the grouped ones are never pills and open from one "More" pill. `VideoPlayer` `actionItems` take `group` too. Ungrouped actions are unchanged (VIDEO-KIT-01, VF-EDIT-04).
+
 ## [ui-v0.5.714] - 2026-11-20
 
 - `MediaShelf` rail and grid tiles take `renderMenu` and `hasMenu`: a small "⋮" overflow button at the tile's top corner (48 px hit layer, Tab stop, Enter or Space opens, arrows move, Escape closes and returns focus, pressing it never opens the tile) opens the row's `row_actions` with words and icons from the kit menu; a tile with no visible action draws no button; vertical rows keep their pills. `media_shelf` nodes feed it from `row_actions` (`show_when_field` and `hide_when_field` honoured, same dispatch), and `group` nests actions under one submenu item (spec 0.1.461, VIDEO-KIT-01).
