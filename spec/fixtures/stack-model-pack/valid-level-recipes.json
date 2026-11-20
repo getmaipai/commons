@@ -90,7 +90,9 @@
             "clip_film_shot",
             "enhance"
           ],
-          "memory_floor_bytes": 77700000000
+          "memory_floor_bytes": 77700000000,
+          "label": "Standard",
+          "description": "Quick, with sound"
         }
       ]
     }

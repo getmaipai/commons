@@ -31,6 +31,9 @@ export const StackOperationRow = z.object({
   level: StackJobLevel,
   available: z.boolean(),
   unavailable_reason: text.optional(),
+  // VF-PROFILE-01: the level's name people see (Standard, Boost, Max) and one plain line the screens may show beside it; written by the pack, no model names, pixel counts or memory words.
+  label: text.optional(),
+  description: text.optional(),
   inputs: z.object({ start_picture: z.boolean(), end_picture: z.boolean(), references: z.number().int().min(0), sheets: z.number().int().min(0), source_clip: z.boolean() }).strict(),
   seconds: z.object({ min: z.number().positive(), max: z.number().positive() }).strict(),
   sizes: z.array(z.object({ width: z.number().int().min(1), height: z.number().int().min(1), orientation: StackJobShape }).strict()),
@@ -57,6 +60,8 @@ export const StackLevelRecipe = z.object({
   checkpoint: text,
   schedule: text,
   prompt_format: text,
+  label: text.optional(),
+  description: text.optional(),
   adapter: z.object({ id: text, strength: z.number(), required: z.boolean() }).strict().optional(),
   finish: z.array(StackFinishStep).optional(),
 }).strict();

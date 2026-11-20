@@ -90,7 +90,9 @@
           },
           "requires": [
             "video model"
-          ]
+          ],
+          "label": "Standard",
+          "description": "Quick, with sound"
         }
       ]
     },
