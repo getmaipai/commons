@@ -1,3 +1,7 @@
+## [ui-v0.5.713] - 2026-11-20
+
+- Pill tabs (the dashboard `TabsTrigger` in the pill variant, for example the Video app's section tabs) get a `::before` hit layer to 48 px: after the layer fix their only pseudo-element was the 1.8 px active underline, so they measured 44 px with no hit area. `media_stage` refetches with `poll_while` (spec 0.1.460); the polling loop is the shared `usePollWhile` hook (VIDEO-KIT-01).
+
 ## [ui-v0.5.712] - 2026-11-20
 
 - FIX (regression from ui-v0.5.702, A11Y-DEBT-01): the touch-floor rules in `tokens.css` were plain CSS, and an unlayered rule beats every layered Tailwind utility, so `position: relative` forced on every focusable element overrode `.absolute` (the Studio's trim handles and playhead could not be dragged, the Play button on a clip card and the phone menu button sat in the wrong place) and the pseudo-element rule overrode every `after:` utility. Both rules, and the text-field minimum height, now live in `@layer base`, under the utilities, so a class such as `absolute`, `fixed`, `sticky` or `after:inset-0` wins. The 48 px hit areas stay. A test keeps the rules inside the layer. Any global CSS rule change must ship with a before and after layout comparison (VIDEO-KIT-01).

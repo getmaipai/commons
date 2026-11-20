@@ -1,3 +1,7 @@
+## [spec-v0.1.460] - 2026-11-20
+
+- `media_stage` takes an optional `poll_while` (`field`, `values`), the same shape as `media_shelf` and `job_progress`: it refetches `bind` while the first row's field is in `values` (for example waiting) and stops otherwise, so a stage can show a render's progress and then its finished result without a reload (VIDEO-KIT-01).
+
 ## [spec-v0.1.457] - 2026-11-20
 
 - Package check (VIDEO-KIT-01): a `media_shelf` that sets `row_actions` without `orientation: "vertical"` is refused with a plain message ("row_actions are drawn only when orientation is vertical, so these buttons would never show"), because a rail or grid shelf draws no row buttons and Home had shelves whose buttons were invisible for weeks. Existing packages must drop `row_actions` from non-vertical shelves or make them vertical before they pin this tag.
