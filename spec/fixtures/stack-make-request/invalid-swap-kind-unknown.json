@@ -1,0 +1,15 @@
+{
+  "job": "swap",
+  "audience": "adult",
+  "clip": "media-5",
+  "references": [
+    "media-6",
+    "media-7",
+    "media-8"
+  ],
+  "description": "swap the lead",
+  "start_seconds": 1.5,
+  "seconds": 4,
+  "level": "max",
+  "kind": "body"
+}

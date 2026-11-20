@@ -506,6 +506,13 @@
           "type": "string",
           "minLength": 1
         },
+        "kind": {
+          "enum": [
+            "face",
+            "head",
+            "person"
+          ]
+        },
         "start_seconds": {
           "type": "number",
           "minimum": 0
