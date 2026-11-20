@@ -1,0 +1,23 @@
+{
+  "id": "job-1",
+  "job": "clip",
+  "state": "done",
+  "percent": 100,
+  "status": "Done",
+  "files": [
+    "media-9"
+  ],
+  "poster": "media-10",
+  "made_with": {
+    "part": "clip-model-a",
+    "label": "Clip model A",
+    "pack_version": "1.0.0",
+    "shape": "landscape",
+    "seconds": 4,
+    "sound": true,
+    "notes": [
+      "The clip was shortened to 4 seconds because this model takes 4 at this level."
+    ],
+    "receipt": "job-1"
+  }
+}

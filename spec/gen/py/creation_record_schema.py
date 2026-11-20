@@ -27,6 +27,10 @@ class JobId(RootModel[constr(min_length=1)]):
     root: constr(min_length=1)
 
 
+class ReceiptId(RootModel[constr(min_length=1)]):
+    root: constr(min_length=1)
+
+
 class Recipe(BaseModel):
     """
     The tool and page that made it, and the route.
@@ -151,6 +155,10 @@ class CreationRecord(BaseModel):
     job_ids: list[constr(min_length=1)] = Field(
         ...,
         description='The job rows that ran it (picture, video, music, media edit). The job rows stay what they are for running a job.',
+    )
+    receipt_ids: list[constr(min_length=1)] = Field(
+        [],
+        description="VF-RECEIPT-01: the ids of the Stack video receipts of the jobs that made it (one per video job). Ids only; a receipt is read through the owner's route and its content is never copied here or into file.provenance.",
     )
     production_id: constr(pattern=r'^mprd-[a-z0-9]{6,}$') | None = None
     shot_id: constr(min_length=1, max_length=80) | None = Field(

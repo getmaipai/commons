@@ -26,4 +26,6 @@ export const STACK_SCHEMA_NAMES: ReadonlySet<string> = new Set([
   "stack-make-result.schema.json",
   "stack-make-refusal.schema.json",
   "stack-jobs-catalog.schema.json",
+  // VF-RECEIPT-01: hand-written mirror.
+  "stack-video-receipt.schema.json",
 ]);

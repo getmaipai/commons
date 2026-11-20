@@ -39,7 +39,8 @@ export const StackMakeRequest = z.discriminatedUnion("job", [
 ]);
 export type StackMakeRequest = z.infer<typeof StackMakeRequest>;
 
-export const StackMadeWith = z.object({ part: StackPartId, label: text, pack_version: text, shape: StackJobShape.nullable(), seconds: z.number().min(0).nullable(), sound: z.boolean(), notes: z.array(text) }).strict();
+// `receipt` (VF-RECEIPT-01): the job id the owner's route answers for the job's StackVideoReceipt. Optional: only video jobs write one.
+export const StackMadeWith = z.object({ part: StackPartId, label: text, pack_version: text, shape: StackJobShape.nullable(), seconds: z.number().min(0).nullable(), sound: z.boolean(), notes: z.array(text), receipt: text.optional() }).strict();
 export type StackMadeWith = z.infer<typeof StackMadeWith>;
 
 const resBase = { id: text, state: z.enum(["queued", "running", "waiting_for_you", "paused", "stalled", "done", "failed", "cancelled"]), percent: z.number().int().min(0).max(100), status: z.string(), files: z.array(text), poster: text.nullable(), made_with: StackMadeWith.nullable() };

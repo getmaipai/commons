@@ -67,6 +67,16 @@
       "default": [],
       "description": "The job rows that ran it (picture, video, music, media edit). The job rows stay what they are for running a job."
     },
+    "receipt_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "default": [],
+      "description": "VF-RECEIPT-01: the ids of the Stack video receipts of the jobs that made it (one per video job). Ids only; a receipt is read through the owner's route and its content is never copied here or into file.provenance."
+    },
     "production_id": {
       "type": [
         "string",

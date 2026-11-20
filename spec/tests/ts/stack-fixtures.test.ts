@@ -46,6 +46,7 @@ import { StackSizing } from "../../stack/ts/stack-sizing";
 import { StackModelPack } from "../../stack/ts/stack-model-pack";
 import { StackMakeRequest, StackMakeResult, StackMakeRefusal } from "../../stack/ts/stack-make";
 import { StackJobsCatalog } from "../../stack/ts/stack-jobs-catalog";
+import { StackVideoReceipt } from "../../stack/ts/stack-video-receipt";
 
 const SPEC = join(import.meta.dir, "..", "..");
 const ajv = new Ajv2020({ strict: false, allErrors: true });
@@ -81,6 +82,7 @@ const SHAPES: Array<{ name: string; zod: ZodType }> = [
   { name: "stack-make-result", zod: StackMakeResult },
   { name: "stack-make-refusal", zod: StackMakeRefusal },
   { name: "stack-jobs-catalog", zod: StackJobsCatalog },
+  { name: "stack-video-receipt", zod: StackVideoReceipt },
 ];
 
 for (const shape of SHAPES) {

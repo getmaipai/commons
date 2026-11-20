@@ -33,6 +33,17 @@ export const CreationRecord = z
         "The job rows that ran it (picture, video, music, media edit). The job rows stay what they are for running a job.",
       )
       .default([]),
+    /**VF-RECEIPT-01: the ids of the Stack video receipts of the jobs that made it (one per video job). Ids only; a receipt is read through the owner's route and its content is never copied here or into file.provenance.*/
+    receipt_ids: z
+      .array(z.string().min(1))
+      .refine(
+        (arr) => arr.every((item, i) => arr.indexOf(item) == i),
+        "All items must be unique!",
+      )
+      .describe(
+        "VF-RECEIPT-01: the ids of the Stack video receipts of the jobs that made it (one per video job). Ids only; a receipt is read through the owner's route and its content is never copied here or into file.provenance.",
+      )
+      .default([]),
     production_id: z
       .union([z.string().regex(new RegExp("^mprd-[a-z0-9]{6,}$")), z.null()])
       .default(null),
@@ -212,6 +223,10 @@ export const CreationRecord = z
                   "generate",
                   "edit",
                   "film",
+                  "retake",
+                  "swap",
+                  "restyle",
+                  "ingredients",
                 ])
                 .describe(
                   "What the job did: a new song (text2music), or a change to an existing version (the rest).",

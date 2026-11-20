@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "job_id": "job-1",
+  "operation": "generate",
+  "made_at": "2026-11-20T10:00:00Z",
+  "runtime": {
+    "id": "engine-a",
+    "revision": "b82b97e"
+  },
+  "model": {
+    "id": "model-a",
+    "build": "bf16",
+    "quantization": null
+  },
+  "steps": {
+    "count": null,
+    "schedule": "8+3"
+  },
+  "adapter": null,
+  "inputs": [
+    {
+      "role": "start",
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "bytes": 1234
+    }
+  ],
+  "requested": {
+    "width": 1920,
+    "height": 1088,
+    "frames": 121,
+    "seconds": 5
+  },
+  "native": {
+    "width": 1920,
+    "height": 1088,
+    "frames": 121,
+    "fps": 24,
+    "seconds": 5.04,
+    "audio": true,
+    "bytes": 9000000
+  },
+  "delivered": {
+    "width": 1280,
+    "height": 720,
+    "frames": 121,
+    "fps": 24,
+    "seconds": 5.04,
+    "audio": true,
+    "bytes": 9000000
+  },
+  "delivered_is": "messaging_copy",
+  "seed": 7,
+  "phases": [
+    {
+      "name": "generate",
+      "ms": 480000
+    }
+  ],
+  "peak_memory_bytes": null,
+  "finish": [
+    {
+      "operation": "messaging_copy",
+      "from": {
+        "width": 1920,
+        "height": 1088
+      },
+      "to": {
+        "width": 1280,
+        "height": 720
+      },
+      "ok": true,
+      "code": null
+    }
+  ],
+  "prompt": {
+    "bytes": 120,
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  }
+}

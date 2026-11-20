@@ -74,6 +74,10 @@ class GenerationProvenance(BaseModel):
         'generate',
         'edit',
         'film',
+        'retake',
+        'swap',
+        'restyle',
+        'ingredients',
     ] = Field(
         ...,
         description='What the job did: a new song (text2music), or a change to an existing version (the rest).',
