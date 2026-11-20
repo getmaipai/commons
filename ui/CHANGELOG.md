@@ -1,3 +1,7 @@
+## [ui-v0.5.720] - 2026-11-20
+
+- `MediaStage` takes `waitingActions` and the `media_stage` block takes `waiting_actions` (at most 2 buttons): drawn under the progress strip while the stage state is `waiting`, for example Stop (VIDEO-KIT-01).
+
 ## [ui-v0.5.719] - 2026-11-20
 
 - `prompt_bar` submit arguments fall back to page state: a `{name}` in `submit.call.args` that the bar does not own (not its prompt, a field, a chip, a reference, the tier, the mode or a suggestion) is read from page state when it is set, so a rename page reached by `navigate {to, state: {id}}` posts the id instead of the literal "{id}" (the 404 on Video Templates and Elements rename). The bar's own names never fall back, so a hidden field's old value is still not sent (VIDEO-KIT-01).
