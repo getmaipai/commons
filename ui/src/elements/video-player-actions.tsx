@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useRef, type KeyboardEvent, type PointerEvent, type ReactNode } from "react";
-import { ArrowRightIcon, Loader2Icon, MoreHorizontalIcon } from "lucide-react";
+import { Loader2Icon, MoreHorizontalIcon } from "lucide-react";
 import { cn } from "cn";
 import { i18n } from "@/kit/i18n";
 import { getIcon } from "@/kit/icons";
@@ -203,7 +203,7 @@ export function OverlayPills({ actions, slot, trailing, className }: { actions: 
           <DropdownMenuContent align="end">
             {entries.map((entry, index) => (
               <DropdownMenuSub key={`group-${entry.group}-${index}`}>
-                <DropdownMenuSubTrigger>{entry.group}<ArrowRightIcon aria-hidden className="ms-auto" /></DropdownMenuSubTrigger>
+                <DropdownMenuSubTrigger>{entry.group}</DropdownMenuSubTrigger>
                 <DropdownMenuSubContent>{entry.actions.map(action => <MoreActionItem key={action.key} action={action} />)}</DropdownMenuSubContent>
               </DropdownMenuSub>
             ))}
@@ -271,7 +271,7 @@ export function ActionRow({
             <DropdownMenuContent align="start">
               {menuEntries.map((entry, index) => entry.group ? (
                 <DropdownMenuSub key={`group-${entry.group}-${index}`}>
-                  <DropdownMenuSubTrigger>{entry.group}<ArrowRightIcon aria-hidden className="ms-auto" /></DropdownMenuSubTrigger>
+                  <DropdownMenuSubTrigger>{entry.group}</DropdownMenuSubTrigger>
                   <DropdownMenuSubContent>{entry.actions.map(action => <MoreActionItem key={action.key} action={action} />)}</DropdownMenuSubContent>
                 </DropdownMenuSub>
               ) : <MoreActionItem key={entry.actions[0]!.key} action={entry.actions[0]!} />)}

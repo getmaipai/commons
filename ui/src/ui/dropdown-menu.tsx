@@ -211,9 +211,33 @@ function DropdownMenuShortcut({
   )
 }
 
+// A11Y/phone (VF-EDIT-04): a fly-out submenu cannot be used by touch on a phone (it opens beside its parent, off the edge and taller than the
+// room), so below 640 px a submenu is an inline accordion: its trigger toggles, and its items sit indented right under it inside the same menu.
+const PHONE_MENU_QUERY = "(max-width: 639.98px)"
+const SubInlineContext = React.createContext<{ open: boolean; toggle: (open?: boolean) => void } | null>(null)
+
+function usePhoneMenu(): boolean {
+  const [phone, setPhone] = React.useState(false)
+  React.useEffect(() => {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") return
+    const list = window.matchMedia(PHONE_MENU_QUERY)
+    const update = () => setPhone(list.matches)
+    update()
+    list.addEventListener?.("change", update)
+    return () => list.removeEventListener?.("change", update)
+  }, [])
+  return phone
+}
+
 function DropdownMenuSub({
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Sub>) {
+  const phone = usePhoneMenu()
+  const [open, setOpen] = React.useState(false)
+  const toggle = React.useCallback((next?: boolean) => setOpen((current) => (next === undefined ? !current : next)), [])
+  if (phone) {
+    return <SubInlineContext.Provider value={{ open, toggle }}>{props.children}</SubInlineContext.Provider>
+  }
   return <DropdownMenuPrimitive.Sub data-slot="dropdown-menu-sub" {...props} />
 }
 
@@ -225,16 +249,37 @@ function DropdownMenuSubTrigger({
 }: React.ComponentProps<typeof DropdownMenuPrimitive.SubTrigger> & {
   inset?: boolean
 }) {
+  const inline = React.useContext(SubInlineContext)
+  const triggerClass = cn(
+    "flex min-h-12 cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-base outline-hidden select-none focus:bg-accent focus:text-accent-foreground data-[inset]:pl-8 data-[state=open]:bg-accent data-[state=open]:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground",
+    className
+  )
+  if (inline) {
+    return (
+      <DropdownMenuPrimitive.Item
+        data-slot="dropdown-menu-sub-trigger"
+        data-inset={inset}
+        data-state={inline.open ? "open" : "closed"}
+        aria-expanded={inline.open}
+        className={triggerClass}
+        onSelect={(event) => { event.preventDefault(); inline.toggle() }}
+        onKeyDown={(event) => {
+          if (event.key === "ArrowRight") { event.preventDefault(); inline.toggle(true) }
+          if (event.key === "ArrowLeft") { event.preventDefault(); inline.toggle(false) }
+        }}
+      >
+        {children}
+        <ChevronRightIcon className={cn("ml-auto size-4 transition-transform", inline.open && "rotate-90")} />
+      </DropdownMenuPrimitive.Item>
+    )
+  }
   return (
     <DropdownMenuPrimitive.SubTrigger
       data-slot="dropdown-menu-sub-trigger"
       data-inset={inset}
       // min-h-12/text-base: the same touch-target and type floors as
       // DropdownMenuItem.
-      className={cn(
-        "flex min-h-12 cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-base outline-hidden select-none focus:bg-accent focus:text-accent-foreground data-[inset]:pl-8 data-[state=open]:bg-accent data-[state=open]:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground",
-        className
-      )}
+      className={triggerClass}
       {...props}
     >
       {children}
@@ -247,6 +292,11 @@ function DropdownMenuSubContent({
   className,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.SubContent>) {
+  const inline = React.useContext(SubInlineContext)
+  if (inline) {
+    if (!inline.open) return null
+    return <div role="group" data-slot="dropdown-menu-sub-content" data-inline="" className="ms-3 border-s border-border/60 ps-1">{props.children}</div>
+  }
   return (
     <DropdownMenuPrimitive.SubContent
       data-slot="dropdown-menu-sub-content"
