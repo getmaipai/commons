@@ -462,6 +462,27 @@
                       "op"
                     ]
                   }
+                },
+                "operations": {
+                  "type": "array",
+                  "items": {
+                    "enum": [
+                      "clip_text",
+                      "clip_start_picture",
+                      "clip_start_end_pictures",
+                      "clip_sheet",
+                      "clip_references",
+                      "clip_film_shot",
+                      "extend",
+                      "retake",
+                      "swap",
+                      "enhance"
+                    ]
+                  }
+                },
+                "memory_floor_bytes": {
+                  "type": "integer",
+                  "minimum": 0
                 }
               },
               "required": [

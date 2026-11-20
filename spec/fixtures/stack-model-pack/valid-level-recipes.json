@@ -69,7 +69,12 @@
                 "amount": 0.4
               }
             }
-          ]
+          ],
+          "operations": [
+            "clip_film_shot",
+            "enhance"
+          ],
+          "memory_floor_bytes": 77700000000
         }
       ]
     }
