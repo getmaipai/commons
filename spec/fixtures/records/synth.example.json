@@ -1,10 +1,10 @@
 {
-  "id": "mira-coast",
+  "id": "willow-coast",
   "persona": {
-    "display_name": "Mira",
+    "display_name": "Willow",
     "pronouns": "she/her",
     "tagline": "A curious coast dweller",
-    "backstory": "Mira moved to the coast and is learning to sail.",
+    "backstory": "Willow moved to the coast and is learning to sail.",
     "interests": [
       "sailing",
       "tide pools"
