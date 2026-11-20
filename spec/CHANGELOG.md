@@ -1,3 +1,7 @@
+## [spec-v0.1.435] - 2026-11-20
+
+- VF-UI-15 (copy only): the help and option copy of `generation.video_tier` use the names the Video screens show: Fast and Full HD, not Standard and Boost. Same key, same values, same default; no new key. Additive text change.
+
 ## [spec-v0.1.434] - 2026-11-20
 
 - VF-DOOR-01 (Stack half): the `clip` request gains optional `quiet_seconds` (20 to 3600: how long chat must be quiet before the job resumes) and `quiet_max_wait_seconds` (0 to 86400 or null: the longest the job waits for that before it starts anyway), the household's resource settings Home already passes on the old door. No `negative_prompt` and no `loras` on the clip request on purpose: negative wording belongs to the pack's prompt writer and looks to style ids. Additive.
