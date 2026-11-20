@@ -51,7 +51,7 @@ import { SharePanel } from "@/kit/elements/share-panel";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/kit/ui/select";
 import { PackageScopeContext, PageSidebarContext, PageStateContext, resolveParams } from "@/kit/schema/packageScope";
 import { MediaHostContext, type CastTarget, type MediaHost } from "@/kit/schema/mediaHost";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/kit/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/kit/ui/dropdown-menu";
 import type { Action } from "@/kit/schema/types";
 import { useBinding } from "@/kit/schema/binding";
 import { useDispatchAction } from "@/kit/schema/actions";
@@ -1518,30 +1518,12 @@ function MediaShelfBody({ node, state }: { node: MediaShelfNode; state: Row }) {
                   return typeof value === "string" || typeof value === "number" ? value : null;
                 }
               : undefined}
+            hasMenu={(row) => !pinnedRow && (node.row_actions ?? []).some((button) => (!button.show_when_field || Boolean(readField(row, button.show_when_field))) && (!button.hide_when_field || !readField(row, button.hide_when_field)))}
             renderActions={node.row_actions?.length && !pinnedRow
-              ? (row) => node.row_actions!.map((button, i) => {
-                  if (button.show_when_field && !readField(row, button.show_when_field)) return null;
-                  if (button.hide_when_field && readField(row, button.hide_when_field)) return null;
-                  const Icon = getIcon(button.icon);
-                  const fieldLabel = button.label_field ? readField(row, button.label_field) : undefined;
-                  const label = typeof fieldLabel === "string" && fieldLabel !== "" ? fieldLabel : fillTemplate(button.label, row);
-                  const iconOnly = button.icon === "play";
-                  return (
-                    <Button
-                      key={i}
-                      type="button"
-                      data-slot="row-action"
-                      title={label}
-                      variant={iconOnly ? "inverse" : "outline"}
-                      size={iconOnly ? "icon" : "default"}
-                      className={iconOnly ? "size-[48px] rounded-full" : "h-auto min-h-[48px] rounded-full whitespace-normal"}
-                      aria-label={`${label}: ${String(readField(row, node.item_label_field))}`}
-                      onClick={() => dispatch(button.action, [row])}
-                    >
-                      <Icon aria-hidden="true" />{iconOnly ? null : <span data-slot="row-action-label">{label}</span>}
-                    </Button>
-                  );
-                })
+              ? (row) => renderShelfRowActions(row, node, dispatch)
+              : undefined}
+            renderMenu={node.row_actions?.length && !pinnedRow && node.orientation !== "vertical"
+              ? (row) => renderShelfRowMenu(row, node, dispatch)
               : undefined}
             hideWhenEmpty={node.hide_when_empty}
             seeAll={node.see_all ? { label: node.see_all.label, onSelect: () => dispatch(node.see_all!.action) } : undefined}
@@ -1602,6 +1584,46 @@ function MediaShelfBody({ node, state }: { node: MediaShelfNode; state: Row }) {
       }}
     </AsyncState>
   );
+}
+
+function visibleShelfActions(row: Row, node: MediaShelfNode) {
+  return (node.row_actions ?? []).flatMap((button, index) => {
+    if (button.show_when_field && !readField(row, button.show_when_field)) return [];
+    if (button.hide_when_field && readField(row, button.hide_when_field)) return [];
+    const fieldLabel = button.label_field ? readField(row, button.label_field) : undefined;
+    return [{ button, index, label: typeof fieldLabel === "string" && fieldLabel !== "" ? fieldLabel : fillTemplate(button.label, row) }];
+  });
+}
+
+function shelfActionGroups(actions: ReturnType<typeof visibleShelfActions>) {
+  const groups = new Map<string, typeof actions>();
+  const entries: Array<{ group?: string; action?: (typeof actions)[number] }> = [];
+  for (const item of actions) {
+    if (!item.button.group) { entries.push({ action: item }); continue; }
+    let group = groups.get(item.button.group);
+    if (!group) { group = []; groups.set(item.button.group, group); entries.push({ group: item.button.group }); }
+    group.push(item);
+  }
+  return entries.map((entry) => entry.group ? { group: entry.group, actions: groups.get(entry.group)! } : { actions: [entry.action!] });
+}
+
+function renderShelfRowActions(row: Row, node: MediaShelfNode, dispatch: ReturnType<typeof useDispatchAction>["dispatch"]) {
+  return shelfActionGroups(visibleShelfActions(row, node)).map((entry, groupIndex) => {
+    if (entry.group) return <DropdownMenu key={`group-${groupIndex}`}>
+      <DropdownMenuTrigger asChild><Button type="button" data-slot="row-action-group" variant="outline" className="h-auto min-h-[48px] rounded-full whitespace-normal">{entry.group}</Button></DropdownMenuTrigger>
+      <DropdownMenuContent>{entry.actions.map(({ button, index, label }) => { const Icon = getIcon(button.icon); return <DropdownMenuItem key={index} onSelect={() => dispatch(button.action, [row])}><Icon aria-hidden="true" />{label}</DropdownMenuItem>; })}</DropdownMenuContent>
+    </DropdownMenu>;
+    const { button, index, label } = entry.actions[0]!;
+    const Icon = getIcon(button.icon);
+    const iconOnly = button.icon === "play";
+    return <Button key={index} type="button" data-slot="row-action" title={label} variant={iconOnly ? "inverse" : "outline"} size={iconOnly ? "icon" : "default"} className={iconOnly ? "size-[48px] rounded-full" : "h-auto min-h-[48px] rounded-full whitespace-normal"} aria-label={`${label}: ${String(readField(row, node.item_label_field))}`} onClick={() => dispatch(button.action, [row])}><Icon aria-hidden="true" />{iconOnly ? null : <span data-slot="row-action-label">{label}</span>}</Button>;
+  });
+}
+
+function renderShelfRowMenu(row: Row, node: MediaShelfNode, dispatch: ReturnType<typeof useDispatchAction>["dispatch"]) {
+  return shelfActionGroups(visibleShelfActions(row, node)).map((entry, groupIndex) => entry.group
+    ? <DropdownMenuSub key={`group-${groupIndex}`}><DropdownMenuSubTrigger>{entry.group}</DropdownMenuSubTrigger><DropdownMenuSubContent>{entry.actions.map(({ button, index, label }) => { const Icon = getIcon(button.icon); return <DropdownMenuItem key={index} onSelect={() => dispatch(button.action, [row])}><Icon aria-hidden="true" />{label}</DropdownMenuItem>; })}</DropdownMenuSubContent></DropdownMenuSub>
+    : entry.actions.map(({ button, index, label }) => { const Icon = getIcon(button.icon); return <DropdownMenuItem key={index} onSelect={() => dispatch(button.action, [row])}><Icon aria-hidden="true" />{label}</DropdownMenuItem>; }));
 }
 
 /** MUSIC-KIT-01: the loading, error and empty states the four music blocks share; `children` gets the rows. */

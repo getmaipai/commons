@@ -238,13 +238,12 @@ describe("the News pages (NEWS-00)", () => {
     expect(run("page")).not.toContain("surface");
     expect(run("dark")).toContain('page: surface "dark" is not "page" or "studio"');
   });
-  test("VIDEO-KIT-01: a media_shelf with row_actions must be vertical, or the package is refused with a plain message", () => {
+  test("media_shelf with row_actions is accepted on horizontal shelves", () => {
     const page = (node: unknown) => ({ type: "page", id: "x", title: "X", body: [node] });
     const run = (node: unknown) => checkAppPackage("news", newsContributes, (m) => (m === "today" ? page(node) : news(m)), "child").join("\n");
-    const shelf = { type: "media_shelf", bind: { source: "package", path: "today" }, item_key_field: "id", item_label_field: "t", item_media_field: "poster", row_actions: [{ icon: "refresh-cw", label: "Again", action: { call: { target: "/api/plugins/news/again" } } }] };
-    expect(run({ ...shelf, orientation: "vertical" })).not.toContain("row_actions are drawn only");
-    for (const orientation of [undefined, "horizontal"]) expect(run({ ...shelf, orientation })).toContain('row_actions are drawn only when orientation is "vertical"');
-    expect(run({ ...shelf, row_actions: undefined })).not.toContain("row_actions are drawn only");
+    const shelf = { type: "media_shelf", bind: { source: "package", path: "topics" }, item_key_field: "id", item_label_field: "t", item_media_field: "poster", row_actions: [{ icon: "refresh-cw", label: "Again", action: { call: { target: "/api/plugins/news/again" } } }] };
+    expect(run({ ...shelf, orientation: "vertical" })).toBe("");
+    for (const orientation of [undefined, "horizontal"]) expect(run({ ...shelf, orientation })).toBe("");
   });
   test("VIDEO-UI-14: a looping media_shelf names the field of its clip, and that field is a path", () => {
     const page = (node: unknown) => ({ type: "page", id: "x", title: "X", body: [node] });

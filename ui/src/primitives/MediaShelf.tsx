@@ -17,6 +17,8 @@ import { play, rewind, useMatches } from "@/kit/elements/option-cards";
 import { LIKE_POP_CLASS, likeHaptic, useLikePop } from "@/kit/primitives/likeFeedback";
 import { useReorder, type ReorderConfig } from "@/kit/primitives/reorder";
 import { i18n } from "@/kit/i18n"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/kit/ui/dropdown-menu";
+import { HIT_FLOOR } from "@/kit/utils";
 
 /** The aspect ratios the kit will draw a media tile at. A closed set,
  * not a free string: docs/UI.md requires images and video to be fluid
@@ -87,6 +89,10 @@ interface MediaShelfProps<T> {
   renderIndex?: (item: T) => ReactNode;
   /** Row controls outside the artwork button. Schema shelves offer up to two. */
   renderActions?: (item: T) => ReactNode;
+  /** Actions for rail and grid tiles, opened from a corner overflow menu. */
+  renderMenu?: (item: T) => ReactNode;
+  /** Whether the item has any visible menu actions. */
+  hasMenu?: (item: T) => boolean;
   /** MEDIA-POLISH-01: with no items, draw nothing at all (no heading, no
    * empty state): a row with nothing in it is simply absent. */
   hideWhenEmpty?: boolean;
@@ -185,6 +191,8 @@ export function MediaShelf<T>({
   isHighlighted,
   renderIndex,
   renderActions,
+  renderMenu,
+  hasMenu,
   hideWhenEmpty = false,
   seeAll,
   cardRadius = "default",
@@ -376,7 +384,7 @@ export function MediaShelf<T>({
           key={getKey(item)}
           aria-current={isHighlighted?.(item) ? "true" : undefined}
           {...reorder.itemProps(items.indexOf(item))}
-          className={cn(reorder.itemProps(items.indexOf(item)).className, inserted.has(getKey(item)) && "motion-list", "flex flex-col gap-2", circle && "items-center text-center", layout === "grid" ? "min-w-0" : ["shrink-0 snap-start", proTiles ? "w-[156px] md:w-[176px]" : circle ? "w-[var(--media-artist-size)]" : variant === "plain" ? (density === "compact" ? PLAIN_ITEM_WIDTH_COMPACT : PLAIN_ITEM_WIDTH) : SHELF_ITEM_WIDTH[density]])}
+          className={cn(reorder.itemProps(items.indexOf(item)).className, inserted.has(getKey(item)) && "motion-list", "group/tiles relative flex flex-col gap-2", circle && "items-center text-center", layout === "grid" ? "min-w-0" : ["shrink-0 snap-start", proTiles ? "w-[156px] md:w-[176px]" : circle ? "w-[var(--media-artist-size)]" : variant === "plain" ? (density === "compact" ? PLAIN_ITEM_WIDTH_COMPACT : PLAIN_ITEM_WIDTH) : SHELF_ITEM_WIDTH[density]])}
         >
           <TileFrame
             onPlay={onPlay ? () => onPlay(item) : undefined}
@@ -418,6 +426,16 @@ export function MediaShelf<T>({
             </div>
           </Card>
           </TileFrame>
+          {renderMenu && (hasMenu?.(item) ?? true) && Children.count(renderMenu(item)) > 0 ? <div data-slot="media-shelf-tile-menu" className="absolute right-2 top-2 z-10">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button type="button" aria-label={i18n._({ id: "ui.More actions for {name}", message: "More actions for {name}", values: { name: getLabel?.(item) ?? i18n._({ id: "ui.item", message: "item" }) } })} data-slot="media-shelf-tile-menu-trigger" className={cn("flex size-8 items-center justify-center rounded-full border border-border/40 bg-[var(--surface-glass)] text-foreground shadow-lg backdrop-blur-[var(--glass-blur)] transition-opacity", HIT_FLOOR, FOCUS_RING, "opacity-100 pointer-coarse:opacity-100 pointer-fine:group-hover/tiles:opacity-100 pointer-fine:focus-visible:opacity-100")} onClick={(event) => event.stopPropagation()}>
+                  <span aria-hidden="true" className="text-xl leading-none">⋮</span>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">{renderMenu(item)}</DropdownMenuContent>
+            </DropdownMenu>
+          </div> : null}
           {renderCaption ? (
             // Outside the Card, not inside it: a caption is flow
             // content, which is invalid inside a button, and a caption

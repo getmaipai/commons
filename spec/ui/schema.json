@@ -526,7 +526,7 @@
         "row_actions": {
           "type": "array",
           "maxItems": 3,
-          "description": "Vertical row controls outside the artwork button, drawn ONLY in `orientation: \"vertical\"`: a rail or grid tile has no place for them, so on any other shelf they are not drawn at all (do not set them there). Play is icon-only; other actions are labelled pills that wrap. Labels may contain {field} placeholders; a nonempty label_field value overrides the label. Each action receives its row, just like on_select.",
+          "description": "Vertical rows draw row_actions as labelled pills. Rail and grid tiles open them from a \"⋮\" menu with words beside each icon. Actions sharing `group` appear under one submenu named by the group; ungrouped actions stay at the top level. Play is a normal menu item. Labels may contain {field} placeholders; a nonempty label_field value overrides the label. Each action receives its row, just like on_select.",
           "items": {
             "type": "object",
             "additionalProperties": false,
@@ -537,6 +537,7 @@
               "label_field": { "type": "string", "minLength": 1 },
               "show_when_field": { "type": "string", "minLength": 1, "description": "Draw this button only when this row field is truthy." },
               "hide_when_field": { "type": "string", "minLength": 1, "description": "Draw this button only when this row field is falsy." },
+              "group": { "type": "string", "maxLength": 40, "description": "Place this action under a submenu with actions sharing the same group value." },
               "action": { "$ref": "#/$defs/action" }
             }
           }

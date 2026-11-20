@@ -259,6 +259,7 @@ export const MediaShelfNodeSchema = z.object({
     /** Draw this button only when that row field is truthy (`show_when_field`) or falsy (`hide_when_field`). */
     show_when_field: z.string().min(1).optional(),
     hide_when_field: z.string().min(1).optional(),
+    group: z.string().max(40).optional(),
     action: ActionSchema,
   }).strict()).max(3).optional(),
   // PARITY-01: a sort control, filter chips and a pinned row.
