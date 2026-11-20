@@ -116,6 +116,7 @@ msgstr "{creatorName}, open profile"
 #: src/elements/question-flow.tsx:49
 #: src/elements/track-studio.tsx:807
 #: src/elements/track-studio.tsx:861
+#: src/elements/video-player.tsx:551
 msgid "ui.{current} of {total}"
 msgstr "{current} of {total}"
 
@@ -130,13 +131,13 @@ msgid "ui.{days}d"
 msgstr "{days}d"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:153
+#: src/elements/job-progress.tsx:154
 msgid "ui.{done} of {total, plural, one {# shot} other {# shots}} done"
 msgstr "{done} of {total, plural, one {# shot} other {# shots}} done"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:360
-#: src/elements/job-progress.tsx:428
+#: src/elements/job-progress.tsx:361
+#: src/elements/job-progress.tsx:429
 msgid "ui.{done} of {total}"
 msgstr "{done} of {total}"
 
@@ -176,8 +177,8 @@ msgid "ui.{label} ({duration}s)"
 msgstr "{label} ({duration}s)"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:128
-#: src/elements/job-progress.tsx:427
+#: src/elements/job-progress.tsx:129
+#: src/elements/job-progress.tsx:428
 msgid "ui.{label} progress"
 msgstr "{label} progress"
 
@@ -403,7 +404,7 @@ msgid "ui.{seconds} seconds remaining"
 msgstr "{seconds} seconds remaining"
 
 #. js-lingui-explicit-id
-#: src/elements/storyboard-player.tsx:70
+#: src/elements/storyboard-player.tsx:71
 msgid "ui.{seconds}s"
 msgstr "{seconds}s"
 
@@ -424,8 +425,13 @@ msgid "ui.{summary} Takes {eta}."
 msgstr "{summary} Takes {eta}."
 
 #. js-lingui-explicit-id
+#: src/elements/clip-compare.tsx:67
+msgid "ui.{time} of {total}"
+msgstr "{time} of {total}"
+
+#. js-lingui-explicit-id
 #: src/elements/activity-popover.tsx:59
-#: src/elements/job-progress.tsx:377
+#: src/elements/job-progress.tsx:378
 msgid "ui.{title} progress"
 msgstr "{title} progress"
 
@@ -479,7 +485,7 @@ msgstr "{used} of {limit} used"
 
 #. js-lingui-explicit-id
 #: src/elements/music-track.tsx:36
-#: src/elements/video-player.tsx:463
+#: src/elements/video-player.tsx:562
 msgid "ui.{value} percent"
 msgstr "{value} percent"
 
@@ -489,7 +495,7 @@ msgid "ui.{value} percent, {elapsed} so far"
 msgstr "{value} percent, {elapsed} so far"
 
 #. js-lingui-explicit-id
-#: src/elements/video-player.tsx:463
+#: src/elements/video-player.tsx:562
 msgid "ui.{value} percent, {time} so far"
 msgstr "{value} percent, {time} so far"
 
@@ -589,12 +595,12 @@ msgid "ui.A short note about what this project is for. It is for people only; th
 msgstr "A short note about what this project is for. It is for people only; the assistant does not read it."
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:88
+#: src/elements/job-progress.tsx:89
 msgid "ui.About {count, plural, one {# hour} other {# hours}} left"
 msgstr "About {count, plural, one {# hour} other {# hours}} left"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:88
+#: src/elements/job-progress.tsx:89
 msgid "ui.About {count, plural, one {# minute} other {# minutes}} left"
 msgstr "About {count, plural, one {# minute} other {# minutes}} left"
 
@@ -631,7 +637,7 @@ msgid "ui.Actions"
 msgstr "Actions"
 
 #. js-lingui-explicit-id
-#: src/elements/ProposalCardShowcase.tsx:66
+#: src/elements/ProposalCardShowcase.tsx:69
 msgid "ui.Actions busy and disabled"
 msgstr "Actions busy and disabled"
 
@@ -766,6 +772,7 @@ msgid "ui.Advanced"
 msgstr "Advanced"
 
 #. js-lingui-explicit-id
+#: src/elements/clip-compare.tsx:54
 #: src/elements/image-editor-compare.tsx:69
 #: src/elements/track-studio-compare-bar.tsx:55
 msgid "ui.After"
@@ -871,7 +878,7 @@ msgid "ui.Always deny"
 msgstr "Always deny"
 
 #. js-lingui-explicit-id
-#: src/elements/video-player.tsx:107
+#: src/elements/video-player.tsx:121
 msgid "ui.Another still"
 msgstr "Another still"
 
@@ -1088,12 +1095,14 @@ msgid "ui.Batch actions"
 msgstr "Batch actions"
 
 #. js-lingui-explicit-id
+#: src/elements/clip-compare.tsx:53
 #: src/elements/image-editor-compare.tsx:68
 #: src/elements/track-studio-compare-bar.tsx:54
 msgid "ui.Before"
 msgstr "Before"
 
 #. js-lingui-explicit-id
+#: src/elements/clip-compare.tsx:58
 #: src/elements/image-editor-compare.tsx:73
 msgid "ui.Before and after divider"
 msgstr "Before and after divider"
@@ -1203,14 +1212,14 @@ msgstr "Can view"
 #: src/elements/feedback-dialog.tsx:174
 #: src/elements/image-editor.tsx:1704
 #: src/elements/image-editor.tsx:1792
-#: src/elements/job-progress.tsx:296
+#: src/elements/job-progress.tsx:297
 #: src/elements/music-edit.tsx:62
 #: src/elements/project-home-page.tsx:29
 #: src/elements/project-settings.tsx:72
 #: src/elements/thread-list.aui.tsx:182
 #: src/elements/thread.aui.tsx:1657
 #: src/elements/tier-segment.tsx:52
-#: src/elements/video-player.tsx:109
+#: src/elements/video-player.tsx:123
 #: src/primitives/Player.tsx:187
 #: src/schema/ConfirmDialog.tsx:83
 #: src/schema/NodeRenderer.tsx:2194
@@ -1223,12 +1232,12 @@ msgid "ui.Cancel"
 msgstr "Cancel"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:171
+#: src/elements/job-progress.tsx:172
 msgid "ui.Cancel the job"
 msgstr "Cancel the job"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:286
+#: src/elements/job-progress.tsx:287
 msgid "ui.cancelled"
 msgstr "cancelled"
 
@@ -1295,7 +1304,7 @@ msgid "ui.Changed as described"
 msgstr "Changed as described"
 
 #. js-lingui-explicit-id
-#: src/elements/storyboard-player.tsx:65
+#: src/elements/storyboard-player.tsx:66
 msgid "ui.Changing this shot"
 msgstr "Changing this shot"
 
@@ -1371,10 +1380,16 @@ msgstr "Circle open"
 #: src/elements/image-editor.tsx:1224
 #: src/elements/image-editor.tsx:1254
 #: src/elements/image-editor.tsx:1306
+#: src/elements/video-player.tsx:554
 #: src/schema/NodeRenderer.tsx:731
 #: src/settings/LocationField.tsx:252
 msgid "ui.Clear"
 msgstr "Clear"
+
+#. js-lingui-explicit-id
+#: src/elements/video-player.tsx:129
+msgid "ui.Clear retake point"
+msgstr "Clear retake point"
 
 #. js-lingui-explicit-id
 #: src/primitives/AppDirectory.tsx:191
@@ -1405,6 +1420,11 @@ msgstr "Click to zoom image"
 #: src/elements/clip-feed.tsx:326
 msgid "ui.Clip {n} of {total}"
 msgstr "Clip {n} of {total}"
+
+#. js-lingui-explicit-id
+#: src/elements/clip-compare.tsx:63
+msgid "ui.Clip position"
+msgstr "Clip position"
 
 #. js-lingui-explicit-id
 #: src/elements/clip-feed.tsx:305
@@ -1529,6 +1549,11 @@ msgstr "Comment on"
 #: src/elements/track-studio.tsx:573
 msgid "ui.Compare"
 msgstr "Compare"
+
+#. js-lingui-explicit-id
+#: src/elements/clip-compare.tsx:55
+msgid "ui.Compare view"
+msgstr "Compare view"
 
 #. js-lingui-explicit-id
 #: src/elements/image-editor.tsx:2017
@@ -1994,7 +2019,7 @@ msgstr "Description"
 #. js-lingui-explicit-id
 #: src/elements/media-viewer.tsx:117
 #: src/elements/result-feed.tsx:237
-#: src/elements/video-player.tsx:420
+#: src/elements/video-player.tsx:505
 msgid "ui.Details"
 msgstr "Details"
 
@@ -2014,7 +2039,7 @@ msgid "ui.diagram could not be rendered"
 msgstr "diagram could not be rendered"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:99
+#: src/elements/job-progress.tsx:100
 msgid "ui.Did not finish"
 msgstr "Did not finish"
 
@@ -2097,8 +2122,8 @@ msgid "ui.Document"
 msgstr "Document"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:82
-#: src/elements/job-progress.tsx:170
+#: src/elements/job-progress.tsx:83
+#: src/elements/job-progress.tsx:171
 #: src/elements/robot-face.tsx:35
 #: src/elements/todo-list.tsx:23
 msgid "ui.done"
@@ -2123,7 +2148,7 @@ msgstr "down"
 #: src/elements/image-editor.tsx:1091
 #: src/elements/image-editor.tsx:1097
 #: src/elements/music-track.tsx:35
-#: src/elements/video-player.tsx:100
+#: src/elements/video-player.tsx:114
 msgid "ui.Download"
 msgstr "Download"
 
@@ -2133,7 +2158,7 @@ msgid "ui.Download {name}"
 msgstr "Download {name}"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:422
+#: src/elements/job-progress.tsx:423
 msgid "ui.Download file progress"
 msgstr "Download file progress"
 
@@ -2143,7 +2168,7 @@ msgid "ui.Download image"
 msgstr "Download image"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:372
+#: src/elements/job-progress.tsx:373
 msgid "ui.Download paused after the connection stalled."
 msgstr "Download paused after the connection stalled."
 
@@ -2255,7 +2280,7 @@ msgid "ui.Edit this project's name, icon, instructions and memory."
 msgstr "Edit this project's name, icon, instructions and memory."
 
 #. js-lingui-explicit-id
-#: src/elements/video-player.tsx:108
+#: src/elements/video-player.tsx:122
 msgid "ui.Edit words"
 msgstr "Edit words"
 
@@ -2344,7 +2369,7 @@ msgid "ui.Erase"
 msgstr "Erase"
 
 #. js-lingui-explicit-id
-#: src/elements/ProposalCardShowcase.tsx:71
+#: src/elements/ProposalCardShowcase.tsx:74
 #: src/elements/VoiceLineRowShowcase.tsx:38
 msgid "ui.Error"
 msgstr "Error"
@@ -2421,8 +2446,8 @@ msgid "ui.Fades"
 msgstr "Fades"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:81
-#: src/elements/job-progress.tsx:286
+#: src/elements/job-progress.tsx:82
+#: src/elements/job-progress.tsx:287
 #: src/elements/schedule-card.tsx:106
 #: src/elements/todo-list.tsx:24
 #: src/elements/trace-waterfall.tsx:31
@@ -2440,7 +2465,7 @@ msgid "ui.Family"
 msgstr "Family"
 
 #. js-lingui-explicit-id
-#: src/elements/video-player.tsx:110
+#: src/elements/video-player.tsx:124
 msgid "ui.Favorite"
 msgstr "Favorite"
 
@@ -2496,7 +2521,7 @@ msgid "ui.File"
 msgstr "File"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:418
+#: src/elements/job-progress.tsx:419
 msgid "ui.File details"
 msgstr "File details"
 
@@ -2708,7 +2733,7 @@ msgid "ui.Guessed by MaiPai"
 msgstr "Guessed by MaiPai"
 
 #. js-lingui-explicit-id
-#: src/elements/ProposalCardShowcase.tsx:51
+#: src/elements/ProposalCardShowcase.tsx:54
 msgid "ui.Guessed, with a changed label"
 msgstr "Guessed, with a changed label"
 
@@ -2875,7 +2900,7 @@ msgid "ui.I couldn't make that song."
 msgstr "I couldn't make that song."
 
 #. js-lingui-explicit-id
-#: src/elements/video-player.tsx:105
+#: src/elements/video-player.tsx:119
 msgid "ui.I couldn't make that video."
 msgstr "I couldn't make that video."
 
@@ -3273,7 +3298,12 @@ msgid "ui.Loading settings"
 msgstr "Loading settings"
 
 #. js-lingui-explicit-id
-#: src/elements/storyboard-player.tsx:66
+#: src/elements/clip-compare.tsx:64
+msgid "ui.Loading the clips"
+msgstr "Loading the clips"
+
+#. js-lingui-explicit-id
+#: src/elements/storyboard-player.tsx:67
 msgid "ui.Loading the storyboard"
 msgstr "Loading the storyboard"
 
@@ -3420,7 +3450,7 @@ msgstr "make album"
 #. js-lingui-explicit-id
 #: src/elements/clip-feed.tsx:44
 #: src/elements/music-track.tsx:35
-#: src/elements/video-player.tsx:102
+#: src/elements/video-player.tsx:116
 msgid "ui.Make another"
 msgstr "Make another"
 
@@ -3447,7 +3477,7 @@ msgid "ui.make song"
 msgstr "make song"
 
 #. js-lingui-explicit-id
-#: src/elements/video-player.tsx:106
+#: src/elements/video-player.tsx:120
 msgid "ui.Make the video from this"
 msgstr "Make the video from this"
 
@@ -3474,12 +3504,12 @@ msgstr "Making the music"
 
 #. js-lingui-explicit-id
 #: src/elements/proposal-card.tsx:72
-#: src/elements/ProposalCardShowcase.tsx:56
+#: src/elements/ProposalCardShowcase.tsx:59
 msgid "ui.Making the pictures"
 msgstr "Making the pictures"
 
 #. js-lingui-explicit-id
-#: src/elements/video-player.tsx:98
+#: src/elements/video-player.tsx:112
 msgid "ui.Making your video"
 msgstr "Making your video"
 
@@ -3592,7 +3622,7 @@ msgstr "Moon Phase"
 #: src/elements/creation-header.tsx:117
 #: src/elements/image-editor.tsx:299
 #: src/elements/thread.aui.tsx:1454
-#: src/elements/video-player.tsx:111
+#: src/elements/video-player.tsx:125
 #: src/PhoneNav.tsx:130
 #: src/PhoneNav.tsx:137
 #: src/PhoneNav.tsx:145
@@ -3690,6 +3720,7 @@ msgid "ui.Music"
 msgstr "Music"
 
 #. js-lingui-explicit-id
+#: src/elements/clip-compare.tsx:61
 #: src/elements/clip-feed.tsx:39
 #: src/primitives/Player.tsx:173
 msgid "ui.Mute"
@@ -3927,7 +3958,7 @@ msgid "ui.No other screens are on"
 msgstr "No other screens are on"
 
 #. js-lingui-explicit-id
-#: src/elements/storyboard-player.tsx:64
+#: src/elements/storyboard-player.tsx:65
 msgid "ui.No picture yet"
 msgstr "No picture yet"
 
@@ -3967,7 +3998,7 @@ msgid "ui.No settings yet."
 msgstr "No settings yet."
 
 #. js-lingui-explicit-id
-#: src/elements/storyboard-player.tsx:67
+#: src/elements/storyboard-player.tsx:68
 msgid "ui.No shots yet. Add a shot to start your storyboard."
 msgstr "No shots yet. Add a shot to start your storyboard."
 
@@ -4242,6 +4273,11 @@ msgid "ui.One of the files could not be played. The rest still can."
 msgstr "One of the files could not be played. The rest still can."
 
 #. js-lingui-explicit-id
+#: src/elements/clip-compare.tsx:65
+msgid "ui.One of the two clips did not load. Reload this page or open the clip from the Library."
+msgstr "One of the two clips did not load. Reload this page or open the clip from the Library."
+
+#. js-lingui-explicit-id
 #: src/elements/VoiceLineRowShowcase.tsx:32
 msgid "ui.One reading, no picture"
 msgstr "One reading, no picture"
@@ -4453,7 +4489,7 @@ msgid "ui.Panel"
 msgstr "Panel"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:286
+#: src/elements/job-progress.tsx:287
 msgid "ui.partial"
 msgstr "partial"
 
@@ -4473,10 +4509,11 @@ msgid "ui.Paste the new value"
 msgstr "Paste the new value"
 
 #. js-lingui-explicit-id
+#: src/elements/clip-compare.tsx:60
 #: src/elements/clip-feed.tsx:42
-#: src/elements/job-progress.tsx:296
+#: src/elements/job-progress.tsx:297
 #: src/elements/music-track.tsx:35
-#: src/elements/storyboard-player.tsx:61
+#: src/elements/storyboard-player.tsx:62
 #: src/elements/track-studio-compare-bar.tsx:62
 #: src/elements/track-studio-compare-bar.tsx:62
 #: src/elements/track-studio.tsx:554
@@ -4493,7 +4530,7 @@ msgid "ui.Pause {name}"
 msgstr "Pause {name}"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:78
+#: src/elements/job-progress.tsx:79
 #: src/elements/schedule-card.tsx:89
 msgid "ui.paused"
 msgstr "paused"
@@ -4604,7 +4641,7 @@ msgid "ui.Picture editing tools"
 msgstr "Picture editing tools"
 
 #. js-lingui-explicit-id
-#: src/elements/storyboard-player.tsx:71
+#: src/elements/storyboard-player.tsx:72
 msgid "ui.Picture for: {caption}"
 msgstr "Picture for: {caption}"
 
@@ -4677,7 +4714,7 @@ msgstr "Pixels"
 
 #. js-lingui-explicit-id
 #: src/elements/music-track.tsx:36
-#: src/elements/video-player.tsx:404
+#: src/elements/video-player.tsx:489
 msgid "ui.Place in line: {position}"
 msgstr "Place in line: {position}"
 
@@ -4697,14 +4734,15 @@ msgid "ui.Planning"
 msgstr "Planning"
 
 #. js-lingui-explicit-id
+#: src/elements/clip-compare.tsx:59
 #: src/elements/clip-feed.tsx:41
 #: src/elements/music-track.tsx:35
-#: src/elements/storyboard-player.tsx:60
+#: src/elements/storyboard-player.tsx:61
 #: src/elements/track-studio-compare-bar.tsx:62
 #: src/elements/track-studio-compare-bar.tsx:62
 #: src/elements/track-studio.tsx:554
 #: src/elements/track-studio.tsx:554
-#: src/elements/video-player.tsx:112
+#: src/elements/video-player.tsx:126
 #: src/primitives/MediaShelf.tsx:222
 #: src/primitives/Player.tsx:164
 #: src/schema/ClipFeedNodeView.tsx:26
@@ -4944,12 +4982,12 @@ msgid "ui.Quality"
 msgstr "Quality"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:76
+#: src/elements/job-progress.tsx:77
 msgid "ui.queued"
 msgstr "queued"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:95
+#: src/elements/job-progress.tsx:96
 #: src/elements/music-track.tsx:38
 msgid "ui.Queued"
 msgstr "Queued"
@@ -5009,12 +5047,12 @@ msgstr "Reading settings"
 
 #. js-lingui-explicit-id
 #: src/elements/companion-preview.tsx:45
-#: src/elements/job-progress.tsx:97
+#: src/elements/job-progress.tsx:98
 msgid "ui.Ready"
 msgstr "Ready"
 
 #. js-lingui-explicit-id
-#: src/elements/ProposalCardShowcase.tsx:46
+#: src/elements/ProposalCardShowcase.tsx:49
 msgid "ui.Ready, with an editable description"
 msgstr "Ready, with an editable description"
 
@@ -5381,8 +5419,8 @@ msgid "ui.Results"
 msgstr "Results"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:296
-#: src/elements/job-progress.tsx:367
+#: src/elements/job-progress.tsx:297
+#: src/elements/job-progress.tsx:368
 msgid "ui.Resume"
 msgstr "Resume"
 
@@ -5397,10 +5435,20 @@ msgid "ui.Resuming from {time}"
 msgstr "Resuming from {time}"
 
 #. js-lingui-explicit-id
+#: src/elements/video-player.tsx:377
+msgid "ui.Retake from {time}"
+msgstr "Retake from {time}"
+
+#. js-lingui-explicit-id
+#: src/elements/video-player.tsx:552
+msgid "ui.Retake point {time}"
+msgstr "Retake point {time}"
+
+#. js-lingui-explicit-id
 #: src/elements/activity-popover.tsx:65
 #: src/elements/error-state.tsx:40
-#: src/elements/job-progress.tsx:296
-#: src/elements/job-progress.tsx:370
+#: src/elements/job-progress.tsx:297
+#: src/elements/job-progress.tsx:371
 #: src/elements/thread.aui.tsx:1597
 msgid "ui.Retry"
 msgstr "Retry"
@@ -5431,7 +5479,7 @@ msgid "ui.Rotate right"
 msgstr "Rotate right"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:77
+#: src/elements/job-progress.tsx:78
 #: src/elements/message-queue.tsx:43
 #: src/elements/trace-waterfall.tsx:29
 msgid "ui.running"
@@ -5531,7 +5579,7 @@ msgstr "Saved."
 
 #. js-lingui-explicit-id
 #: src/elements/proposal-card.tsx:73
-#: src/elements/ProposalCardShowcase.tsx:61
+#: src/elements/ProposalCardShowcase.tsx:64
 msgid "ui.Saving"
 msgstr "Saving"
 
@@ -5683,6 +5731,7 @@ msgstr "See all projects"
 
 #. js-lingui-explicit-id
 #: src/elements/clip-feed.tsx:45
+#: src/elements/video-player.tsx:130
 msgid "ui.Seek"
 msgstr "Seek"
 
@@ -5876,7 +5925,7 @@ msgstr "seven"
 #: src/elements/image-editor.tsx:1134
 #: src/elements/music-track.tsx:35
 #: src/elements/share-dialog.tsx:125
-#: src/elements/video-player.tsx:101
+#: src/elements/video-player.tsx:115
 #: src/primitives/ArticleView.tsx:460
 #: src/primitives/ArticleView.tsx:472
 #: src/primitives/Player.tsx:196
@@ -5904,18 +5953,18 @@ msgid "ui.Shared, view sharing"
 msgstr "Shared, view sharing"
 
 #. js-lingui-explicit-id
-#: src/elements/storyboard-player.tsx:68
+#: src/elements/storyboard-player.tsx:69
 msgid "ui.Shot {shot} of {count}, {time}"
 msgstr "Shot {shot} of {count}, {time}"
 
 #. js-lingui-explicit-id
-#: src/elements/storyboard-player.tsx:69
+#: src/elements/storyboard-player.tsx:70
 msgid "ui.Shot {shot}: {caption}, {seconds} seconds"
 msgstr "Shot {shot}: {caption}, {seconds} seconds"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:156
-#: src/elements/storyboard-player.tsx:62
+#: src/elements/job-progress.tsx:157
+#: src/elements/storyboard-player.tsx:63
 msgid "ui.Shots"
 msgstr "Shots"
 
@@ -5994,6 +6043,11 @@ msgid "ui.Show the character"
 msgstr "Show the character"
 
 #. js-lingui-explicit-id
+#: src/elements/clip-compare.tsx:66
+msgid "ui.Showing {percent}% of the before"
+msgstr "Showing {percent}% of the before"
+
+#. js-lingui-explicit-id
 #: src/primitives/Player.tsx:175
 msgid "ui.Shrink the player"
 msgstr "Shrink the player"
@@ -6002,6 +6056,11 @@ msgstr "Shrink the player"
 #: src/primitives/Player.tsx:190
 msgid "ui.Shuffle"
 msgstr "Shuffle"
+
+#. js-lingui-explicit-id
+#: src/elements/clip-compare.tsx:56
+msgid "ui.Side by side"
+msgstr "Side by side"
 
 #. js-lingui-explicit-id
 #: src/dashboard/components/ui/sidebar.tsx:211
@@ -6172,7 +6231,7 @@ msgid "ui.Split at playhead"
 msgstr "Split at playhead"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:79
+#: src/elements/job-progress.tsx:80
 msgid "ui.stalled"
 msgstr "stalled"
 
@@ -6255,7 +6314,7 @@ msgstr "Step {step} of {total} · {label}"
 #: src/elements/activity-popover.tsx:64
 #: src/elements/image-generation.tsx:21
 #: src/elements/music-track.tsx:35
-#: src/elements/video-player.tsx:99
+#: src/elements/video-player.tsx:113
 msgid "ui.Stop"
 msgstr "Stop"
 
@@ -6296,7 +6355,7 @@ msgstr "Stop voice input"
 
 #. js-lingui-explicit-id
 #: src/elements/music-track.tsx:35
-#: src/elements/video-player.tsx:104
+#: src/elements/video-player.tsx:118
 msgid "ui.Stopped. Nothing was kept."
 msgstr "Stopped. Nothing was kept."
 
@@ -6321,7 +6380,7 @@ msgid "ui.Stories"
 msgstr "Stories"
 
 #. js-lingui-explicit-id
-#: src/elements/storyboard-player.tsx:63
+#: src/elements/storyboard-player.tsx:64
 msgid "ui.Storyboard position"
 msgstr "Storyboard position"
 
@@ -6755,7 +6814,7 @@ msgid "ui.Time is up"
 msgstr "Time is up"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:110
+#: src/elements/job-progress.tsx:111
 msgid "ui.Time left unknown"
 msgstr "Time left unknown"
 
@@ -6910,7 +6969,7 @@ msgstr "Trim start of {label}"
 #: src/elements/image-editor.tsx:1725
 #: src/elements/media-viewer.tsx:123
 #: src/elements/music-track.tsx:35
-#: src/elements/video-player.tsx:103
+#: src/elements/video-player.tsx:117
 #: src/primitives/AsyncState.tsx:83
 msgid "ui.Try again"
 msgstr "Try again"
@@ -7040,6 +7099,7 @@ msgid "ui.Unlocked"
 msgstr "Unlocked"
 
 #. js-lingui-explicit-id
+#: src/elements/clip-compare.tsx:62
 #: src/elements/clip-feed.tsx:40
 msgid "ui.Unmute"
 msgstr "Unmute"
@@ -7179,7 +7239,7 @@ msgid "ui.UV Index"
 msgstr "UV Index"
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:80
+#: src/elements/job-progress.tsx:81
 msgid "ui.verifying"
 msgstr "verifying"
 
@@ -7278,9 +7338,9 @@ msgid "ui.Wait for the current change to finish."
 msgstr "Wait for the current change to finish."
 
 #. js-lingui-explicit-id
-#: src/elements/job-progress.tsx:98
+#: src/elements/job-progress.tsx:99
 #: src/elements/music-track.tsx:35
-#: src/elements/video-player.tsx:97
+#: src/elements/video-player.tsx:111
 msgid "ui.Waiting its turn"
 msgstr "Waiting its turn"
 
@@ -7407,6 +7467,11 @@ msgid "ui.Wind direction"
 msgstr "Wind direction"
 
 #. js-lingui-explicit-id
+#: src/elements/clip-compare.tsx:57
+msgid "ui.Wipe"
+msgstr "Wipe"
+
+#. js-lingui-explicit-id
 #: src/elements/track-studio-model.ts:30
 msgid "ui.Wipe down"
 msgstr "Wipe down"
@@ -7434,7 +7499,7 @@ msgstr "working"
 #. js-lingui-explicit-id
 #: src/elements/activity-feed.tsx:33
 #: src/elements/companion-stage.tsx:96
-#: src/elements/job-progress.tsx:96
+#: src/elements/job-progress.tsx:97
 msgid "ui.Working"
 msgstr "Working"
 

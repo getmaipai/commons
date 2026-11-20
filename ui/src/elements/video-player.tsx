@@ -8,6 +8,7 @@ import {
   ImagePlusIcon,
   PencilLineIcon,
   RefreshCwIcon,
+  RotateCcwIcon,
   Share2Icon,
   SparklesIcon,
   SquareIcon,
@@ -28,6 +29,7 @@ import { LockTile } from "./adult-lock";
 import { PendingActions, type PendingAction } from "./pending-actions";
 import {
   ActionRow,
+  RetakeBar,
   VIDEO_PLAYER_ACTION_CAP,
   iconFor,
   type RowAction,
@@ -48,12 +50,16 @@ export { VIDEO_PLAYER_ACTION_CAP } from "./video-player-actions";
 export type VideoPlayerStatus = "draft" | "queued" | "generating" | "ready" | "failed" | "cancelled";
 
 /** The built-in controls, for `controls`. */
-export type VideoPlayerControlName = "stop" | "retry" | "makeAnother" | "render" | "anotherStill" | "editWords" | "favorite";
+export type VideoPlayerControlName = "stop" | "retry" | "makeAnother" | "render" | "anotherStill" | "editWords" | "favorite" | "retake";
 
 /** Per built-in control: `disabledReason` (one plain line; present means disabled) and `starts` (what it starts, for the host's marker). */
 export interface VideoPlayerControl {
   disabledReason?: string;
   starts?: VideoPlayerStarts;
+  /** `retake` only: one calm line beside the action ("Keeps the opening. About 8 minutes."). */
+  note?: string;
+  /** `retake` only: the action is running (spinner, disabled). */
+  busy?: boolean;
 }
 
 /** The width an entry may take. `default` is about 576 px, `lg` 768, `xl` 1024, `full` the whole column. */
@@ -91,6 +97,14 @@ export interface VideoPlayerCopy {
   favorite?: string;
   more?: string;
   play?: string;
+  /** The retake action's text; `{time}` becomes the clip's current time as m:ss. Default "Retake from {time}". */
+  retakeFrom?: string;
+  /** The line beside the scrub bar while a retake point is set; `{time}` becomes the point as m:ss. Default "Retake point {time}". */
+  retakePoint?: string;
+  /** The button that clears the retake point. */
+  clearRetake?: string;
+  /** Names the scrub bar under the clip. */
+  seek?: string;
 }
 
 const defaultCopy = (): Required<VideoPlayerCopy> => ({
@@ -110,6 +124,10 @@ const defaultCopy = (): Required<VideoPlayerCopy> => ({
   favorite: i18n._({ id: "ui.Favorite", message: "Favorite" }),
   more: i18n._({ id: "ui.More", message: "More" }),
   play: i18n._({ id: "ui.Play", message: "Play" }),
+  retakeFrom: "",
+  retakePoint: "",
+  clearRetake: i18n._({ id: "ui.Clear retake point", message: "Clear retake point" }),
+  seek: i18n._({ id: "ui.Seek", message: "Seek" }),
 });
 
 /** m:ss for a count of milliseconds. */
@@ -147,6 +165,11 @@ function download(url: string, name: string) {
  * onEditWords), `actionItems` (per-action `when`, `disabledReason`, `starts`), `actionsVariant="icons"`,
  * `actionsInline` with a More menu, a Favorite toggle, `notice` (visible in every status; `hint` stays live-only),
  * `controls` (`disabledReason` and `starts` for the built-ins), `size`, and optional WebVTT `tracks`.
+ *
+ * Additive (retake from a time): `onRetakeFrom(timeSec)` draws "Retake from 0:07" on a ready clip (the time follows the player; the person
+ * scrubs, then chooses). Choosing sets a marker on the scrub bar under the clip until it is cleared. `controls.retake` or an
+ * `actionItems` entry with `kind: "retake_from"` carries `disabledReason` (shown as text, not only a tooltip), `note` and `busy`. Ordinary
+ * `actionItems` take `note` (one calm line beside the action) and `busy` too (another take, extend, enhance).
  */
 /** The props of an unlocked player (the whole Element API). */
 export type VideoPlayerProps = Parameters<typeof VideoPlayerBody>[0];
@@ -186,6 +209,9 @@ function VideoPlayerBody({
   onRender,
   onAnotherStill,
   onEditWords,
+  onRetakeFrom,
+  retakeArmedAt,
+  durationSec,
   favorite = false,
   onFavorite,
   controls,
@@ -254,6 +280,12 @@ function VideoPlayerBody({
   onAnotherStill?: () => void;
   /** Draft: go back to the words. */
   onEditWords?: () => void;
+  /** Ready: retake the clip from a time. Called with the player's current time in seconds when the person chooses "Retake from here". */
+  onRetakeFrom?: (timeSec: number) => void;
+  /** Controlled marker: the retake point in seconds drawn on the scrub bar, or `null` for none. Absent: the player keeps the chosen time itself until it is cleared. */
+  retakeArmedAt?: number | null;
+  /** The clip's length in seconds, for the scrub bar before the file reports its own. */
+  durationSec?: number;
   /** Whether this clip is a favorite; drives the Favorite toggle's pressed state. */
   favorite?: boolean;
   /** Draws the Favorite toggle (ready and draft) at the end of the row; called with the new state. */
@@ -315,6 +347,48 @@ function VideoPlayerBody({
   const tags = (badges ?? []).filter(Boolean);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [playing, setPlaying] = useState(false);
+  const [clock, setClock] = useState(0);
+  const [length, setLength] = useState(0);
+  const [armedOwn, setArmedOwn] = useState<number | null>(null);
+  const retakeItem = (actionItems ?? []).find(item => item.kind === "retake_from" && (item.when ?? ["ready"]).includes(status));
+  const retakeOn = status === "ready" && Boolean(src) && !bare && Boolean(onRetakeFrom || retakeItem);
+  const armed = retakeArmedAt !== undefined ? retakeArmedAt : armedOwn;
+  const total = length > 0 ? length : durationSec && durationSec > 0 ? durationSec : 0;
+  const syncClock = () => {
+    const el = videoRef.current;
+    if (!el) return;
+    setClock(Number.isFinite(el.currentTime) ? el.currentTime : 0);
+    if (Number.isFinite(el.duration) && el.duration > 0) setLength(el.duration);
+  };
+  const seekTo = (sec: number) => {
+    const el = videoRef.current;
+    if (el) { try { el.currentTime = sec; } catch { /* the clip is not ready to seek */ } }
+    setClock(sec);
+  };
+  const chooseRetake = () => {
+    const raw = videoRef.current ? videoRef.current.currentTime : clock;
+    const at = Number.isFinite(raw) ? Math.round(raw * 10) / 10 : 0;
+    setArmedOwn(at);
+    onRetakeFrom?.(at);
+  };
+  const timeText = formatClock(clock * 1000);
+  const retakeLabel = (template?: string) => {
+    const line = template ?? text.retakeFrom;
+    return line ? line.replace("{time}", timeText) : i18n._({ id: "ui.Retake from {time}", message: "Retake from {time}", values: { time: timeText } });
+  };
+  const retakeRow = (o: { label?: string; icon?: string; disabledReason?: string; note?: string; busy?: boolean; placement?: "start" | "end" }): RowAction & { placement: "start" | "end" } => ({
+    key: "retake-from",
+    label: retakeLabel(o.label),
+    icon: o.icon ? iconFor(o.icon) : <RotateCcwIcon aria-hidden />,
+    onSelect: chooseRetake,
+    disabledReason: o.disabledReason,
+    note: o.note,
+    busy: o.busy,
+    reasonVisible: true,
+    pressed: armed !== null,
+    variant: armed !== null ? "secondary" : "ghost",
+    placement: o.placement ?? "end",
+  });
   const control = (name: VideoPlayerControlName) => ({ disabledReason: controls?.[name]?.disabledReason, starts: controls?.[name]?.starts ?? DEFAULT_STARTS[name] });
 
   // The row: items placed at the start, the built-ins for this status, then items placed at the end.
@@ -329,20 +403,30 @@ function VideoPlayerBody({
     builtIns.push({ key: "download", label: text.download, icon: <DownloadIcon aria-hidden />, onSelect: () => (onDownload ? onDownload() : download(src, downloadName)) });
     if (onShare) builtIns.push({ key: "share", label: text.share, icon: <Share2Icon aria-hidden />, onSelect: onShare });
   }
+  if (onRetakeFrom && !retakeItem && status === "ready" && src) {
+    const { placement: _placement, ...built } = retakeRow({ disabledReason: controls?.retake?.disabledReason, note: controls?.retake?.note, busy: controls?.retake?.busy });
+    void _placement;
+    builtIns.push(built);
+  }
   if (status === "failed" && onRetry) builtIns.push({ key: "retry", label: text.retry, icon: <RefreshCwIcon aria-hidden />, onSelect: onRetry, variant: "outline", ...control("retry") });
   if (status !== "failed" && status !== "draft" && onMakeAnother) builtIns.push({ key: "make-another", label: text.makeAnother, icon: <WandSparklesIcon aria-hidden />, onSelect: onMakeAnother, ...control("makeAnother") });
   const items: Array<RowAction & { placement: "start" | "end" }> = (actionItems ?? [])
     .filter(item => (item.when ?? ["ready"]).includes(status))
     .slice(0, VIDEO_PLAYER_ACTION_CAP)
-    .map((item, index) => ({
-      key: item.key ?? `item-${index}-${item.label}`,
-      label: item.label,
-      icon: iconFor(item.icon),
-      disabledReason: item.disabledReason,
-      starts: item.starts,
-      placement: item.placement ?? "end",
-      onSelect: () => item.onSelect?.(),
-    }));
+    .map((item, index) => item.kind === "retake_from"
+      ? { ...retakeRow({ label: item.label, icon: item.icon, disabledReason: item.disabledReason, note: item.note, busy: item.busy, placement: item.placement }), key: item.key ?? "retake-from" }
+      : {
+        key: item.key ?? `item-${index}-${item.label}`,
+        label: item.label,
+        icon: iconFor(item.icon),
+        disabledReason: item.disabledReason,
+        starts: item.starts,
+        note: item.note,
+        busy: item.busy,
+        reasonVisible: item.note !== undefined,
+        placement: item.placement ?? "end",
+        onSelect: () => item.onSelect?.(),
+      });
   const rowActions: RowAction[] = [...items.filter(item => item.placement === "start"), ...builtIns, ...items.filter(item => item.placement === "end")];
   const favoriteControl = control("favorite");
   const favoriteButton = onFavorite && (status === "ready" || status === "draft") ? (
@@ -389,6 +473,7 @@ function VideoPlayerBody({
           preload={preload}
           onError={onMediaError}
           controls={overlay ? playing : true}
+          {...(retakeOn ? { onTimeUpdate: syncClock, onSeeked: syncClock, onLoadedMetadata: syncClock, onDurationChange: syncClock } : {})}
           {...(overlay ? { onPlay: () => setPlaying(true), onPause: () => setPlaying(false), onEnded: () => setPlaying(false) } : {})}
           loop={loop}
           playsInline
@@ -457,6 +542,20 @@ function VideoPlayerBody({
   const card = (
     <Card data-slot="video-player" data-status={status} className={cn("w-full gap-0 overflow-hidden py-0", (reveal || overlay) && "group/player", SIZE_CLASS[size], className)}>
       {framed}
+      {retakeOn ? (
+        <RetakeBar
+          time={clock}
+          duration={total}
+          armedAt={armed}
+          seekLabel={text.seek}
+          valueText={i18n._({ id: "ui.{current} of {total}", message: "{current} of {total}", values: { current: timeText, total: formatClock(total * 1000) } })}
+          pointText={armed === null ? "" : text.retakePoint ? text.retakePoint.replace("{time}", formatClock(armed * 1000)) : i18n._({ id: "ui.Retake point {time}", message: "Retake point {time}", values: { time: formatClock(armed * 1000) } })}
+          clearLabel={text.clearRetake}
+          clearText={i18n._({ id: "ui.Clear", message: "Clear" })}
+          onSeek={seekTo}
+          onClear={() => { setArmedOwn(null); }}
+        />
+      ) : null}
       {overlay && !notice && !(caption && prompt) ? null : <CardContent className="flex flex-col gap-3 py-3">
         {live ? (
           <>

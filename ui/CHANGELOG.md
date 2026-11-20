@@ -1,3 +1,8 @@
+## [ui-v0.5.692] - 2026-11-20
+
+- `VideoPlayer`: a `retake_from` action reports the scrubbed time through `onRetakeFrom(timeSec)`, marks that moment on the scrub bar, and says why when it is not available; every action can carry a one-line `note` (what it keeps and how long it takes) and a `busy` state, for another take, extend and enhance (VIDEO-KIT-01).
+- New `ClipCompare` (`elements/clip-compare`): a before-and-after of two clips or two stills, side by side or as a wipe, with one play button and scrub bar that keep both clips in step (VIDEO-KIT-01).
+
 ## [ui-v0.5.691] - 2026-11-20
 
 - New video kit Elements (VIDEO-KIT-01), none wired into Home yet: `StoryboardPlayer` (`elements/storyboard-player`, a timed rough cut of shots with voice lines and an optional sound bed, a scrub bar marked at shot boundaries, captions and a shot strip with waveforms; states loading, no picture, being changed, playing); `ActionBar` (`elements/action-bar`, a sticky bar with a primary and a secondary action, a server-supplied estimate line, busy and disabled states and a reason line); `ProposalCard` (`elements/proposal-card`, pictures with "Matches your photo" or "Guessed by MaiPai" badges, an editable description, approve, change and discard); `VoiceLineRow` (`elements/voice-line-row`, play, speaker, reading n of m, say it differently, use the other reading, making state).

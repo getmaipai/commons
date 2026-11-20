@@ -57,9 +57,19 @@ const ALLOW: AllowEntry[] = [
     reason: "Showcase only: generated sample pictures in different hues.",
   },
   {
+    file: "src/elements/CompareShowcase.tsx",
+    match: /^hsl\($/,
+    reason: "Showcase only: generated sample stills (an original and a changed version) so the compare demo has pictures in different hues.",
+  },
+  {
     file: "src/elements/StoryboardPlayerShowcase.tsx",
     match: /^hsl\($/,
     reason: "Showcase only: generated sample stills so the demo has pictures in different hues.",
+  },
+  {
+    file: "src/elements/VideoRetakeShowcase.tsx",
+    match: /^hsl\($/,
+    reason: "Showcase only: a generated sample still in one hue so the demo clip has a picture.",
   },
   {
     file: "src/elements/JobProgressShotsShowcase.tsx",
