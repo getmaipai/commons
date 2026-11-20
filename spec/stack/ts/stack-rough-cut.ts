@@ -13,7 +13,7 @@ const text = z.string().min(1);
 const id = z.string().min(1).max(60).regex(/^[A-Za-z0-9._-]+$/);
 
 export const StackRoughCutShot = z.object({ id, picture: text, seconds: z.number().positive().max(60), motion: text.optional(), caption: z.string().min(1).max(200).optional() }).strict();
-// A line names its shot by wrapping the spec's dialogue shape, never by copying its fields.
+// A line names its shot by wrapping the spec's dialogue shape, never by copying its fields. FILM-LINES-01: a `shot_id` may repeat, at most 3 lines per shot, from different speakers, spoken in the order sent one after another (0.2 s lead, 0.3 s between lines, no overlap) and all inside the shot's seconds.
 export const StackRoughCutLine = z.object({ shot_id: id, line: StackClipDialogue }).strict();
 export const StackRoughCutVoice = z.object({ speaker: text, voice_address: text.optional(), minor: z.boolean().optional() }).strict();
 
@@ -37,7 +37,7 @@ export type StackRoughCutResult = z.infer<typeof StackRoughCutResult>;
  * The rows the kit `storyboard_player` block plays (ui/schema.json `storyboard_shot_row`), made from a rough-cut result. Home calls this when it
  * serves the block's data: `captions`, `stills` and `lineTexts` are Home's own (the plan's shot text, the stored picture addresses and the lines it sent), so the result itself
  * carries none of them. `duration_sec` is the shot's length on the file's clock, `line_start_sec` is seconds after the start of the SHOT (the result's
- * line start is on the file's clock). A shot without a picture address is `no_picture`.
+ * line start is on the file's clock). A shot without a picture address is `no_picture`. FILM-LINES-01: a shot with several lines shows its FIRST line (its `line_start_sec`, its text).
  */
 export function roughCutShotRows(
   result: StackRoughCutResult,
