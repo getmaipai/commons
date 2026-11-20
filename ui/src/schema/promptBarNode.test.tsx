@@ -94,6 +94,17 @@ describe("prompt_bar node", () => {
     expect(body.blank_other).not.toBe("hidden words");
   });
 
+  test("a submit argument the bar does not own falls back to page state (a rename page posts its id), and the bar's own names never do", async () => {
+    const rename = { ...cardsNode, fields: [{ state: "blank_subject", label: "Subject" }, { state: "blank_other", label: "Other", when: { state: "blank_subject", equals: "never" } }], submit: { call: { target: "/api/plugins/videos/rename", args: { id: "{id}", name: "{prompt}", blank_other: "{blank_other}", missing: "{nothing_here}" } } } } as UiNode;
+    const { view } = drawWith(rename, { id: "template-7", blank_other: "hidden words" });
+    fireEvent.click(view.getByRole("button", { name: "Make" }));
+    await waitFor(() => expect(calls.length).toBe(1));
+    const body = calls[0]!.body as Record<string, unknown>;
+    expect(body.id).toBe("template-7");
+    expect(body.blank_other).not.toBe("hidden words");
+    expect(body.missing).not.toBe("template-7");
+  });
+
   test("fields schema enforces bounds and absent fields remain absent", () => {
     const base = { type: "prompt_bar", label: "Describe", submit: { call: { target: "/make" } } };
     expect(PageNodeSchema.parse({ type: "page", id: "x", title: "X", body: [base] }).body[0]).toBeTruthy();

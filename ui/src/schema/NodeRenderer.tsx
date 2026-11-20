@@ -931,10 +931,22 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
     // STYLES-04: a suggested chip left on is the person's yes. Only the submit carries the id (never page state, so never the address).
     const taken = new Set<"style" | "character">();
     for (const row of suggested) if (!taken.has(row.kind)) { taken.add(row.kind); item[suggestStates[row.kind]] = row.id; }
+    if (modeConfig) item[modeConfig.state] = mode;
+    // VIDEO-KIT-01: a `{name}` in the submit's arguments that the bar does not own (not its prompt, field, chip, reference, tier, mode or suggestion)
+    // falls back to page state, so a rename page reached by `navigate {to, state: {id}}` posts that id instead of the literal "{id}".
+    {
+      const own = new Set<string>([promptKey, ...(node.fields ?? []).map((f) => f.state), ...chips.map((c) => c.state), ...refs.map((r) => r.state), ...Object.values(suggestStates)]);
+      if (node.tier) own.add(node.tier.state);
+      if (modeConfig) own.add(modeConfig.state);
+      for (const name of new Set([...JSON.stringify(modeAction ?? node.submit).matchAll(/\{([A-Za-z_][A-Za-z0-9_.]*)\}/g)].map((m) => m[1]!))) {
+        if (own.has(name) || name in item) continue;
+        const known = readField(state, name);
+        if (known !== undefined && known !== null && known !== "") item[name] = known;
+      }
+    }
     writer?.merge({ [promptKey]: text.trim() });
     setDismissed([]);
     setBusy(true);
-    if (modeConfig) item[modeConfig.state] = mode;
     dispatch(modeAction ?? node.submit, [item], () => setBusy(false), { typedArgs: true });
   }
   // ONE-COMPOSER (COMPOSER-03): on a Create page the host lists the composer's modes. The bar then draws the kit composer: this page's
