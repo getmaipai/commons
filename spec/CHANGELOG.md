@@ -1,3 +1,7 @@
+## [spec-v0.1.441] - 2026-11-20
+
+- `media_stage` (VIDEO-KIT-01): a pill and an error action may carry `starts: "video" | "picture"` (disabled with the host's one making-notice line while that kind is not ready); a pill takes an optional `states` list (by default pills are not drawn in `waiting`, `loading` or `error`); `aspect` (`wide`, `standard`, `short`) sets the stage shape. Additive.
+
 ## [spec-v0.1.440] - 2026-11-20
 
 - VF-ROUGHCUT-01 follow-up: a line of the `media.rough_cut` result may carry an optional `wave` (1 to 200 loudness samples from 0 to 1, the loudest scaled to 1) for the storyboard player's small waveform; `roughCutShotRows` passes it as `line_wave`. Additive; every 0.1.438 fixture stays valid.

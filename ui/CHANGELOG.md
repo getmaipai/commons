@@ -1,3 +1,7 @@
+## [ui-v0.5.698] - 2026-11-20
+
+- `MediaStage` (spec 0.1.441): the stage grows to fit its overlay in `waiting` and `error` so nothing clips on a phone; pills are hidden in `waiting`, `loading` and `error` unless a pill lists `states`; `aspect` is `wide`, `standard` or `short`; a pill or error action with `starts` is disabled with the host's making notice; on a phone the first pill shows its word, the others are icons, extras go in a More menu. The retake action says the armed time ("Retake from 0:07").
+
 ## [ui-v0.5.697] - 2026-11-20
 
 - `empty_state` takes `action_variant` (`default`, `secondary`, `ghost` or `outline`, spec 0.1.439): the main button draws in that kit Button look; without it the button stays `secondary`. `EmptyState` (`primitives/EmptyState`) has an `actionVariant` prop for it, `AsyncState` and `MediaShelf` pass `emptyActionVariant` on, and every block that draws a page's `empty_state` button (list, card grid, media shelf, music blocks, answer blocks, billboard, reader, player, clip feed, storyboard player, image editor) passes it through.
