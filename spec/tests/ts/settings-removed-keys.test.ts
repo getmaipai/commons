@@ -9,6 +9,11 @@ test("chat.teen_gate_grain is gone: a teen's replies are always checked per sent
   expect(keys.some((k) => k.key === "chat.teen_gate_grain")).toBe(false);
 });
 
+test("voice.talk_over and voice.talk_over_window_ms are gone: the pre-recorded cue before an answer is retired (owner decision 2026-11-20)", () => {
+  expect(keys.some((k) => k.key === "voice.talk_over")).toBe(false);
+  expect(keys.some((k) => k.key === "voice.talk_over_window_ms")).toBe(false);
+});
+
 // Retired keys (2026-11-07, AUDIT-DEAD-01): nothing reads them, but a stored value must stay readable and ignored, and a write must
 // still succeed, so they stay in the registry in a parked group that no settings card draws.
 import { SettingsKey } from "../../gen/ts/settings-key.js";

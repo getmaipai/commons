@@ -1,3 +1,7 @@
+## [spec-v0.1.473] - 2026-11-20
+
+- Removed `voice.talk_over` and `voice.talk_over_window_ms`: the "Talk before I finish" feature (TALK-OVER-01, INSTANT-FILLER-01a) is retired by owner decision 2026-11-20. Home no longer plays a pre-recorded spoken cue when a sentence ends; replies start when the turn is committed, and any acknowledgement should come from the household's own model. Retirement note for rule 12: the behaviour it held (a canned cue and a protected overlap window) is retired, not ported; the speculative start (`voice.speculative_start`), the spoken thinking cues and the barge-in stop are separate features and stay. A stored value for either key is deleted by Home's migration.
+
 ## [spec-v0.1.472] - 2026-11-20
 
 - `voice.talk_over` defaults to `off` again (owner decision 2026-11-20; it was `gentle` since spec-v0.1.371). The pre-recorded spoken cue before an answer is retired as a default: replies start about a second after the person stops, and any acknowledgement should come from the household's own model. The key, its options and its copy are unchanged, so a household can still choose Gentle or Natural.
