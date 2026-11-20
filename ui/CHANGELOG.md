@@ -1,3 +1,7 @@
+## [ui-v0.5.708] - 2026-11-20
+
+- `Page`: the root is `flex-1 min-h-0` as well as `h-full`. Under a row in a flex column (a package app's section tabs on a phone) it was as tall as the whole column, so its scroller ended one row (about 69 px at 375 wide) below the screen and hid the last lines; it now takes only the room that is left. Parents that are not a flex column are unchanged (PHONE-07).
+
 ## [ui-v0.5.707] - 2026-11-20
 
 - `JobProgress` shots: a running shot with no `etaSeconds` draws no time line at all (it said "Time left unknown"; the bar and percent stay). A shot with a real estimate keeps its line (VIDEO-KIT-01).

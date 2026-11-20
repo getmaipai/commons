@@ -22,7 +22,7 @@ interface PageProps {
 // has nothing to split into yet with exactly one page in the whole app).
 export function Page({ title, hideTitle, className, children }: PageProps) {
   return (
-    <div className={cn("flex h-full min-w-0 flex-col", className)}>
+    <div className={cn("flex h-full min-h-0 min-w-0 flex-1 flex-col", className)}>
       <h1 className={hideTitle ? "sr-only" : "px-4 pt-5 pb-1 text-3xl font-bold tracking-tight"}>{title}</h1>
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">{children}</div>
     </div>
