@@ -5,7 +5,7 @@
 import { z } from "zod";
 
 import { StackPartId } from "./stack-part";
-import { StackJobCapabilities, StackJobLevel, StackJobLimitsBase, StackJobName, StackStyleMedia } from "./stack-model-pack";
+import { StackJobCapabilities, StackJobLevel, StackJobLimitsBase, StackJobName, StackOperationRow, StackStyleMedia } from "./stack-model-pack";
 
 const text = z.string().min(1);
 const Alt = z.object({ part: StackPartId, label: text }).strict();
@@ -27,6 +27,7 @@ const entry = z.object({
   part: z.object({ id: StackPartId, label: text }).strict().nullable(),
   limits: z.object({ levels: z.array(StackJobLevel).refine((v) => new Set(v).size === v.length), ...StackJobLimitsBase }).strict(),
   capabilities: StackJobCapabilities,
+  operations: z.array(StackOperationRow).optional(),
   styles: z.object({ bases: z.array(CatalogBase), max: z.number().int().min(0) }).strict(),
   restyles: z.array(z.object({ name: text, label: text }).strict()),
   stems: z.array(z.object({ name: text, label: text }).strict()).optional(),

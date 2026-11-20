@@ -354,6 +354,125 @@
                 "status"
               ]
             }
+          },
+          "profiles": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "level": {
+                  "enum": [
+                    "standard",
+                    "boost",
+                    "max"
+                  ]
+                },
+                "profile": {
+                  "enum": [
+                    "preview",
+                    "quality"
+                  ]
+                },
+                "size": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "width": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "height": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "required": [
+                    "width",
+                    "height"
+                  ]
+                },
+                "steps": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "checkpoint": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "schedule": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "prompt_format": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "adapter": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "strength": {
+                      "type": "number"
+                    },
+                    "required": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "strength",
+                    "required"
+                  ]
+                },
+                "finish": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "op": {
+                        "enum": [
+                          "lanczos_scale",
+                          "unsharp",
+                          "model_upscale",
+                          "loudness"
+                        ]
+                      },
+                      "params": {
+                        "type": "object",
+                        "additionalProperties": {
+                          "oneOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "string",
+                              "minLength": 1
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "required": [
+                      "op"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "level",
+                "profile",
+                "steps",
+                "checkpoint",
+                "schedule",
+                "prompt_format"
+              ]
+            }
           }
         },
         "required": [

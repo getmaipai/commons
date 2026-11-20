@@ -22,6 +22,40 @@ export const StackJobLimitsBase = {
   max_words: z.number().int().min(0).optional(),
 };
 
+// VF-CAPS-01: one row per video operation and level, built by the Stack from its validators and measured tables (one source). Home may
+// filter on input combinations only; whether a job fits in memory or how long it takes is the Stack's `available` answer (rule E4).
+export const StackVideoOperation = z.enum(["clip_text", "clip_start_picture", "clip_start_end_pictures", "clip_sheet", "clip_references", "extend", "retake", "swap", "enhance"]);
+export type StackVideoOperation = z.infer<typeof StackVideoOperation>;
+export const StackOperationRow = z.object({
+  operation: StackVideoOperation,
+  level: StackJobLevel,
+  available: z.boolean(),
+  unavailable_reason: text.optional(),
+  inputs: z.object({ start_picture: z.boolean(), end_picture: z.boolean(), references: z.number().int().min(0), sheets: z.number().int().min(0), source_clip: z.boolean() }).strict(),
+  seconds: z.object({ min: z.number().positive(), max: z.number().positive() }).strict(),
+  sizes: z.array(z.object({ width: z.number().int().min(1), height: z.number().int().min(1), orientation: StackJobShape }).strict()),
+  sound: z.object({ generated: z.boolean(), voice_reference: z.boolean(), keeps_source_audio: z.boolean() }).strict(),
+  requires: z.array(text),
+}).strict();
+export type StackOperationRow = z.infer<typeof StackOperationRow>;
+
+// VF-PROFILE-01: the real recipe of one level, as values the runner reads. `level` stays the only quality key on the wire; `profile`
+// ("preview" or "quality") is only a name for a group of levels. A `size` names a native size other than the level's default shape size.
+export const StackFinishOp = z.enum(["lanczos_scale", "unsharp", "model_upscale", "loudness"]);
+export const StackFinishStep = z.object({ op: StackFinishOp, params: z.record(text, z.union([z.number(), text])).optional() }).strict();
+export const StackLevelRecipe = z.object({
+  level: StackJobLevel,
+  profile: z.enum(["preview", "quality"]),
+  size: Pixels.optional(),
+  steps: z.number().int().min(1),
+  checkpoint: text,
+  schedule: text,
+  prompt_format: text,
+  adapter: z.object({ id: text, strength: z.number(), required: z.boolean() }).strict().optional(),
+  finish: z.array(StackFinishStep).optional(),
+}).strict();
+export type StackLevelRecipe = z.infer<typeof StackLevelRecipe>;
+
 const PackJob = z.object({
   job: StackJobName,
   limits: z.object({ ...StackJobLimitsBase, steps_fixed: z.boolean().optional() }).strict(),
@@ -29,6 +63,7 @@ const PackJob = z.object({
   capabilities: StackJobCapabilities,
   recipe: text,
   adapter: text.optional(),
+  profiles: z.array(StackLevelRecipe).optional(),
   peaks: z.array(z.object({ shape: StackJobShape.optional(), level: StackJobLevel.optional(), bytes: z.number().int().min(0), status: z.enum(["measured", "unverified"]), measured_on: text.optional() }).strict()),
 }).strict();
 
