@@ -197,7 +197,7 @@ describe("MediaStage", () => {
   });
 
   test("named aspect presets map wide, standard and short, with wide as default", () => {
-    for (const [aspect, css] of [[undefined, "16 / 8.2"], ["wide", "16 / 8.2"], ["standard", "16 / 9"], ["short", "16 / 6"]] as const) {
+    for (const [aspect, css] of [[undefined, "16 / 8.2"], ["wide", "16 / 8.2"], ["standard", "16 / 9"], ["short", "21 / 6"]] as const) {
       const view = render(<MediaStage description="x" aspect={aspect} />);
       expect(slot(view.container, "media-stage")!.style.getPropertyValue("--media-stage-aspect")).toBe(css);
       cleanup();
@@ -218,5 +218,15 @@ describe("MediaStage", () => {
     expect(v.container.querySelectorAll("video").length).toBe(1);
     expect(v.getByTestId("media-stage-three-actions").querySelectorAll('[data-slot="media-stage-pill"]').length).toBe(3);
   });
-});
 
+  test("waiting and error keep the aspect ratio and set no explicit min-height, so the box can grow to its content", async () => {
+    const { readFileSync } = await import("node:fs");
+    const css = readFileSync(new URL("../tokens.css", import.meta.url), "utf8");
+    const rule = css.split("\n").find((l) => l.startsWith('[data-slot="media-stage"][data-state="waiting"], [data-slot="media-stage"][data-state="error"] {'))!;
+    expect(rule).toContain("min-height: auto");
+    expect(rule).toContain("overflow: visible");
+    expect(rule).not.toContain("aspect-ratio");
+    expect(css).not.toMatch(/data-state="error"\][^{]*\{[^}]*min-height: max\(/);
+    expect(css).toContain('[data-slot="media-stage-error"] { flex: 0 0 auto; }');
+  });
+});

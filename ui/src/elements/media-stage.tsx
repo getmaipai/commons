@@ -191,7 +191,7 @@ export function MediaStage({
   const drifting = state === "idle" && !reduced;
   const Heading = `h${titleLevel}` as "h1" | "h2" | "h3";
   const aspectValue = aspect ?? "wide";
-  const style = ({ "--media-stage-aspect": aspectValue === "wide" ? "16 / 8.2" : aspectValue === "standard" ? "16 / 9" : aspectValue === "short" ? "16 / 6" : aspectValue } as CSSProperties);
+  const style = ({ "--media-stage-aspect": aspectValue === "wide" ? "16 / 8.2" : aspectValue === "standard" ? "16 / 9" : aspectValue === "short" ? "21 / 6" : aspectValue } as CSSProperties);
   const visiblePills = (pills ?? []).filter((pill) => pill.states ? pill.states.includes(state) : !["loading", "waiting", "error"].includes(state));
   const PlayIcon = getIcon("play");
   const hasTitle = Boolean(eyebrow || title || subtitle);

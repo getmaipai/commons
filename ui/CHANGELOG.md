@@ -1,3 +1,7 @@
+## [ui-v0.5.700] - 2026-11-20
+
+- `MediaStage`: in `waiting` and `error` the stage keeps its aspect ratio and grows with its overlay, so the eyebrow, title and facts line can no longer spill out of the top over the block above (an explicit min-height had replaced the browser's content minimum). On a phone the error message no longer takes a fixed 14 rem. `aspect: "short"` is now a 21 / 6 banner on a wide screen (16 / 9 on a phone) (VIDEO-KIT-01).
+
 ## [ui-v0.5.699] - 2026-11-20
 
 - The UI schema renders `job_progress` and `clip_compare`, the player's `retake_from` action, `time` and `facts` on the quality choice, `facts` and the display variant on `creation_header`, and the optional storyboard fields (shot framing and place line under the shot number, a note sentence, shots being redone) (spec 0.1.443, VIDEO-KIT-01).
