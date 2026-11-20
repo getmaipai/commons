@@ -1,3 +1,7 @@
+## [ui-v0.5.718] - 2026-11-20
+
+- `TrackStudio` on a phone (VF-EDIT-01 fix): the sticky export bar is one compact row, about 60 px (the primary export button plus the secondary as an icon button, the hint moved to a screen-reader line and the bar's tooltip), and the transport bar is in flow under the preview instead of sticking over the video, for video and audio alike (VIDEO-KIT-01).
+
 ## [ui-v0.5.717] - 2026-11-20
 
 - Submenus on a phone (VF-EDIT-04 fix): the kit's `DropdownMenuSub` is an inline accordion below 640 px (the fly-out opened beside its parent, off the left edge and taller than the screen, so nothing showed by touch). The trigger toggles on tap, Enter or Space, ArrowRight opens and ArrowLeft closes, `aria-expanded` follows, and the group's items sit indented right under it inside the same menu, each at 48 px. From 640 px up it stays a fly-out. This covers every grouped menu: the clip row's More menu, the overlay pills' More pill and the media tile menu. The duplicate arrow on grouped triggers in the clip menu is gone (the trigger draws its own chevron). Opened in a browser: at 375 touch the four items are visible at left 63, 48 px apart; at 1280 the fly-out is visible (VIDEO-KIT-01).
