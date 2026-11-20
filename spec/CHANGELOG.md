@@ -1,3 +1,7 @@
+## [spec-v0.1.468] - 2026-11-20
+
+- Model pack: a clip job may carry `minor_recipes` (a recipe file per rating, `G` and `PG-13`) and `negative_prompt` (the terms an engine that takes a negative prompt always receives). Jobs catalog: an optional `minor_ratings` per job lists the ratings the Stack holds a minor recipe for; absent means none, and a caller keeps its own wording (VF-MINOR-RECIPE-01).
+
 ## [spec-v0.1.467] - 2026-11-20
 
 - `media_stage` takes an optional `waiting_actions` (at most 2 buttons, same shape as `error_actions` without `starts`/`states`): drawn under the progress strip while the stage state is `waiting`, for example Stop. The action fires with the row's own fields as placeholders (VIDEO-KIT-01).

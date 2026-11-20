@@ -30,6 +30,8 @@ const entry = z.object({
   operations: z.array(StackOperationRow).optional(),
   // VF-CONTRACT-01: the optional request fields this Stack's `POST /stack/v1/jobs/make` accepts for this job (every key of the job's request shape, `job` and `audience` included), so a client sends only what is advertised and never pays a failed call to an older Stack.
   request_fields: z.array(text).optional(),
+  // VF-MINOR-RECIPE-01: the ratings this Stack holds a minor recipe for on this job; absent means none, and a caller keeps its own wording for a minor's clip.
+  minor_ratings: z.array(z.enum(["G", "PG-13"])).min(1).optional(),
   styles: z.object({ bases: z.array(CatalogBase), max: z.number().int().min(0) }).strict(),
   restyles: z.array(z.object({ name: text, label: text }).strict()),
   stems: z.array(z.object({ name: text, label: text }).strict()).optional(),

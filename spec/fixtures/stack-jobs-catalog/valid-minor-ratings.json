@@ -1,0 +1,68 @@
+{
+  "audience": "minor",
+  "jobs": [
+    {
+      "job": "song",
+      "label": "song",
+      "available": true,
+      "part": {
+        "id": "music-model-a",
+        "label": "Music maker"
+      },
+      "limits": {
+        "levels": [
+          "standard",
+          "boost"
+        ],
+        "max_seconds": {
+          "standard": 120,
+          "boost": 240
+        },
+        "max_words": 700
+      },
+      "capabilities": {
+        "text": true,
+        "end_picture": false,
+        "sound": true,
+        "keeps_likeness": false
+      },
+      "styles": {
+        "bases": [],
+        "max": 0
+      },
+      "restyles": [],
+      "minor_ratings": [
+        "G",
+        "PG-13"
+      ]
+    },
+    {
+      "job": "sound_effect",
+      "label": "sound effect",
+      "available": true,
+      "part": {
+        "id": "music-model-a",
+        "label": "Music maker"
+      },
+      "limits": {
+        "levels": [
+          "standard"
+        ],
+        "max_seconds": {
+          "standard": 10
+        }
+      },
+      "capabilities": {
+        "text": false,
+        "end_picture": false,
+        "sound": true,
+        "keeps_likeness": false
+      },
+      "styles": {
+        "bases": [],
+        "max": 0
+      },
+      "restyles": []
+    }
+  ]
+}

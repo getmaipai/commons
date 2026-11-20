@@ -748,6 +748,40 @@
               "redraws",
               "seconds"
             ]
+          },
+          "minor_recipes": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "G": {
+                "type": "string",
+                "minLength": 1
+              },
+              "PG-13": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "anyOf": [
+              {
+                "required": [
+                  "G"
+                ]
+              },
+              {
+                "required": [
+                  "PG-13"
+                ]
+              }
+            ]
+          },
+          "negative_prompt": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
           }
         },
         "required": [

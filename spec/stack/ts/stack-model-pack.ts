@@ -91,6 +91,10 @@ const PackJob = z.object({
   adapter: text.optional(),
   profiles: z.array(StackLevelRecipe).optional(),
   reference_clip: StackReferenceClipRules.optional(),
+  // VF-MINOR-RECIPE-01: a clip job that may serve a minor carries one recipe file per rating it serves (`G` for a child by default, `PG-13` for a teen; the rating comes from the person's
+  // ceiling, never from age) and, for an engine that takes a negative prompt, the terms it always receives. The Stack applies them; a caller cannot ask for less.
+  minor_recipes: z.object({ G: text.optional(), "PG-13": text.optional() }).strict().refine((v) => v.G !== undefined || v["PG-13"] !== undefined).optional(),
+  negative_prompt: z.array(text).min(1).optional(),
   peaks: z.array(z.object({ shape: StackJobShape.optional(), level: StackJobLevel.optional(), bytes: z.number().int().min(0), status: z.enum(["measured", "unverified"]), measured_on: text.optional() }).strict()),
 }).strict();
 
