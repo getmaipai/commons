@@ -3850,16 +3850,13 @@
   {
     "key": "storage.warn_free_gb",
     "scope": "household",
-    "selector": "boolean",
-    "default": true,
+    "selector": "number",
+    "default": 0,
     "label": "Warn when free disk space drops below (GB)",
     "help": "A Repairs item is raised below this. 0 uses the built-in rule: the larger of 30 GB and 10 percent of the drive.",
-    "copy": {
-      "does": "Checks each headline and story sentence against the wording limits below X."
-    },
     "level": "advanced",
     "secret": false,
-    "lives_in": "household.ai_advanced",
+    "lives_in": "household.storage",
     "honoured_by": [
       "home"
     ]

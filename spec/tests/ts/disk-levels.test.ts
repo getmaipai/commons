@@ -30,3 +30,12 @@ test("overrides replace the rule, 0 means the rule", () => {
   expect(diskLines(TB18, { warnFreeGb: 50, criticalFreeGb: 20 })).toMatchObject({ warnBytes: 50 * GB, criticalBytes: 20 * GB });
   expect(diskLines(TB18, { warnFreeGb: 0, criticalFreeGb: 0 }).warnBytes).toBe(180 * GB);
 });
+
+test("the two disk keys are numbers that default to 0 (use the rule) and live with storage", async () => {
+  const keys = (await Bun.file(new URL("../../settings/keys.json", import.meta.url)).json()) as Array<Record<string, unknown>>;
+  for (const name of ["storage.warn_free_gb", "storage.critical_free_gb"]) {
+    const key = keys.find((k) => k.key === name);
+    expect(key, name).toBeDefined();
+    expect(key).toMatchObject({ selector: "number", default: 0, lives_in: "household.storage", scope: "household" });
+  }
+});

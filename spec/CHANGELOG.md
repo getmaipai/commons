@@ -1,3 +1,7 @@
+## [spec-v0.1.426] - 2026-11-20
+
+- DISK-GUARD-01 fix: `storage.warn_free_gb` in 0.1.425 was a copy of the wrong entry (boolean, default true). It is now a number, default 0 (use the rule), like `storage.critical_free_gb`. Use 0.1.426, not 0.1.425.
+
 ## [spec-v0.1.425] - 2026-11-20
 
 - DISK-GUARD-01: `spec/stack/ts/disk-levels.ts`, one pure `diskLines`/`diskLevel` (warn: larger of 30 GB and 10 percent free; critical: larger of 10 GB and 3 percent; hysteresis 1 percent of the drive) used by the Stack and Home, and the household key `storage.warn_free_gb`; `storage.critical_free_gb` now defaults to 0 (use the rule).
