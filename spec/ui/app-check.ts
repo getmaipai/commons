@@ -103,6 +103,8 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
   if (type === "media_shelf") {
     checkBinding(node.bind, `${where} media_shelf`, data, "list", out);
     checkAction(node.on_select, packageId, `${where} media_shelf.on_select`, out, true);
+    // VIDEO-KIT-01: row actions are drawn only in vertical rows; on a rail or grid shelf the buttons would never appear.
+    if (Array.isArray(node.row_actions) && node.row_actions.length > 0 && node.orientation !== "vertical") out.push(`${where} media_shelf: row_actions are drawn only when orientation is "vertical", so these buttons would never show; set orientation to "vertical" or remove row_actions.`);
     if (Array.isArray(node.row_actions)) node.row_actions.forEach((button, i) => isObject(button) && checkAction(button.action, packageId, `${where} media_shelf.row_actions[${i}]`, out, true));
     if (isObject(node.see_all)) checkAction(node.see_all.action, packageId, `${where} media_shelf.see_all`, out);
     checkFieldPath(node.item_media_field, `${where} media_shelf`, "item_media_field", out);

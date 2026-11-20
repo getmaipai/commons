@@ -1,3 +1,7 @@
+## [ui-v0.5.711] - 2026-11-20
+
+- No sideways scroll on a phone from a media stage or an ambient glow: the schema page body clips horizontal overflow (a glow bleeds past the stage box, and the waiting and error stage keeps its drift inside), `AmbientGlow` clips its own blurred blobs, and the waiting and error stage clips only sideways so it still grows to fit its overlay. Measured at 375 px: scroller width equals its client width for idle, waiting and error (it was 5 px wider). Row actions and the subtitle wrap items are in ui 0.5.710; the package check for them is spec 0.1.457 (VIDEO-KIT-01).
+
 ## [ui-v0.5.710] - 2026-11-20
 
 - `media_shelf` vertical rows: the subtitle wraps to three lines instead of one line with an ellipsis (compact rows keep one line). A test confirms row actions draw as labelled pills beside their icon (only the play action is icon-only) and that a non-vertical shelf draws none (spec 0.1.455, VIDEO-KIT-01).

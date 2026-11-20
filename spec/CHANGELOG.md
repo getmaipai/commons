@@ -1,3 +1,7 @@
+## [spec-v0.1.457] - 2026-11-20
+
+- Package check (VIDEO-KIT-01): a `media_shelf` that sets `row_actions` without `orientation: "vertical"` is refused with a plain message ("row_actions are drawn only when orientation is vertical, so these buttons would never show"), because a rail or grid shelf draws no row buttons and Home had shelves whose buttons were invisible for weeks. Existing packages must drop `row_actions` from non-vertical shelves or make them vertical before they pin this tag.
+
 ## [spec-v0.1.455] - 2026-11-20
 
 - `media_shelf.row_actions` description (VIDEO-KIT-01): they are drawn only in `orientation: "vertical"` rows, as labelled pills that wrap (play stays icon-only); on a rail or grid shelf they are not drawn at all. Documentation only; no refusal yet, because existing Home pages still set them on non-vertical shelves.

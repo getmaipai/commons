@@ -3102,7 +3102,7 @@ html[data-pro-look] [data-slot="row-action"] [data-slot="row-action-label"] { di
 [data-slot="media-stage"][data-ready] { min-height: 560px; }
 [data-slot="media-stage"][data-compact] { min-height: 0; }
 /* Waiting and error keep the aspect ratio but no explicit min-height, so the box can grow to its content (an explicit min-height would replace the automatic content minimum and let the overlay spill out of the top). */
-[data-slot="media-stage"][data-state="waiting"], [data-slot="media-stage"][data-state="error"] { min-height: auto; overflow: visible; }
+[data-slot="media-stage"][data-state="waiting"], [data-slot="media-stage"][data-state="error"] { min-height: auto; overflow-x: clip; overflow-y: visible; }
 [data-slot="media-stage"][data-state="waiting"] :is([data-slot="media-stage-picture"], [data-slot="media-stage-scrim"], [data-slot="media-stage-skeleton"]), [data-slot="media-stage"][data-state="error"] :is([data-slot="media-stage-picture"], [data-slot="media-stage-scrim"], [data-slot="media-stage-skeleton"]) { border-radius: inherit; }
 [data-slot="media-stage-picture"], [data-slot="media-stage-scrim"], [data-slot="media-stage-skeleton"], [data-slot="media-stage-drift"] { position: absolute; inset: 0; }
 [data-slot="media-stage-picture"] { z-index: 0; overflow: hidden; }

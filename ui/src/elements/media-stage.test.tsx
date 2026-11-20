@@ -224,7 +224,8 @@ describe("MediaStage", () => {
     const css = readFileSync(new URL("../tokens.css", import.meta.url), "utf8");
     const rule = css.split("\n").find((l) => l.startsWith('[data-slot="media-stage"][data-state="waiting"], [data-slot="media-stage"][data-state="error"] {'))!;
     expect(rule).toContain("min-height: auto");
-    expect(rule).toContain("overflow: visible");
+    expect(rule).toContain("overflow-y: visible");
+    expect(rule).toContain("overflow-x: clip");
     expect(rule).not.toContain("aspect-ratio");
     expect(css).not.toMatch(/data-state="error"\][^{]*\{[^}]*min-height: max\(/);
     expect(css).toContain('[data-slot="media-stage-error"] { flex: 0 0 auto; }');

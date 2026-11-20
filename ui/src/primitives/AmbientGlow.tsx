@@ -113,7 +113,7 @@ export function AmbientGlow({ getVideo, poster, ambient = true, still = false, c
   const blob = cn("absolute size-3/5 rounded-full blur-3xl", !still && "motion-safe:transition-colors motion-safe:duration-1000");
   return (
     <div aria-hidden="true" data-slot="ambient-glow" data-ready={colors ? "true" : "false"} data-still={still ? "true" : undefined} style={style}
-      className={cn("pointer-events-none absolute -inset-[6%] -z-10 opacity-0 data-[ready=true]:opacity-60", !still && "transition-opacity duration-1000", className)}>
+      className={cn("pointer-events-none absolute -inset-[6%] -z-10 overflow-clip opacity-0 data-[ready=true]:opacity-60", !still && "transition-opacity duration-1000", className)}>
       <span className={cn(blob, "start-0 top-0 bg-(--ambient-1)")} />
       <span className={cn(blob, "end-0 top-0 bg-(--ambient-2)")} />
       <span className={cn(blob, "start-0 bottom-0 bg-(--ambient-3)")} />
