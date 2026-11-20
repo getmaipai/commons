@@ -28,14 +28,17 @@ const entry = z.object({
   limits: z.object({ levels: z.array(StackJobLevel).refine((v) => new Set(v).size === v.length), ...StackJobLimitsBase }).strict(),
   capabilities: StackJobCapabilities,
   operations: z.array(StackOperationRow).optional(),
+  // VF-CONTRACT-01: the optional request fields this Stack's `POST /stack/v1/jobs/make` accepts for this job (every key of the job's request shape, `job` and `audience` included), so a client sends only what is advertised and never pays a failed call to an older Stack.
+  request_fields: z.array(text).optional(),
   styles: z.object({ bases: z.array(CatalogBase), max: z.number().int().min(0) }).strict(),
   restyles: z.array(z.object({ name: text, label: text }).strict()),
   stems: z.array(z.object({ name: text, label: text }).strict()).optional(),
 });
 export const StackAdultJobEntry = entry.extend({ why_not: text.nullable(), alternatives: z.array(Alt) }).strict();
 export const StackMinorJobEntry = entry.strict();
+// `spec` (VF-CONTRACT-01): the version of `@maipai/spec` the Stack was built against, e.g. "0.1.449". Absent on an older Stack: a client then sends only the fields that Stack's own contract has always had.
 export const StackJobsCatalog = z.discriminatedUnion("audience", [
-  z.object({ audience: z.literal("adult"), jobs: z.array(StackAdultJobEntry) }).strict(),
-  z.object({ audience: z.literal("minor"), jobs: z.array(StackMinorJobEntry) }).strict(),
+  z.object({ audience: z.literal("adult"), jobs: z.array(StackAdultJobEntry), spec: text.optional() }).strict(),
+  z.object({ audience: z.literal("minor"), jobs: z.array(StackMinorJobEntry), spec: text.optional() }).strict(),
 ]);
 export type StackJobsCatalog = z.infer<typeof StackJobsCatalog>;

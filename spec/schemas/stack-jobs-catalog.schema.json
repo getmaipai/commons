@@ -818,6 +818,13 @@
                     "requires"
                   ]
                 }
+              },
+              "request_fields": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
               }
             },
             "required": [
@@ -833,6 +840,10 @@
               "alternatives"
             ]
           }
+        },
+        "spec": {
+          "type": "string",
+          "minLength": 1
         }
       },
       "required": [
@@ -1622,6 +1633,13 @@
                     "requires"
                   ]
                 }
+              },
+              "request_fields": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
               }
             },
             "required": [
@@ -1635,6 +1653,10 @@
               "restyles"
             ]
           }
+        },
+        "spec": {
+          "type": "string",
+          "minLength": 1
         }
       },
       "required": [
