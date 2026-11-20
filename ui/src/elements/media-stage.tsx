@@ -33,12 +33,12 @@ export interface MediaStagePill {
   pressed?: boolean;
   /** Same as `disabledReason` (the name the result feed uses). */
   reason?: string;
+  starts?: "video" | "picture";
+  states?: MediaStageState[];
 }
 
-/** The phone width (the stage's own CSS breakpoint). Under it the pills stay in one row and the extra ones go into a More menu. */
+/** The phone width (the stage's own CSS breakpoint). Under it the first pill and a More menu stay in one row. */
 const PHONE_QUERY = "(max-width: 859.98px)";
-/** The most buttons in the phone row; a third pill (or more) leaves one pill and the More button. */
-const PHONE_MAX_PILLS = 2;
 
 function PillButton({ pill }: { pill: MediaStagePill }) {
   const Icon = pill.icon ? getIcon(pill.icon) : null;
@@ -86,8 +86,8 @@ export interface MediaStageProps {
   scrim?: "soft" | "strong";
   /** The waiting look: the picture goes quiet (filter only). `state="waiting"` sets it too. */
   dim?: boolean;
-  /** CSS aspect-ratio on a wide screen; 4 / 3 on a phone regardless. Default "16 / 8.2". */
-  aspect?: string;
+  /** Named ratio (wide by default); custom CSS ratios are also accepted. Wide and standard are 4 / 3 on phones; short is 16 / 9. */
+  aspect?: "wide" | "standard" | "short" | (string & {});
   /** idle: still with a slow drift. looping: the loop plays, no drift. paused: still only. loading: skeleton. waiting: dimmed still. error: still plus the message. */
   state?: MediaStageState;
   /** Names the picture for assistive tech (what the stage shows). */
@@ -190,7 +190,9 @@ export function MediaStage({
   const looping = state === "looping" && !reduced && Boolean(media?.loop);
   const drifting = state === "idle" && !reduced;
   const Heading = `h${titleLevel}` as "h1" | "h2" | "h3";
-  const style = aspect ? ({ "--media-stage-aspect": aspect } as CSSProperties) : undefined;
+  const aspectValue = aspect ?? "wide";
+  const style = ({ "--media-stage-aspect": aspectValue === "wide" ? "16 / 8.2" : aspectValue === "standard" ? "16 / 9" : aspectValue === "short" ? "16 / 6" : aspectValue } as CSSProperties);
+  const visiblePills = (pills ?? []).filter((pill) => pill.states ? pill.states.includes(state) : !["loading", "waiting", "error"].includes(state));
   const PlayIcon = getIcon("play");
   const hasTitle = Boolean(eyebrow || title || subtitle);
   return (
@@ -198,6 +200,7 @@ export function MediaStage({
       data-slot="media-stage"
       data-size={size}
       data-state={state}
+      data-aspect={aspectValue === "wide" || aspectValue === "standard" || aspectValue === "short" ? aspectValue : undefined}
       data-scrim={scrim}
       data-dim={waiting ? "" : undefined}
       data-looping={looping ? "" : undefined}
@@ -223,15 +226,15 @@ export function MediaStage({
       <div data-slot="media-stage-scrim" aria-hidden="true" />
       {loading ? <span className="sr-only" role="status">{i18n._({ id: "ui.Loading", message: "Loading" })}</span> : null}
       {titlePill ? <div data-slot="media-stage-title-pill">{titlePill}</div> : null}
-      {pills && pills.length > 0 ? (
+      {visiblePills.length > 0 ? (
         <div data-slot="media-stage-pills">
-          {phone && pills.length > PHONE_MAX_PILLS ? (
+          {phone && visiblePills.length > 1 ? (
             <>
-              {pills.slice(0, PHONE_MAX_PILLS - 1).map((pill) => <PillButton key={pill.id} pill={pill} />)}
-              <MorePills pills={pills.slice(PHONE_MAX_PILLS - 1)} />
+              {visiblePills.slice(0, 1).map((pill) => <PillButton key={pill.id} pill={pill} />)}
+              <MorePills pills={visiblePills.slice(1)} />
             </>
           ) : (
-            pills.map((pill) => <PillButton key={pill.id} pill={pill} />)
+            visiblePills.map((pill) => <PillButton key={pill.id} pill={pill} />)
           )}
         </div>
       ) : null}

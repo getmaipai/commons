@@ -40,6 +40,7 @@ describe("VideoPlayer retake from a time", () => {
     expect(view.getByText("Retake point 0:03")).toBeTruthy();
     expect(view.getByRole("button", { name: "Retake from 0:03" }).getAttribute("aria-pressed")).toBe("true");
     media.set(6);
+    expect(view.getByRole("button", { name: "Retake from 0:03" })).toBeTruthy();
     expect((view.container.querySelector("[data-slot=video-player-retake-marker]") as HTMLElement).style.insetInlineStart).toContain("25%");
     fireEvent.click(view.getByRole("button", { name: "Clear retake point" }));
     expect(view.container.querySelector("[data-slot=video-player-retake-marker]")).toBeNull();

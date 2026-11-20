@@ -90,6 +90,37 @@ describe("MediaStage", () => {
     expect(slot(v.container, "media-stage-still")).toBeTruthy();
   });
 
+  test("error and waiting grow beyond their aspect box and retain the complete overlay", () => {
+    const message = "The video could not be made. The scene may need more detail. Try changing the words, or give it another moment before trying again.";
+    const v = render(<MediaStage description="x" state="error" eyebrow="Could not finish" title="Your video is still within reach" errorMessage={message} errorActions={<><button>Try again</button><button>Change the words</button></>} />);
+    const stage = slot(v.container, "media-stage")!;
+    expect(stage.getAttribute("data-state")).toBe("error");
+    expect(stage.style.aspectRatio).toBe("");
+    expect(stage.style.minHeight).toBe("");
+    expect(v.getByText("Could not finish")).toBeTruthy();
+    expect(v.getByRole("heading", { name: "Your video is still within reach" })).toBeTruthy();
+    expect(v.getByRole("alert").textContent).toBe(message);
+    expect(v.getByRole("button", { name: "Try again" })).toBeTruthy();
+    expect(v.getByRole("button", { name: "Change the words" })).toBeTruthy();
+    expect(getComputedStyle(stage).overflow).not.toBe("hidden");
+  });
+
+  test("state hides default pills, and per-pill states override the hidden states", () => {
+    const pills = [
+      { id: "default", label: "Default", onSelect: () => {} },
+      { id: "override", label: "Error only", states: ["error" as const], onSelect: () => {} },
+    ];
+    const v = render(<MediaStage description="x" state="error" pills={pills} />);
+    expect(v.queryByRole("button", { name: "Default" })).toBeNull();
+    expect(v.getByRole("button", { name: "Error only" })).toBeTruthy();
+    cleanup();
+    for (const state of ["waiting", "loading"] as const) {
+      const hidden = render(<MediaStage description="x" state={state} pills={[pills[0]!]} />);
+      expect(hidden.queryByRole("button", { name: "Default" })).toBeNull();
+      cleanup();
+    }
+  });
+
   test("pills are real buttons with a name and call back; the title pill, title level and slots render", () => {
     const calls: string[] = [];
     const v = render(
@@ -121,6 +152,8 @@ describe("MediaStage", () => {
     const buttons = Array.from(row.querySelectorAll("button"));
     expect(buttons.length).toBeLessThanOrEqual(2);
     expect(buttons.map((b) => b.getAttribute("aria-label"))).toEqual(["Share", "More"]);
+    expect(buttons[0]!.querySelector('[data-slot="media-stage-pill-label"]')!.textContent).toBe("Share");
+    expect(buttons[1]!.querySelector('[data-slot="media-stage-pill-label"]')).toBeNull();
     expect(v.queryByRole("button", { name: "Another take" })).toBeNull();
     const more = v.getByRole("button", { name: "More" });
     expect(more.tagName).toBe("BUTTON");
@@ -132,11 +165,11 @@ describe("MediaStage", () => {
     expect(calls).toEqual(["again"]);
   });
 
-  test("a phone width with two actions, and a wide screen with three, keep every pill in the row and no More menu", () => {
+  test("a phone width keeps the first action and puts the rest in More; a wide screen keeps every pill in the row", () => {
     const three = [{ id: "a", label: "A", onSelect: () => {} }, { id: "b", label: "B", onSelect: () => {} }, { id: "c", label: "C", onSelect: () => {} }];
     stubMatchMedia({ "(max-width: 859.98px)": true });
     const a = render(<MediaStage description="x" pills={three.slice(0, 2)} />);
-    expect(a.queryByRole("button", { name: "More" })).toBeNull();
+    expect(a.getByRole("button", { name: "More" })).toBeTruthy();
     expect(a.getAllByRole("button").length).toBe(2);
     cleanup();
     stubMatchMedia({});
@@ -161,6 +194,14 @@ describe("MediaStage", () => {
     expect(root.style.getPropertyValue("--media-stage-aspect")).toBe("21 / 9");
     expect(root.getAttribute("data-scrim")).toBe("strong");
     expect(root.hasAttribute("data-ready")).toBe(false);
+  });
+
+  test("named aspect presets map wide, standard and short, with wide as default", () => {
+    for (const [aspect, css] of [[undefined, "16 / 8.2"], ["wide", "16 / 8.2"], ["standard", "16 / 9"], ["short", "16 / 6"]] as const) {
+      const view = render(<MediaStage description="x" aspect={aspect} />);
+      expect(slot(view.container, "media-stage")!.style.getPropertyValue("--media-stage-aspect")).toBe(css);
+      cleanup();
+    }
   });
 
   test("the progress strip clamps and names its value", () => {

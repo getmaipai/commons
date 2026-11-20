@@ -9,6 +9,7 @@ import { renderWithQueryClient } from "./renderWithQueryClient";
 import { NodeRenderer } from "@/kit/schema/NodeRenderer";
 import { PageNodeSchema, type UiNode } from "@/kit/schema/types";
 import { PackageScopeContext, PageStateContext } from "@/kit/schema/packageScope";
+import { MediaHostContext, type MediaHost } from "@/kit/schema/mediaHost";
 
 export interface Call { url: string; method: string; body: unknown }
 export const calls: Call[] = [];
@@ -47,7 +48,7 @@ function Where() {
 }
 
 /** Draws `node` the way a package page does: package scope, a page-state writer, a router. */
-export function mountBlock(node: UiNode, options: { packageId?: string; state?: Record<string, unknown>; at?: string } = {}) {
+export function mountBlock(node: UiNode, options: { packageId?: string; state?: Record<string, unknown>; at?: string; host?: MediaHost | null } = {}) {
   const packageId = options.packageId ?? "videos";
   function Page() {
     const [state, setState] = useState<Record<string, unknown>>(options.state ?? {});
@@ -61,7 +62,7 @@ export function mountBlock(node: UiNode, options: { packageId?: string; state?: 
   const view = renderWithQueryClient(
     <MemoryRouter initialEntries={[options.at ?? `/apps/${packageId}`]}>
       <PackageScopeContext.Provider value={{ packageId }}>
-        <Page />
+        <MediaHostContext.Provider value={options.host ?? null}><Page /></MediaHostContext.Provider>
       </PackageScopeContext.Provider>
       <Where />
     </MemoryRouter>,

@@ -383,8 +383,9 @@ function VideoPlayerBody({
   };
   const timeText = formatClock(clock * 1000);
   const retakeLabel = (template?: string) => {
+    const labelTime = armed !== null ? formatClock(armed * 1000) : timeText;
     const line = template ?? text.retakeFrom;
-    return line ? line.replace("{time}", timeText) : i18n._({ id: "ui.Retake from {time}", message: "Retake from {time}", values: { time: timeText } });
+    return line ? line.replace("{time}", labelTime) : i18n._({ id: "ui.Retake from {time}", message: "Retake from {time}", values: { time: labelTime } });
   };
   const retakeRow = (o: { label?: string; icon?: string; disabledReason?: string; note?: string; busy?: boolean; placement?: "start" | "end" }): RowAction & { placement: "start" | "end" } => ({
     key: "retake-from",

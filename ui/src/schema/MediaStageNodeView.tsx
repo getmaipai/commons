@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useContext, type ReactNode } from "react";
 import { AsyncState } from "@/kit/primitives/AsyncState";
 import { MediaStage, MediaStageProgress, type MediaStagePill, type MediaStageState } from "@/kit/elements/media-stage";
 import { Button } from "@/kit/ui/button";
@@ -9,11 +9,14 @@ import { useBinding } from "@/kit/schema/binding";
 import { useDispatchAction } from "@/kit/schema/actions";
 import { readField } from "@/kit/schema/fieldPath";
 import { localPicture } from "@/kit/schema/mediaPath";
+import { MediaHostContext, type MediaHost } from "@/kit/schema/mediaHost";
 import type { MediaStageNode, UiNode } from "@/kit/schema/types";
 
 type Row = Record<string, unknown>;
 
 const STATES: readonly string[] = ["idle", "looping", "paused", "loading", "waiting", "error"];
+type Starts = "video" | "picture";
+type HostWithNotice = MediaHost & { makingNotice?(kind: Starts): string | null | undefined };
 const str = (v: unknown): string | undefined => (typeof v === "string" && v !== "" ? v : undefined);
 
 /** UI-BLOCKS-01: `media_stage`. The first row of `bind` is the stage. `children` (the page's own nodes, the composer) are drawn by
@@ -21,6 +24,7 @@ const str = (v: unknown): string | undefined => (typeof v === "string" && v !== 
 export function MediaStageNodeView({ node, state, renderChild }: { node: MediaStageNode; state: Row; renderChild: (child: UiNode, index: number) => ReactNode }) {
   const query = useBinding<Row[]>(node.bind, state);
   const { dispatch, pendingConfirm, lastError } = useDispatchAction();
+  const host = useContext(MediaHostContext) as HostWithNotice | null;
   const row = Array.isArray(query.data) ? query.data[0] : undefined;
   const text = (path: string | undefined): string | undefined => (row && path ? str(readField(row, path)) : undefined);
   const composer = node.children && node.children.length > 0 ? node.children.map(renderChild) : undefined;
@@ -32,13 +36,15 @@ export function MediaStageNodeView({ node, state, renderChild }: { node: MediaSt
   const title = text(node.title);
   const progress = row && node.progress ? readField(row, node.progress) : undefined;
 
-  const pills: MediaStagePill[] | undefined = node.pills?.map((pill, i) => ({ id: String(i), label: pill.label, icon: pill.icon, onSelect: () => dispatch(pill.action, [row ?? {}]) }));
+  const notice = (starts: Starts | undefined) => starts ? host?.makingNotice?.(starts) ?? undefined : undefined;
+  const pills: MediaStagePill[] | undefined = node.pills?.map((pill, i) => { const reason = notice(pill.starts); return { id: String(i), label: pill.label, icon: pill.icon, starts: pill.starts, states: pill.states, disabledReason: reason, disabled: Boolean(reason), onSelect: () => dispatch(pill.action, [row ?? {}]) }; });
   const errorActions = node.error_actions && node.error_actions.length > 0 ? (
     <>
       {node.error_actions.map((button, i) => {
         const Icon = button.icon ? getIcon(button.icon) : null;
+        const reason = notice(button.starts);
         return (
-          <Button key={i} type="button" variant={i === 0 ? "default" : "outline"} className="min-h-12" onClick={() => dispatch(button.action, [row ?? {}])}>
+          <Button key={i} type="button" variant={i === 0 ? "default" : "outline"} className="min-h-12" disabled={Boolean(reason)} title={reason} onClick={() => dispatch(button.action, [row ?? {}])}>
             {Icon ? <Icon aria-hidden className="size-4" /> : null}
             {button.label}
           </Button>
@@ -59,6 +65,7 @@ export function MediaStageNodeView({ node, state, renderChild }: { node: MediaSt
         compact={node.compact === true}
         ready={!loading}
         state={stage}
+        aspect={node.aspect}
         description={description}
         media={{
           still: localPicture(row ? readField(row, node.media.still) : undefined) ?? undefined,

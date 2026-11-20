@@ -10,6 +10,7 @@
       "media": { "still": "still.url", "loop": "loop.url", "position": "still.position" },
       "description": "description",
       "scrim": "strong",
+      "aspect": "wide",
       "state": "state",
       "eyebrow": "eyebrow",
       "title": "title",

@@ -1486,6 +1486,7 @@
         },
         "description": { "type": "string", "minLength": 1, "description": "Dotted path of the sentence that names the picture for assistive tech." },
         "scrim": { "type": "string", "enum": ["soft", "strong"] },
+        "aspect": { "type": "string", "enum": ["wide", "standard", "short"], "default": "wide" },
         "state": { "type": "string", "minLength": 1, "description": "Dotted path of the state: `idle`, `looping`, `paused`, `loading`, `waiting` or `error`." },
         "eyebrow": { "type": "string", "minLength": 1, "description": "Dotted path of the small line above the title." },
         "title": { "type": "string", "minLength": 1, "description": "Dotted path of the title." },
@@ -1498,7 +1499,7 @@
             "type": "object",
             "additionalProperties": false,
             "required": ["label", "action"],
-            "properties": { "label": { "type": "string", "minLength": 1, "maxLength": 40 }, "icon": { "type": "string", "description": "A lucide icon name." }, "action": { "$ref": "#/$defs/action" } }
+            "properties": { "label": { "type": "string", "minLength": 1, "maxLength": 40 }, "icon": { "type": "string", "description": "A lucide icon name." }, "action": { "$ref": "#/$defs/action" }, "starts": { "type": "string", "enum": ["picture", "video"] }, "states": { "type": "array", "items": { "type": "string", "enum": ["idle", "looping", "paused", "waiting", "error"] } } }
           }
         },
         "title_pill": { "type": "string", "minLength": 1, "description": "Dotted path of a small label at the top left." },
@@ -1520,7 +1521,7 @@
             "type": "object",
             "additionalProperties": false,
             "required": ["label", "action"],
-            "properties": { "label": { "type": "string", "minLength": 1, "maxLength": 40 }, "icon": { "type": "string", "description": "A lucide icon name." }, "action": { "$ref": "#/$defs/action" } }
+            "properties": { "label": { "type": "string", "minLength": 1, "maxLength": 40 }, "icon": { "type": "string", "description": "A lucide icon name." }, "action": { "$ref": "#/$defs/action" }, "starts": { "type": "string", "enum": ["picture", "video"] }, "states": { "type": "array", "items": { "type": "string", "enum": ["idle", "looping", "paused", "waiting", "error"] } } }
           }
         }
       }

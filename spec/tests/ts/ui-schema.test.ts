@@ -841,9 +841,9 @@ describe("UI-BLOCKS-01: storyboard_player, action_bar, proposal_card, voice_line
   test("media_stage takes a bound row, size, scrim, pills, a progress path, children and an error", () => {
     const node = { type: "media_stage", bind, size: "stage", media: { still: "s" }, description: "d", scrim: "soft", state: "st" };
     expect(validate(node)).toBe(true);
-    const pill = { label: "Share", icon: "share-2", action };
+    const pill = { label: "Share", icon: "share-2", action, starts: "video", states: ["idle", "error"] };
     const full = {
-      ...node, size: "hero", scrim: "strong", media: { still: "s", loop: "l", position: "p" }, eyebrow: "e", title: "t", subtitle: "u", pills: [pill], title_pill: "tp", progress: "pr", compact: true,
+      ...node, size: "hero", scrim: "strong", aspect: "standard", media: { still: "s", loop: "l", position: "p" }, eyebrow: "e", title: "t", subtitle: "u", pills: [pill], title_pill: "tp", progress: "pr", compact: true,
       children: [{ type: "empty_state", icon: "x", text: "Composer goes here" }, { type: "section", children: [empty_state] }],
       error_message: "em", error_actions: [{ label: "Try again", action }],
     };
@@ -851,6 +851,7 @@ describe("UI-BLOCKS-01: storyboard_player, action_bar, proposal_card, voice_line
     for (const size of ["hero", "stage"]) for (const scrim of ["soft", "strong"]) expect(validate({ ...node, size, scrim })).toBe(true);
     refused(node, [
       { size: "huge" },
+      { aspect: "square" },
       { size: undefined },
       { scrim: "none" },
       { scrim: undefined },

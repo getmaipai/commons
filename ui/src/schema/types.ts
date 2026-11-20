@@ -953,7 +953,7 @@ export const VoiceLineNodeSchema = z.object({
 });
 export type VoiceLineNode = z.infer<typeof VoiceLineNodeSchema>;
 
-const MediaStageButtonSchema = z.object({ label: ButtonLabelSchema, icon: z.string().optional(), action: ActionSchema }).strict();
+const MediaStageButtonSchema = z.object({ label: ButtonLabelSchema, icon: z.string().optional(), action: ActionSchema, starts: z.enum(["picture", "video"]).optional(), states: z.array(z.enum(["idle", "looping", "paused", "waiting", "error"])).optional() }).strict();
 const MediaStageBaseSchema = z.object({
   type: z.literal("media_stage"),
   bind: PackageBindingSchema,
@@ -961,6 +961,7 @@ const MediaStageBaseSchema = z.object({
   media: z.object({ still: FieldPathSchema, loop: FieldPathSchema.optional(), position: FieldPathSchema.optional() }).strict(),
   description: FieldPathSchema,
   scrim: z.enum(["soft", "strong"]),
+  aspect: z.enum(["wide", "standard", "short"]).optional(),
   state: FieldPathSchema,
   eyebrow: FieldPathSchema.optional(),
   title: FieldPathSchema.optional(),

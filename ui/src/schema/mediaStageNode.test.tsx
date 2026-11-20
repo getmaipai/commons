@@ -4,6 +4,7 @@ import { cleanup, fireEvent, waitFor } from "@testing-library/react";
 import { stubMatchMedia } from "../../tests/stubMatchMedia";
 import { calls, fixtureNode, hub, mountBlock } from "../../tests/blockHarness";
 import { MediaStageNodeSchema, PageNodeSchema } from "@/kit/schema/types";
+import type { MediaHost } from "@/kit/schema/mediaHost";
 
 const realMatchMedia = window.matchMedia;
 const originalFetch = globalThis.fetch;
@@ -17,6 +18,7 @@ const stage = {
 const node = (change: Record<string, unknown> = {}) => fixtureNode("media-stage.json", change);
 const mount = (change: Record<string, unknown> = {}) => mountBlock(node(change), { state: { film: "f1" } });
 const root = (view: ReturnType<typeof mount>) => view.container.querySelector('[data-slot="media-stage"]') as HTMLElement;
+const drawWithHost = (change: Record<string, unknown>, host: Partial<MediaHost>) => mountBlock(node(change), { state: { film: "f1" }, host: host as MediaHost });
 
 describe("media_stage node", () => {
   test("the example page parses (children are page nodes), and a stage with no children is fine", () => {
@@ -76,6 +78,24 @@ describe("media_stage node", () => {
     await waitFor(() => expect(calls.some((c) => c.url === "/api/plugins/videos/duplicate/f1")).toBe(true));
     fireEvent.click(view.getByRole("button", { name: "Library" }));
     await waitFor(() => expect(view.where().path).toBe("/apps/videos/library"));
+  });
+
+  test("starts disables pills and error actions with the host notice, then enables them without it", async () => {
+    hub({ stage: [stage] });
+    const n = { pills: [{ label: "Make video", starts: "video", action: { call: { target: "/api/plugins/videos/make/{id}" } } }], error_actions: [{ label: "Retry video", starts: "video", action: { call: { target: "/api/plugins/videos/retry/{id}" } } }] };
+    const busy = drawWithHost(n, { makingNotice: () => "Video is not ready yet." });
+    const pill = await busy.findByRole("button", { name: "Make video" }) as HTMLButtonElement;
+    expect(pill.disabled).toBe(true);
+    expect(pill.title).toBe("Video is not ready yet.");
+    cleanup();
+    hub({ stage: [{ ...stage, state: "error" }] });
+    const errorBusy = drawWithHost(n, { makingNotice: () => "Video is not ready yet." });
+    const errorAction = await errorBusy.findByRole("button", { name: "Retry video" }) as HTMLButtonElement;
+    expect(errorAction.disabled).toBe(true);
+    cleanup();
+    hub({ stage: [stage] });
+    const available = drawWithHost(n, { makingNotice: () => undefined });
+    expect((await available.findByRole("button", { name: "Make video" }) as HTMLButtonElement).disabled).toBe(false);
   });
 
   test("state looping plays the loop (a same-origin file); idle and paused keep the still only", async () => {

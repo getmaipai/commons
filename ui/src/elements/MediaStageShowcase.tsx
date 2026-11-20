@@ -57,7 +57,7 @@ export function MediaStageShowcase() {
       <Heading>{d("Loading")}</Heading>
       <MediaStage size="stage" state="loading" description={d("The video is loading")} />
       <Heading>{d("Error")}</Heading>
-      <MediaStage size="stage" state="error" media={MEDIA} description={d("A paper boat drifting on a rainy pond")} errorMessage={d("The video could not be made. Try again, or change the words.")} errorActions={<RetryButton />} />
+      <MediaStage size="stage" state="error" media={MEDIA} description={d("A paper boat drifting on a rainy pond")} eyebrow={d("Could not finish")} title={d("Your video is still within reach")} errorMessage={d("The video could not be made. The scene may need a little more detail. Try changing the words, or give it another moment before you try again.")} errorActions={<><RetryButton /><button type="button">{d("Change the words")}</button></>} />
       <Heading>{d("At 375 px")}</Heading>
       <div className="w-[375px] max-w-full">
         <MediaStage size="hero" media={MEDIA} description={d("A paper boat drifting on a rainy pond")} eyebrow={d("New video")} title={d("What should we make today?")} pills={PILLS}>
