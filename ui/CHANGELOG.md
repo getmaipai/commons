@@ -1,5 +1,6 @@
-## [ui-v0.5.709] - 2026-11-20
+## [ui-v0.5.710] - 2026-11-20
 
+- `media_shelf` vertical rows: the subtitle wraps to three lines instead of one line with an ellipsis (compact rows keep one line). A test confirms row actions draw as labelled pills beside their icon (only the play action is icon-only) and that a non-vertical shelf draws none (spec 0.1.455, VIDEO-KIT-01).
 - `SchemaPage`: the page body's bottom padding is the phone bar's inset (`--phone-nav-offset`, 0 from 640 px up) plus 1 rem, so the last item of a long page scrolls clear of the floating bottom bar (it ended 63 px under it at 360, 375 and 402 wide once the sections left the phone layout). A page with no bar keeps 1 rem as before; `floatingBar` keeps its fixed 6 rem (PHONE-07).
 
 ## [ui-v0.5.708] - 2026-11-20

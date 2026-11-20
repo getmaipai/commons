@@ -1553,7 +1553,7 @@ function MediaShelfBody({ node, state }: { node: MediaShelfNode; state: Row }) {
                 <span className="flex min-w-0 flex-col">
                   <span className={node.orientation === "vertical" && node.density !== "compact" ? "line-clamp-2 text-sm font-semibold" : "truncate text-sm font-semibold"}>{String(readField(row, node.item_label_field))}</span>
                   {node.item_subtitle_field ? (
-                    <span className="text-muted-foreground truncate text-sm">{fillTemplate(node.item_subtitle_field, row)}</span>
+                    <span className={cn("text-muted-foreground text-sm", node.orientation === "vertical" && node.density !== "compact" ? "line-clamp-3" : "truncate")}>{fillTemplate(node.item_subtitle_field, row)}</span>
                   ) : null}
                 </span>
               );

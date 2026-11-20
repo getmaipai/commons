@@ -1,3 +1,7 @@
+## [spec-v0.1.455] - 2026-11-20
+
+- `media_shelf.row_actions` description (VIDEO-KIT-01): they are drawn only in `orientation: "vertical"` rows, as labelled pills that wrap (play stays icon-only); on a rail or grid shelf they are not drawn at all. Documentation only; no refusal yet, because existing Home pages still set them on non-vertical shelves.
+
 ## [spec-v0.1.453] - 2026-11-20
 
 - `action_bar` takes an optional `note` (a dotted path into the first bound row): a plain helper line under the estimate or reason that explains and never disables a button (`reason` stays the disabled reason). It needs a `bind`, like `estimate` and `reason` (VIDEO-KIT-01).

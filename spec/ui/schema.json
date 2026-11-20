@@ -526,7 +526,7 @@
         "row_actions": {
           "type": "array",
           "maxItems": 3,
-          "description": "Vertical row controls outside the artwork button. Play is icon-only; other actions are labelled pills. Labels may contain {field} placeholders; a nonempty label_field value overrides the label. Each action receives its row, just like on_select.",
+          "description": "Vertical row controls outside the artwork button, drawn ONLY in `orientation: \"vertical\"`: a rail or grid tile has no place for them, so on any other shelf they are not drawn at all (do not set them there). Play is icon-only; other actions are labelled pills that wrap. Labels may contain {field} placeholders; a nonempty label_field value overrides the label. Each action receives its row, just like on_select.",
           "items": {
             "type": "object",
             "additionalProperties": false,
