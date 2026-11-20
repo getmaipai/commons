@@ -156,6 +156,17 @@ describe("media_stage node", () => {
     expect(idle.queryByRole("button", { name: "Stop" })).toBeNull();
   });
 
+  test("hide_when_empty: an answered empty list draws nothing, a row still draws, and the default keeps the stage", async () => {
+    hub({ stage: [] });
+    const hidden = mount({ hide_when_empty: true });
+    await waitFor(() => expect((globalThis.fetch as unknown as { mock: { calls: unknown[] } }).mock.calls.length).toBeGreaterThan(0));
+    await waitFor(() => expect(root(hidden)).toBeNull());
+    hidden.unmount();
+    hub({ stage: [stage] });
+    const shown = mount({ hide_when_empty: true });
+    expect(await shown.findByRole("heading", { name: "What should we make today?" })).toBeTruthy();
+  });
+
   test("state error: the server's message and the error actions, which call with the row", async () => {
     hub({ stage: [{ ...stage, state: "error", error: "The film could not be made. Try again, or change the words." }] });
     const view = mount();

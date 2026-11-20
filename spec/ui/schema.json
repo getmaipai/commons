@@ -1559,6 +1559,7 @@
           "items": { "$ref": "#" },
           "description": "The page's own nodes, drawn on the glass panel of a `hero` (the composer)."
         },
+        "hide_when_empty": { "type": "boolean", "default": false, "description": "Once the bound call has answered with no rows, the stage draws nothing (it still draws its loading state while the call is open). Use it for a result stage that has nothing to show before the person has made anything." },
         "error_message": { "type": "string", "minLength": 1, "description": "Dotted path of the plain error line, with the next step, shown in the `error` state." },
         "waiting_actions": {
           "type": "array",

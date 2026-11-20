@@ -70,6 +70,8 @@ export function MediaStageNodeView({ node, state, renderChild }: { node: MediaSt
     </>
   ) : undefined;
 
+  if (node.hide_when_empty === true && !loading && !row) return null;
+
   // The stage draws its own loading state; only a failed first answer gives way to the kit's retry line.
   if (query.data === undefined && query.isError) {
     return <AsyncState data={null} error isFetching={query.isFetching} onRetry={() => query.refetch()} errorLayout="row">{() => null}</AsyncState>;

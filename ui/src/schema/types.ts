@@ -995,6 +995,7 @@ const MediaStageBaseSchema = z.object({
   title_pill: FieldPathSchema.optional(),
   progress: FieldPathSchema.optional(),
   compact: z.boolean().optional(),
+  hide_when_empty: z.boolean().optional(),
   error_message: FieldPathSchema.optional(),
   waiting_actions: z.array(z.object({ label: z.string().min(1).max(40), icon: z.string().optional(), action: ActionSchema }).strict()).max(2).optional(),
   error_actions: z.array(MediaStageButtonSchema).max(3).optional(),
