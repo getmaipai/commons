@@ -115,3 +115,36 @@ describe("JobProgressShotsShowcase", () => {
     expect(v.getByRole("status").textContent).toContain("Try again on s4");
   });
 });
+
+describe("JobProgress in shots mode with no stages", () => {
+  const mk = (...states: JobProgressShot["state"][]): JobProgressShot[] => states.map((state, i) => ({ id: `s${i}`, label: `Shot ${i + 1}`, state }));
+  const header = (v: ReturnType<typeof render>) => v.container.querySelector("[data-slot=job-progress]")!.firstElementChild!;
+
+  test("a running shot keeps the job unfinished: no done word and the Cancel control shows", () => {
+    const v = render(<JobProgress title="Rendering" stages={[]} stageIndex={0} stageProgress={0} shots={mk("done", "running", "failed")} />);
+    expect(header(v).textContent).not.toMatch(/done|partial|failed/i);
+    expect(v.getByRole("button", { name: "Cancel the job" })).toBeTruthy();
+  });
+  test("a queued or held shot also keeps it running", () => {
+    for (const states of [["done", "queued"], ["done", "held"]] as const) {
+      const v = render(<JobProgress title="Rendering" stages={[]} stageIndex={0} stageProgress={0} shots={mk(...states)} />);
+      expect(v.queryByRole("button", { name: "Cancel the job" })).not.toBeNull();
+      v.unmount();
+    }
+  });
+  test("all shots done: the header says done and there is no Cancel", () => {
+    const v = render(<JobProgress title="Rendering" stages={[]} stageIndex={0} stageProgress={0} shots={mk("done", "done")} />);
+    expect(header(v).textContent).toContain("done");
+    expect(v.queryByRole("button", { name: "Cancel the job" })).toBeNull();
+  });
+  test("finished with some failed reads partial; all failed reads failed; a caller outcome wins", () => {
+    const partial = render(<JobProgress title="Rendering" stages={[]} stageIndex={0} stageProgress={0} shots={mk("done", "failed")} />);
+    expect(header(partial).textContent).toContain("partial");
+    partial.unmount();
+    const failed = render(<JobProgress title="Rendering" stages={[]} stageIndex={0} stageProgress={0} shots={mk("failed", "failed")} />);
+    expect(header(failed).textContent).toContain("failed");
+    failed.unmount();
+    const cancelled = render(<JobProgress title="Rendering" stages={[]} stageIndex={0} stageProgress={0} shots={mk("running")} outcome={{ status: "cancelled" }} />);
+    expect(header(cancelled).textContent).toContain("cancelled");
+  });
+});

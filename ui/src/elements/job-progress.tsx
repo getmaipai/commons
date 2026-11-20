@@ -283,8 +283,16 @@ export function JobProgress({
     completed + (current ? current.weight * progress : 0),
     totalWeight,
   );
-  const finished = stage >= stages.length || outcome !== undefined;
-  const outcomeLabel = outcome?.status === "success" ? doneLabel : outcome?.status === "partial" ? i18n._({ id: "ui.partial", message: "partial" }) : outcome?.status === "failed" ? i18n._({ id: "ui.failed", message: "failed" }) : outcome?.status === "cancelled" ? i18n._({ id: "ui.cancelled", message: "cancelled" }) : outcome?.status;
+  // A job drawn as a list of shots has no stages, so "all stages passed" is always true; its state comes from the shots: it is running while any
+  // shot is queued, running or held, and its outcome is read from them (all done, some failed, or all failed) unless the caller sets one.
+  const shotsMode = Boolean(shots && shots.length > 0);
+  const shotsActive = shotsMode && shots!.some((shot) => shot.state === "queued" || shot.state === "running" || shot.state === "held");
+  const shotsOutcome: NonNullable<typeof outcome> | undefined = shotsMode && !shotsActive
+    ? { status: shots!.every((shot) => shot.state === "done") ? "success" : shots!.some((shot) => shot.state === "done") ? "partial" : "failed" }
+    : undefined;
+  const shownOutcome = outcome ?? shotsOutcome;
+  const finished = shotsMode ? outcome !== undefined || !shotsActive : stage >= stages.length || outcome !== undefined;
+  const outcomeLabel = shownOutcome?.status === "success" ? doneLabel : shownOutcome?.status === "partial" ? i18n._({ id: "ui.partial", message: "partial" }) : shownOutcome?.status === "failed" ? i18n._({ id: "ui.failed", message: "failed" }) : shownOutcome?.status === "cancelled" ? i18n._({ id: "ui.cancelled", message: "cancelled" }) : shownOutcome?.status;
   const elapsedLabel = elapsedMs === undefined ? undefined : `${Math.max(0, Math.round(elapsedMs / 1000))}s`;
 
   if (presentation === "card") {
@@ -313,11 +321,11 @@ export function JobProgress({
       {...props}
     >
       <div className="flex items-center gap-2.5">
-        {outcome?.status === "partial" ? (
+        {shownOutcome?.status === "partial" ? (
           <CircleAlertIcon className="size-3.5 shrink-0 text-status-warning" />
-        ) : outcome?.status === "failed" ? (
+        ) : shownOutcome?.status === "failed" ? (
           <XIcon className="size-3.5 shrink-0 text-destructive" />
-        ) : outcome?.status === "cancelled" ? (
+        ) : shownOutcome?.status === "cancelled" ? (
           <CircleSlashIcon className="text-muted-foreground size-3.5 shrink-0" />
         ) : finished ? (
           <CheckIcon className="size-3.5 shrink-0 text-status-ok" />

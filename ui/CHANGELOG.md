@@ -1,3 +1,7 @@
+## [ui-v0.5.705] - 2026-11-20
+
+- `JobProgress` with shots and no stages: the job is finished only when no shot is queued, running or held (it read "done" with a running shot, and the Cancel control never drew). While a shot is active the header shows no outcome word and Cancel stays; when none is active the header reads done (all done), partial (some failed) or failed (none done), unless the caller sets `outcome` (VIDEO-KIT-01).
+
 ## [ui-v0.5.704] - 2026-11-20
 
 - `job_progress` refreshes itself with `poll_while` (spec 0.1.451); a bound `action_bar` draws nothing once its data answers with an empty list (it showed an enabled primary button with no reason); `job_progress` and `media_stage` draw no row-dependent controls (cancel, pills, error actions) for an empty answer. Empty answers: `storyboard_player` draws its empty state, `proposal_card` and `voice_line` draw nothing, `clip_compare` draws only when both clips resolve.
