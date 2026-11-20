@@ -788,13 +788,13 @@ describe("audio lanes with content only", () => {
   });
 });
 
-describe("the transport does not float over the Tracks card in an audio studio", () => {
-  test("sticky only for video", async () => {
+describe("the transport never floats over the picture or the Tracks card", () => {
+  test("in flow for video and audio alike (VF-EDIT-01: on a phone it sits under the preview, not over it)", async () => {
     const song = openSong();
     expect(song.container.querySelector("[data-slot='track-studio-transport']")!.className).not.toContain("sticky");
     cleanup();
     const video = open();
-    expect(video.container.querySelector("[data-slot='track-studio-transport']")!.className).toContain("max-sm:sticky");
+    expect(video.container.querySelector("[data-slot='track-studio-transport']")!.className).not.toContain("sticky");
   });
 });
 
@@ -877,5 +877,19 @@ describe("the host's own peaks", () => {
     await waitFor(() => expect(seen).toContain("/f/song.m4a"));
     await flush();
     expect(container.querySelector(`[data-lane="music"] [data-piece] svg rect`)).toBeTruthy();
+  });
+});
+
+describe("the phone export bar is one compact row (VF-EDIT-01)", () => {
+  test("a single row: the secondary export is an icon button and the hint is not drawn as a line", () => {
+    const view = open({ onExport: () => {}, onExportNle: () => {}, exportPlacement: "bottom" });
+    const bar = view.container.querySelector("[data-slot='track-studio-export-bar']") as HTMLElement;
+    expect(bar.className).toContain("items-center");
+    expect(bar.className).not.toContain("flex-col");
+    expect(bar.className).toContain("p-2");
+    expect(bar.querySelector("[data-slot='track-studio-export-nle-button']")!.textContent).toBe("");
+    expect(bar.querySelector("[data-slot='track-studio-export-nle-button']")!.getAttribute("aria-label")).toBeTruthy();
+    expect(bar.querySelector("p")).toBeNull();
+    expect(bar.querySelector(".sr-only")).not.toBeNull();
   });
 });

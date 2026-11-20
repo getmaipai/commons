@@ -6,7 +6,7 @@
 // (track-studio-engine.ts) and renders nothing: it cuts where the export dissolves, and says so. Draws on the studio tokens only. The plan, the peaks,
 // the thumbnails and every media element live in this component's own state and are gone when it unmounts or the clip relocks (K4).
 
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useId, useSyncExternalStore, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { ContrastIcon, DownloadIcon, XIcon, PauseIcon, PlayIcon, PlusIcon, Redo2Icon, RepeatIcon, ScissorsIcon, SkipBackIcon, Trash2Icon, Undo2Icon } from "lucide-react";
 import { cn, FOCUS_RING, hueTintBackground } from "@/kit/utils";
 import { useIsPhoneLayout } from "@/kit/hooks/useIsPhoneLayout";
@@ -154,6 +154,7 @@ function StudioBody(props: TrackStudioProps) {
   const { onPlanChange, onMetric } = props;
   const tools = props.tools ?? ALL_TOOLS;
   const exportPlacement = props.exportPlacement ?? "top";
+  const exportHintId = useId();
   const audioKind = (props.kind ?? "video") === "audio";
   const panels = props.panels ?? (audioKind ? AUDIO_PANELS : ALL_PANELS);
   const limits: StudioLimits = useMemo(() => ({ ...DEFAULT_LIMITS, ...props.limits }), [props.limits]);
@@ -520,7 +521,7 @@ function StudioBody(props: TrackStudioProps) {
         </div>
       </div>
 
-      <div className={cn("bg-card flex min-w-0 flex-wrap items-center gap-3 rounded-2xl p-3", !audioKind && "z-10 max-sm:sticky max-sm:shadow-lg")} data-slot="track-studio-transport">
+      <div className={cn("bg-card flex min-w-0 flex-wrap items-center gap-3 rounded-2xl p-3", !audioKind && "z-10")} data-slot="track-studio-transport">
         <Button size={isPhone ? "default" : "lg"} className="rounded-full" onClick={togglePlay} aria-label={playing ? i18n._({ id: "ui.Pause", message: "Pause" }) : i18n._({ id: "ui.Play", message: "Play" })}>{playing ? <PauseIcon /> : <PlayIcon />}{playing ? i18n._({ id: "ui.Pause", message: "Pause" }) : i18n._({ id: "ui.Play", message: "Play" })}</Button>
         {isPhone ? (
           <Button variant="secondary" size="icon" className="rounded-full" aria-label={i18n._({ id: "ui.Back to start", message: "Back to start" })} onClick={() => void seekTo(0)}><SkipBackIcon /></Button>
@@ -615,9 +616,10 @@ function StudioBody(props: TrackStudioProps) {
         </div>
         <p className="text-muted-foreground mt-3 text-sm lg:hidden">{previewLine()}</p>
       </div>
-      {props.onExport && exportPlacement !== "top" ? <div className={cn("bg-card flex min-w-0 flex-col gap-3 rounded-2xl border border-border p-3 max-sm:sticky max-sm:bottom-[var(--phone-nav-offset,0px)] max-sm:z-20", exportPlacement === "auto" && "lg:hidden")} data-slot="track-studio-export-bar">
-        <div className="flex flex-wrap gap-2"><Button size="lg" className="min-h-11 rounded-full" onClick={doExport} disabled={!changed || !!props.exportDisabledReason} data-slot="track-studio-export-button">{props.exportLabel ?? i18n._({ id: "ui.Export as a new clip", message: "Export as a new clip" })}</Button>{props.onExportNle ? <Button variant="secondary" size="lg" className="min-h-11 rounded-full" onClick={() => props.onExportNle?.(plan)} disabled={!changed || !!props.exportDisabledReason} data-slot="track-studio-export-nle-button"><DownloadIcon aria-hidden="true" />{props.exportNleLabel ?? i18n._({ id: "ui.Export for editing", message: "Export for editing" })}</Button> : null}</div>
-        {props.exportDisabledReason ? <p className="text-muted-foreground text-sm">{props.exportDisabledReason}</p> : !changed ? <p className="text-muted-foreground text-sm">{i18n._({ id: "ui.Change something to export it.", message: "Change something to export it." })}</p> : null}
+      {props.onExport && exportPlacement !== "top" ? <div className={cn("bg-card flex min-w-0 items-center justify-end gap-2 rounded-2xl border border-border p-2 max-sm:sticky max-sm:bottom-[var(--phone-nav-offset,0px)] max-sm:z-20", exportPlacement === "auto" && "lg:hidden")} data-slot="track-studio-export-bar" title={props.exportDisabledReason ?? (!changed ? i18n._({ id: "ui.Change something to export it.", message: "Change something to export it." }) : undefined)}>
+        <span className="sr-only" id={exportHintId}>{props.exportDisabledReason ?? (!changed ? i18n._({ id: "ui.Change something to export it.", message: "Change something to export it." }) : "")}</span>
+        {props.onExportNle ? <Button variant="secondary" size="icon" className="shrink-0 rounded-full" aria-label={props.exportNleLabel ?? i18n._({ id: "ui.Export for editing", message: "Export for editing" })} onClick={() => props.onExportNle?.(plan)} disabled={!changed || !!props.exportDisabledReason} data-slot="track-studio-export-nle-button"><DownloadIcon aria-hidden="true" /></Button> : null}
+        <Button className="min-w-0 flex-1 rounded-full sm:flex-none" aria-describedby={exportHintId} onClick={doExport} disabled={!changed || !!props.exportDisabledReason} data-slot="track-studio-export-button">{props.exportLabel ?? i18n._({ id: "ui.Export as a new clip", message: "Export as a new clip" })}</Button>
       </div> : null}
     </section>
   );
