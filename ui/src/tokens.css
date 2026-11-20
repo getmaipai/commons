@@ -3151,7 +3151,8 @@ html[data-pro-look] [data-slot="row-action"] [data-slot="row-action-label"] { di
   backdrop-filter: blur(10px);
 }
 [data-slot="media-stage-error"] { margin: 0; flex: 1 1 14rem; font-size: 15px; line-height: 1.4; color: var(--foreground); }
-[data-slot="media-stage-error-actions"] { display: flex; flex-wrap: wrap; gap: 8px; }
+[data-slot="media-stage-error-actions"], [data-slot="media-stage-waiting-actions"] { display: flex; flex-wrap: wrap; gap: 8px; }
+[data-slot="media-stage-waiting-actions"] { margin-top: 12px; }
 [data-slot="media-stage-progress"] { position: relative; flex: 1 1 10rem; height: 6px; border-radius: 999px; background: color-mix(in oklab, var(--foreground) 22%, transparent); }
 [data-slot="media-stage-progress-fill"] { position: relative; display: block; height: 100%; border-radius: 999px; background: var(--status-progress-ink); transition: width .3s ease; }
 [data-slot="media-stage-progress-fill"]::after { content: ""; position: absolute; top: 50%; right: -6px; width: 12px; height: 12px; border-radius: 999px; transform: translateY(-50%); background: var(--status-progress-ink); }

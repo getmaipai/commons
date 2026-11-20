@@ -996,6 +996,7 @@ const MediaStageBaseSchema = z.object({
   progress: FieldPathSchema.optional(),
   compact: z.boolean().optional(),
   error_message: FieldPathSchema.optional(),
+  waiting_actions: z.array(z.object({ label: z.string().min(1).max(40), icon: z.string().optional(), action: ActionSchema }).strict()).max(2).optional(),
   error_actions: z.array(MediaStageButtonSchema).max(3).optional(),
 });
 export type MediaStageNode = z.infer<typeof MediaStageBaseSchema> & { children?: UiNode[] };

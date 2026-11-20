@@ -143,6 +143,19 @@ describe("media_stage node", () => {
     expect(none.queryByRole("progressbar")).toBeNull();
   });
 
+  test("state waiting: waiting_actions show under the progress strip and call with the row; not in other states", async () => {
+    const wa = { waiting_actions: [{ label: "Stop", action: { call: { target: "/api/plugins/videos/cancel/{id}" } } }] };
+    hub({ stage: [{ ...stage, state: "waiting", progress: 42 }] });
+    const view = mount(wa);
+    fireEvent.click(await view.findByRole("button", { name: "Stop" }));
+    await waitFor(() => expect(calls.some((c) => c.url === "/api/plugins/videos/cancel/f1")).toBe(true));
+    view.unmount();
+    hub({ stage: [{ ...stage, state: "idle" }] });
+    const idle = mount(wa);
+    await idle.findByRole("heading", { name: "What should we make today?" });
+    expect(idle.queryByRole("button", { name: "Stop" })).toBeNull();
+  });
+
   test("state error: the server's message and the error actions, which call with the row", async () => {
     hub({ stage: [{ ...stage, state: "error", error: "The film could not be made. Try again, or change the words." }] });
     const view = mount();

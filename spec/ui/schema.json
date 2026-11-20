@@ -1514,7 +1514,7 @@
       "type": "object",
       "additionalProperties": false,
       "required": ["type", "bind", "size", "media", "description", "scrim", "state"],
-      "description": "UI-BLOCKS-01: a big picture stage: a still (with a slow drift, or a muted loop), a scrim, a title block, floating pills, an optional progress strip and, on `hero`, the page's own nodes (`children`, the composer) on a glass panel at the bottom. `bind` is a package data call; the first row is the stage (see `media_stage_row`). `media`, `description`, `state`, `eyebrow`, `title`, `subtitle`, `title_pill`, `progress` and `error_message` are dotted paths into that row, so the server supplies every word; `description` names the picture for assistive tech. `size`: `hero` is a page's top stage with the composer on it, `stage` a player or progress stage. `scrim`: how much of the bottom the picture fades under (`strong` for busy pictures). `compact` gives up the hero's minimum height because a result shows below it. In the `error` state the strip shows `error_message` and `error_actions` instead of the progress strip. A `pills` or `error_actions` action fires with the row's own fields as placeholders.",
+      "description": "UI-BLOCKS-01: a big picture stage: a still (with a slow drift, or a muted loop), a scrim, a title block, floating pills, an optional progress strip and, on `hero`, the page's own nodes (`children`, the composer) on a glass panel at the bottom. `bind` is a package data call; the first row is the stage (see `media_stage_row`). `media`, `description`, `state`, `eyebrow`, `title`, `subtitle`, `title_pill`, `progress` and `error_message` are dotted paths into that row, so the server supplies every word; `description` names the picture for assistive tech. `size`: `hero` is a page's top stage with the composer on it, `stage` a player or progress stage. `scrim`: how much of the bottom the picture fades under (`strong` for busy pictures). `compact` gives up the hero's minimum height because a result shows below it. In the `error` state the strip shows `error_message` and `error_actions` instead of the progress strip. In the `waiting` state `waiting_actions` (at most 2, for example Stop) are drawn under the progress strip. A `pills`, `waiting_actions` or `error_actions` action fires with the row's own fields as placeholders.",
       "properties": {
         "type": { "const": "media_stage" },
         "bind": { "$ref": "#/$defs/package_binding" },
@@ -1560,6 +1560,17 @@
           "description": "The page's own nodes, drawn on the glass panel of a `hero` (the composer)."
         },
         "error_message": { "type": "string", "minLength": 1, "description": "Dotted path of the plain error line, with the next step, shown in the `error` state." },
+        "waiting_actions": {
+          "type": "array",
+          "maxItems": 2,
+          "description": "Buttons drawn under the progress strip while the stage state is `waiting` (a queued or running job), for example Stop. An action fires with the row's own fields as placeholders.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label", "action"],
+            "properties": { "label": { "type": "string", "minLength": 1, "maxLength": 40 }, "icon": { "type": "string", "description": "A lucide icon name." }, "action": { "$ref": "#/$defs/action" } }
+          }
+        },
         "error_actions": {
           "type": "array",
           "maxItems": 3,

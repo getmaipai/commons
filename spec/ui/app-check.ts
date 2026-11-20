@@ -219,7 +219,7 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
   if (type === "media_stage") {
     checkBinding(node.bind, `${where} media_stage`, data, "list", out);
     if (isObject(node.media)) for (const [name, value] of Object.entries(node.media)) checkFieldPath(value, `${where} media_stage.media`, name, out);
-    for (const key of ["pills", "error_actions"]) {
+    for (const key of ["pills", "waiting_actions", "error_actions"]) {
       const buttons = node[key];
       if (Array.isArray(buttons)) buttons.forEach((button, i) => isObject(button) && checkAction(button.action, packageId, `${where} media_stage.${key}[${i}].action`, out));
     }

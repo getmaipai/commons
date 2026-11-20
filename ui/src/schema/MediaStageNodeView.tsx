@@ -56,6 +56,20 @@ export function MediaStageNodeView({ node, state, renderChild }: { node: MediaSt
     </>
   ) : undefined;
 
+  const waitingActions = row && node.waiting_actions && node.waiting_actions.length > 0 ? (
+    <>
+      {node.waiting_actions.map((button, i) => {
+        const Icon = button.icon ? getIcon(button.icon) : null;
+        return (
+          <Button key={i} type="button" variant="outline" className="min-h-12" onClick={() => dispatch(button.action, [row])}>
+            {Icon ? <Icon aria-hidden className="size-4" /> : null}
+            {button.label}
+          </Button>
+        );
+      })}
+    </>
+  ) : undefined;
+
   // The stage draws its own loading state; only a failed first answer gives way to the kit's retry line.
   if (query.data === undefined && query.isError) {
     return <AsyncState data={null} error isFetching={query.isFetching} onRetry={() => query.refetch()} errorLayout="row">{() => null}</AsyncState>;
@@ -83,6 +97,7 @@ export function MediaStageNodeView({ node, state, renderChild }: { node: MediaSt
         overlay={typeof progress === "number" && Number.isFinite(progress) ? <MediaStageProgress value={progress} label={title ?? description} /> : undefined}
         errorMessage={text(node.error_message)}
         errorActions={errorActions}
+        waitingActions={waitingActions}
       >
         {composer}
       </MediaStage>

@@ -32,6 +32,9 @@
           "submit": { "call": { "target": "/api/plugins/videos/make", "args": { "prompt": "{prompt}" } } }
         }
       ],
+      "waiting_actions": [
+        { "label": "Stop", "icon": "square", "action": { "call": { "target": "/api/plugins/videos/cancel/{id}" } } }
+      ],
       "error_message": "error",
       "error_actions": [
         { "label": "Try again", "icon": "refresh-cw", "action": { "call": { "target": "/api/plugins/videos/retry/{id}" } } },

@@ -111,6 +111,8 @@ export interface MediaStageProps {
   /** The plain error line, with the next step, shown in the `error` state. */
   errorMessage?: ReactNode;
   errorActions?: ReactNode;
+  /** Buttons under the progress strip while the stage state is `waiting` (for example Stop). */
+  waitingActions?: ReactNode;
   /** The hero has its full height (420, 560 on a wide screen). Default true; set false while the page is not ready. */
   ready?: boolean;
   /** A result shows below, so the hero gives up its minimum height. */
@@ -178,6 +180,7 @@ export function MediaStage({
   playButton,
   errorMessage,
   errorActions,
+  waitingActions,
   ready = true,
   compact = false,
   className,
@@ -257,8 +260,11 @@ export function MediaStage({
             {errorMessage ? <p data-slot="media-stage-error" role="alert">{errorMessage}</p> : null}
             {errorActions ? <div data-slot="media-stage-error-actions">{errorActions}</div> : null}
           </div>
-        ) : overlay ? (
-          <div data-slot="media-stage-overlay">{overlay}</div>
+        ) : overlay || (state === "waiting" && waitingActions) ? (
+          <div data-slot="media-stage-overlay">
+            {overlay}
+            {state === "waiting" && waitingActions ? <div data-slot="media-stage-waiting-actions">{waitingActions}</div> : null}
+          </div>
         ) : null}
       </div>
     </section>
