@@ -140,3 +140,47 @@ describe("creation_header studio variant (VIDEO-STUDIO-03)", () => {
     expect(CreationHeaderNodeSchema.parse(node).secondary).toBeUndefined();
   });
 });
+
+describe("creation_header display variant and facts, VIDEO-KIT-01 (K2)", () => {
+  const display = (change: Record<string, unknown> = {}) => CreationHeaderNodeSchema.parse({ ...node, variant: "display", eyebrow: "Studio", ...change });
+  const draw = async (n: ReturnType<typeof display>, data: Record<string, unknown>) => {
+    const original = globalThis.fetch;
+    globalThis.fetch = mock(() => Promise.resolve(new Response(JSON.stringify({ ...row, ...data }), { status: 200 }))) as unknown as typeof fetch;
+    try {
+      const view = renderWithQueryClient(<MemoryRouter><NodeRenderer node={n} /></MemoryRouter>);
+      await view.findByRole("heading");
+      return view;
+    } finally { globalThis.fetch = original; }
+  };
+
+  test("display parses, and fields.facts names the row path (default facts)", () => {
+    expect(display().variant).toBe("display");
+    expect(display().fields).toBeUndefined();
+    expect(display({ fields: { facts: "line" } }).fields?.facts).toBe("line");
+    expect(() => display({ fields: { facts: "" } })).toThrow();
+    expect(() => CreationHeaderNodeSchema.parse({ ...node, variant: "huge" })).toThrow();
+  });
+
+  test("display draws the eyebrow, the display title and the facts line, and no creator line or chip", async () => {
+    const view = await draw(display(), { title: "Juniper's gate", facts: "Full HD · 5 s · 1920×1088" });
+    const header = view.container.querySelector("header[data-variant=display]")!;
+    expect(header.querySelector("[data-slot=creation-header-eyebrow]")!.textContent).toBe("Studio");
+    expect(view.getByRole("heading", { name: "Juniper's gate" })).toBeTruthy();
+    expect(header.querySelector("[data-slot=facts-line]")!.textContent).toBe("Full HD · 5 s · 1920×1088");
+    expect(view.queryByText("Made at home")).toBeNull();
+    expect(view.queryByRole("button", { name: /sharing/ })).toBeNull();
+  });
+
+  test("a facts path reads another row field, and an empty or missing value draws nothing", async () => {
+    const view = await draw(display({ fields: { facts: "summary" } }), { title: "Gate", facts: "ignored", summary: "5 s · wide" });
+    expect(view.container.querySelector("[data-slot=facts-line]")!.textContent).toBe("5 s · wide");
+    view.unmount();
+    const none = await draw(display(), { title: "Gate", facts: "   " });
+    expect(none.container.querySelector("[data-slot=facts-line]")).toBeNull();
+  });
+
+  test("the facts line reaches the full variant too", async () => {
+    const view = await draw(CreationHeaderNodeSchema.parse(node) as ReturnType<typeof display>, { title: "Gate", facts: "5 s · wide" });
+    expect(view.container.querySelector("[data-slot=facts-line]")!.textContent).toBe("5 s · wide");
+  });
+});

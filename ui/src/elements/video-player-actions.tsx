@@ -33,7 +33,7 @@ export interface VideoPlayerAction {
   busy?: boolean;
   /** `start` puts it before the built-in actions (Download, Share, ...), `end` (default) after them. */
   placement?: "start" | "end";
-  onSelect?: () => void;
+  onSelect?: (timeSec?: number) => void;
 }
 
 /** The most actions one row draws (inline and in More together). */

@@ -387,11 +387,11 @@ function VideoPlayerBody({
     const line = template ?? text.retakeFrom;
     return line ? line.replace("{time}", labelTime) : i18n._({ id: "ui.Retake from {time}", message: "Retake from {time}", values: { time: labelTime } });
   };
-  const retakeRow = (o: { label?: string; icon?: string; disabledReason?: string; note?: string; busy?: boolean; placement?: "start" | "end" }): RowAction & { placement: "start" | "end" } => ({
+  const retakeRow = (o: { label?: string; icon?: string; disabledReason?: string; note?: string; busy?: boolean; placement?: "start" | "end"; onSelect?: (timeSec?: number) => void }): RowAction & { placement: "start" | "end" } => ({
     key: "retake-from",
     label: retakeLabel(o.label),
     icon: o.icon ? iconFor(o.icon) : <RotateCcwIcon aria-hidden />,
-    onSelect: chooseRetake,
+    onSelect: () => { const at = videoRef.current ? videoRef.current.currentTime : clock; chooseRetake(); o.onSelect?.(Number.isFinite(at) ? Math.round(at * 10) / 10 : 0); },
     disabledReason: o.disabledReason,
     note: o.note,
     busy: o.busy,
@@ -425,7 +425,7 @@ function VideoPlayerBody({
     .filter(item => (item.when ?? ["ready"]).includes(status))
     .slice(0, VIDEO_PLAYER_ACTION_CAP)
     .map((item, index) => item.kind === "retake_from"
-      ? { ...retakeRow({ label: item.label, icon: item.icon, disabledReason: item.disabledReason, note: item.note, busy: item.busy, placement: item.placement }), key: item.key ?? "retake-from" }
+      ? { ...retakeRow({ label: item.label, icon: item.icon, disabledReason: item.disabledReason, note: item.note, busy: item.busy, placement: item.placement, onSelect: item.onSelect }), key: item.key ?? "retake-from" }
       : {
         key: item.key ?? `item-${index}-${item.label}`,
         label: item.label,

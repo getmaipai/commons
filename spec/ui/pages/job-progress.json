@@ -1,0 +1,33 @@
+{
+  "type": "page",
+  "id": "job-progress",
+  "title": "Juniper's film",
+  "body": [
+    {
+      "type": "job_progress",
+      "bind": {
+        "source": "package",
+        "path": "shots"
+      },
+      "title": "Juniper's film",
+      "overall_eta_seconds": "overall_eta_seconds",
+      "item_fields": {
+        "shot_id": "id",
+        "label": "label",
+        "state": "state",
+        "progress": "progress",
+        "eta_seconds": "eta_seconds",
+        "thumb": "thumb",
+        "note": "note",
+        "held_reason": "held_reason",
+        "failure_message": "failure.message",
+        "failure_actions": "failure.actions"
+      },
+      "cancel": {
+        "call": {
+          "target": "/api/jobs/{id}/cancel"
+        }
+      }
+    }
+  ]
+}

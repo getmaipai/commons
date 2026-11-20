@@ -12,6 +12,8 @@
     { "$ref": "#/$defs/form" },
     { "$ref": "#/$defs/empty_state" },
     { "$ref": "#/$defs/progress" },
+    { "$ref": "#/$defs/job_progress" },
+    { "$ref": "#/$defs/clip_compare" },
     { "$ref": "#/$defs/list" },
     { "$ref": "#/$defs/card_grid" },
     { "$ref": "#/$defs/media_shelf" },
@@ -201,6 +203,7 @@
         },
         "made_at": { "type": ["string", "null"], "format": "date-time" },
         "description": { "type": ["string", "null"] },
+        "facts": { "type": ["string", "null"], "description": "VIDEO-KIT-01 (K2): one plain line (the `fields.facts` path, default `facts`), drawn in the kit's facts line." },
         "visibility": {
           "type": ["object", "null"],
           "properties": {
@@ -232,10 +235,10 @@
         "share_change": { "$ref": "#/$defs/share_change" },
         "candidates_bind": { "$ref": "#/$defs/binding", "description": "Optional binding returning candidate people [{id, name, avatar_url?}] for the share panel." },
         "heading_level": { "type": "string", "enum": ["h1", "h2"], "default": "h1" },
-        "variant": { "type": "string", "enum": ["full", "byline", "collection", "studio"], "default": "full", "description": "VIDEO-STUDIO-03 (K2): `studio` is a page header: the optional `eyebrow` as a small uppercase tracked line, the row's title as a huge bold uppercase heading, the row's art (`fields.art`) at the start, and `secondary` then `primary` at the end. It draws no creator line, date, description or visibility chip. Default `full`, unchanged." },
+        "variant": { "type": "string", "enum": ["full", "byline", "collection", "studio", "display"], "default": "full", "description": "VIDEO-KIT-01 (K2): `display` is a large display heading for a page about one thing: the optional `eyebrow` as a small uppercase line, the row's title as a big display heading, and the row's facts line under it. It draws no creator line, date, description, art or visibility chip, and its actions are not drawn. VIDEO-STUDIO-03 (K2): `studio` is a page header: the optional `eyebrow` as a small uppercase tracked line, the row's title as a huge bold uppercase heading, the row's art (`fields.art`) at the start, and `secondary` then `primary` at the end. It draws no creator line, date, description or visibility chip. Default `full`, unchanged." },
         "backdrop": { "type": "string", "enum": ["none", "art_gradient"], "default": "none", "description": "PARITY-01: `art_gradient` draws a soft static gradient behind the header, taken from the dominant colour of the row's art (`fields.art`), falling back to the theme tokens when the art is missing or cannot be read. Default `none`, unchanged." },
         "eyebrow": { "type": "string", "minLength": 1, "maxLength": 40, "description": "VIDEO-STUDIO-03 (K2): `studio` variant only. The line above the title (CREATE, STUDIO), drawn uppercase." },
-        "fields": { "type": "object", "additionalProperties": false, "properties": { "art": { "type": "string", "default": "art" }, "meta": { "type": "string", "default": "meta" }, "footer_lines": { "type": "string", "default": "footer_lines" }, "locked": { "type": "string", "default": "locked", "description": "VIDEO-STUDIO-03 (K2): `studio` variant only. Dotted path to a boolean in the row; true draws no art, eyebrow or title (an adult-only item while the lock is on). The actions stay." } } },
+        "fields": { "type": "object", "additionalProperties": false, "properties": { "art": { "type": "string", "default": "art" }, "meta": { "type": "string", "default": "meta" }, "footer_lines": { "type": "string", "default": "footer_lines" }, "locked": { "type": "string", "default": "locked", "description": "VIDEO-STUDIO-03 (K2): `studio` variant only. Dotted path to a boolean in the row; true draws no art, eyebrow or title (an adult-only item while the lock is on). The actions stay." }, "facts": { "type": "string", "default": "facts", "description": "VIDEO-KIT-01 (K2): dotted path to one plain line the server writes (\"Full HD · 5 s · 1920×1088\"), drawn in the kit's facts line (monospace, muted) in every variant. A missing or empty value draws nothing. The kit never builds this text." } } },
         "primary": { "type": "object", "additionalProperties": false, "required": ["label", "action"], "properties": { "label": { "type": "string", "minLength": 1 }, "icon": { "type": "string" }, "action": { "$ref": "#/$defs/action" } } },
         "secondary": { "type": "object", "additionalProperties": false, "required": ["label", "action"], "description": "VIDEO-STUDIO-03 (K2): `studio` variant only. A quiet pill drawn before `primary` (at most one primary).", "properties": { "label": { "type": "string", "minLength": 1 }, "icon": { "type": "string" }, "action": { "$ref": "#/$defs/action" } } },
         "shuffle": { "type": "object", "additionalProperties": false, "required": ["label", "action"], "properties": { "label": { "type": "string", "minLength": 1 }, "icon": { "type": "string", "description": "MUSIC-POLISH-01: an icon name from the kit set. Default \"shuffle\"." }, "labeled": { "type": "boolean", "default": false, "description": "MUSIC-POLISH-01: draw the label beside the icon, not an icon alone (an Artist's Start radio)." }, "action": { "$ref": "#/$defs/action" } } },
@@ -344,6 +347,26 @@
         "bind": { "$ref": "#/$defs/binding" }
       }
     },
+    "job_progress": {
+      "type": "object", "additionalProperties": false, "required": ["type", "bind", "item_fields"],
+      "description": "VIDEO-KIT-01 (K7): JobProgress with bound shot rows. Each action in failure_actions is {label, action} and dispatches with its shot row.",
+      "properties": {
+        "type": { "const": "job_progress" }, "bind": { "$ref": "#/$defs/binding" },
+        "title": { "type": "string", "minLength": 1 }, "overall_eta_seconds": { "type": "string", "minLength": 1, "description": "Dotted path in the first bound row to the overall ETA in seconds." },
+        "cancel": { "$ref": "#/$defs/action", "description": "Fired with the bound shot rows." },
+        "item_fields": { "type": "object", "additionalProperties": false, "required": ["shot_id", "label", "state", "progress", "eta_seconds", "thumb", "note", "held_reason", "failure_message", "failure_actions"], "properties": {
+          "shot_id": { "type": "string" }, "label": { "type": "string" }, "state": { "type": "string", "enum": ["queued", "running", "done", "held", "failed"] },
+          "progress": { "type": "string", "description": "Dotted path to a number from 0 to 1 (or 0 to 100)." }, "eta_seconds": { "type": "string" }, "thumb": { "type": "string", "description": "Same-origin image path." }, "note": { "type": "string" }, "held_reason": { "type": "string" }, "failure_message": { "type": "string" },
+          "failure_actions": { "type": "string", "description": "Dotted path to an optional array of {label, action}; actions dispatch with their shot row." }
+        } }
+      }
+    },
+    "clip_compare": {
+      "type": "object", "additionalProperties": false, "required": ["type", "before", "after"],
+      "description": "VIDEO-KIT-01 (K8): compare two same-origin media addresses, literal or bound upstream before this node.",
+      "properties": { "type": { "const": "clip_compare" }, "before": { "$ref": "#/$defs/clip_compare_side" }, "after": { "$ref": "#/$defs/clip_compare_side" }, "mode": { "type": "string", "enum": ["side_by_side", "wipe"], "default": "side_by_side" }, "mode_state": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 40 } }
+    },
+    "clip_compare_side": { "type": "object", "additionalProperties": false, "required": ["src", "kind"], "properties": { "src": { "type": "string", "minLength": 1, "description": "Same-origin address." }, "kind": { "type": "string", "enum": ["video", "image"] }, "label": { "type": "string" }, "poster": { "type": "string", "description": "Same-origin poster address." } } },
     "batch_action": {
       "type": "object",
       "additionalProperties": false,
@@ -735,6 +758,7 @@
             "favorite": { "$ref": "#/$defs/feed_handler" }
           }
         },
+        "retake_from": { "type": "object", "additionalProperties": false, "required": ["label", "action"], "description": "The VideoPlayer's retake_from action. The action receives the row plus numeric {time_sec} from the scrubber; disabled_reason_path reads a row reason.", "properties": { "label": { "type": "string", "minLength": 1, "maxLength": 40 }, "action": { "$ref": "#/$defs/action" }, "disabled_reason_path": { "type": "string", "minLength": 1 } } },
         "actions": {
           "type": "array",
           "maxItems": 24,
@@ -1971,6 +1995,12 @@
               "minLength": 1,
               "maxLength": 40
             },
+            "facts": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120,
+              "description": "VIDEO-KIT-01 (K2): one plain line under the quality choice, in the kit's facts line (monospace, muted), for example \"Full HD · 5 s · 24 fps\". Written by the page; the kit never builds it. Absent: no line."
+            },
             "default": {
               "type": "string",
               "enum": [
@@ -2007,6 +2037,12 @@
                   "hint": {
                     "type": "string",
                     "maxLength": 80
+                  },
+                  "time": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80,
+                    "description": "VIDEO-KIT-01 (K2): a short plain time for this level (\"About 8 minutes for 5 seconds\"), written by the page or the server, never built by the kit. Drawn with the hint as one line in every presentation, and on the card in `cards`; it wins over the time a `submit_detail` label gives this level. Absent: the level shows its hint alone. Say time, never credits. A level with a `disabled_reason` shows no time."
                   },
                   "disabled_reason": {
                     "type": "string",

@@ -67,6 +67,8 @@ import { ActionBarNodeView } from "@/kit/schema/ActionBarNodeView";
 import { ProposalCardNodeView } from "@/kit/schema/ProposalCardNodeView";
 import { VoiceLineNodeView } from "@/kit/schema/VoiceLineNodeView";
 import { MediaStageNodeView } from "@/kit/schema/MediaStageNodeView";
+import { JobProgressNodeView } from "@/kit/schema/JobProgressNodeView";
+import { ClipCompareNodeView } from "@/kit/schema/ClipCompareNodeView";
 import { isOwnBlobUrl, localPicture } from "@/kit/schema/mediaPath";
 import { evaluateCondition } from "@/kit/schema/condition";
 import { fillTemplate, readField, writeField } from "@/kit/schema/fieldPath";
@@ -180,6 +182,9 @@ function CreationHeaderNodeView({ node, state }: { node: CreationHeaderNode; sta
   const base = { ...row };
   const fire = (action: Action, personId?: string) => dispatch(action, [{ ...base, ...(personId ? { person_id: personId } : {}) }]);
   const artValue = row[node.fields?.art ?? "art"];
+  // VIDEO-KIT-01 (K2): one plain line the server writes, drawn by the element's facts line (nothing when empty).
+  const factsValue = row[node.fields?.facts ?? "facts"];
+  const facts = typeof factsValue === "string" && factsValue.trim() !== "" ? factsValue : null;
   return (
     <div className={node.backdrop === "art_gradient" ? "relative isolate" : "contents"} data-slot={node.backdrop === "art_gradient" ? "creation-backdrop" : undefined}>
       {node.backdrop === "art_gradient" ? <ArtGradient art={typeof artValue === "string" ? localPicture(artValue) : null} /> : null}
@@ -188,6 +193,7 @@ function CreationHeaderNodeView({ node, state }: { node: CreationHeaderNode; sta
         headingLevel={node.heading_level}
         visibility={{ mode, people, canManage: false, onOpen: () => undefined }}
         variant="studio"
+        facts={facts}
         eyebrow={node.eyebrow}
         art={typeof row[node.fields?.art ?? "art"] === "string" ? row[node.fields?.art ?? "art"] as string : null}
         locked={row[node.fields?.locked ?? "locked"] === true}
@@ -201,17 +207,26 @@ function CreationHeaderNodeView({ node, state }: { node: CreationHeaderNode; sta
         headingLevel={node.heading_level}
         visibility={{ mode, people, canManage: rawVisibility.can_manage === true, onOpen: () => setOpen(true) }}
         variant="collection"
+        facts={facts}
         art={typeof row[node.fields?.art ?? "art"] === "string" ? row[node.fields?.art ?? "art"] as string : null}
         meta={typeof row[node.fields?.meta ?? "meta"] === "string" ? row[node.fields?.meta ?? "meta"] as string : null}
         primary={node.primary ? { ...node.primary, onSelect: () => fire(node.primary!.action) } : undefined}
         shuffle={node.shuffle ? { ...node.shuffle, onSelect: () => fire(node.shuffle!.action) } : undefined}
         more={(node.more ?? []).map(item => ({ ...item, onSelect: () => fire(item.action) }))}
       />
+      : node.variant === "display" ? <CreationHeader
+        title={typeof row.title === "string" ? row.title : null}
+        headingLevel={node.heading_level}
+        visibility={{ mode, people, canManage: false, onOpen: () => undefined }}
+        variant="display"
+        eyebrow={node.eyebrow}
+        facts={facts}
+      />
       : <CreationHeader
         title={typeof row.title === "string" ? row.title : null}
         creator={{ name: typeof creator.name === "string" ? creator.name : null, avatarUrl: typeof creator.avatar_url === "string" && !/\{[^{}]+\}/.test(creator.avatar_url) ? creator.avatar_url : null, avatarSeed: typeof creator.avatar_seed === "string" && !/\{[^{}]+\}/.test(creator.avatar_seed) ? creator.avatar_seed : null, label: typeof creator.label === "string" ? creator.label : null, href: typeof creator.href === "string" ? creator.href : null, linkLabel: typeof creator.link_label === "string" ? creator.link_label : null }}
         madeAt={typeof row.made_at === "string" ? row.made_at : null} description={typeof row.description === "string" ? row.description : null} headingLevel={node.heading_level}
-        visibility={{ mode, people, canManage: rawVisibility.can_manage === true, onOpen: () => setOpen(true) }} variant={node.variant === "byline" ? "byline" : "full"} />}
+        visibility={{ mode, people, canManage: rawVisibility.can_manage === true, onOpen: () => setOpen(true) }} variant={node.variant === "byline" ? "byline" : "full"} facts={facts} />}
       <SharePanel open={open} onOpenChange={setOpen} people={people} candidates={candidates} canManage={rawVisibility.can_manage === true}
         onAdd={(id) => fire(node.share_change.add, id)} onRemove={(id) => fire(node.share_change.remove, id)} onMakePrivate={() => fire(node.share_change.make_private)} />
     </div>
@@ -1001,7 +1016,10 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
   const quality = withModes && tierList.length > 1 && node.tier ? {
     value: tierList.some((t) => t.id === tier) ? tier : tierList[0]!.id,
     onValueChange: (next: string) => { setTier(next as TierId); writer?.merge({ [node.tier!.state]: next }); },
-    options: tierList.map((t) => ({ value: t.id, label: t.label, ...(t.hint ? { detail: t.hint } : {}) })),
+    options: tierList.map((t) => {
+      const detail = [t.hint, t.disabled_reason ? undefined : t.time].filter(Boolean).join(" · ");
+      return { value: t.id, label: t.label, ...(detail ? { detail } : {}) };
+    }),
   } : undefined;
   return (
     <PromptBar
@@ -1088,7 +1106,8 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
         label: node.tier.label,
         presentation: node.tier.presentation,
         details: node.submit_detail && node.submit_detail.state === node.tier.state ? node.submit_detail.labels : undefined,
-        tiers: node.tier.tiers.map((t) => ({ id: t.id, label: t.label, hint: t.hint, disabledReason: t.disabled_reason, confirm: t.confirm })),
+        facts: node.tier.facts,
+        tiers: node.tier.tiers.map((t) => ({ id: t.id, label: t.label, hint: t.hint, time: t.time, disabledReason: t.disabled_reason, confirm: t.confirm })),
         onValueChange: (next) => { setTier(next); writer?.merge({ [node.tier!.state]: next }); },
       } : undefined}
     />
@@ -2544,6 +2563,10 @@ export function NodeRenderer({ node, state = {} }: { node: UiNode; state?: Row }
       return <BillboardNodeView node={node} state={state} />;
     case "player":
       return <PlayerNodeView node={node} state={state} />;
+    case "job_progress":
+      return <JobProgressNodeView node={node} state={state} />;
+    case "clip_compare":
+      return <ClipCompareNodeView node={node} state={state} />;
     case "reader":
       return <ReaderNodeView node={node} state={state} />;
     case "detail_pane":

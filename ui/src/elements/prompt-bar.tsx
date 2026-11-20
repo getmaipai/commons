@@ -119,6 +119,7 @@ export interface PromptBarTier {
   presentation?: "segment" | "cards" | "dropdown";
   /** VIDEO-UI-12: cards only: the time words for each level, by id. */
   details?: Readonly<Record<string, string>>;
+  facts?: string;
 }
 
 export interface PromptBarSuggestion {

@@ -153,6 +153,11 @@ export function ResultFeedNodeView({ node, state }: { node: ResultFeedNode; stat
     const favorite = call("favorite");
     if (favorite) player.onFavorite = favorite;
     if (f.favorite) player.favorite = readField(row, f.favorite) === true;
+    if (node.retake_from) {
+      const retake = node.retake_from;
+      const disabledReason = retake.disabled_reason_path ? str(readField(row, retake.disabled_reason_path)) : undefined;
+      player.actionItems = [...(player.actionItems ?? []), { key: "retake-from", kind: "retake_from", label: retake.label, disabledReason, onSelect: (timeSec?: number) => dispatch(retake.action, [{ ...row, time_sec: timeSec ?? 0 }]) }];
+    }
     // Keep each control's host default `starts` unless the handler names one.
     for (const key of Object.keys(controls) as VideoPlayerControlName[]) if (controls[key]!.starts === undefined) delete controls[key]!.starts;
     if (Object.keys(controls).length > 0) player.controls = controls;

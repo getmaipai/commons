@@ -87,6 +87,12 @@ export const ProgressNodeSchema = z.object({
 });
 export type ProgressNode = z.infer<typeof ProgressNodeSchema>;
 
+export const JobProgressNodeSchema = z.object({ type: z.literal("job_progress"), bind: BindingSchema, item_fields: z.object({ shot_id: z.string().min(1), label: z.string().min(1), state: z.string().min(1), progress: z.string().min(1), eta_seconds: z.string().min(1), thumb: z.string().min(1), note: z.string().min(1), held_reason: z.string().min(1), failure_message: z.string().min(1), failure_actions: z.string().min(1) }).strict(), title: z.string().min(1).optional(), overall_eta_seconds: z.string().min(1).optional(), cancel: ActionSchema.optional() }).strict();
+export type JobProgressNode = z.infer<typeof JobProgressNodeSchema>;
+const SameOriginMediaPathSchema = z.string().regex(/^\/(?!\/)[^\\]*$|^blob:/);
+export const ClipCompareNodeSchema = z.object({ type: z.literal("clip_compare"), before: z.object({ src: SameOriginMediaPathSchema, kind: z.enum(["video", "image"]), label: z.string().optional(), poster: SameOriginMediaPathSchema.optional() }).strict(), after: z.object({ src: SameOriginMediaPathSchema, kind: z.enum(["video", "image"]), label: z.string().optional(), poster: SameOriginMediaPathSchema.optional() }).strict(), mode: z.enum(["side_by_side", "wipe"]).default("side_by_side"), mode_state: z.string().min(1).optional() }).strict();
+export type ClipCompareNode = z.infer<typeof ClipCompareNodeSchema>;
+
 /** The three creation sharing operations are host-owned calls, never navigation or another action kind. */
 const ShareCallActionSchema = z.object({
   call: z.object({ target: z.string(), method: z.enum(["POST", "PATCH", "DELETE"]).default("POST"), args: z.record(z.string(), z.unknown()).optional() }),
@@ -121,13 +127,13 @@ export const CreationHeaderNodeSchema = z.object({
   share_change: ShareChangeSchema,
   candidates_bind: BindingSchema.optional(),
   heading_level: z.enum(["h1", "h2"]).default("h1"),
-  variant: z.enum(["full", "byline", "collection", "studio"]).default("full"),
+  variant: z.enum(["full", "byline", "collection", "studio", "display"]).default("full"),
   // PARITY-01: a static gradient from the art's dominant colour behind the header.
   backdrop: z.enum(["none", "art_gradient"]).optional(),
   // VIDEO-STUDIO-03 (K2): the studio page header.
   eyebrow: z.string().min(1).max(40).optional(),
   secondary: z.object({ label: z.string().min(1), icon: z.string().optional(), action: ActionSchema }).optional(),
-  fields: z.object({ art: z.string().min(1).default("art"), meta: z.string().min(1).default("meta"), footer_lines: z.string().min(1).default("footer_lines"), locked: z.string().min(1).default("locked") }).strict().optional(),
+  fields: z.object({ art: z.string().min(1).default("art"), meta: z.string().min(1).default("meta"), footer_lines: z.string().min(1).default("footer_lines"), locked: z.string().min(1).default("locked"), facts: z.string().min(1).default("facts") }).strict().optional(),
   primary: z.object({ label: z.string().min(1), icon: z.string().optional(), action: ActionSchema }).optional(),
   shuffle: z.object({ label: z.string().min(1), icon: z.string().optional(), labeled: z.boolean().optional(), action: ActionSchema }).optional(),
   more: z.array(z.object({ label: z.string().min(1), icon: z.string().optional(), action: ActionSchema })).optional(),
@@ -617,6 +623,8 @@ export const PromptBarNodeSchema = z.object({
       presentation: z.enum(["segment", "cards", "dropdown"]).optional(),
       state: z.string().regex(/^[a-z][a-z0-9_]*$/).max(40),
       label: z.string().min(1).max(40).optional(),
+      // VIDEO-KIT-01 (K2): one plain line under the quality choice.
+      facts: z.string().min(1).max(120).optional(),
       default: z.enum(["standard", "boost", "max"]).optional(),
       tiers: z
         .array(
@@ -624,6 +632,8 @@ export const PromptBarNodeSchema = z.object({
             id: z.enum(["standard", "boost", "max"]),
             label: z.string().min(1).max(24),
             hint: z.string().max(80).optional(),
+            // VIDEO-KIT-01 (K2): a short plain time for this level, drawn with the hint.
+            time: z.string().min(1).max(80).optional(),
             disabled_reason: z.string().max(120).optional(),
             confirm: z.string().max(200).optional(),
           }),
@@ -807,6 +817,7 @@ export const ResultFeedNodeSchema = z.object({
     })
     .strict()
     .optional(),
+  retake_from: z.object({ label: z.string().min(1).max(40), action: ActionSchema, disabled_reason_path: z.string().min(1).optional() }).strict().optional(),
   actions: z
     .array(
       z.object({
@@ -1152,6 +1163,8 @@ export type UiNode =
   | FormNode
   | EmptyStateNode
   | ProgressNode
+  | JobProgressNode
+  | ClipCompareNode
   | CreationHeaderNode
   | ListNode
   | CardGridNode
@@ -1192,6 +1205,8 @@ export const UiNodeSchema: z.ZodType<UiNode> = z.lazy(() =>
     FormNodeSchema,
     EmptyStateNodeSchema,
     ProgressNodeSchema,
+  JobProgressNodeSchema,
+  ClipCompareNodeSchema,
     CreationHeaderNodeSchema,
     ListNodeSchema,
     CardGridNodeSchema,
@@ -1235,6 +1250,8 @@ export const NODE_TYPES = [
   "form",
   "empty_state",
   "progress",
+  "job_progress",
+  "clip_compare",
   "creation_header",
   "list",
   "card_grid",

@@ -1,0 +1,5 @@
+{
+  "type": "page", "id": "clip-compare", "title": "Juniper's film", "body": [
+    { "type": "clip_compare", "before": { "src": "/media/juniper-before.mp4", "kind": "video", "label": "Before", "poster": "/media/juniper-before.jpg" }, "after": { "src": "/media/juniper-after.mp4", "kind": "video", "label": "After", "poster": "/media/juniper-after.jpg" }, "mode": "side_by_side", "mode_state": "compare_mode" }
+  ]
+}
