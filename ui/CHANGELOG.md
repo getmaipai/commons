@@ -1,3 +1,8 @@
+## [ui-v0.5.691] - 2026-11-20
+
+- New video kit Elements (VIDEO-KIT-01), none wired into Home yet: `StoryboardPlayer` (`elements/storyboard-player`, a timed rough cut of shots with voice lines and an optional sound bed, a scrub bar marked at shot boundaries, captions and a shot strip with waveforms; states loading, no picture, being changed, playing); `ActionBar` (`elements/action-bar`, a sticky bar with a primary and a secondary action, a server-supplied estimate line, busy and disabled states and a reason line); `ProposalCard` (`elements/proposal-card`, pictures with "Matches your photo" or "Guessed by MaiPai" badges, an editable description, approve, change and discard); `VoiceLineRow` (`elements/voice-line-row`, play, speaker, reading n of m, say it differently, use the other reading, making state).
+- `TierSegment`: a level can carry `time` (a short server-supplied time); the segment draws it after the hint on one line, and the cards use it before `details`. `JobProgress`: a `shots` list with honest time left per shot and overall, a held state, a failed state with next-step actions and a "fixed on its own" note slot.
+
 ## [ui-v0.5.689] - 2026-11-17
 
 - `prompt_bar`: a recipe field that is shown sends what was typed with the submit under its own state name, so a `{blank_subject}` argument fills (before, it reached the server unfilled, so a template's typed words were dropped).
