@@ -1,3 +1,7 @@
+## [ui-v0.5.726] - 2026-11-20
+
+- `StoryboardPlayer`: while no shot has a picture or a clip the stage is one 4 rem line (icon and "No picture yet"), not a 16:9 box. `ActionBar` on a phone with a secondary button is one compact row: the buttons side by side, the estimate and note lines kept for assistive tech only, so the bar no longer covers the player (VIDEO-KIT-01).
+
 ## [ui-v0.5.725] - 2026-11-20
 
 - `StoryboardPlayer` empty state is a 16:9 card (the stage's own shape), so an empty film page does not jump when shots arrive (VIDEO-KIT-01).
