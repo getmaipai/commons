@@ -3053,6 +3053,9 @@ html[data-pro-look] [data-slot="data-table-mobile-sort"] { flex-wrap: nowrap; ov
 /* The PRO look draws a shelf row action as a ghost icon button; its label stays as the accessible name and tooltip. */
 html[data-pro-look] [data-slot="row-action"]:not([data-variant="inverse"]) { border-color: transparent; background: transparent; box-shadow: none; width: 3rem; min-width: 3rem; padding: 0; }
 html[data-pro-look] [data-slot="row-action"] [data-slot="row-action-label"] { display: none; }
+/* A vertical shelf row (a list of films or clips) keeps its action words visible, as outline pills: Keep, Skip, Make again are not guessable from an icon. */
+html[data-pro-look] [data-slot="media-shelf"][data-orientation="vertical"] [data-slot="row-action"]:not([data-variant="inverse"]) { border-color: var(--border); width: auto; min-width: 3rem; padding-inline: 1rem; }
+html[data-pro-look] [data-slot="media-shelf"][data-orientation="vertical"] [data-slot="row-action"] [data-slot="row-action-label"] { display: inline; }
 
 /* KIT-QA-01: the phone header's height as one variable, so a full-screen flow dialog sits under it (and the safe area) instead of over it. */
 :root { --phone-header-height: 3.5rem; }
