@@ -15,3 +15,30 @@ test("EmptyState default stays unchanged and tile variant renders its title and 
   expect(tile.className).toContain("size-24");
   expect(tile.className).toContain("var(--accent-hero)");
 });
+
+test("actionVariant maps to the kit Button looks; left out, the button stays secondary", () => {
+  const draw = (actionVariant?: "default" | "secondary" | "ghost" | "outline", variant?: "tile") => {
+    const button = render(<EmptyState icon="check" text="Nothing here" variant={variant} actionLabel="Add one" onAction={() => {}} actionVariant={actionVariant} />).getByRole("button", { name: "Add one" });
+    const look = { variant: button.getAttribute("data-variant"), className: button.className };
+    cleanup();
+    return look;
+  };
+  for (const variant of [undefined, "tile"] as const) {
+    const baseline = draw(undefined, variant);
+    expect(baseline.variant).toBe("secondary");
+    expect(draw("secondary", variant)).toEqual(baseline);
+    for (const look of ["default", "ghost", "outline"] as const) expect(draw(look, variant).variant).toBe(look);
+  }
+  expect(draw("default").className).toContain("bg-primary");
+  expect(draw("outline").className).toContain("border");
+  expect(draw("outline", "tile").className).toContain("rounded-full");
+});
+
+test("actionVariant leaves the second button ghost", () => {
+  const second = (actionVariant?: "outline") => {
+    const className = render(<EmptyState icon="check" text="Nothing here" actionLabel="Add one" onAction={() => {}} actionVariant={actionVariant} secondaryLabel="Later" onSecondary={() => {}} />).getByRole("button", { name: "Later" }).className;
+    cleanup();
+    return className;
+  };
+  expect(second("outline")).toBe(second());
+});

@@ -72,6 +72,8 @@ export const EmptyStateNodeSchema = z.object({
   action: ActionSchema.optional(),
   /** The button's own words for the action (spec `empty_state.action_label`); without it the kit derives a plain label. */
   action_label: z.string().min(1).max(40).optional(),
+  /** The main button's look (spec `empty_state.action_variant`): the kit Button variants; without it the button stays the quiet `secondary`. */
+  action_variant: z.enum(["default", "secondary", "ghost", "outline"]).optional(),
   /** A second way forward, drawn as a quiet button beside the first (spec `empty_state.secondary_action`). Only drawn when `action` is set. */
   secondary_action: ActionSchema.optional(),
   secondary_action_label: z.string().min(1).max(40).optional(),
@@ -774,6 +776,8 @@ export const ResultFeedNodeSchema = z.object({
       created_at: z.string().optional(),
       width: z.string().optional(),
       height: z.string().optional(),
+      // VIDEO-KIT-01: one plain line the server writes, drawn in the kit's facts line under the words.
+      facts: z.string().optional(),
       // ADULT-LOCK-01: a row whose `locked` path (default "locked") is true is one lock tile; `making` (default "making") adds its spinner.
       locked: z.string().optional(),
       making: z.string().optional(),
@@ -819,7 +823,9 @@ export const ResultFeedNodeSchema = z.object({
   actions_variant: z.enum(["default", "icons"]).default("default"),
   actions_inline: z.number().int().min(1).max(8).optional(),
   // VIDEO-UI-14: the media-first feed and the one View button for the filters.
-  look: z.enum(["default", "media"]).default("default"),
+  // VIDEO-KIT-01: `stage` draws each finished entry on the kit's MediaStage look; `overlay_actions` floats the row actions on the picture.
+  look: z.enum(["default", "media", "stage"]).default("default"),
+  overlay_actions: z.boolean().optional(),
   filters_presentation: z.enum(["inline", "popover"]).default("inline"),
   // VIDEO-STUDIO-03 (K5): the day headings and filter labels as a small uppercase tracked eyebrow.
   heading_style: z.enum(["default", "eyebrow"]).optional(),

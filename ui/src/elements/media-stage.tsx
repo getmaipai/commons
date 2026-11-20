@@ -29,6 +29,10 @@ export interface MediaStagePill {
   disabled?: boolean;
   /** Why the action is off, in plain words with the next step. Shown under the label in the More menu and as the tooltip of a disabled pill. */
   disabledReason?: string;
+  /** A toggle pill (Favorite): drawn as pressed or not (`aria-pressed`). Absent: a plain button. */
+  pressed?: boolean;
+  /** Same as `disabledReason` (the name the result feed uses). */
+  reason?: string;
 }
 
 /** The phone width (the stage's own CSS breakpoint). Under it the pills stay in one row and the extra ones go into a More menu. */
@@ -39,7 +43,7 @@ const PHONE_MAX_PILLS = 2;
 function PillButton({ pill }: { pill: MediaStagePill }) {
   const Icon = pill.icon ? getIcon(pill.icon) : null;
   return (
-    <button type="button" data-slot="media-stage-pill" aria-label={pill.label} title={pill.disabled ? pill.disabledReason : undefined} disabled={pill.disabled} onClick={pill.onSelect}>
+    <button type="button" data-slot="media-stage-pill" aria-label={pill.label} aria-pressed={pill.pressed} title={pill.disabled ? (pill.disabledReason ?? pill.reason) : undefined} disabled={pill.disabled} onClick={pill.onSelect}>
       {Icon ? <Icon aria-hidden className="size-4 shrink-0" /> : null}
       <span data-slot="media-stage-pill-label" data-iconless={Icon ? undefined : ""}>{pill.label}</span>
     </button>

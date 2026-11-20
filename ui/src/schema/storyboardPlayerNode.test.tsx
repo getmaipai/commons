@@ -119,6 +119,13 @@ describe("storyboard_player node", () => {
     await waitFor(() => expect(calls.some((c) => c.url.endsWith("/first-shot"))).toBe(true));
   });
 
+  test("no rows: the empty state's action_variant draws the button in that kit look", async () => {
+    hub({ shots: [] });
+    const view = mountBlock(node({ empty_state: { type: "empty_state", icon: "film", text: "No shots yet. Describe the first scene.", action: { call: { target: "/api/plugins/videos/first-shot" } }, action_label: "Add a shot", action_variant: "default" } }));
+    await view.findByText("No shots yet. Describe the first scene.");
+    expect(view.getByRole("button", { name: "Add a shot" }).getAttribute("data-variant")).toBe("default");
+  });
+
   test("a failed call says so once and offers Try again", async () => {
     hub({ shots: "fail" });
     const view = mountBlock(node());

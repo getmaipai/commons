@@ -1,6 +1,6 @@
 // VIDEO-UI-04 (K10): the ResultFeed Element draws entries in the order given, grouped, with a filter bar.
 import { afterEach, describe, expect, mock, test } from "bun:test";
-import { cleanup, fireEvent, render } from "@testing-library/react";
+import { cleanup, fireEvent, render, within } from "@testing-library/react";
 import { ResultFeed, feedDayLabel, groupFeedEntries, type ResultFeedEntry } from "./result-feed";
 
 afterEach(cleanup);
@@ -171,5 +171,112 @@ describe("ResultFeed filters_presentation popover", () => {
     expect(view.getAllByRole("switch").length).toBe(2);
     expect(view.getByRole("combobox", { name: "Type" })).toBeTruthy();
     expect(view.queryByRole("button", { name: /^View/ })).toBeNull();
+  });
+});
+
+describe("ResultFeed facts, overlayActions and the stage look (VIDEO-KIT-01)", () => {
+  const take = (key: string, extra: Partial<ResultFeedEntry> = {}, player: Record<string, unknown> = {}): ResultFeedEntry => ({
+    key,
+    words: `words ${key}`,
+    facts: `Full HD · 5 s · ${key}`,
+    player: { status: "ready", prompt: `words ${key}`, src: `/${key}.mp4`, poster: `/${key}.jpg`, ...player } as ResultFeedEntry["player"],
+    ...extra,
+  });
+
+  test("a facts line draws once under the words in every look, and nothing without it", () => {
+    for (const look of ["default", "media"] as const) {
+      const view = render(<ResultFeed look={look} entries={[take("a"), { ...take("b"), facts: undefined }, { ...take("c"), facts: "  " }]} grouping="none" />);
+      const lines = view.container.querySelectorAll("[data-slot=facts-line]");
+      expect(lines.length).toBe(1);
+      expect(lines[0]!.textContent).toBe("Full HD · 5 s · a");
+      const first = view.getAllByRole("article")[0]!;
+      const words = first.querySelector("[data-slot=result-feed-words]")!;
+      expect(words.compareDocumentPosition(lines[0]!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      cleanup();
+    }
+  });
+
+  test("without facts or overlayActions the default and media looks draw exactly what they did", () => {
+    const entries = () => [take("a", { facts: undefined }), take("b", { facts: undefined }, { status: "generating", src: undefined })];
+    for (const look of ["default", "media"] as const) {
+      const base = render(<ResultFeed look={look} entries={entries()} />).container.innerHTML;
+      cleanup();
+      expect(render(<ResultFeed look={look} overlayActions={false} entries={entries()} />).container.innerHTML).toBe(base);
+      expect(base).not.toContain("facts-line");
+      expect(base).not.toContain("video-player-overlay-pills");
+      cleanup();
+    }
+  });
+
+  test("overlayActions floats a finished entry's actions as pills on its picture; a running entry keeps its row", () => {
+    const entries = [
+      take("a", {}, { onMakeAnother: () => {}, actionItems: [{ label: "Remix", icon: "pencil" }] }),
+      take("b", {}, { status: "generating", src: undefined, poster: undefined, onStop: () => {} }),
+    ];
+    const view = render(<ResultFeed overlayActions entries={entries} grouping="none" />);
+    const [done, running] = view.getAllByRole("article");
+    const pills = done!.querySelector("[data-slot=video-player-picture]")!;
+    expect(pills.querySelector("[data-slot=video-player-overlay-pills]")).toBeTruthy();
+    expect(within(pills as HTMLElement).getByRole("button", { name: /Remix/ })).toBeTruthy();
+    expect(within(pills as HTMLElement).getByRole("button", { name: /Make another/ })).toBeTruthy();
+    expect(running!.querySelector("[data-slot=video-player-overlay-pills]")).toBeNull();
+    expect(within(running as HTMLElement).getByRole("button", { name: "Stop" })).toBeTruthy();
+  });
+
+  test("look stage draws a finished entry as one MediaStage with the words and actions as pills, and the facts under it", () => {
+    const onMakeAnother = mock(() => {});
+    const onFavorite = mock((_next: boolean) => {});
+    const remix = mock(() => {});
+    const view = render(<ResultFeed look="stage" grouping="none" entries={[take("a", {}, { onMakeAnother, onFavorite, favorite: true, actionItems: [{ label: "Remix", icon: "pencil", onSelect: remix }] })]} />);
+    const article = view.getByRole("article");
+    const stage = article.querySelector("[data-slot=media-stage]")!;
+    expect(stage.getAttribute("data-size")).toBe("stage");
+    expect(article.querySelector("[data-slot=video-player]")).toBeNull();
+    expect(stage.querySelector("[data-slot=media-stage-title-pill]")!.textContent).toBe("words a");
+    expect(stage.querySelector("[data-slot=media-stage-loop]")!.getAttribute("src")).toBe("/a.mp4");
+    expect(stage.querySelector("[data-slot=media-stage-picture]")!.getAttribute("aria-label")).toBe("words a");
+    const buttons = within(stage.querySelector("[data-slot=media-stage-pills]") as HTMLElement).getAllByRole("button").map((b) => b.getAttribute("aria-label"));
+    expect(buttons).toEqual(["Download", "Remix", "Make another", "Favorite"]);
+    fireEvent.click(view.getByRole("button", { name: "Make another" }));
+    fireEvent.click(view.getByRole("button", { name: "Remix" }));
+    const favorite = view.getByRole("button", { name: "Favorite" });
+    expect(favorite.getAttribute("aria-pressed")).toBe("true");
+    fireEvent.click(favorite);
+    expect(onMakeAnother).toHaveBeenCalledTimes(1);
+    expect(remix).toHaveBeenCalledTimes(1);
+    expect(onFavorite).toHaveBeenCalledWith(false);
+    const facts = article.querySelector("[data-slot=facts-line]")!;
+    expect(facts.textContent).toBe("Full HD · 5 s · a");
+    expect(stage.compareDocumentPosition(facts) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  test("look stage keeps a disabled action's reason, a picture-only take as a still, and every other status as the default layout", () => {
+    const entries = [
+      take("a", {}, { src: undefined, onMakeAnother: () => {}, controls: { makeAnother: { disabledReason: "Videos are not ready yet." } } }),
+      ...["queued", "generating", "draft", "failed", "cancelled"].map((s) => take(s, {}, { status: s, src: undefined, poster: undefined, error: "Nope.", onStop: () => {}, onRetry: () => {} })),
+    ];
+    const view = render(<ResultFeed look="stage" grouping="none" entries={entries} />);
+    const articles = view.getAllByRole("article");
+    expect(view.container.querySelectorAll("[data-slot=media-stage]").length).toBe(1);
+    const stage = articles[0]!.querySelector("[data-slot=media-stage]")!;
+    expect(stage.getAttribute("data-state")).toBe("paused");
+    expect(stage.querySelector("[data-slot=media-stage-loop]")).toBeNull();
+    const pill = view.getByRole("button", { name: "Make another" }) as HTMLButtonElement;
+    expect(pill.disabled).toBe(true);
+    expect(pill.title).toBe("Videos are not ready yet.");
+    for (const article of articles.slice(1)) {
+      expect(article.querySelector("[data-slot=media-stage]")).toBeNull();
+      expect(article.querySelector("[data-slot=video-player]")).toBeTruthy();
+      expect(article.querySelectorAll("[data-slot=result-feed-words]").length).toBe(1);
+    }
+    expect(view.getByText("Waiting its turn")).toBeTruthy();
+    expect(view.getAllByRole("button", { name: "Stop" }).length).toBe(2);
+    expect(view.getByRole("button", { name: "Try again" })).toBeTruthy();
+  });
+
+  test("a stage entry with no picture and no clip is not drawn as a stage", () => {
+    const view = render(<ResultFeed look="stage" grouping="none" entries={[take("a", {}, { src: undefined, poster: undefined })]} />);
+    expect(view.container.querySelector("[data-slot=media-stage]")).toBeNull();
+    expect(view.container.querySelector("[data-slot=video-player]")).toBeTruthy();
   });
 });

@@ -15,7 +15,9 @@ import { Switch } from "@/kit/ui/switch";
 import { SafeImage } from "@/kit/primitives/SafeImage";
 import { DayDivider } from "./day-separator";
 import { eyebrow } from "./surfaces";
-import { VideoPlayer, type VideoPlayerProps } from "./video-player";
+import { VideoPlayer, defaultCopy as videoPlayerCopy, download as downloadClip, type VideoPlayerProps } from "./video-player";
+import { MediaStage, type MediaStagePill } from "./media-stage";
+import { FactsLine } from "./facts-line";
 import { LockTile, type LockedRow } from "./adult-lock";
 import { useInsertedKeys } from "@/kit/hooks/useInsertedKeys";
 
@@ -37,6 +39,8 @@ export interface ResultFeedEntry {
   references?: ResultFeedReference[];
   /** The day heading this entry sits under ("Today"); entries are newest first, so a day's entries are next to each other. */
   day?: string;
+  /** VIDEO-KIT-01: one plain line the server wrote ("Full HD · 5 s · 1920×1088"), drawn in the facts line under the words (under the stage in the `stage` look). */
+  facts?: string;
   player: ResultFeedPlayerProps;
 }
 
@@ -65,6 +69,30 @@ interface Group {
   key: string;
   label?: string;
   entries: ResultFeedEntry[];
+}
+
+/** VIDEO-KIT-01: a finished take, the only kind of entry the `stage` look draws as a stage: `ready` with a picture or a clip. */
+function isFinished(entry: ResultFeedEntry): boolean {
+  const player = entry.player as Partial<VideoPlayerProps>;
+  return player.status === "ready" && Boolean(player.src || player.poster || player.still);
+}
+
+/** The floating pills of a finished stage entry, from the same props the VideoPlayer takes: Download, Share, the row's own actions,
+ * Make another and Favorite, each with the host's `disabledReason`. A retake-from item needs the player's clock and is left out. */
+function stagePills(entry: ResultFeedEntry): MediaStagePill[] {
+  const p = entry.player as Partial<VideoPlayerProps>;
+  const text = { ...videoPlayerCopy(), ...p.copy };
+  const reasonOf = (name: keyof NonNullable<VideoPlayerProps["controls"]>) => p.controls?.[name]?.disabledReason;
+  const pills: MediaStagePill[] = [];
+  if (p.src) pills.push({ id: "download", label: text.download, icon: "download", onSelect: () => (p.onDownload ? p.onDownload() : downloadClip(p.src!, p.downloadName ?? "video.mp4")) });
+  if (p.onShare) pills.push({ id: "share", label: text.share, icon: "share", onSelect: p.onShare });
+  (p.actionItems ?? []).forEach((item, i) => {
+    if (item.kind === "retake_from" || !(item.when ?? ["ready"]).includes("ready")) return;
+    pills.push({ id: item.key ?? `item-${i}`, label: item.label, icon: item.icon, onSelect: () => item.onSelect?.(), disabled: Boolean(item.disabledReason || item.busy), reason: item.disabledReason });
+  });
+  if (p.onMakeAnother) pills.push({ id: "make-another", label: text.makeAnother, icon: "wand-sparkles", onSelect: p.onMakeAnother, disabled: Boolean(reasonOf("makeAnother")), reason: reasonOf("makeAnother") });
+  if (p.onFavorite) pills.push({ id: "favorite", label: text.favorite, icon: "heart", pressed: Boolean(p.favorite), onSelect: () => p.onFavorite!(!p.favorite), disabled: Boolean(reasonOf("favorite")), reason: reasonOf("favorite") });
+  return pills;
 }
 
 /** Gathers entries, keeping the feed's newest-first order: by day, by their words, or not at all. */
@@ -172,6 +200,7 @@ export function ResultFeed({
   filtersPresentation = "inline",
   onUnlock,
   headingStyle = "default",
+  overlayActions = false,
 }: {
   entries: (ResultFeedEntry | ResultFeedLockedEntry)[];
   filters?: ResultFeedFilter[];
@@ -182,14 +211,19 @@ export function ResultFeed({
   empty?: React.ReactNode;
   /** VIDEO-UI-14: `media` draws the feed picture first: the newest entry wide, the rest in a grid (two columns only while the feed's own
    * pane gives each at least 320 px, one otherwise), the tags on the picture, the words once under it, and the player's icon row over
-   * the picture on hover or focus (always on touch). Default `default`: one column, the words above the player. */
-  look?: "default" | "media";
+   * the picture on hover or focus (always on touch). VIDEO-KIT-01: `stage` draws each finished entry (`ready` with a picture or a clip) as one
+   * big `MediaStage`, one per row in a single column: the picture or a muted looping take under a scrim, the words as a pill at the top left,
+   * the row's actions as floating pills at the top right, the `facts` line under it; every other entry keeps the default layout.
+   * Default `default`: one column, the words above the player. */
+  look?: "default" | "media" | "stage";
   /** VIDEO-UI-14: `popover` puts the filters behind one View button (a sheet on a phone). Default `inline`. */
   filtersPresentation?: "inline" | "popover";
   /** ADULT-LOCK-01: called when the lock tile is pressed. Absent: the tile opens the page's passcode dialog (`AdultLockProvider`). */
   onUnlock?: () => void;
   /** VIDEO-STUDIO-03 (K5): `eyebrow` draws the day headings, and the filter labels, as a small uppercase tracked line. Default `default`. */
   headingStyle?: "default" | "eyebrow";
+  /** VIDEO-KIT-01: the VideoPlayer's `overlayActions` for every entry, in the default and media looks: the row actions as floating pills on a finished picture. Default false. */
+  overlayActions?: boolean;
 }) {
   const entries: ResultFeedEntry[] = [];
   let hasLocked = false;
@@ -203,8 +237,10 @@ export function ResultFeed({
   const groups = groupFeedEntries(entries, grouping);
   const inserted = useInsertedKeys(entries.map((entry) => entry.key));
   const media = look === "media";
+  const stage = look === "stage";
+  const pillsOn = overlayActions ? { overlayActions: true } : {};
   return (
-    <section data-slot="result-feed" aria-label={label} className={cn("flex w-full flex-col gap-4", media && "@container")} data-look={media ? "media" : undefined}>
+    <section data-slot="result-feed" aria-label={label} className={cn("flex w-full flex-col gap-4", media && "@container")} data-look={media ? "media" : stage ? "stage" : undefined}>
       {filters.length > 0 && filtersPresentation === "popover" ? <FilterView filters={filters} headingStyle={headingStyle} /> : null}
       {filters.length > 0 && filtersPresentation !== "popover" ? (
         <div data-slot="result-feed-filters" role="group" aria-label={i18n._({ id: "ui.Filter results", message: "Filter results" })} className="flex flex-wrap items-center gap-x-5 gap-y-2">
@@ -225,14 +261,28 @@ export function ResultFeed({
               const picked = [...(entry.references?.map((r) => r.label) ?? []), ...(entry.tags ?? [])];
               return (
                 <article key={entry.key} data-slot="result-feed-entry" data-status={entry.player.status} data-first={first ? "true" : undefined} aria-label={shorten(entry.words)} className={cn("flex min-w-0 flex-col gap-2", first && "@2xl:col-span-2", inserted.has(entry.key) && "motion-list")}>
-                  {media ? (
+                  {stage && isFinished(entry) ? (
                     <>
-                      <VideoPlayer {...player} size={first ? "xl" : "full"} caption={false} badges={picked} chrome="overlay" actionsReveal="hover" />
+                      <MediaStage
+                        size="stage"
+                        description={entry.words}
+                        media={{ still: player.poster ?? player.still, loop: player.src }}
+                        state={player.src ? "looping" : "paused"}
+                        titlePill={shorten(entry.words, 48)}
+                        pills={stagePills(entry)}
+                      />
+                      <FactsLine>{entry.facts}</FactsLine>
+                    </>
+                  ) : media ? (
+                    <>
+                      <VideoPlayer {...player} {...pillsOn} size={first ? "xl" : "full"} caption={false} badges={picked} chrome="overlay" actionsReveal="hover" />
                       <p data-slot="result-feed-words" className="text-foreground line-clamp-2 text-sm">{entry.words}</p>
+                      <FactsLine>{entry.facts}</FactsLine>
                     </>
                   ) : (
                     <>
                       <p data-slot="result-feed-words" className="text-foreground line-clamp-3 text-sm">{entry.words}</p>
+                      <FactsLine>{entry.facts}</FactsLine>
                       {(entry.tags?.length ?? 0) > 0 || (entry.references?.length ?? 0) > 0 ? (
                         <ul data-slot="result-feed-tags" aria-label={i18n._({ id: "ui.Details", message: "Details" })} className="flex flex-wrap items-center gap-1.5">
                           {entry.references?.map((ref, i) => (
@@ -250,7 +300,7 @@ export function ResultFeed({
                           ))}
                         </ul>
                       ) : null}
-                      <VideoPlayer {...player} />
+                      <VideoPlayer {...player} {...pillsOn} />
                     </>
                   )}
                 </article>

@@ -129,6 +129,12 @@ describe("clip_feed node", () => {
     await view.findByText("No clips yet.");
     expect(view.getByRole("button", { name: "Back to Videos" })).toBeTruthy();
   });
+  test("no rows: the empty_state action_variant draws the button in that kit look", async () => {
+    answer([]);
+    const view = draw(feed({ empty_state: { type: "empty_state", icon: "film", text: "No clips yet.", action: { navigate: { to: "/apps/videos" } }, action_label: "Back to Videos", action_variant: "ghost" } }));
+    await view.findByText("No clips yet.");
+    expect(view.getByRole("button", { name: "Back to Videos" }).getAttribute("data-variant")).toBe("ghost");
+  });
   test("Close runs on_close", async () => {
     answer(rows);
     const view = draw(feed({ on_close: { call: { target: "/api/plugins/clips/closed", method: "POST" } } }));

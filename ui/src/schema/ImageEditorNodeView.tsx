@@ -220,6 +220,7 @@ function EmptyPlaceholder({ node }: { node: ImageEditorNode }) {
       icon={empty.icon}
       text={empty.text}
       actionLabel={empty.action ? label(empty.action, empty.action_label) : undefined}
+      actionVariant={empty.action ? empty.action_variant : undefined}
       onAction={empty.action ? () => dispatch(empty.action!) : undefined}
       secondaryLabel={empty.action && empty.secondary_action ? label(empty.secondary_action, empty.secondary_action_label) : undefined}
       onSecondary={empty.action && empty.secondary_action ? () => dispatch(empty.secondary_action!) : undefined}

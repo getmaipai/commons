@@ -3,6 +3,7 @@ import { cleanup, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter, useLocation } from "react-router-dom";
 import { renderWithQueryClient } from "../../tests/renderWithQueryClient";
 import { NodeRenderer, widgetRefetchInterval } from "@/kit/schema/NodeRenderer";
+import { EmptyStateNodeSchema } from "@/kit/schema/types";
 import type { FormNode, ListNode, SectionNode, WidgetCardNode, WidgetRowNode } from "@/kit/schema/types";
 import type { WidgetDescriptor, WidgetData } from "@/kit/widgets";
 
@@ -632,6 +633,30 @@ describe("empty_state button label", () => {
   });
 });
 
+describe("empty_state action_variant", () => {
+  const empty = { type: "empty_state", icon: "film", text: "No videos yet.", action: { navigate: { to: "/settings" } }, action_label: "Add a folder" };
+  const classOf = async (extra: object) => {
+    const view = renderNode({ ...empty, ...extra } as never);
+    const className = (await view.findByRole("button", { name: "Add a folder" })).className;
+    cleanup();
+    return className;
+  };
+
+  test("action_variant picks the main button's kit look; without it the button stays secondary", async () => {
+    const plain = await classOf({});
+    expect(await classOf({ action_variant: "secondary" })).toBe(plain);
+    const filled = await classOf({ action_variant: "default" });
+    expect(filled).toContain("bg-primary");
+    expect(await classOf({ action_variant: "outline" })).toContain("border");
+    expect(new Set([plain, filled, await classOf({ action_variant: "ghost" }), await classOf({ action_variant: "outline" })]).size).toBe(4);
+  });
+
+  test("the node schema takes the four values and refuses any other", () => {
+    for (const action_variant of ["default", "secondary", "ghost", "outline"]) expect(EmptyStateNodeSchema.safeParse({ ...empty, action_variant }).success).toBe(true);
+    for (const action_variant of ["destructive", "link", "red", 3]) expect(EmptyStateNodeSchema.safeParse({ ...empty, action_variant }).success).toBe(false);
+  });
+});
+
 function CurrentPath() {
   return <output aria-label="Current path">{useLocation().pathname}</output>;
 }
@@ -695,6 +720,25 @@ describe("list-like empty state actions", () => {
         const view = renderNode({ ...node, empty_state: { ...actionableEmptyState, action: undefined } });
         await view.findByText("No videos yet.");
         expect(view.queryByRole("button")).toBeNull();
+      } finally {
+        env.restore();
+      }
+    });
+
+    test(`${node.type} passes the empty action's action_variant to its button`, async () => {
+      const env = stubFetch([]);
+      try {
+        const classOf = async (empty: Record<string, unknown>) => {
+          const view = renderNode({ ...node, empty_state: empty } as never);
+          const className = (await view.findByRole("button", { name: "Add a folder" })).className;
+          cleanup();
+          return className;
+        };
+        const plain = await classOf(actionableEmptyState);
+        const outline = await classOf({ ...actionableEmptyState, action_variant: "outline" });
+        expect(outline).toContain("border");
+        expect(outline).not.toBe(plain);
+        expect(await classOf({ ...actionableEmptyState, action_variant: "secondary" })).toBe(plain);
       } finally {
         env.restore();
       }

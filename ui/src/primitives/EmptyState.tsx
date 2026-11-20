@@ -2,11 +2,15 @@ import { getIcon } from "@/kit/icons";
 import { Button } from "@/kit/ui/button";
 import { cn } from "@/kit/utils";
 
+export type EmptyStateActionVariant = "default" | "secondary" | "ghost" | "outline";
+
 interface EmptyStateProps {
   icon: string;
   text: string;
   actionLabel?: string;
   onAction?: () => void;
+  /** The main button's look (spec `empty_state.action_variant`): the kit Button variants. Without it the button stays `secondary`. */
+  actionVariant?: EmptyStateActionVariant;
   /** A quiet second button beside the first (only drawn with the first). */
   secondaryLabel?: string;
   onSecondary?: () => void;
@@ -19,7 +23,7 @@ interface EmptyStateProps {
 // action here is a plain callback rather than the schema's typed `action`
 // union (navigate/call/play/confirm/ask). That dispatch belongs to the
 // generic UiNode interpreter, deferred (home/docs/dev.md, this slice).
-export function EmptyState({ icon, text, actionLabel, onAction, secondaryLabel, onSecondary, variant = "default", title, accent = "primary" }: EmptyStateProps) {
+export function EmptyState({ icon, text, actionLabel, onAction, actionVariant = "secondary", secondaryLabel, onSecondary, variant = "default", title, accent = "primary" }: EmptyStateProps) {
   const Icon = getIcon(icon);
   if (variant === "tile") return (
     <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
@@ -31,7 +35,7 @@ export function EmptyState({ icon, text, actionLabel, onAction, secondaryLabel, 
       </div>
       {title ? <h2 className="text-[22px] font-semibold">{title}</h2> : null}
       <p className="text-sm text-[var(--muted-foreground)]">{text}</p>
-      {actionLabel && onAction ? <Button variant="secondary" shape="pill" onClick={onAction}>{actionLabel}</Button> : null}
+      {actionLabel && onAction ? <Button variant={actionVariant} shape="pill" onClick={onAction}>{actionLabel}</Button> : null}
     </div>
   );
   return (
@@ -40,7 +44,7 @@ export function EmptyState({ icon, text, actionLabel, onAction, secondaryLabel, 
       <p className="text-base text-[var(--muted-foreground)]">{text}</p>
       {actionLabel && onAction ? (
         <div className="flex flex-wrap items-center justify-center gap-2">
-          <Button variant="secondary" onClick={onAction}>
+          <Button variant={actionVariant} onClick={onAction}>
             {actionLabel}
           </Button>
           {secondaryLabel && onSecondary ? (

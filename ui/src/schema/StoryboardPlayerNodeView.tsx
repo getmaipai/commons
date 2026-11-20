@@ -101,7 +101,7 @@ export function StoryboardPlayerNodeView({ node, state }: { node: StoryboardPlay
     const empty = node.empty_state;
     return (
       <div data-slot="storyboard-player" data-state="empty" className="w-full rounded-[var(--radius-card)] border border-[var(--border)] bg-[var(--surface-card)]">
-        <EmptyState icon={empty.icon} text={empty.text} actionLabel={emptyActionLabel(empty)} onAction={empty.action ? () => dispatch(empty.action!) : undefined} />
+        <EmptyState icon={empty.icon} text={empty.text} actionLabel={emptyActionLabel(empty)} actionVariant={empty.action ? empty.action_variant : undefined} onAction={empty.action ? () => dispatch(empty.action!) : undefined} />
         {pendingConfirm ? <ConfirmDialog pendingConfirm={pendingConfirm} /> : null}
       </div>
     );

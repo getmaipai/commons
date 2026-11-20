@@ -126,6 +126,7 @@ function EmptyStateNodeView({ node }: { node: EmptyStateNode }) {
       icon={node.icon}
       text={node.text}
       actionLabel={node.action ? (node.action_label ?? actionLabel(node.action)) : undefined}
+      actionVariant={node.action_variant}
       onAction={node.action ? () => dispatch(node.action!) : undefined}
       secondaryLabel={node.action && node.secondary_action ? (node.secondary_action_label ?? actionLabel(node.secondary_action)) : undefined}
       onSecondary={node.action && node.secondary_action ? () => dispatch(node.secondary_action!) : undefined}
@@ -377,6 +378,7 @@ function AnswerBlocksNodeView({ node, state }: { node: AnswerBlocksNode; state: 
       emptyIcon={node.empty_state?.icon ?? "inbox"}
       emptyText={emptyText}
       emptyActionLabel={node.empty_state?.action ? (node.empty_state.action_label ?? actionLabel(node.empty_state.action)) : undefined}
+      emptyActionVariant={node.empty_state?.action ? node.empty_state.action_variant : undefined}
       onEmptyAction={node.empty_state?.action ? () => dispatch(node.empty_state!.action!) : undefined}
     >
       {(list) => (
@@ -1226,6 +1228,7 @@ function ListNodeView({ node, state = {} }: { node: ListNode; state?: Row }) {
         emptyIcon={node.empty_state?.icon ?? "inbox"}
         emptyText={node.empty_state?.text ?? i18n._({ id: "ui.Nothing here yet.", message: "Nothing here yet." })}
         emptyActionLabel={node.empty_state?.action ? (node.empty_state.action_label ?? actionLabel(node.empty_state.action)) : undefined}
+        emptyActionVariant={node.empty_state?.action ? node.empty_state.action_variant : undefined}
         onEmptyAction={node.empty_state?.action ? () => dispatch(node.empty_state!.action!) : undefined}
       >
         {(rows) => (
@@ -1320,6 +1323,7 @@ function CardGridNodeView({ node }: { node: CardGridNode }) {
       emptyIcon={node.empty_state?.icon ?? "inbox"}
       emptyText={node.empty_state?.text ?? i18n._({ id: "ui.Nothing here yet.", message: "Nothing here yet." })}
       emptyActionLabel={node.empty_state?.action ? (node.empty_state.action_label ?? actionLabel(node.empty_state.action)) : undefined}
+      emptyActionVariant={node.empty_state?.action ? node.empty_state.action_variant : undefined}
       onEmptyAction={node.empty_state?.action ? () => dispatch(node.empty_state!.action!) : undefined}
     >
       {(rows) => (
@@ -1436,6 +1440,7 @@ function MediaShelfBody({ node, state }: { node: MediaShelfNode; state: Row }) {
       emptyIcon={node.empty_state?.icon ?? "inbox"}
       emptyText={node.empty_state?.text ?? i18n._({ id: "ui.Nothing here yet.", message: "Nothing here yet." })}
       emptyActionLabel={node.empty_state?.action ? (node.empty_state.action_label ?? actionLabel(node.empty_state.action)) : undefined}
+      emptyActionVariant={node.empty_state?.action ? node.empty_state.action_variant : undefined}
       onEmptyAction={node.empty_state?.action ? () => dispatch(node.empty_state!.action!) : undefined}
     >
       {(rows) => {
@@ -1603,6 +1608,7 @@ function MusicBlockState({ bind, state, hideWhenEmpty, emptyState, errorMessage,
       emptyIcon={emptyState?.icon ?? "music"}
       emptyText={emptyState?.text ?? i18n._({ id: "ui.Nothing here yet.", message: "Nothing here yet." })}
       emptyActionLabel={emptyState?.action ? (emptyState.action_label ?? actionLabel(emptyState.action)) : undefined}
+      emptyActionVariant={emptyState?.action ? emptyState.action_variant : undefined}
       onEmptyAction={emptyState?.action ? () => dispatch(emptyState.action!) : undefined}
     >
       {(rows) => (
@@ -1791,6 +1797,7 @@ function BillboardNodeView({ node, state }: { node: BillboardNode; state: Row })
       emptyIcon={node.empty_state?.icon ?? "film"}
       emptyText={node.empty_state?.text ?? i18n._({ id: "ui.Nothing featured yet.", message: "Nothing featured yet." })}
       emptyActionLabel={node.empty_state?.action ? (node.empty_state.action_label ?? actionLabel(node.empty_state.action)) : undefined}
+      emptyActionVariant={node.empty_state?.action ? node.empty_state.action_variant : undefined}
       onEmptyAction={node.empty_state?.action ? () => dispatch(node.empty_state!.action!) : undefined}
     >
       {(rows) => rows.length === 0 ? null : (
@@ -1840,6 +1847,7 @@ function ReaderNodeView({ node, state }: { node: ReaderNode; state: Row }) {
       }}
       emptyIcon={node.empty_state?.icon ?? "book"} emptyText={node.empty_state?.text ?? i18n._({ id: "ui.This book is not available.", message: "This book is not available." })}
       emptyActionLabel={node.empty_state?.action ? (node.empty_state.action_label ?? actionLabel(node.empty_state.action)) : undefined}
+      emptyActionVariant={node.empty_state?.action ? node.empty_state.action_variant : undefined}
       onEmptyAction={node.empty_state?.action ? () => dispatch(node.empty_state!.action!) : undefined}
     >
       {(row) => {
@@ -1885,6 +1893,7 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
       emptyIcon={node.empty_state?.icon ?? "film"}
       emptyText={node.empty_state?.text ?? i18n._({ id: "ui.This item is not available.", message: "This item is not available." })}
       emptyActionLabel={node.empty_state?.action ? (node.empty_state.action_label ?? actionLabel(node.empty_state.action)) : undefined}
+      emptyActionVariant={node.empty_state?.action ? node.empty_state.action_variant : undefined}
       onEmptyAction={node.empty_state?.action ? () => dispatch(node.empty_state!.action!) : undefined}
     >
       {(row) => {

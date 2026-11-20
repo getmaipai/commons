@@ -108,7 +108,7 @@ export interface VideoPlayerCopy {
   seek?: string;
 }
 
-const defaultCopy = (): Required<VideoPlayerCopy> => ({
+export const defaultCopy = (): Required<VideoPlayerCopy> => ({
   queued: i18n._({ id: "ui.Waiting its turn", message: "Waiting its turn" }),
   generating: i18n._({ id: "ui.Making your video", message: "Making your video" }),
   stop: i18n._({ id: "ui.Stop", message: "Stop" }),
@@ -146,7 +146,8 @@ export function barValue(progress: number | null | undefined, elapsedMs: number,
   return Math.min(90, Math.round((elapsedMs / estimateMs) * 90));
 }
 
-function download(url: string, name: string) {
+/** Saves a clip by a temporary link (the built-in Download). Exported so a feed that draws its own actions saves the same way. */
+export function download(url: string, name: string) {
   const link = document.createElement("a");
   link.href = url;
   link.download = name;

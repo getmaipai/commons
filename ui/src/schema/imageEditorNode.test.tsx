@@ -194,6 +194,18 @@ describe("image_editor node", () => {
     expect(container.querySelector("[data-slot=image-editor]")).toBeNull();
   });
 
+  test("a placeholder row's empty state draws its main button in the page's action_variant", async () => {
+    const empty = ImageEditorNodeSchema.parse({
+      type: "image_editor",
+      bind: { source: "package", path: "picture" },
+      hide_when_empty: true,
+      empty_state: { type: "empty_state", icon: "image", text: "No pictures yet.", action: { navigate: { to: "/create" } }, action_label: "Make a picture", action_variant: "outline" },
+    }) as unknown as UiNode;
+    picture = { id: "", empty: true };
+    const { findByRole } = renderWithQueryClient(<Harness n={empty} />);
+    expect((await findByRole("button", { name: "Make a picture" })).getAttribute("data-variant")).toBe("outline");
+  });
+
   test("hide_when_empty draws nothing when the bound data has no row, and the default line otherwise", async () => {
     const hidden = ImageEditorNodeSchema.parse({ type: "image_editor", bind: { source: "package", path: "picture" }, hide_when_empty: true }) as unknown as UiNode;
     const shown = ImageEditorNodeSchema.parse({ type: "image_editor", bind: { source: "package", path: "picture" } }) as unknown as UiNode;

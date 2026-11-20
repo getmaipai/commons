@@ -93,7 +93,7 @@ export function ClipFeedNodeView({ node, state }: { node: ClipFeedNode; state: R
             onLike={like ? (clip, liked) => dispatch(handlerAction(like), [{ ...rowOf(clip), liked }], undefined, { quiet: true, typedArgs: true }) : undefined}
             onRemake={remake ? (clip) => dispatch(handlerAction(remake), [rowOf(clip)]) : undefined}
             remakeNotice={notice}
-            empty={<EmptyState icon={node.empty_state.icon} text={node.empty_state.text} actionLabel={emptyActionLabel(node.empty_state)} onAction={node.empty_state.action ? () => dispatch(node.empty_state.action!) : undefined} />}
+            empty={<EmptyState icon={node.empty_state.icon} text={node.empty_state.text} actionLabel={emptyActionLabel(node.empty_state)} actionVariant={node.empty_state.action ? node.empty_state.action_variant : undefined} onAction={node.empty_state.action ? () => dispatch(node.empty_state.action!) : undefined} />}
           />
           {lastError ? <p role="alert" className="text-destructive px-4 text-sm">{lastError}</p> : null}
         </>

@@ -2,7 +2,7 @@ import { Children, isValidElement, useEffect, useRef, useState, type ComponentPr
 import { Card } from "@/kit/primitives/Card";
 import { SafeImage } from "@/kit/primitives/SafeImage";
 import { Button } from "@/kit/ui/button";
-import { EmptyState } from "@/kit/primitives/EmptyState";
+import { EmptyState, type EmptyStateActionVariant } from "@/kit/primitives/EmptyState";
 import { Section } from "@/kit/primitives/Section";
 import { GRID_COLUMNS, SHELF_ITEM_WIDTH, type Density } from "@/kit/responsive";
 import { getIcon } from "@/kit/icons";
@@ -56,6 +56,7 @@ interface MediaShelfProps<T> {
   label?: string;
   emptyState?: { icon: string; text: string };
   emptyActionLabel?: string;
+  emptyActionVariant?: EmptyStateActionVariant;
   onEmptyAction?: () => void;
   /** MEDIA-PLAYER-01: how much of the item was played, 0 to 1. A bar along
    * the tile's bottom edge; nothing is drawn for undefined, 0 or less. */
@@ -172,6 +173,7 @@ export function MediaShelf<T>({
   label,
   emptyState,
   emptyActionLabel,
+  emptyActionVariant,
   onEmptyAction,
   getProgress,
   renderBadge,
@@ -239,7 +241,7 @@ export function MediaShelf<T>({
   if (items.length === 0 && !hasLocked && emptyState) {
     return (
       <Frame heading={heading} headingStyle={headingStyle} seeAll={seeAll}>
-        <EmptyState icon={emptyState.icon} text={emptyState.text} actionLabel={emptyActionLabel} onAction={onEmptyAction} />
+        <EmptyState icon={emptyState.icon} text={emptyState.text} actionLabel={emptyActionLabel} actionVariant={emptyActionVariant} onAction={onEmptyAction} />
       </Frame>
     );
   }

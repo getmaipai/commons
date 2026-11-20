@@ -1,7 +1,7 @@
 import { PageSkeleton } from "./PageSkeleton";
 import type { ReactNode } from "react";
 import { ErrorState } from "@/kit/elements/error-state";
-import { EmptyState } from "@/kit/primitives/EmptyState";
+import { EmptyState, type EmptyStateActionVariant } from "@/kit/primitives/EmptyState";
 import { RouteSkeleton } from "@/kit/primitives/RouteSkeleton";
 import { i18n } from "@/kit/i18n"
 
@@ -34,6 +34,7 @@ interface AsyncStateProps<T> {
   emptyIcon?: string;
   emptyText?: string;
   emptyActionLabel?: string;
+  emptyActionVariant?: EmptyStateActionVariant;
   onEmptyAction?: () => void;
   isEmpty?: (data: T) => boolean;
   loadingLabel?: string;
@@ -58,6 +59,7 @@ export function AsyncState<T>({
   emptyIcon = "inbox",
   emptyText = i18n._({ id: "ui.Nothing here yet.", message: "Nothing here yet." }),
   emptyActionLabel,
+  emptyActionVariant,
   onEmptyAction,
   isEmpty,
   loadingLabel = i18n._({ id: "ui.Loading", message: "Loading" }),
@@ -89,7 +91,7 @@ export function AsyncState<T>({
   if (data === undefined) return loading;
 
   if (data === null || (isEmpty && isEmpty(data))) {
-    return <EmptyState icon={emptyIcon} text={emptyText} actionLabel={emptyActionLabel} onAction={onEmptyAction} />;
+    return <EmptyState icon={emptyIcon} text={emptyText} actionLabel={emptyActionLabel} actionVariant={emptyActionVariant} onAction={onEmptyAction} />;
   }
 
   return <>{children(data)}</>;

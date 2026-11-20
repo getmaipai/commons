@@ -181,6 +181,7 @@ export function ResultFeedNodeView({ node, state }: { node: ResultFeedNode; stat
         ? refsRaw.flatMap((r) => (r && typeof r === "object" && str((r as Row).label) ? [{ label: str((r as Row).label)!, thumb: str((r as Row).thumb) }] : []))
         : undefined,
       day: created ? feedDayLabel(created) : undefined,
+      facts: f.facts ? str(readField(row, f.facts)) : undefined,
       player: player as ResultFeedEntry["player"],
     };
   }
@@ -194,6 +195,7 @@ export function ResultFeedNodeView({ node, state }: { node: ResultFeedNode; stat
             filters={filters}
             grouping={grouping}
             look={node.look}
+            overlayActions={node.overlay_actions}
             filtersPresentation={node.filters_presentation}
             headingStyle={node.heading_style}
             empty={<EmptyState icon={node.empty_state?.icon ?? "film"} text={node.empty_state?.text ?? i18n._({ id: "ui.Nothing here yet.", message: "Nothing here yet." })} />}

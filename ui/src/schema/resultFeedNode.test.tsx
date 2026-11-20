@@ -301,3 +301,81 @@ describe("result_feed look and filters_presentation (VIDEO-UI-14)", () => {
     expect(view.getByRole("button", { name: /^View/ })).toBeTruthy();
   });
 });
+
+describe("result_feed facts, overlay_actions and look stage (VIDEO-KIT-01)", () => {
+  const withKeys = (extra: object) => ResultFeedNodeSchema.parse({
+    ...(feed as object),
+    fields: { ...(feed as { fields: object }).fields, facts: "facts" },
+    handlers: { ...(feed as { handlers: object }).handlers, make_another: { starts: "video", call: { target: "/api/plugins/videos/actions/another", args: { id: "{id}" } } }, favorite: { call: { target: "/api/plugins/videos/actions/favorite", args: { id: "{id}" } } } },
+    ...extra,
+  }) as unknown as UiNode;
+  const done = (id: string, extra: Row = {}) => queued(id, { status: "ready", src: `/${id}.mp4`, still: `/${id}.jpg`, favorite: false, facts: "Full HD · 5 s", ...extra });
+
+  test("the schema keeps the node as it was, and takes look stage, overlay_actions and fields.facts", () => {
+    const base = ResultFeedNodeSchema.parse(feed);
+    expect(base.overlay_actions).toBeUndefined();
+    expect(base.look).toBe("default");
+    expect(ResultFeedNodeSchema.safeParse({ ...(feed as object), look: "stage" }).success).toBe(true);
+    expect(ResultFeedNodeSchema.safeParse({ ...(feed as object), overlay_actions: true }).success).toBe(true);
+    expect(ResultFeedNodeSchema.safeParse({ ...(feed as object), overlay_actions: "yes" }).success).toBe(false);
+    expect(ResultFeedNodeSchema.safeParse({ ...(feed as object), fields: { words: "w", status: "s", facts: "facts" } }).success).toBe(true);
+    expect(ResultFeedNodeSchema.safeParse({ ...(feed as object), fields: { words: "w", status: "s", facts: 3 } }).success).toBe(false);
+  });
+
+  test("fields.facts draws the row's server line under its words, and a row without it draws none", async () => {
+    server = [done("a"), done("b", { facts: undefined }), done("c", { facts: "" })];
+    const view = renderWithQueryClient(<Harness node={withKeys({})} />);
+    await advance(0);
+    const lines = view.container.querySelectorAll("[data-slot=facts-line]");
+    expect(lines.length).toBe(1);
+    expect(lines[0]!.textContent).toBe("Full HD · 5 s");
+    expect(view.getAllByRole("article")[0]!.contains(lines[0]!)).toBe(true);
+  });
+
+  test("no facts field leaves the feed with no facts line", async () => {
+    server = [done("a")];
+    const view = renderWithQueryClient(<Harness />);
+    await advance(0);
+    expect(view.container.querySelector("[data-slot=facts-line]")).toBeNull();
+  });
+
+  test("overlay_actions floats the finished row's actions on its picture", async () => {
+    server = [done("a"), queued("b", { status: "generating", percent: 30 })];
+    const view = renderWithQueryClient(<Harness node={withKeys({ overlay_actions: true })} />);
+    await advance(0);
+    const [ready, running] = view.getAllByRole("article");
+    expect(ready!.querySelector("[data-slot=video-player-overlay-pills]")).toBeTruthy();
+    expect(running!.querySelector("[data-slot=video-player-overlay-pills]")).toBeNull();
+    cleanup();
+    const plain = renderWithQueryClient(<Harness node={withKeys({})} />);
+    await advance(0);
+    expect(plain.container.querySelector("[data-slot=video-player-overlay-pills]")).toBeNull();
+  });
+
+  test("look stage draws a finished row as a MediaStage whose pills run the page's actions with the row; other rows keep the player", async () => {
+    server = [done("a"), queued("b", { status: "generating", percent: 30 })];
+    const view = renderWithQueryClient(<Harness node={withKeys({ look: "stage", actions: [{ label: "Make it Max", starts: "video", action: { call: { target: "/api/plugins/videos/actions/max", args: { id: "{id}" } } } }] })} />);
+    await advance(0);
+    const [ready, running] = view.getAllByRole("article");
+    expect(ready!.querySelector("[data-slot=media-stage]")).toBeTruthy();
+    expect(ready!.querySelector("[data-slot=media-stage-loop]")!.getAttribute("src")).toBe("/a.mp4");
+    expect(ready!.querySelector("[data-slot=facts-line]")!.textContent).toBe("Full HD · 5 s");
+    expect(running!.querySelector("[data-slot=media-stage]")).toBeNull();
+    expect(view.getByRole("button", { name: "Stop" })).toBeTruthy();
+    const names = [...ready!.querySelectorAll("[data-slot=media-stage-pill]")].map((b) => b.getAttribute("aria-label"));
+    expect(names).toEqual(["Download", "Make it Max", "Make another", "Favorite"]);
+    await act(async () => { fireEvent.click(view.getByRole("button", { name: "Make it Max" })); });
+    await advance(0);
+    expect(calls.find((c) => c.url === "/api/plugins/videos/actions/max")?.body).toEqual({ id: "a" });
+  });
+
+  test("look stage disables a starts action with the host's notice", async () => {
+    server = [done("a")];
+    const host = { makingNotice: (kind: string) => (kind === "video" ? "Video is not ready on this home yet." : null) } as unknown as MediaHost;
+    const view = renderWithQueryClient(<Harness host={host} node={withKeys({ look: "stage" })} />);
+    await advance(0);
+    const pill = view.getByRole("button", { name: "Make another" }) as HTMLButtonElement;
+    expect(pill.disabled).toBe(true);
+    expect(pill.title).toBe("Video is not ready on this home yet.");
+  });
+});
