@@ -30,4 +30,7 @@ export const STACK_SCHEMA_NAMES: ReadonlySet<string> = new Set([
   "stack-video-receipt.schema.json",
   // VF-ROLES-01: hand-written mirror of the operation names.
   "stack-video-operation.schema.json",
+  // VF-ROUGHCUT-01: hand-written mirrors of the rough-cut request and result.
+  "stack-rough-cut-request.schema.json",
+  "stack-rough-cut-result.schema.json",
 ]);

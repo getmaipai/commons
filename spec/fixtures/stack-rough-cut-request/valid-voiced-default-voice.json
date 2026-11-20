@@ -1,0 +1,66 @@
+{
+  "audience": "adult",
+  "shots": [
+    {
+      "id": "shot-1",
+      "picture": "/media/film/still-1.png",
+      "seconds": 5,
+      "motion": "zoom in"
+    },
+    {
+      "id": "shot-2",
+      "picture": "/media/film/still-2.png",
+      "seconds": 5
+    },
+    {
+      "id": "shot-3",
+      "picture": "/media/film/still-3.png",
+      "seconds": 5
+    },
+    {
+      "id": "shot-4",
+      "picture": "/media/film/still-4.png",
+      "seconds": 5,
+      "motion": "pan left"
+    },
+    {
+      "id": "shot-5",
+      "picture": "/media/film/still-5.png",
+      "seconds": 5
+    },
+    {
+      "id": "shot-6",
+      "picture": "/media/film/still-6.png",
+      "seconds": 5
+    }
+  ],
+  "lines": [
+    {
+      "shot_id": "shot-2",
+      "line": {
+        "speaker": "iris",
+        "text": "Please put the blue mug back."
+      }
+    },
+    {
+      "shot_id": "shot-3",
+      "line": {
+        "speaker": "iris",
+        "text": "It was my grandmother's."
+      }
+    },
+    {
+      "shot_id": "shot-5",
+      "line": {
+        "speaker": "iris",
+        "text": "Thank you for keeping it safe.",
+        "language": "en"
+      }
+    }
+  ],
+  "voices": [
+    {
+      "speaker": "iris"
+    }
+  ]
+}

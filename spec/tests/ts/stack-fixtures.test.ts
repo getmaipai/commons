@@ -47,6 +47,7 @@ import { StackModelPack } from "../../stack/ts/stack-model-pack";
 import { StackMakeRequest, StackMakeResult, StackMakeRefusal, StackVideoOperation } from "../../stack/ts/stack-make";
 import { StackJobsCatalog } from "../../stack/ts/stack-jobs-catalog";
 import { StackVideoReceipt } from "../../stack/ts/stack-video-receipt";
+import { StackRoughCutRequest, StackRoughCutResult } from "../../stack/ts/stack-rough-cut";
 
 const SPEC = join(import.meta.dir, "..", "..");
 const ajv = new Ajv2020({ strict: false, allErrors: true });
@@ -84,6 +85,8 @@ const SHAPES: Array<{ name: string; zod: ZodType }> = [
   { name: "stack-video-operation", zod: StackVideoOperation },
   { name: "stack-jobs-catalog", zod: StackJobsCatalog },
   { name: "stack-video-receipt", zod: StackVideoReceipt },
+  { name: "stack-rough-cut-request", zod: StackRoughCutRequest },
+  { name: "stack-rough-cut-result", zod: StackRoughCutResult },
 ];
 
 for (const shape of SHAPES) {

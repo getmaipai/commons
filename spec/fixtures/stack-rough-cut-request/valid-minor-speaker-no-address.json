@@ -1,0 +1,31 @@
+{
+  "audience": "adult",
+  "shots": [
+    {
+      "id": "shot-1",
+      "picture": "/media/film/still-1.png",
+      "seconds": 5,
+      "motion": "zoom in"
+    },
+    {
+      "id": "shot-2",
+      "picture": "/media/film/still-2.png",
+      "seconds": 5
+    }
+  ],
+  "lines": [
+    {
+      "shot_id": "shot-2",
+      "line": {
+        "speaker": "iris",
+        "text": "Please put the blue mug back."
+      }
+    }
+  ],
+  "voices": [
+    {
+      "speaker": "iris",
+      "minor": true
+    }
+  ]
+}

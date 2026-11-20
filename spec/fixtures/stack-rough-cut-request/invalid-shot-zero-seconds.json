@@ -1,0 +1,10 @@
+{
+  "audience": "adult",
+  "shots": [
+    {
+      "id": "a",
+      "picture": "/p.png",
+      "seconds": 0
+    }
+  ]
+}

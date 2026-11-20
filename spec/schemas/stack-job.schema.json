@@ -37,7 +37,7 @@
     "kind": {
       "type": "string",
       "minLength": 1,
-      "description": "The runner's kind: a generator role id (`image`, `music`), or a Stack task (`model.install`, `engine.install`, `engine.stage`), or a media job (MEDIA-SPEC-01: `media.fetch`, `media.probe`, `media.transcode`, `media.preview`, `media.chapter_snap`, `media.tts`, `media.mix`), each run on the Stack's one idle lane."
+      "description": "The runner's kind: a generator role id (`image`, `music`), or a Stack task (`model.install`, `engine.install`, `engine.stage`), or a media job (MEDIA-SPEC-01: `media.fetch`, `media.probe`, `media.transcode`, `media.preview`, `media.chapter_snap`, `media.tts`, `media.mix`, `media.verify`, `media.rough_cut`), each run on the Stack's one idle lane."
     },
     "role": {
       "type": [

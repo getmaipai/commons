@@ -1,0 +1,45 @@
+{
+  "audience": "adult",
+  "shots": [
+    {
+      "id": "shot-1",
+      "picture": "/media/film/still-1.png",
+      "seconds": 5,
+      "motion": "zoom in"
+    },
+    {
+      "id": "shot-2",
+      "picture": "/media/film/still-2.png",
+      "seconds": 5
+    },
+    {
+      "id": "shot-3",
+      "picture": "/media/film/still-3.png",
+      "seconds": 5
+    },
+    {
+      "id": "shot-4",
+      "picture": "/media/film/still-4.png",
+      "seconds": 5,
+      "motion": "pan left"
+    },
+    {
+      "id": "shot-5",
+      "picture": "/media/film/still-5.png",
+      "seconds": 5
+    },
+    {
+      "id": "shot-6",
+      "picture": "/media/film/still-6.png",
+      "seconds": 5
+    }
+  ],
+  "lines": [
+    {
+      "line": {
+        "speaker": "iris",
+        "text": "Please put the blue mug back."
+      }
+    }
+  ]
+}

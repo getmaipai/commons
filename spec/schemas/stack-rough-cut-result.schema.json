@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/stack-rough-cut-result.schema.json",
+  "title": "StackRoughCutResult",
+  "description": "VF-ROUGHCUT-01. The result of `media.rough_cut`, and the shape the kit storyboard_player block plays: the file, the total length, each shot's start and end in the file, and each voiced line's audio with its start and length. Times are seconds on the file's own clock. No render estimate and no memory figure (E4).",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "file": {
+      "type": "string",
+      "minLength": 1
+    },
+    "total_s": {
+      "type": "number",
+      "minimum": 0
+    },
+    "shots": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9._-]+$",
+            "minLength": 1,
+            "maxLength": 60
+          },
+          "start_s": {
+            "type": "number",
+            "minimum": 0
+          },
+          "end_s": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "id",
+          "start_s",
+          "end_s"
+        ]
+      }
+    },
+    "lines": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "shot_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9._-]+$",
+            "minLength": 1,
+            "maxLength": 60
+          },
+          "speaker": {
+            "type": "string",
+            "minLength": 1
+          },
+          "start_s": {
+            "type": "number",
+            "minimum": 0
+          },
+          "length_s": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "audio": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "shot_id",
+          "speaker",
+          "start_s",
+          "length_s",
+          "audio"
+        ]
+      }
+    }
+  },
+  "required": [
+    "file",
+    "total_s",
+    "shots",
+    "lines"
+  ]
+}
