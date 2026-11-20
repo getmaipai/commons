@@ -1,0 +1,10 @@
+{
+  "id": "job-3",
+  "job": "song",
+  "state": "running",
+  "percent": 35,
+  "status": "Writing the song",
+  "files": [],
+  "poster": null,
+  "made_with": null
+}

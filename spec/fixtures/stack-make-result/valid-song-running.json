@@ -1,0 +1,18 @@
+{
+  "id": "job-3",
+  "job": "song",
+  "state": "running",
+  "percent": 35,
+  "status": "Writing the song",
+  "files": [],
+  "poster": null,
+  "made_with": {
+    "part": "music-model-a",
+    "label": "Music model A",
+    "pack_version": "1.0.0",
+    "shape": null,
+    "seconds": 60,
+    "sound": true,
+    "notes": []
+  }
+}

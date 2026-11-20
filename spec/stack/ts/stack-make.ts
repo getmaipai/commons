@@ -43,12 +43,15 @@ export const StackMadeWith = z.object({ part: StackPartId, label: text, pack_ver
 export type StackMadeWith = z.infer<typeof StackMadeWith>;
 
 const resBase = { id: text, state: z.enum(["queued", "running", "waiting_for_you", "paused", "stalled", "done", "failed", "cancelled"]), percent: z.number().int().min(0).max(100), status: z.string(), files: z.array(text), poster: text.nullable(), made_with: StackMadeWith.nullable() };
-const plainJobs = z.enum(["picture", "picture_edit", "clip", "clip_from_sheet", "restyle", "swap", "song", "song_edit", "sound_effect", "vocal_swap"]);
+const plainJobs = z.enum(["picture", "picture_edit", "clip", "clip_from_sheet", "restyle", "swap", "sound_effect", "vocal_swap"]);
+// A song, a song edit and a stems split always name what made them, running or done, so made_with is never null for them.
+const madeJobs = { ...resBase, made_with: StackMadeWith };
 export const StackMakeResult = z.union([
   z.object({ ...resBase, job: plainJobs }).strict(),
+  z.object({ ...madeJobs, job: z.enum(["song", "song_edit"]) }).strict(),
   z.object({ ...resBase, job: z.literal("character_sheet"), panels: z.array(text) }).strict(),
   z.object({ ...resBase, job: z.literal("contact_sheet"), tiles: z.array(text) }).strict(),
-  z.object({ ...resBase, job: z.literal("stems"), stems: z.array(z.object({ name: text, file: text }).strict()) }).strict(),
+  z.object({ ...madeJobs, job: z.literal("stems"), stems: z.array(z.object({ name: text, file: text }).strict()) }).strict(),
   z.object({ ...resBase, job: z.literal("lyric_timing"), timings: z.array(z.object({ start_seconds: z.number().min(0), text }).strict()) }).strict(),
 ]);
 export type StackMakeResult = z.infer<typeof StackMakeResult>;
