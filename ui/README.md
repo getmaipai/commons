@@ -72,3 +72,16 @@ Schema player hosts can supply that line with `MediaHost.voiceoverFor(item)` whe
 Non-color styling bundles live in `../spec/ui/looks.json`. Map each Look to a bundle there, then run `bun run gen:looks` from this directory to refresh the marked token block in `src/tokens.css`.
 
 Pages should not hard-code `font-bold` or `tracking-*` on `text-title`, `text-hero`, or `text-section`; the active Look sets their weight and tracking.
+
+## Global CSS changes
+
+A rule that matches elements by type or role (`button`, `[role=...]`, `input`, `:where(...)`) reaches every Element and every page, so it ships
+with a before and after layout comparison, not a look at a few pages (A11Y-DEBT-01, 2026-11-20: a global `position: relative` in plain CSS beat
+Tailwind's layered `.absolute`, and the Studio's trim handles stopped working in a tag the earlier "pictures look the same" check had passed).
+Rules for such a change:
+
+1. Put it in `@layer base`, under the utilities. An unlayered rule beats every layered utility whatever its specificity.
+2. Run `scripts/layout-sweep/ksweep.mjs` against the last tag and the change, then `sweepdiff.py`: every difference in computed position or in
+   box size is fixed or justified in the changelog entry, and no element whose class says `absolute`, `fixed` or `sticky` may compute otherwise.
+3. Add a test that keeps the rule where it belongs (see `src/touch-floor-layer.test.ts`).
+
