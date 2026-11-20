@@ -32,12 +32,30 @@ const PackJob = z.object({
   peaks: z.array(z.object({ shape: StackJobShape.optional(), level: StackJobLevel.optional(), bytes: z.number().int().min(0), status: z.enum(["measured", "unverified"]), measured_on: text.optional() }).strict()),
 }).strict();
 
+// MODELPACK-SPEC-03: what a client needs to rank a source's result for this base. `civitai_labels` are the labels
+// a Civitai result names, `text_patterns` match a title or a repo name, `browse` stays the browse values, and
+// `generic_labels` are a family's labels that name no version. All new fields are optional so older packs stay valid.
+// A retired base says which base it was judged on (`tested_on`) and what each bench mark means (`marks`).
+export const StackStyleMedia = z.enum(["picture", "video"]);
+export const StackStyleBase = z.object({
+  id: StackPartId,
+  label: text,
+  short: text.optional(),
+  media: StackStyleMedia.optional(),
+  civitai_labels: z.array(text).optional(),
+  text_patterns: z.array(text).optional(),
+  browse: z.array(text),
+  generic_labels: z.array(text).optional(),
+  retired: z.object({ mark: text, tested_on: StackPartId.optional(), marks: z.object({ tested: text.optional(), no_effect: text.optional() }).strict().optional() }).strict().optional(),
+}).strict();
+export type StackStyleBase = z.infer<typeof StackStyleBase>;
+
 export const StackModelPack = z.object({
   id: StackPartId,
   version: text,
   part: StackPartId,
   jobs: z.array(PackJob).min(1),
-  style_bases: z.array(z.object({ id: StackPartId, label: text, browse: z.array(text), retired: z.object({ mark: text }).strict().optional() }).strict()).optional(),
+  style_bases: z.array(StackStyleBase).optional(),
   field_map: z.record(text, text).optional(),
   notes: z.array(text).optional(),
 }).strict();

@@ -1,0 +1,121 @@
+{
+  "id": "pack-clip-a",
+  "version": "1.0.0",
+  "part": "clip-model-a",
+  "jobs": [
+    {
+      "job": "clip",
+      "limits": {
+        "max_seconds": {
+          "standard": 5,
+          "boost": 8,
+          "max": 10
+        },
+        "max_references": 0,
+        "shapes": {
+          "landscape": {
+            "standard": {
+              "width": 768,
+              "height": 448
+            },
+            "boost": {
+              "width": 1280,
+              "height": 704
+            },
+            "max": {
+              "width": 1920,
+              "height": 1088
+            }
+          },
+          "portrait": {
+            "standard": {
+              "width": 448,
+              "height": 768
+            }
+          }
+        },
+        "steps_fixed": true
+      },
+      "audiences": [
+        "adult",
+        "minor"
+      ],
+      "capabilities": {
+        "text": false,
+        "end_picture": true,
+        "sound": true,
+        "keeps_likeness": false
+      },
+      "recipe": "recipes/clip.md",
+      "peaks": [
+        {
+          "shape": "landscape",
+          "level": "standard",
+          "bytes": 12000000000,
+          "status": "measured",
+          "measured_on": "2026-11-01"
+        }
+      ]
+    },
+    {
+      "job": "swap",
+      "limits": {
+        "max_seconds": {
+          "standard": 4,
+          "boost": 6,
+          "max": 8
+        },
+        "max_references": 16
+      },
+      "audiences": [
+        "adult"
+      ],
+      "capabilities": {
+        "text": false,
+        "end_picture": false,
+        "sound": true,
+        "keeps_likeness": true
+      },
+      "recipe": "recipes/swap.md",
+      "adapter": "swap",
+      "peaks": [
+        {
+          "shape": "landscape",
+          "bytes": 18000000000,
+          "status": "unverified"
+        }
+      ]
+    }
+  ],
+  "style_bases": [
+    {
+      "id": "base-a",
+      "label": "Clip base A, the whole name",
+      "short": "Base A",
+      "media": "video",
+      "civitai_labels": [
+        "Clip Base A",
+        "Clip Base A 1.1"
+      ],
+      "text_patterns": [
+        "clip-a",
+        "clip base a"
+      ],
+      "browse": [
+        "clip-a-*"
+      ],
+      "generic_labels": [
+        "ClipBaseA"
+      ],
+      "installable": true
+    }
+  ],
+  "field_map": {
+    "description": "prompt",
+    "seconds": "num_seconds",
+    "references": "ref_images"
+  },
+  "notes": [
+    "Photos that show the face clearly give the best likeness"
+  ]
+}

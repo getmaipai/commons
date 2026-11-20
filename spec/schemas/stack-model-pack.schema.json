@@ -381,7 +381,38 @@
             "type": "string",
             "minLength": 1
           },
+          "short": {
+            "type": "string",
+            "minLength": 1
+          },
+          "media": {
+            "enum": [
+              "picture",
+              "video"
+            ]
+          },
+          "civitai_labels": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "text_patterns": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
           "browse": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "generic_labels": {
             "type": "array",
             "items": {
               "type": "string",
@@ -395,6 +426,25 @@
               "mark": {
                 "type": "string",
                 "minLength": 1
+              },
+              "tested_on": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^[a-z0-9][a-z0-9._-]*$"
+              },
+              "marks": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "tested": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "no_effect": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
               }
             },
             "required": [
