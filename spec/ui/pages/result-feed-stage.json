@@ -1,0 +1,100 @@
+{
+  "type": "page",
+  "id": "result-feed-stage",
+  "title": "Made videos",
+  "body": [
+    {
+      "type": "result_feed",
+      "bind": {
+        "source": "package",
+        "path": "recipes",
+        "params": {
+          "scope": "feed"
+        }
+      },
+      "fields": {
+        "words": "prompt",
+        "status": "status",
+        "poster": "still",
+        "src": "src",
+        "facts": "facts",
+        "created_at": "created_at",
+        "favorite": "favorite",
+        "progress": "percent"
+      },
+      "handlers": {
+        "make_another": {
+          "starts": "video",
+          "call": {
+            "target": "/api/plugins/videos/actions/another",
+            "args": {
+              "id": "{id}"
+            }
+          }
+        },
+        "retry": {
+          "starts": "video",
+          "call": {
+            "target": "/api/plugins/videos/actions/another",
+            "args": {
+              "id": "{id}"
+            }
+          }
+        },
+        "stop": {
+          "call": {
+            "target": "/api/plugins/videos/actions/cancel",
+            "args": {
+              "id": "{id}"
+            }
+          }
+        },
+        "favorite": {
+          "call": {
+            "target": "/api/plugins/videos/actions/favorite",
+            "args": {
+              "id": "{id}"
+            }
+          }
+        }
+      },
+      "actions": [
+        {
+          "label": "Remix",
+          "icon": "pencil",
+          "when": [
+            "ready"
+          ],
+          "action": {
+            "navigate": {
+              "to": "/apps/videos/create",
+              "state": {
+                "prompt": "{prompt}"
+              }
+            }
+          }
+        }
+      ],
+      "look": "stage",
+      "overlay_actions": true,
+      "poll_while": {
+        "statuses": [
+          "queued",
+          "generating"
+        ],
+        "record": {
+          "path": "recipes",
+          "params": {
+            "scope": "job",
+            "id": "{id}"
+          }
+        }
+      },
+      "empty_state": {
+        "type": "empty_state",
+        "icon": "film",
+        "text": "No videos yet. Make one and it shows up here."
+      }
+    }
+  ]
+}

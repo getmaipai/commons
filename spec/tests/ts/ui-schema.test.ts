@@ -125,6 +125,15 @@ describe("UI schema", () => {
     expect(validate({ type: "page", id: "p", title: "P", body: [{ ...base, action_label: "" }] })).toBe(false);
   });
 
+  test("VIDEO-KIT-01: an empty_state action may carry an action_variant of the four kit Button looks; any other value is refused", () => {
+    const base = { type: "empty_state", icon: "film", text: "No videos yet.", action: { navigate: { to: "/apps/videos/create" } }, action_label: "Make a video" };
+    const page = (node: unknown) => ({ type: "page", id: "p", title: "P", body: [node] });
+    for (const action_variant of ["default", "secondary", "ghost", "outline"]) expect(validate(page({ ...base, action_variant }))).toBe(true);
+    expect(validate(page(base))).toBe(true);
+    for (const action_variant of ["destructive", "link", "primary", "", true, 3, "#ff0000"]) expect(validate(page({ ...base, action_variant }))).toBe(false);
+    expect(validate(page({ ...base, action_color: "red" }))).toBe(false);
+  });
+
   test("a deprecated cinema page tone remains accepted", () => {
     const page = { type: "page", id: "p", title: "P", body: [{ type: "empty_state", icon: "x", text: "t" }] };
     expect(validate({ ...page, tone: "cinema" })).toBe(true);
@@ -385,6 +394,16 @@ describe("UI schema, package apps", () => {
     expect(validate({ ...shelf, media_loop: false })).toBe(true);
     expect(validate({ ...shelf, media_loop: "yes" })).toBe(false);
     expect(validate({ ...shelf, item_loop_field: 3 })).toBe(false);
+  });
+  test("VIDEO-KIT-01: result_feed look stage, overlay_actions and fields.facts, all optional and additive", () => {
+    const feed = { type: "result_feed", bind: { source: "package", path: "recipes" }, fields: { words: "prompt", status: "status" }, poll_while: { statuses: ["queued"], record: { path: "recipes" } } };
+    expect(validate({ ...feed, look: "stage" })).toBe(true);
+    for (const look of ["default", "media"]) expect(validate({ ...feed, look })).toBe(true);
+    for (const look of ["hero", "Stage", ""]) expect(validate({ ...feed, look })).toBe(false);
+    for (const overlay_actions of [true, false]) expect(validate({ ...feed, overlay_actions })).toBe(true);
+    for (const overlay_actions of ["yes", 1, null]) expect(validate({ ...feed, overlay_actions })).toBe(false);
+    expect(validate({ ...feed, fields: { ...feed.fields, facts: "facts" } })).toBe(true);
+    for (const facts of [3, true, null]) expect(validate({ ...feed, fields: { ...feed.fields, facts } })).toBe(false);
   });
   test("VIDEO-STUDIO-03: creation_header studio variant (eyebrow, secondary, fields.locked) and heading_style on media_shelf and result_feed", () => {
     const header = { type: "creation_header", bind: { source: "package", path: "clip" }, share_change: { add: { call: { target: "/x" } }, remove: { call: { target: "/x" } }, make_private: { call: { target: "/x" } } } };

@@ -34,7 +34,7 @@
       "hide_when_empty": true,
       "see_all": { "label": "See all", "action": { "navigate": { "to": "/apps/videos/history" } } },
       "on_select": { "play": { "media_id": "{id}" } },
-      "empty_state": { "type": "empty_state", "icon": "film", "text": "Nothing to continue yet. Videos you start show up here." }
+      "empty_state": { "type": "empty_state", "icon": "film", "text": "Nothing to continue yet. Videos you start show up here.", "action": { "navigate": { "to": "/apps/videos/create" } }, "action_label": "Make a video", "action_variant": "outline" }
     }
   ]
 }
