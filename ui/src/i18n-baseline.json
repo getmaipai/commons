@@ -40,6 +40,7 @@
   "elements/DataTableMinWidthShowcase.tsx": 1,
   "elements/DataTableSelectionShowcase.tsx": 3,
   "elements/DraftRestoreComposerShowcase.tsx": 1,
+  "elements/JobProgressShotsShowcase.tsx": 20,
   "elements/K02bShowcase.tsx": 12,
   "elements/KitGalleryShowcase.tsx": 194,
   "elements/MediaViewerShowcase.tsx": 41,

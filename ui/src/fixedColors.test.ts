@@ -52,6 +52,21 @@ const ALLOW: AllowEntry[] = [
     reason: "Showcase only: generated sample thumbnails so the gallery demo has pictures in different hues.",
   },
   {
+    file: "src/elements/ProposalCardShowcase.tsx",
+    match: /^hsl\($/,
+    reason: "Showcase only: generated sample pictures in different hues.",
+  },
+  {
+    file: "src/elements/StoryboardPlayerShowcase.tsx",
+    match: /^hsl\($/,
+    reason: "Showcase only: generated sample stills so the demo has pictures in different hues.",
+  },
+  {
+    file: "src/elements/JobProgressShotsShowcase.tsx",
+    match: /^#[0-9a-f]{6}$/i,
+    reason: "Showcase only: the sample shot thumbnails' colors.",
+  },
+  {
     file: "src/elements/DataTableSelectionShowcase.tsx",
     match: /^#[0-9a-f]{6}$/i,
     reason: "Showcase only: the sample picture's gradient stops.",

@@ -14,6 +14,8 @@ export interface TierOptionDef {
   label: string;
   /** One line under the control for this tier (for example "Fast", "More detail"). */
   hint?: string;
+  /** K2: a short server-supplied time ("About 8 minutes for 5 seconds"), drawn with the hint as one line in every presentation. Wins over `details`. */
+  time?: string;
   /** Set when the tier cannot be picked right now; the reason is shown instead of the hint. */
   disabledReason?: string;
   /** Set when choosing this tier needs a yes first: the one confirm line (what it costs and what waits). */
@@ -51,6 +53,7 @@ export function TierSegment({ value, onValueChange, tiers = defaultTiers(), conf
   const [pending, setPending] = useState<TierOptionDef | null>(null);
   const shown = tiers.find((t) => t.id === value);
   const note = pending?.confirm ?? undefined;
+  const timeOf = (tier: TierOptionDef) => (tier.disabledReason ? undefined : tier.time ?? details?.[tier.id]);
   const choose = (tier: TierOptionDef) => {
     if (tier.disabledReason || tier.id === value) return;
     if (tier.confirm) setPending(tier);
@@ -69,8 +72,8 @@ export function TierSegment({ value, onValueChange, tiers = defaultTiers(), conf
     const choices = tiers.map((tier) => ({
       id: tier.id,
       label: tier.label,
-      description: `${tier.disabledReason ?? tier.hint ?? ""}${!tier.disabledReason && details?.[tier.id] ? ` · ${details[tier.id]}` : ""}`,
-      dataDescription: `${tier.disabledReason ?? tier.hint ?? ""}${!tier.disabledReason && details?.[tier.id] ? ` · ${details[tier.id]}` : ""}`,
+      description: `${tier.disabledReason ?? tier.hint ?? ""}${timeOf(tier) ? ` · ${timeOf(tier)}` : ""}`,
+      dataDescription: `${tier.disabledReason ?? tier.hint ?? ""}${timeOf(tier) ? ` · ${timeOf(tier)}` : ""}`,
       icon: getIcon(tier.id === "max" ? "brain" : "zap"),
       ...(tier.disabledReason ? { disabled: true } : {}),
       ...(tier.id === "max" ? { accent: getIcon("sparkles") } : {}),
@@ -98,7 +101,7 @@ export function TierSegment({ value, onValueChange, tiers = defaultTiers(), conf
           {tiers.map((tier) => {
             const selected = tier.id === value;
             const blocked = Boolean(tier.disabledReason);
-            const time = !blocked ? details?.[tier.id] : undefined;
+            const time = timeOf(tier);
             return (
               <button
                 key={tier.id}
@@ -153,7 +156,7 @@ export function TierSegment({ value, onValueChange, tiers = defaultTiers(), conf
       </div>
       {confirmBlock ?? (density === "compact" ? null : (
         <p data-slot="tier-segment-hint" className="text-[12.5px] text-muted-foreground">
-          {shown?.disabledReason ?? shown?.hint ?? " "}
+          {shown?.disabledReason ?? ([shown?.hint, shown ? timeOf(shown) : undefined].filter(Boolean).join(" · ") || " ")}
         </p>
       ))}
     </div>

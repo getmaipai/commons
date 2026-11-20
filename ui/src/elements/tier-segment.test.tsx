@@ -117,4 +117,18 @@ describe("TierSegment presentation cards (VIDEO-UI-12)", () => {
     expect(container.querySelector('[data-presentation="cards"]')).toBeNull();
     expect(container.querySelector('[data-slot="tier-card-time"]')).toBeNull();
   });
+  test("K2: a level's own time joins its hint on one line in every presentation, and a blocked level shows only its reason", () => {
+    const withTime: TierOptionDef[] = [
+      { id: "standard", label: "Quick draft", hint: "Fast", time: "about 1 minute" },
+      { id: "boost", label: "Final HD", hint: "Full HD", time: "about 8 minutes for 5 seconds" },
+      { id: "max", label: "Best", hint: "Slowest", time: "about 20 minutes", disabledReason: "Not on this home yet. Ask an admin." },
+    ];
+    const seg = render(<TierSegment value="boost" onValueChange={() => {}} tiers={withTime} />);
+    expect(seg.container.querySelector('[data-slot="tier-segment-hint"]')?.textContent).toBe("Full HD · about 8 minutes for 5 seconds");
+    seg.unmount();
+    const cards = render(<TierSegment presentation="cards" value="standard" onValueChange={() => {}} tiers={withTime} />);
+    expect(cards.getByText("about 1 minute")).toBeTruthy();
+    expect(cards.queryByText("about 20 minutes")).toBeNull();
+    expect(cards.getByText("Not on this home yet. Ask an admin.")).toBeTruthy();
+  });
 });
