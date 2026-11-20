@@ -108,6 +108,43 @@ describe("MediaStage", () => {
     expect(slot(v.container, "media-stage-composer")).toBeTruthy();
   });
 
+  test("at a phone width three actions are one row of at most two buttons, and the rest sit in a More menu", async () => {
+    stubMatchMedia({ "(max-width: 859.98px)": true });
+    const calls: string[] = [];
+    const pills = [
+      { id: "share", label: "Share", icon: "share", onSelect: () => calls.push("share") },
+      { id: "dl", label: "Download", icon: "download", onSelect: () => calls.push("dl"), disabled: true, disabledReason: "Finish the video first." },
+      { id: "again", label: "Another take", icon: "sparkles", onSelect: () => calls.push("again") },
+    ];
+    const v = render(<MediaStage description="x" media={media} title="Title" pills={pills} />);
+    const row = slot(v.container, "media-stage-pills")!;
+    const buttons = Array.from(row.querySelectorAll("button"));
+    expect(buttons.length).toBeLessThanOrEqual(2);
+    expect(buttons.map((b) => b.getAttribute("aria-label"))).toEqual(["Share", "More"]);
+    expect(v.queryByRole("button", { name: "Another take" })).toBeNull();
+    const more = v.getByRole("button", { name: "More" });
+    expect(more.tagName).toBe("BUTTON");
+    fireEvent.pointerDown(more, { button: 0, ctrlKey: false });
+    const items = await v.findAllByRole("menuitem");
+    expect(items.map((i) => i.textContent)).toEqual(["DownloadFinish the video first.", "Another take"]);
+    expect(items[0]!.getAttribute("aria-disabled")).toBe("true");
+    fireEvent.click(items[1]!);
+    expect(calls).toEqual(["again"]);
+  });
+
+  test("a phone width with two actions, and a wide screen with three, keep every pill in the row and no More menu", () => {
+    const three = [{ id: "a", label: "A", onSelect: () => {} }, { id: "b", label: "B", onSelect: () => {} }, { id: "c", label: "C", onSelect: () => {} }];
+    stubMatchMedia({ "(max-width: 859.98px)": true });
+    const a = render(<MediaStage description="x" pills={three.slice(0, 2)} />);
+    expect(a.queryByRole("button", { name: "More" })).toBeNull();
+    expect(a.getAllByRole("button").length).toBe(2);
+    cleanup();
+    stubMatchMedia({});
+    const b = render(<MediaStage description="x" pills={three} />);
+    expect(b.queryByRole("button", { name: "More" })).toBeNull();
+    expect(b.getAllByRole("button").length).toBe(3);
+  });
+
   test("hero is ready by default, compact gives up the minimum height, aspect and scrim are props", () => {
     const a = render(<MediaStage size="hero" description="x" />);
     expect(slot(a.container, "media-stage")!.hasAttribute("data-ready")).toBe(true);
@@ -138,6 +175,7 @@ describe("MediaStage", () => {
     const states = Array.from(v.container.querySelectorAll('[data-slot="media-stage"]')).map((n) => n.getAttribute("data-state"));
     for (const s of ["idle", "looping", "paused", "waiting", "loading", "error"]) expect(states).toContain(s);
     expect(v.container.querySelectorAll("video").length).toBe(1);
+    expect(v.getByTestId("media-stage-three-actions").querySelectorAll('[data-slot="media-stage-pill"]').length).toBe(3);
   });
 });
 

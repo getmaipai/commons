@@ -1,3 +1,7 @@
+## [ui-v0.5.696] - 2026-11-20
+
+- `MediaStage`: at phone width the pills stay in one row at the top and never reach the title; more than two collapse into one "More" menu. `MediaShelf` tiles take an optional `loop` (a muted mp4) that plays after a short hover or on focus, never on touch or under reduced motion (VIDEO-KIT-01).
+
 ## [ui-v0.5.695] - 2026-11-20
 
 - The UI schema renders five new blocks (VIDEO-KIT-01, spec 0.1.437): `storyboard_player`, `action_bar`, `proposal_card`, `voice_line` and `media_stage`, each mapped to its kit Element through the same bound data, state and action helpers `clip_feed` uses. A bad `disabled_when` keeps a button off instead of unmounting the page.

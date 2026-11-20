@@ -66,6 +66,10 @@ export function MediaStageShowcase() {
         <div className="mt-4" />
         <MediaStage size="stage" media={MEDIA} description={d("A paper boat drifting on a rainy pond")} title={d("The boat leaves the shore")} pills={PILLS} overlay={<MediaStageProgress value={42} label={d("Video progress")} />} />
       </div>
+      <Heading>{d("At 375 px, three actions (one row and a More menu)")}</Heading>
+      <div className="w-[375px] max-w-full" data-testid="media-stage-three-actions">
+        <MediaStage size="stage" media={MEDIA} description={d("A paper boat drifting on a rainy pond")} title={d("The boat leaves the shore")} pills={PILLS} overlay={<MediaStageProgress value={42} label={d("Video progress")} />} />
+      </div>
     </div>
   );
 }

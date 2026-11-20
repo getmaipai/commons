@@ -72,6 +72,11 @@ const ALLOW: AllowEntry[] = [
     reason: "Showcase only: a generated sample still in one hue so the demo stage has a picture.",
   },
   {
+    file: "src/primitives/MediaTileLoopShowcase.tsx",
+    match: /^hsl\($/,
+    reason: "Showcase only: generated sample stills in different hues so the hover-loop tiles have pictures.",
+  },
+  {
     file: "src/elements/VideoRetakeShowcase.tsx",
     match: /^hsl\($/,
     reason: "Showcase only: a generated sample still in one hue so the demo clip has a picture.",

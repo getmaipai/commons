@@ -1,4 +1,4 @@
-import { Children, isValidElement, type ComponentProps, type ImgHTMLAttributes, type ReactNode, type RefObject } from "react";
+import { Children, isValidElement, useEffect, useRef, useState, type ComponentProps, type ImgHTMLAttributes, type ReactNode, type RefObject } from "react";
 import { Card } from "@/kit/primitives/Card";
 import { SafeImage } from "@/kit/primitives/SafeImage";
 import { Button } from "@/kit/ui/button";
@@ -13,6 +13,7 @@ import { cn, FOCUS_RING } from "@/kit/utils";
 import { useInsertedKeys } from "@/kit/hooks/useInsertedKeys";
 import { useSurface } from "@/kit/useSurface";
 import { LockTile, collapseLocked } from "@/kit/elements/adult-lock";
+import { play, rewind, useMatches } from "@/kit/elements/option-cards";
 import { LIKE_POP_CLASS, likeHaptic, useLikePop } from "@/kit/primitives/likeFeedback";
 import { useReorder, type ReorderConfig } from "@/kit/primitives/reorder";
 import { i18n } from "@/kit/i18n"
@@ -126,6 +127,10 @@ interface MediaShelfProps<T> {
    * and a quiet Reorder button above the shelf turns on Move up and Move down buttons. `onReorder` gets the complete new key
    * order and a `revert`; the shelf shows the new order at once. Needs `getLabel` or `getReorderLabel` for the buttons' names. Absent: no handles. */
   reorder?: ReorderConfig;
+  /** A hover loop for a tile: the resolved address of a short silent mp4, per item. On a pointer screen it starts after a short hover
+   * (about 300 ms) or on keyboard focus, muted and inline, over the still, and rewinds and stops on leave or blur. It never plays on a
+   * touch screen or under reduced motion, and a failed or refused play leaves the still. Absent for an item: the tile is drawn as before. */
+  getLoop?: (item: T) => string | undefined;
   /** MEDIA-PARITY-02: the item's name in the reorder buttons ("Drag Lanterns to reorder"). Falls back to `getLabel`, then "item". */
   getReorderLabel?: (item: T) => string;
 }
@@ -192,6 +197,7 @@ export function MediaShelf<T>({
   onUnlock,
   reorder: reorderConfig,
   getReorderLabel,
+  getLoop,
 }: MediaShelfProps<T>) {
   const collapsed = isLocked ? collapseLocked(allItems, isLocked, isMaking) : { open: allItems, hasLocked: false, making: false };
   const { hasLocked, making } = collapsed;
@@ -293,6 +299,7 @@ export function MediaShelf<T>({
                     meta={density === "compact" ? undefined : renderMeta?.(item)}
                     label={variant === "plain" && !renderCaption && !renderActions && hasArtTile(media) ? getLabel?.(item) : undefined}
                     hasSafeImageLabel={hasSafeImageTileLabel(media)}
+                    loop={getLoop?.(item)}
                   />
                 </div>
               </Card>
@@ -404,6 +411,7 @@ export function MediaShelf<T>({
                 meta={renderMeta?.(item)}
                 label={variant === "plain" && !renderCaption && hasArtTile(media) ? getLabel?.(item) : undefined}
                 hasSafeImageLabel={hasSafeImageTileLabel(media)}
+                loop={getLoop?.(item)}
               />
             </div>
           </Card>
@@ -595,10 +603,77 @@ function PlainShelfFrame({ heading, headingStyle, seeAll, children }: ShelfFrame
   );
 }
 
-/** The tile's corners and bottom edge: badge, running time and progress. Shared with any media tile the kit draws. */
-export function MediaTileOverlay({ progress = 0, badge, meta, label, hasSafeImageLabel = false, metaPlacement = "end", badgeStyle = "default" }: { progress?: number; badge?: ReactNode; meta?: ReactNode; label?: string; hasSafeImageLabel?: boolean; metaPlacement?: "end" | "start"; badgeStyle?: "default" | "mono" }) {
+/** How long the pointer rests on a tile before its loop starts. */
+export const TILE_LOOP_DELAY_MS = 300;
+
+/**
+ * The hover loop of a tile: a muted, inline video (preload none) laid over the still. It starts after a short hover on a pointer screen or on
+ * keyboard focus, and rewinds and pauses on leave or blur. Touch screens (`hover: none`) and reduced motion get no video at all, and a loop that
+ * fails or is refused to play stays hidden, so the still always shows. The listeners go on the tile's card, which holds the focus.
+ */
+function TileLoop({ src }: { src: string }) {
+  const video = useRef<HTMLVideoElement | null>(null);
+  const reduced = useMatches("(prefers-reduced-motion: reduce)");
+  const touch = useMatches("(hover: none)");
+  const allowed = !reduced && !touch;
+  const [active, setActive] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const [failed, setFailed] = useState(false);
+  useEffect(() => { setPlaying(false); setFailed(false); }, [src]);
+  useEffect(() => {
+    const host = video.current?.closest<HTMLElement>('[data-slot="kit-card"]') ?? video.current?.parentElement;
+    if (!allowed || !host) { setActive(false); return; }
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const clear = () => { if (timer !== undefined) { clearTimeout(timer); timer = undefined; } };
+    const enter = () => { clear(); timer = setTimeout(() => { timer = undefined; setActive(true); }, TILE_LOOP_DELAY_MS); };
+    const leave = () => { clear(); setActive(false); };
+    const focus = () => {
+      // A mouse press also focuses the card; only keyboard focus starts the loop at once (the hover delay covers the pointer).
+      let keyboard = true;
+      try { keyboard = host.matches(":focus-visible"); } catch { /* no :focus-visible here: treat focus as keyboard */ }
+      if (keyboard) { clear(); setActive(true); }
+    };
+    host.addEventListener("pointerenter", enter);
+    host.addEventListener("pointerleave", leave);
+    host.addEventListener("focusin", focus);
+    host.addEventListener("focusout", leave);
+    return () => {
+      clear();
+      host.removeEventListener("pointerenter", enter);
+      host.removeEventListener("pointerleave", leave);
+      host.removeEventListener("focusin", focus);
+      host.removeEventListener("focusout", leave);
+    };
+  }, [allowed, src]);
+  useEffect(() => {
+    if (active && allowed) play(video.current);
+    else { rewind(video.current); setPlaying(false); }
+  }, [active, allowed]);
+  if (!allowed || failed) return null;
+  return (
+    <video
+      ref={(el) => { video.current = el; if (el) { el.muted = true; el.defaultMuted = true; } }}
+      data-slot="media-tile-loop"
+      data-playing={playing ? "" : undefined}
+      src={src}
+      muted
+      loop
+      playsInline
+      preload="none"
+      aria-hidden="true"
+      tabIndex={-1}
+      className="pointer-events-none absolute inset-0 size-full object-cover opacity-0 data-[playing]:opacity-100 motion-safe:transition-opacity motion-safe:duration-[var(--motion-pill)]"
+      onPlaying={() => setPlaying(true)}
+      onError={() => setFailed(true)}
+    />
+  );
+}
+
+/** The tile's corners and bottom edge: badge, running time and progress, and the optional hover loop (`loop`, a muted mp4 address). Shared with any media tile the kit draws. */
+export function MediaTileOverlay({ progress = 0, badge, meta, label, hasSafeImageLabel = false, metaPlacement = "end", badgeStyle = "default", loop }: { progress?: number; badge?: ReactNode; meta?: ReactNode; label?: string; hasSafeImageLabel?: boolean; metaPlacement?: "end" | "start"; badgeStyle?: "default" | "mono"; loop?: string }) {
   return (
     <>
+      {loop ? <TileLoop src={loop} /> : null}
       {label && !hasSafeImageLabel ? <span data-slot="media-tile-label" className="pointer-events-none absolute inset-x-0 bottom-0 truncate bg-[var(--art-scrim)] px-3 pb-2 pt-6 text-left text-base leading-5 text-[var(--art-foreground)]" style={{ fontSize: "16px", fontWeight: "var(--look-weight-section, 500)", letterSpacing: "var(--look-tracking-section, normal)" }}>{label}</span> : null}
       {badge ? <span className={cn("absolute start-2 top-2 flex", badgeStyle === "mono" && "rounded-md bg-[var(--art-overlay)] px-1.5 py-1 font-mono text-[length:var(--font-size-badge)] font-semibold text-[var(--art-foreground)] backdrop-blur-sm")} data-slot="media-tile-badge">{badge}</span> : null}
       {meta ? (

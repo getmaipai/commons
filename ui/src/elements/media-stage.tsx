@@ -4,6 +4,7 @@ import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import { cn } from "cn";
 import { getIcon } from "@/kit/icons";
 import { i18n } from "@/kit/i18n";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/kit/ui/dropdown-menu";
 import { SafeImage } from "../primitives/SafeImage";
 import { useMatches } from "./option-cards";
 
@@ -26,6 +27,51 @@ export interface MediaStagePill {
   icon?: string;
   onSelect: () => void;
   disabled?: boolean;
+  /** Why the action is off, in plain words with the next step. Shown under the label in the More menu and as the tooltip of a disabled pill. */
+  disabledReason?: string;
+}
+
+/** The phone width (the stage's own CSS breakpoint). Under it the pills stay in one row and the extra ones go into a More menu. */
+const PHONE_QUERY = "(max-width: 859.98px)";
+/** The most buttons in the phone row; a third pill (or more) leaves one pill and the More button. */
+const PHONE_MAX_PILLS = 2;
+
+function PillButton({ pill }: { pill: MediaStagePill }) {
+  const Icon = pill.icon ? getIcon(pill.icon) : null;
+  return (
+    <button type="button" data-slot="media-stage-pill" aria-label={pill.label} title={pill.disabled ? pill.disabledReason : undefined} disabled={pill.disabled} onClick={pill.onSelect}>
+      {Icon ? <Icon aria-hidden className="size-4 shrink-0" /> : null}
+      <span data-slot="media-stage-pill-label" data-iconless={Icon ? undefined : ""}>{pill.label}</span>
+    </button>
+  );
+}
+
+/** The single More button of a phone stage: a real button with a name that opens the kit's menu; every item runs the same action as its pill. */
+function MorePills({ pills }: { pills: readonly MediaStagePill[] }) {
+  const MoreIcon = getIcon("ellipsis");
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button type="button" data-slot="media-stage-pill" data-more="" aria-label={i18n._({ id: "ui.More", message: "More" })}>
+          <MoreIcon aria-hidden className="size-4 shrink-0" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" data-slot="media-stage-more-menu">
+        {pills.map((pill) => {
+          const Icon = pill.icon ? getIcon(pill.icon) : null;
+          return (
+            <DropdownMenuItem key={pill.id} disabled={pill.disabled} onSelect={() => pill.onSelect()}>
+              {Icon ? <Icon aria-hidden /> : null}
+              <span className="flex min-w-0 flex-col">
+                <span>{pill.label}</span>
+                {pill.disabled && pill.disabledReason ? <span className="text-muted-foreground text-sm">{pill.disabledReason}</span> : null}
+              </span>
+            </DropdownMenuItem>
+          );
+        })}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 }
 
 export interface MediaStageProps {
@@ -49,7 +95,8 @@ export interface MediaStageProps {
   subtitle?: ReactNode;
   /** The bottom strip: progress, captions, actions. Replaced by the error message in the `error` state. */
   overlay?: ReactNode;
-  /** Floating actions at the top right; they wrap and take at most 80% of the width. */
+  /** Floating actions at the top right. On a wide screen they wrap and take at most 80% of the width; under 860 px they stay in one row
+   * (never down over the title) and, from the third on, move into one "More" menu. */
   pills?: readonly MediaStagePill[];
   /** A small label at the top left. */
   titlePill?: ReactNode;
@@ -132,6 +179,7 @@ export function MediaStage({
   className,
 }: MediaStageProps) {
   const reduced = useMatches("(prefers-reduced-motion: reduce)");
+  const phone = useMatches(PHONE_QUERY);
   const loading = state === "loading";
   const error = state === "error";
   const waiting = dim || state === "waiting";
@@ -173,15 +221,14 @@ export function MediaStage({
       {titlePill ? <div data-slot="media-stage-title-pill">{titlePill}</div> : null}
       {pills && pills.length > 0 ? (
         <div data-slot="media-stage-pills">
-          {pills.map((pill) => {
-            const Icon = pill.icon ? getIcon(pill.icon) : null;
-            return (
-              <button key={pill.id} type="button" data-slot="media-stage-pill" aria-label={pill.label} disabled={pill.disabled} onClick={pill.onSelect}>
-                {Icon ? <Icon aria-hidden className="size-4 shrink-0" /> : null}
-                <span data-slot="media-stage-pill-label" data-iconless={Icon ? undefined : ""}>{pill.label}</span>
-              </button>
-            );
-          })}
+          {phone && pills.length > PHONE_MAX_PILLS ? (
+            <>
+              {pills.slice(0, PHONE_MAX_PILLS - 1).map((pill) => <PillButton key={pill.id} pill={pill} />)}
+              <MorePills pills={pills.slice(PHONE_MAX_PILLS - 1)} />
+            </>
+          ) : (
+            pills.map((pill) => <PillButton key={pill.id} pill={pill} />)
+          )}
         </div>
       ) : null}
       {playButton && !error && !loading ? (
