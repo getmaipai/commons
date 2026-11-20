@@ -134,6 +134,7 @@ describe("StoryboardPlayer", () => {
     const { getByText, queryByRole } = render(<StoryboardPlayer shots={[]} />);
     expect(getByText("No shots yet. Add a shot to start your storyboard.")).toBeTruthy();
     expect(queryByRole("slider")).toBeNull();
+    expect(document.querySelector("[data-slot=storyboard-player][data-state=empty]")!.className).toContain("aspect-video");
   });
 
   test("labels can be overridden", () => {

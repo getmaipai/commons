@@ -271,7 +271,7 @@ export function StoryboardPlayer({ shots, bedSrc, affectedShotIds, note, value, 
   }
   if (shots.length === 0) {
     return (
-      <div data-slot="storyboard-player" data-state="empty" className={cn("w-full rounded-[var(--radius-card)] border border-[var(--border)] bg-[var(--surface-card)]", className)}>
+      <div data-slot="storyboard-player" data-state="empty" className={cn("flex aspect-video w-full rounded-[var(--radius-card)] border border-[var(--border)] bg-[var(--surface-card)]", className)}>
         <EmptyState icon="clapperboard" text={text.empty} />
       </div>
     );
