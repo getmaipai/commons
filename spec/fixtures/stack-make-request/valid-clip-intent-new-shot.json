@@ -1,0 +1,18 @@
+{
+  "job": "clip",
+  "audience": "minor",
+  "description": "a kite flying",
+  "shape": "portrait",
+  "level": "standard",
+  "seconds": 5,
+  "start_picture": "media-1",
+  "end_picture": "media-2",
+  "seed": 3,
+  "intent": "new_shot",
+  "inputs": [
+    {
+      "role": "identity",
+      "file": "/v1/images/generations/a/0.png"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "job": "clip",
+  "audience": "minor",
+  "description": "a kite flying",
+  "shape": "portrait",
+  "level": "standard",
+  "seconds": 5,
+  "start_picture": "media-1",
+  "end_picture": "media-2",
+  "seed": 3,
+  "inputs": [
+    {
+      "role": "voice_reference",
+      "file": "audio-1"
+    }
+  ]
+}

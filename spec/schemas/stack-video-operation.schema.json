@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/stack-video-operation.schema.json",
+  "title": "StackVideoOperation",
+  "description": "VF-ROLES-01. The operations a clip job may be asked for beyond a plain take: retake from a point, extend, enhance. Names only; each needs its own capability row before a pack serves it.",
+  "enum": [
+    "retake_from",
+    "extend",
+    "enhance"
+  ]
+}

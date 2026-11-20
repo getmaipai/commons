@@ -198,6 +198,62 @@
         "seed": {
           "type": "integer"
         },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "role": {
+                "enum": [
+                  "identity",
+                  "wardrobe",
+                  "voice_reference",
+                  "edit_source"
+                ]
+              },
+              "file": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "role",
+              "file"
+            ]
+          }
+        },
+        "dialogue": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "speaker": {
+                "type": "string",
+                "minLength": 1
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1
+              },
+              "language": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "speaker",
+              "text"
+            ]
+          }
+        },
+        "intent": {
+          "enum": [
+            "open_on_picture",
+            "new_shot"
+          ]
+        },
         "wait": {
           "type": "integer",
           "minimum": 0,

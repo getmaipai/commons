@@ -44,7 +44,7 @@ import { StackStatus } from "../../stack/ts/stack-status";
 import { StackSizing } from "../../stack/ts/stack-sizing";
 
 import { StackModelPack } from "../../stack/ts/stack-model-pack";
-import { StackMakeRequest, StackMakeResult, StackMakeRefusal } from "../../stack/ts/stack-make";
+import { StackMakeRequest, StackMakeResult, StackMakeRefusal, StackVideoOperation } from "../../stack/ts/stack-make";
 import { StackJobsCatalog } from "../../stack/ts/stack-jobs-catalog";
 import { StackVideoReceipt } from "../../stack/ts/stack-video-receipt";
 
@@ -81,6 +81,7 @@ const SHAPES: Array<{ name: string; zod: ZodType }> = [
   { name: "stack-make-request", zod: StackMakeRequest },
   { name: "stack-make-result", zod: StackMakeResult },
   { name: "stack-make-refusal", zod: StackMakeRefusal },
+  { name: "stack-video-operation", zod: StackVideoOperation },
   { name: "stack-jobs-catalog", zod: StackJobsCatalog },
   { name: "stack-video-receipt", zod: StackVideoReceipt },
 ];

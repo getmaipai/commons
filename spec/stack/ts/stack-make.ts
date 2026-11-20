@@ -20,10 +20,20 @@ export const StackSongChange = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("extend"), add_seconds: secs, at: z.enum(["start", "end"]).optional() }).strict(),
 ]);
 
+// VF-ROLES-01: optional typed inputs and structured speech on a clip, beside the plain description. All additive: a clip with only `start_picture` and
+// `end_picture` still means the opening and closing frames, and identity is never inferred from either. `level` stays the one quality key (there is
+// no `profile` field on the wire; a profile is only a spec-defined name for a group of levels).
+export const StackClipInputRole = z.enum(["identity", "wardrobe", "voice_reference", "edit_source"]);
+export const StackClipIntent = z.enum(["open_on_picture", "new_shot"]);
+// The operations a clip job may be asked for beyond a plain take; each needs its own row before a pack serves it.
+export const StackVideoOperation = z.enum(["retake_from", "extend", "enhance"]);
+export const StackClipInput = z.object({ role: StackClipInputRole, file: text }).strict();
+export const StackClipDialogue = z.object({ speaker: text, text, language: text.optional() }).strict();
+
 export const StackMakeRequest = z.discriminatedUnion("job", [
   req("picture", { description: text, words: text.optional(), shape: StackJobShape, level: StackJobLevel, count: z.number().int().min(1).optional(), styles: z.array(text).optional(), seed: z.number().int().optional() }),
   req("picture_edit", { picture: text, description: text, words: text.optional(), references: z.array(text).optional(), mask: text.optional(), level: StackJobLevel, styles: z.array(text).optional() }),
-  req("clip", { description: text, shape: StackJobShape, level: StackJobLevel, seconds: secs, start_picture: text.optional(), end_picture: text.optional(), styles: z.array(text).optional(), seed: z.number().int().optional() }),
+  req("clip", { description: text, shape: StackJobShape, level: StackJobLevel, seconds: secs, start_picture: text.optional(), end_picture: text.optional(), styles: z.array(text).optional(), seed: z.number().int().optional(), inputs: z.array(StackClipInput).optional(), dialogue: z.array(StackClipDialogue).optional(), intent: StackClipIntent.optional() }),
   req("clip_from_sheet", { sheet: text, description: text, shape: StackJobShape, level: StackJobLevel, seconds: secs }),
   req("restyle", { clip: text, restyle: text, description: text.optional() }),
   req("swap", { clip: text, references: z.array(text).min(1), description: text.optional(), start_seconds: z.number().min(0).optional(), seconds: secs, level: StackJobLevel }),
@@ -59,7 +69,8 @@ export type StackMakeResult = z.infer<typeof StackMakeResult>;
 
 export const StackMakeRefusal = z.union([
   z.object({ code: z.enum(["too_many_references", "too_long"]), line: text, limit: z.number().min(0) }).strict(),
-  z.object({ code: z.enum(["shape_not_served", "level_not_served"]), line: text }).strict(),
+  // VF-CAPS-01: an input combination the serving pack cannot take, and a model or adapter the job needs that is not installed.
+  z.object({ code: z.enum(["shape_not_served", "level_not_served", "input_not_supported", "not_installed"]), line: text }).strict(),
   z.object({ code: z.literal("not_on_this_model"), line: text, alternatives: z.array(z.object({ part: StackPartId, label: text }).strict()) }).strict(),
 ]);
 export type StackMakeRefusal = z.infer<typeof StackMakeRefusal>;
