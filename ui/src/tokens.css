@@ -3068,6 +3068,11 @@ html[data-pro-look] [data-slot="row-action"] [data-slot="row-action-label"] { di
   border-bottom-color: var(--header-edge-color, var(--border));
 }
 
+/* VIDEO-KIT-K6: the sticky action bar (elements/action-bar.tsx) sits above PhoneNav where it is drawn, the floating variant included. */
+[data-slot="action-bar"][data-sticky] { bottom: env(safe-area-inset-bottom, 0px); }
+html:has([data-slot="phone-nav"]) [data-slot="action-bar"][data-sticky] { bottom: calc(49px + env(safe-area-inset-bottom, 0px)); }
+html:has([data-slot="phone-nav"][data-floating]) [data-slot="action-bar"][data-sticky] { bottom: calc(5rem + env(safe-area-inset-bottom, 0px)); }
+
 /* LOOKS-GENERATED:BEGIN (ui/scripts/gen-looks.ts, from spec/ui/looks.json; do not edit) */
 :root body.style-neutral {
   --font-sans: "Inter Variable", Inter, ui-sans-serif, system-ui, sans-serif;
@@ -3199,11 +3204,6 @@ html[data-pro-look] [data-slot="row-action"] [data-slot="row-action-label"] { di
   --rail-padding: 8px;
 }
 /* LOOKS-GENERATED:END */
-
-/* VIDEO-KIT-K6: the sticky action bar (elements/action-bar.tsx) sits above PhoneNav where it is drawn, the floating variant included. */
-[data-slot="action-bar"][data-sticky] { bottom: env(safe-area-inset-bottom, 0px); }
-html:has([data-slot="phone-nav"]) [data-slot="action-bar"][data-sticky] { bottom: calc(49px + env(safe-area-inset-bottom, 0px)); }
-html:has([data-slot="phone-nav"][data-floating]) [data-slot="action-bar"][data-sticky] { bottom: calc(5rem + env(safe-area-inset-bottom, 0px)); }
 
 /* EASE-GENERATED:BEGIN (ui/scripts/gen-ease-tokens.ts, from spec/ease/presets.json; do not edit) */
 /* Targets: --target-min is the smallest control size; the rail reads --rail-button and --rail-width. */
