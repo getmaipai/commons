@@ -37,7 +37,8 @@
             "shape_not_served",
             "level_not_served",
             "input_not_supported",
-            "not_installed"
+            "not_installed",
+            "needs_start_picture"
           ]
         },
         "line": {

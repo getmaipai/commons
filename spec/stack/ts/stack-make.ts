@@ -27,6 +27,9 @@ export const StackClipInputRole = z.enum(["identity", "wardrobe", "voice_referen
 export const StackClipIntent = z.enum(["open_on_picture", "new_shot"]);
 // The operations a clip job may be asked for beyond a plain take; each needs its own row before a pack serves it.
 export const StackVideoOperation = z.enum(["retake_from", "extend", "enhance"]);
+// VF-ROUTE-01: the way the Stack holds a clip's pictures, chosen by the Stack from the serving pack's capability rows (never by the caller): from words alone, from a
+// start picture (alone or with an end picture), or from identity reference pictures. `route_reason` is one plain line saying why.
+export const StackClipRoute = z.enum(["words", "start_picture", "start_end_pictures", "references"]);
 export const StackClipInput = z.object({ role: StackClipInputRole, file: text }).strict();
 export const StackClipDialogue = z.object({ speaker: text, text, language: text.optional() }).strict();
 
@@ -50,7 +53,7 @@ export const StackMakeRequest = z.discriminatedUnion("job", [
 export type StackMakeRequest = z.infer<typeof StackMakeRequest>;
 
 // `receipt` (VF-RECEIPT-01): the job id the owner's route answers for the job's StackVideoReceipt. Optional: only video jobs write one.
-export const StackMadeWith = z.object({ part: StackPartId, label: text, pack_version: text, shape: StackJobShape.nullable(), seconds: z.number().min(0).nullable(), sound: z.boolean(), notes: z.array(text), receipt: text.optional() }).strict();
+export const StackMadeWith = z.object({ part: StackPartId, label: text, pack_version: text, shape: StackJobShape.nullable(), seconds: z.number().min(0).nullable(), sound: z.boolean(), notes: z.array(text), receipt: text.optional(), route: StackClipRoute.optional(), route_reason: text.optional() }).strict();
 export type StackMadeWith = z.infer<typeof StackMadeWith>;
 
 const resBase = { id: text, state: z.enum(["queued", "running", "waiting_for_you", "paused", "stalled", "done", "failed", "cancelled"]), percent: z.number().int().min(0).max(100), status: z.string(), files: z.array(text), poster: text.nullable(), made_with: StackMadeWith.nullable() };
@@ -69,8 +72,9 @@ export type StackMakeResult = z.infer<typeof StackMakeResult>;
 
 export const StackMakeRefusal = z.union([
   z.object({ code: z.enum(["too_many_references", "too_long"]), line: text, limit: z.number().min(0) }).strict(),
+  // VF-ROUTE-01: `needs_start_picture` means the serving pack holds a person only through a first picture: the caller makes one from the identity picture and sends it as `start_picture`.
   // VF-CAPS-01: an input combination the serving pack cannot take, and a model or adapter the job needs that is not installed.
-  z.object({ code: z.enum(["shape_not_served", "level_not_served", "input_not_supported", "not_installed"]), line: text }).strict(),
+  z.object({ code: z.enum(["shape_not_served", "level_not_served", "input_not_supported", "not_installed", "needs_start_picture"]), line: text }).strict(),
   z.object({ code: z.literal("not_on_this_model"), line: text, alternatives: z.array(z.object({ part: StackPartId, label: text }).strict()) }).strict(),
 ]);
 export type StackMakeRefusal = z.infer<typeof StackMakeRefusal>;

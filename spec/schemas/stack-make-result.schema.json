@@ -118,6 +118,19 @@
                 "receipt": {
                   "type": "string",
                   "minLength": 1
+                },
+                "route": {
+                  "type": "string",
+                  "enum": [
+                    "words",
+                    "start_picture",
+                    "start_end_pictures",
+                    "references"
+                  ]
+                },
+                "route_reason": {
+                  "type": "string",
+                  "minLength": 1
                 }
               },
               "required": [
@@ -254,6 +267,19 @@
             "receipt": {
               "type": "string",
               "minLength": 1
+            },
+            "route": {
+              "type": "string",
+              "enum": [
+                "words",
+                "start_picture",
+                "start_end_pictures",
+                "references"
+              ]
+            },
+            "route_reason": {
+              "type": "string",
+              "minLength": 1
             }
           },
           "required": [
@@ -382,6 +408,19 @@
                   }
                 },
                 "receipt": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "route": {
+                  "type": "string",
+                  "enum": [
+                    "words",
+                    "start_picture",
+                    "start_end_pictures",
+                    "references"
+                  ]
+                },
+                "route_reason": {
                   "type": "string",
                   "minLength": 1
                 }
@@ -527,6 +566,19 @@
                 "receipt": {
                   "type": "string",
                   "minLength": 1
+                },
+                "route": {
+                  "type": "string",
+                  "enum": [
+                    "words",
+                    "start_picture",
+                    "start_end_pictures",
+                    "references"
+                  ]
+                },
+                "route_reason": {
+                  "type": "string",
+                  "minLength": 1
                 }
               },
               "required": [
@@ -666,6 +718,19 @@
               }
             },
             "receipt": {
+              "type": "string",
+              "minLength": 1
+            },
+            "route": {
+              "type": "string",
+              "enum": [
+                "words",
+                "start_picture",
+                "start_end_pictures",
+                "references"
+              ]
+            },
+            "route_reason": {
               "type": "string",
               "minLength": 1
             }
@@ -818,6 +883,19 @@
                   }
                 },
                 "receipt": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "route": {
+                  "type": "string",
+                  "enum": [
+                    "words",
+                    "start_picture",
+                    "start_end_pictures",
+                    "references"
+                  ]
+                },
+                "route_reason": {
                   "type": "string",
                   "minLength": 1
                 }

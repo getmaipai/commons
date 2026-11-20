@@ -44,5 +44,7 @@ export const StackVideoReceipt = z.object({
     code: text.nullable(),
   }).strict()),
   prompt: z.object({ bytes: count, sha256: sha }).strict(),
+  // VF-ROUTE-01: the route the Stack chose for a generic-door clip and why (additive; absent on the legacy door).
+  route: z.object({ name: text, reason: text }).strict().optional(),
 }).strict();
 export type StackVideoReceipt = z.infer<typeof StackVideoReceipt>;
