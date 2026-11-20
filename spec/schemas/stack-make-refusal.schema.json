@@ -33,6 +33,45 @@
       "additionalProperties": false,
       "properties": {
         "code": {
+          "type": "string",
+          "const": "needs_start_picture"
+        },
+        "line": {
+          "type": "string",
+          "minLength": 1
+        },
+        "shape": {
+          "enum": [
+            "landscape",
+            "portrait",
+            "square"
+          ]
+        },
+        "inputs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "enum": [
+              "identity",
+              "wardrobe",
+              "voice_reference",
+              "edit_source"
+            ]
+          }
+        }
+      },
+      "required": [
+        "code",
+        "line",
+        "shape",
+        "inputs"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
           "enum": [
             "shape_not_served",
             "level_not_served",

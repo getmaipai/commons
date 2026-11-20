@@ -24,7 +24,8 @@ export const StackSongChange = z.discriminatedUnion("kind", [
 // `end_picture` still means the opening and closing frames, and identity is never inferred from either. `level` stays the one quality key (there is
 // no `profile` field on the wire; a profile is only a spec-defined name for a group of levels).
 export const StackClipInputRole = z.enum(["identity", "wardrobe", "voice_reference", "edit_source"]);
-export const StackClipIntent = z.enum(["open_on_picture", "new_shot"]);
+// `derived_start` (VF-ROUTE-DERIVE-01): the resend after a `needs_start_picture` answer, whose start picture the caller made through one generic `picture` job. The Stack records it in the receipt; a request that carries a start picture is never answered `needs_start_picture` again.
+export const StackClipIntent = z.enum(["open_on_picture", "new_shot", "derived_start"]);
 // The operations a clip job may be asked for beyond a plain take; each needs its own row before a pack serves it.
 export const StackVideoOperation = z.enum(["retake_from", "extend", "enhance"]);
 // VF-ROUTE-01: the way the Stack holds a clip's pictures, chosen by the Stack from the serving pack's capability rows (never by the caller): from words alone, from a
@@ -34,7 +35,7 @@ export const StackClipInput = z.object({ role: StackClipInputRole, file: text })
 export const StackClipDialogue = z.object({ speaker: text, text, language: text.optional() }).strict();
 
 export const StackMakeRequest = z.discriminatedUnion("job", [
-  req("picture", { description: text, words: text.optional(), shape: StackJobShape, level: StackJobLevel, count: z.number().int().min(1).optional(), styles: z.array(text).optional(), seed: z.number().int().optional() }),
+  req("picture", { inputs: z.array(StackClipInput).optional(), intent: StackClipIntent.optional(), description: text, words: text.optional(), shape: StackJobShape, level: StackJobLevel, count: z.number().int().min(1).optional(), styles: z.array(text).optional(), seed: z.number().int().optional() }),
   req("picture_edit", { picture: text, description: text, words: text.optional(), references: z.array(text).optional(), mask: text.optional(), level: StackJobLevel, styles: z.array(text).optional() }),
   req("clip", { description: text, shape: StackJobShape, level: StackJobLevel, seconds: secs, start_picture: text.optional(), end_picture: text.optional(), styles: z.array(text).optional(), seed: z.number().int().optional(), inputs: z.array(StackClipInput).optional(), dialogue: z.array(StackClipDialogue).optional(), intent: StackClipIntent.optional(), look: text.optional(), quiet_seconds: z.number().int().min(20).max(3600).optional(), quiet_max_wait_seconds: z.number().int().min(0).max(86400).nullable().optional() }),
   req("clip_from_sheet", { sheet: text, description: text, shape: StackJobShape, level: StackJobLevel, seconds: secs }),
@@ -74,6 +75,8 @@ export const StackMakeRefusal = z.union([
   z.object({ code: z.enum(["too_many_references", "too_long"]), line: text, limit: z.number().min(0) }).strict(),
   // VF-ROUTE-01: `needs_start_picture` means the serving pack holds a person only through a first picture: the caller makes one from the identity picture and sends it as `start_picture`.
   // VF-CAPS-01: an input combination the serving pack cannot take, and a model or adapter the job needs that is not installed.
+  // VF-ROUTE-DERIVE-01: the typed answer that says what the first picture must be: its shape and which of the request's input roles to make it from. One derivation per request.
+  z.object({ code: z.literal("needs_start_picture"), line: text, shape: StackJobShape, inputs: z.array(StackClipInputRole).min(1) }).strict(),
   z.object({ code: z.enum(["shape_not_served", "level_not_served", "input_not_supported", "not_installed", "needs_start_picture"]), line: text }).strict(),
   z.object({ code: z.literal("not_on_this_model"), line: text, alternatives: z.array(z.object({ part: StackPartId, label: text }).strict()) }).strict(),
 ]);

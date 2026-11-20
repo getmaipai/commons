@@ -61,6 +61,38 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 120
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "role": {
+                "enum": [
+                  "identity",
+                  "wardrobe",
+                  "voice_reference",
+                  "edit_source"
+                ]
+              },
+              "file": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "role",
+              "file"
+            ]
+          }
+        },
+        "intent": {
+          "enum": [
+            "open_on_picture",
+            "new_shot",
+            "derived_start"
+          ]
         }
       },
       "required": [
@@ -251,7 +283,8 @@
         "intent": {
           "enum": [
             "open_on_picture",
-            "new_shot"
+            "new_shot",
+            "derived_start"
           ]
         },
         "look": {
