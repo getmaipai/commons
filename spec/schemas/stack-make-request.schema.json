@@ -254,6 +254,23 @@
             "new_shot"
           ]
         },
+        "quiet_seconds": {
+          "type": "integer",
+          "minimum": 20,
+          "maximum": 3600
+        },
+        "quiet_max_wait_seconds": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 86400
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
         "wait": {
           "type": "integer",
           "minimum": 0,
