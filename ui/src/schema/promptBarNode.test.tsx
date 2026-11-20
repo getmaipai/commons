@@ -166,6 +166,15 @@ describe("prompt_bar node", () => {
     expect(sent.body).toEqual({ prompt: "a fox", look: "anime", start_frame: "file-picture" });
   });
 
+  test("a prop reference parses, asks the host for a prop and keeps its own label", async () => {
+    const withProp = { ...(cardsNode as Record<string, unknown>), references: [{ state: "prop", label: "Prop", kind: "prop" }] } as unknown as UiNode;
+    const asked: string[] = [];
+    const host: MediaHost = { onPlay: () => {}, pickMedia: (kind) => { asked.push(kind); return Promise.resolve({ id: "prop-1" }); } };
+    const view = draw(withProp, host);
+    fireEvent.click(view.getByRole("button", { name: "Add Prop" }));
+    await waitFor(() => expect(asked).toEqual(["prop"]));
+  });
+
   test("VIDEO-CREATE-02: without a host media picker the slots are disabled and nothing is added to the submit", async () => {
     const view = draw(cardsNode);
     expect((view.getByRole("button", { name: "Add Picture" }) as HTMLButtonElement).disabled).toBe(true);

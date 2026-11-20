@@ -954,7 +954,7 @@ function PromptBarNodeView({ node, state }: { node: PromptBarNode; state: Row })
   // hand the draft to the host. Every chip stays reachable (Look and Camera keep their picture cards inside their group's popover).
   const composerHost = host?.composer;
   const withModes = Boolean(composerHost && node.layout === "chat" && composerHost.modes.length > 1);
-  const refMax = (ref: typeof refs[number]) => (ref.kind === "picture" || ref.kind === "character" ? ref.max ?? 1 : 1);
+  const refMax = (ref: typeof refs[number]) => (ref.kind === "picture" || ref.kind === "character" || ref.kind === "place" || ref.kind === "prop" ? ref.max ?? 1 : 1);
   const pickReference = (ref: typeof refs[number]) => {
     if (!host?.pickMedia) return;
     const current = filled[ref.state] ?? [];

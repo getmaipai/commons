@@ -608,7 +608,7 @@ export const PromptBarNodeSchema = z.object({
       z.object({
         state: z.string().regex(/^[a-z][a-z0-9_]*$/).max(40),
         label: z.string().min(1).max(40),
-        kind: z.enum(["picture", "character", "place", "audio", "video"]),
+        kind: z.enum(["picture", "character", "place", "prop", "audio", "video"]),
         max: z.number().int().min(1).max(3).default(1),
         placement: z.enum(["row", "in_field", "tile"]).optional(),
         hint: z.string().min(1).max(80).optional(),

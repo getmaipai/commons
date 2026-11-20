@@ -53,7 +53,7 @@ export interface PromptBarReference {
   /** The key the chosen file id is reported under. */
   id: string;
   label: string;
-  kind: "picture" | "character" | "place" | "audio" | "video";
+  kind: "picture" | "character" | "place" | "prop" | "audio" | "video";
   /** `row` (default) draws a dashed square under the box. `in_field` draws the chosen file inside the prompt box as a named thumbnail
    * with a remove control, and the empty slot as a small add button in the box's foot. Only a picture, character or place. */
   placement?: "row" | "in_field" | "tile";

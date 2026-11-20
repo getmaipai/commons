@@ -6,7 +6,7 @@
 // and the calm setting already zero it.
 
 import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
-import { ChevronDown, Film, Image as ImageIcon, MapPin, Music, Plus, Sparkles, Trash2, User, Wand2, X, Eraser, SlidersHorizontal } from "lucide-react";
+import { Box, ChevronDown, Film, Image as ImageIcon, MapPin, Music, Plus, Sparkles, Trash2, User, Wand2, X, Eraser, SlidersHorizontal } from "lucide-react";
 import { cn } from "cn";
 import { hitArea } from "../utils";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "../ui/drawer";
@@ -25,7 +25,7 @@ export type ComposerTool = "clear" | "improve" | "lyrics";
 export interface ComposerSlotData {
   id: string;
   label: string;
-  kind: "picture" | "character" | "place" | "audio" | "video";
+  kind: "picture" | "character" | "place" | "prop" | "audio" | "video";
   /** The most files this slot takes (shown in the accessible name of an empty slot when above one). */
   max?: number;
   /** The chosen file id; empty or absent while the slot is empty. */
@@ -156,7 +156,7 @@ export function usePlaceholderFade(placeholder: string | undefined): "a" | "b" |
   return flip;
 }
 
-const SLOT_ICON = { picture: ImageIcon, character: User, place: MapPin, audio: Music, video: Film } as const;
+const SLOT_ICON = { picture: ImageIcon, character: User, place: MapPin, prop: Box, audio: Music, video: Film } as const;
 
 // One look for every control in the panel: plain text-and-icon buttons with a small chevron, no box, no select border. Only the mode pill
 // (a raised surface) and the Presets pill (a soft fill) are drawn as shapes.
