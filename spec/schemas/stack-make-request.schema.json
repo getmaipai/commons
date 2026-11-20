@@ -56,6 +56,11 @@
         },
         "seed": {
           "type": "integer"
+        },
+        "wait": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 120
         }
       },
       "required": [
@@ -120,6 +125,11 @@
             "type": "string",
             "minLength": 1
           }
+        },
+        "wait": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 120
         }
       },
       "required": [
@@ -187,6 +197,11 @@
         },
         "seed": {
           "type": "integer"
+        },
+        "wait": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 120
         }
       },
       "required": [
@@ -241,6 +256,11 @@
         "seconds": {
           "type": "number",
           "exclusiveMinimum": 0
+        },
+        "wait": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 120
         }
       },
       "required": [
@@ -282,6 +302,11 @@
         "description": {
           "type": "string",
           "minLength": 1
+        },
+        "wait": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 120
         }
       },
       "required": [
@@ -339,6 +364,11 @@
             "boost",
             "max"
           ]
+        },
+        "wait": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 120
         }
       },
       "required": [
@@ -393,6 +423,11 @@
             "boost",
             "max"
           ]
+        },
+        "wait": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 120
         }
       },
       "required": [
@@ -443,6 +478,11 @@
             "boost",
             "max"
           ]
+        },
+        "wait": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 120
         }
       },
       "required": [
@@ -512,6 +552,11 @@
         "language": {
           "type": "string",
           "minLength": 1
+        },
+        "wait": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 120
         }
       },
       "required": [
@@ -638,6 +683,11 @@
             "boost",
             "max"
           ]
+        },
+        "wait": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 120
         }
       },
       "required": [
@@ -672,6 +722,11 @@
         "seconds": {
           "type": "number",
           "exclusiveMinimum": 0
+        },
+        "wait": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 120
         }
       },
       "required": [
@@ -710,6 +765,11 @@
             "minLength": 1
           },
           "minItems": 1
+        },
+        "wait": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 120
         }
       },
       "required": [
@@ -752,6 +812,11 @@
         "description": {
           "type": "string",
           "minLength": 1
+        },
+        "wait": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 120
         }
       },
       "required": [
@@ -786,6 +851,11 @@
         "lyrics": {
           "type": "string",
           "minLength": 1
+        },
+        "wait": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 120
         }
       },
       "required": [

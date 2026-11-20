@@ -1,0 +1,9 @@
+{
+  "job": "stems",
+  "audience": "adult",
+  "song": "media-3",
+  "stems": [
+    "vocals"
+  ],
+  "wait": 30
+}

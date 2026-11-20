@@ -9,7 +9,8 @@ import { StackJobAudience, StackJobLevel, StackJobShape } from "./stack-model-pa
 
 const text = z.string().min(1);
 const secs = z.number().positive();
-const common = { audience: StackJobAudience, part: StackPartId.optional() };
+// `wait`: whole seconds the caller will wait for the answer; 0 answers 202 with the job id at once, 120 is the cap.
+const common = { audience: StackJobAudience, part: StackPartId.optional(), wait: z.number().int().min(0).max(120).optional() };
 const req = <J extends string, T extends z.ZodRawShape>(job: J, shape: T) => z.object({ job: z.literal(job), ...common, ...shape }).strict();
 
 // What song_edit changes. Trim, fade and loudness run no model, so no pack serves them and they are not here.
