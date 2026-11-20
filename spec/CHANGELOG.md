@@ -1,3 +1,7 @@
+## [spec-v0.1.470] - 2026-11-20
+
+- `prompt_bar.references[].kind` takes `prop` (an Element of kind prop, picked from the same Cast picker as `character` and `place`); `place` and `prop` slots honor `max` like `character` (VIDEO-KIT-01).
+
 ## [spec-v0.1.469] - 2026-11-20
 
 - `media_stage` takes an optional `hide_when_empty` (default false): once the bound call has answered with no rows the stage draws nothing, and it still draws its loading state while the call is open. For a result stage with nothing to show before anything is made (VIDEO-KIT-01).

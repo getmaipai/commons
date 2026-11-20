@@ -1,3 +1,7 @@
+## [ui-v0.5.722] - 2026-11-20
+
+- `prompt_bar` reference slots take kind `prop` (Box icon, asks the host for a prop); `place` and `prop` slots honor `max` (VIDEO-KIT-01).
+
 ## [ui-v0.5.721] - 2026-11-20
 
 - The `media_stage` block takes `hide_when_empty`: an answered empty list renders nothing; loading still draws the stage (VIDEO-KIT-01).
