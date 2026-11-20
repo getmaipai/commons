@@ -19,6 +19,8 @@ export const StackJobLimitsBase = {
   max_seconds: perLevel(z.number().positive()).optional(),
   max_references: z.number().int().min(0).optional(),
   shapes: z.object({ landscape: perLevel(Pixels).optional(), portrait: perLevel(Pixels).optional(), square: perLevel(Pixels).optional() }).strict().optional(),
+  // VF-ROUTE-DERIVE-01: shapes the pack makes only for the Stack's own use of an identity first picture (a request that carries an `identity` input and a clip intent). Ordinary requests and the screens read `shapes`, never this.
+  first_picture_shapes: z.object({ landscape: perLevel(Pixels).optional(), portrait: perLevel(Pixels).optional(), square: perLevel(Pixels).optional() }).strict().optional(),
   max_words: z.number().int().min(0).optional(),
 };
 
