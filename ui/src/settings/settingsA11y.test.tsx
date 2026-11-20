@@ -86,7 +86,7 @@ describe("KIT-SET-05 structure (axe)", () => {
 
   test("2b a SettingsRenderer with no shell keeps h3 (unchanged default)", async () => {
     const { container } = renderWithQueryClient(<SettingsRenderer scope="person" scopeValue="person:p1" honouredBy="home" />);
-    await waitFor(() => expect(container.querySelector("section h3")).not.toBeNull());
+    await waitFor(() => expect(container.querySelector("[role=group] h3")).not.toBeNull());
   });
 
   test("3 landmarks: with contentAs=section there is one main and the pane is a named region", async () => {

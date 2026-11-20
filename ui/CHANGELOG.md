@@ -1,3 +1,7 @@
+## [ui-v0.5.703] - 2026-11-20
+
+- Settings landmarks (A11Y-DEBT-01): a settings group drawn by `SettingsRenderer` is a named `role="group"` (it was a `<section>` region that repeated the name of the pane around it, which failed the audit's landmark-unique check), and the docked settings pane drops its own name when it equals the area's. No visible change.
+
 ## [ui-v0.5.702] - 2026-11-20
 
 - Touch floor (A11Y-DEBT-01, Home issue 322): every control now has a 48 px tappable area without changing how big it is drawn. The default look scales spacing by 0.9, so a 48 px class painted 43 px and a rail row 46 px; one zero-specificity `::after` in `tokens.css` (buttons, links and the ARIA button-like roles) grows only the hit area to 48 px, and the shared hit layer (`HIT_FLOOR`, used by `hitArea()`, the `control` and `icon-control` Button sizes, the thread list, the section sidebar, file tiles and the like) reaches 48 px at any density instead of a fixed spacing step. Text fields, which cannot carry a pseudo-element, are 48 px tall at minimum. `data-touch-target-exempt` still opts out. Home's own accessibility check went from 950 touch-target findings on 44 pages to none.

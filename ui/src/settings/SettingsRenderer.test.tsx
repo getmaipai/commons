@@ -88,7 +88,7 @@ describe("SettingsRenderer - cards and rows", () => {
   test("one card per registry group, headed by its title, rows split by inset dividers", async () => {
     const { findByText, container } = renderWithQueryClient(<SettingsRenderer {...props} />);
     await findByText("Send photos in chat");
-    const sections = [...container.querySelectorAll("section")];
+    const sections = [...container.querySelectorAll("[role=group][id^=settings-]")];
     expect(sections.map((s) => s.id)).toEqual(["settings-person.chat", "settings-person.search"]);
     expect(sections.map((s) => s.querySelector("h3")!.textContent)).toEqual(["Chat", "Search"]);
     const chat = sections[0]!;
@@ -212,7 +212,7 @@ describe("SettingsRenderer - embedding options", () => {
   test("mergeGroups folds every shown group into the first one's card", async () => {
     const view = renderWithQueryClient(<SettingsRenderer {...props} mergeGroups />);
     await view.findByText("Safe search level");
-    expect(view.container.querySelectorAll("section")).toHaveLength(1);
+    expect(view.container.querySelectorAll("[role=group][id^=settings-]")).toHaveLength(1);
     expect(view.container.querySelectorAll("[data-variant=card]")).toHaveLength(1);
     expect(view.getByText("Send photos in chat")).toBeTruthy();
   });

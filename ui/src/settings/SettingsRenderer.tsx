@@ -368,14 +368,16 @@ export function SettingsRenderer({
                   </ItemGroup>
                 );
                 return (
-                  <section key={group.id} id={`settings-${group.id}`} aria-label={titleOverrides[group.id] ?? sectionTitle(group.id)} className="flex flex-col gap-3">
+                  // A11Y-DEBT-01: a settings group is a named group, not a page region: as a <section> it repeated the name of the pane around it
+                  // ("Household" twice) and failed landmark-unique.
+                  <div key={group.id} id={`settings-${group.id}`} role="group" aria-label={titleOverrides[group.id] ?? sectionTitle(group.id)} className="flex flex-col gap-3">
                     {plainRows ? null : (
                       <Heading className="text-[length:var(--settings-section-heading-size)] font-medium">
                         {titleOverrides[group.id] ?? sectionTitle(group.id)}
                       </Heading>
                     )}
                     {card}
-                  </section>
+                  </div>
                 );
               })}
             </div>

@@ -221,7 +221,8 @@ export function SettingsShell({
 
       <Content
         data-slot="settings-content"
-        aria-label={title}
+        // A11Y-DEBT-01: the docked shell is already a region named for the area; a second region with the same name fails landmark-unique.
+        aria-label={layout === "docked" && title === area.title ? undefined : title}
         className={cn("relative min-w-0 flex-1 self-stretch overflow-y-auto bg-settings-page", showContent ? "block" : "hidden lg:block")}
       >
         <div className="mx-auto flex w-full max-w-(--settings-content-max) flex-col px-6 pb-16 pt-4 lg:pt-(--settings-content-top)">
