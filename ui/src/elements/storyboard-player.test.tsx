@@ -130,6 +130,11 @@ describe("StoryboardPlayer", () => {
     expect(queryByRole("button")).toBeNull();
   });
 
+  test("while no shot has a picture or a clip the stage is one short line, not a tall box", () => {
+    const { container } = render(<StoryboardPlayer shots={shots.map((s) => ({ ...s, still: undefined, clip: undefined }))} />);
+    expect(container.querySelector("[data-slot=storyboard-stage]")!.hasAttribute("data-bare")).toBe(true);
+  });
+
   test("an empty list says what to do", () => {
     const { getByText, queryByRole } = render(<StoryboardPlayer shots={[]} />);
     expect(getByText("No shots yet. Add a shot to start your storyboard.")).toBeTruthy();

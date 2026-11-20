@@ -46,9 +46,11 @@ export function ActionBar({ primary, secondary, estimate, reason, note, sticky =
       data-slot="action-bar"
       data-sticky={sticky ? "" : undefined}
       data-blocked={blocked ? "" : undefined}
+      data-compact={secondary ? "" : undefined}
       className={cn(
         "flex w-full flex-col gap-2 border-t border-border bg-background/95 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/80 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-6",
         sticky && "sticky bottom-0 z-20",
+        secondary && "max-sm:[&_[data-slot=action-bar-line]]:sr-only max-sm:[&_[data-slot=action-bar-note]]:sr-only max-sm:py-2",
         className,
       )}
     >

@@ -282,10 +282,12 @@ export function StoryboardPlayer({ shots, bedSrc, affectedShotIds, note, value, 
   const MicIcon = getIcon("mic");
   const status = shot?.status ?? "ready";
   const pct = total > 0 ? (time / total) * 100 : 0;
+  // No shot has a picture or a clip yet: the stage is one quiet line, not a tall empty box.
+  const nothingDrawn = shots.length > 0 && shots.every((s) => !s.still && !s.clip);
 
   return (
     <div data-slot="storyboard-player" data-state={playing ? "playing" : "paused"} className={cn("flex w-full flex-col gap-3", className)}>
-      <div data-slot="storyboard-stage" className="relative aspect-video w-full overflow-hidden rounded-[var(--radius-card)] border border-[var(--border)] bg-[var(--surface-stage)]">
+      <div data-slot="storyboard-stage" data-bare={nothingDrawn ? "" : undefined} className={cn("relative w-full overflow-hidden rounded-[var(--radius-card)] border border-[var(--border)] bg-[var(--surface-stage)]", nothingDrawn ? "h-16" : "aspect-video")}>
         {shot?.still && status !== "no_picture" ? (
           <SafeImage src={shot.still} alt={text.stillAlt(shot.caption)} tintSeed={shot.caption} className={cn("absolute inset-0 size-full object-cover transition-opacity motion-reduce:transition-none", status === "changing" && "opacity-40")} />
         ) : null}
@@ -293,8 +295,8 @@ export function StoryboardPlayer({ shots, bedSrc, affectedShotIds, note, value, 
           <video ref={clipVideo} src={shot.clip} poster={shot.still} muted playsInline preload="auto" aria-hidden className="absolute inset-0 size-full object-cover" />
         ) : null}
         {status === "no_picture" || (!shot?.still && !shot?.clip) ? (
-          <div data-slot="storyboard-no-picture" className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-[var(--surface-2)] text-[var(--muted-foreground)]">
-            <ImageIcon className="size-10" aria-hidden />
+          <div data-slot="storyboard-no-picture" className={cn("absolute inset-0 flex items-center justify-center bg-[var(--surface-2)] text-[var(--muted-foreground)]", nothingDrawn ? "flex-row gap-2" : "flex-col gap-2")}>
+            <ImageIcon className={nothingDrawn ? "size-5" : "size-10"} aria-hidden />
             <p className="text-sm">{text.noPicture}</p>
           </div>
         ) : null}
