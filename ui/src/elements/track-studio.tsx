@@ -76,6 +76,7 @@ export interface TrackStudioProps {
   levelSteps?: readonly LevelStep[];
   exportLabel?: string;
   exportNleLabel?: string;
+  exportPlacement?: "top" | "auto" | "bottom";
   exportDisabledReason?: string;
   /** Press of Export: the plan. The Element keeps the plan after it. */
   onExport?: (plan: StudioPlan) => void;
@@ -121,6 +122,7 @@ const NUDGE_BIG_S = 1;
 const LABEL_W = 160;
 const LABEL_W_PHONE = 112;
 const LANE_H = 60;
+export const fitZoomPps = (viewW: number, labelW: number, film: number): number => Math.min(80, Math.max(12, Math.floor((viewW - labelW - 16) / (Math.max(film, 2) + 2))));
 
 // ---------------------------------------------------------------------------------------------------------------------
 // The playhead time is read by many small parts at up to 40 Hz; it lives outside React state so only they re-render.
@@ -151,6 +153,7 @@ export function TrackStudio(props: TrackStudioProps) {
 function StudioBody(props: TrackStudioProps) {
   const { onPlanChange, onMetric } = props;
   const tools = props.tools ?? ALL_TOOLS;
+  const exportPlacement = props.exportPlacement ?? "top";
   const audioKind = (props.kind ?? "video") === "audio";
   const panels = props.panels ?? (audioKind ? AUDIO_PANELS : ALL_PANELS);
   const limits: StudioLimits = useMemo(() => ({ ...DEFAULT_LIMITS, ...props.limits }), [props.limits]);
@@ -193,7 +196,7 @@ function StudioBody(props: TrackStudioProps) {
   const selectionRef = useRef(selection);
   selectionRef.current = selection;
   const labelW = isPhone ? LABEL_W_PHONE : LABEL_W;
-  const fitPps = Math.min(80, Math.max(12, Math.floor((viewW - labelW - 16) / (Math.max(film, 10) + 2))));
+  const fitPps = fitZoomPps(viewW, labelW, film);
   const pps = zoom ?? (viewW > 0 ? fitPps : 36);
   const timeW = Math.max(viewW - labelW, (film + 2) * pps);
 
@@ -456,7 +459,7 @@ function StudioBody(props: TrackStudioProps) {
       <div ref={hostRef} hidden data-studio-host />
       <div role="status" aria-live="polite" className={cn("lg:col-span-2", line ? "text-destructive text-sm" : "sr-only")} data-slot="track-studio-line">{line}</div>
 
-      <div className="flex min-w-0 flex-col gap-3 lg:col-start-2 lg:row-start-1" data-slot="track-studio-export">
+      {exportPlacement !== "bottom" ? <div className={cn("flex min-w-0 flex-col gap-3 lg:col-start-2 lg:row-start-1", exportPlacement === "auto" && "hidden lg:flex")} data-slot="track-studio-export">
         {props.onExport ? (
           <>
             <div className="flex flex-wrap gap-2">
@@ -469,7 +472,7 @@ function StudioBody(props: TrackStudioProps) {
           </>
         ) : null}
         <p className="text-muted-foreground hidden text-sm lg:block">{previewLine()}</p>
-      </div>
+      </div> : null}
 
       <div className="flex min-w-0 flex-col gap-4 lg:col-start-1 lg:row-span-2 lg:row-start-1" data-slot="track-studio-main">
       <div className="grid min-w-0 gap-4 lg:grid-cols-[21rem_minmax(0,1fr)]" data-slot="track-studio-top">
@@ -517,39 +520,6 @@ function StudioBody(props: TrackStudioProps) {
         </div>
       </div>
 
-      <div className="bg-card min-w-0 rounded-2xl" data-slot="track-studio-tracks">
-        <div className="flex items-center justify-between gap-4 px-4 pt-3 pb-2"><h3 className={eyebrow}>{i18n._({ id: "ui.Tracks", message: "Tracks" })}</h3>{isPhone ? <div className="w-32"><ZoomControl pps={pps} setZoom={setZoom} compact /></div> : null}</div>
-        {/* A scrollable region must be reachable by keyboard (axe scrollable-region-focusable); arrows then move the playhead. */}
-        {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-        <div ref={scrollRef} className="relative overflow-x-auto overflow-y-hidden pb-2" role="group" aria-label={i18n._({ id: "ui.Tracks. Left and right arrows move the playhead. Space plays.", message: "Tracks. Left and right arrows move the playhead. Space plays." })} tabIndex={0}>
-          <div className="relative" style={{ width: labelW + timeW }}>
-            <Ruler store={timeStore} film={film} pps={pps} labelW={labelW} timeW={timeW} seek={(t) => void seekTo(t)} engine={engineRef} range={range} />
-            {visibleLanes.map((lane) => (
-              <LaneRow
-                key={lane.id}
-                lane={lane}
-                state={state}
-                pps={pps}
-                labelW={labelW}
-                timeW={timeW}
-                selected={selected}
-                solo={solo}
-                media={media}
-                select={setSelected}
-                commit={commit}
-                setSolo={(on) => setSolo(on ? lane.id : null)}
-                seek={(t) => void seekTo(t)}
-                playhead={playhead}
-                setLine={setLine}
-                range={range}
-              />
-            ))}
-            {selection ? <SelectionBand selection={selection} pps={pps} labelW={labelW} /> : null}
-            <Playhead store={timeStore} pps={pps} labelW={labelW} />
-          </div>
-        </div>
-      </div>
-
       <div className={cn("bg-card flex min-w-0 flex-wrap items-center gap-3 rounded-2xl p-3", !audioKind && "z-10 max-sm:sticky max-sm:shadow-lg")} data-slot="track-studio-transport">
         <Button size={isPhone ? "default" : "lg"} className="rounded-full" onClick={togglePlay} aria-label={playing ? i18n._({ id: "ui.Pause", message: "Pause" }) : i18n._({ id: "ui.Play", message: "Play" })}>{playing ? <PauseIcon /> : <PlayIcon />}{playing ? i18n._({ id: "ui.Pause", message: "Pause" }) : i18n._({ id: "ui.Play", message: "Play" })}</Button>
         {isPhone ? (
@@ -584,6 +554,39 @@ function StudioBody(props: TrackStudioProps) {
         ) : null}
         <TimeText store={timeStore} film={film} />
       </div>
+      <div className="bg-card min-w-0 rounded-2xl" data-slot="track-studio-tracks">
+        <div className="flex items-center justify-between gap-4 px-4 pt-3 pb-2"><h3 className={eyebrow}>{i18n._({ id: "ui.Tracks", message: "Tracks" })}</h3>{isPhone ? <div className="w-32"><ZoomControl pps={pps} setZoom={setZoom} compact /></div> : null}</div>
+        {/* A scrollable region must be reachable by keyboard (axe scrollable-region-focusable); arrows then move the playhead. */}
+        {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
+        <div ref={scrollRef} className="relative overflow-x-auto overflow-y-hidden pb-2" role="group" aria-label={i18n._({ id: "ui.Tracks. Left and right arrows move the playhead. Space plays.", message: "Tracks. Left and right arrows move the playhead. Space plays." })} tabIndex={0}>
+          <div className="relative" style={{ width: labelW + timeW }}>
+            <Ruler store={timeStore} film={film} pps={pps} labelW={labelW} timeW={timeW} seek={(t) => void seekTo(t)} engine={engineRef} range={range} />
+            {visibleLanes.map((lane) => (
+              <LaneRow
+                key={lane.id}
+                lane={lane}
+                state={state}
+                pps={pps}
+                labelW={labelW}
+                timeW={timeW}
+                selected={selected}
+                solo={solo}
+                media={media}
+                select={setSelected}
+                commit={commit}
+                setSolo={(on) => setSolo(on ? lane.id : null)}
+                seek={(t) => void seekTo(t)}
+                playhead={playhead}
+                setLine={setLine}
+                range={range}
+              />
+            ))}
+            {selection ? <SelectionBand selection={selection} pps={pps} labelW={labelW} /> : null}
+            <Playhead store={timeStore} pps={pps} labelW={labelW} />
+          </div>
+        </div>
+      </div>
+
       {comparing && comparePair ? <StudioCompareBar pair={comparePair} startAt={playhead()} onClose={() => setComparing(false)} /> : null}
       {audioKind ? (
         <div className="bg-card flex min-w-0 flex-wrap items-center gap-3 rounded-2xl p-3" data-slot="track-studio-selection">
@@ -612,6 +615,10 @@ function StudioBody(props: TrackStudioProps) {
         </div>
         <p className="text-muted-foreground mt-3 text-sm lg:hidden">{previewLine()}</p>
       </div>
+      {props.onExport && exportPlacement !== "top" ? <div className={cn("bg-card flex min-w-0 flex-col gap-3 rounded-2xl border border-border p-3 max-sm:sticky max-sm:bottom-[var(--phone-nav-offset,0px)] max-sm:z-20", exportPlacement === "auto" && "lg:hidden")} data-slot="track-studio-export-bar">
+        <div className="flex flex-wrap gap-2"><Button size="lg" className="min-h-11 rounded-full" onClick={doExport} disabled={!changed || !!props.exportDisabledReason} data-slot="track-studio-export-button">{props.exportLabel ?? i18n._({ id: "ui.Export as a new clip", message: "Export as a new clip" })}</Button>{props.onExportNle ? <Button variant="secondary" size="lg" className="min-h-11 rounded-full" onClick={() => props.onExportNle?.(plan)} disabled={!changed || !!props.exportDisabledReason} data-slot="track-studio-export-nle-button"><DownloadIcon aria-hidden="true" />{props.exportNleLabel ?? i18n._({ id: "ui.Export for editing", message: "Export for editing" })}</Button> : null}</div>
+        {props.exportDisabledReason ? <p className="text-muted-foreground text-sm">{props.exportDisabledReason}</p> : !changed ? <p className="text-muted-foreground text-sm">{i18n._({ id: "ui.Change something to export it.", message: "Change something to export it." })}</p> : null}
+      </div> : null}
     </section>
   );
 }
@@ -1079,9 +1086,9 @@ function TrimHandle({ side, label, valueText, now, min, max, ...rest }: { side: 
       aria-valuenow={Math.round(now * 10) / 10}
       aria-valuetext={valueText}
       data-handle={side}
-      className={cn("bg-primary absolute inset-y-0 z-10 w-2.5 cursor-ew-resize touch-none before:absolute before:inset-[min(0px,calc((100%-49px)/2))] before:inset-y-0 before:content-[''] after:bg-primary-foreground after:absolute after:inset-y-3 after:left-1/2 after:w-px", side === "start" ? "-left-1 rounded-l-md" : "-right-1 rounded-r-md", FOCUS_RING)}
+      className={cn("bg-primary absolute inset-y-0 z-10 h-full min-h-[40px] w-[12px] cursor-ew-resize touch-none before:absolute before:inset-[min(0px,calc((100%-49px)/2))] before:content-[''] max-sm:w-[16px]", side === "start" ? "-left-1 rounded-l-md" : "-right-1 rounded-r-md", FOCUS_RING)}
       {...rest}
-    />
+    ><span aria-hidden="true" className="absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col gap-1">{[0, 1, 2].map((n) => <span key={n} className="bg-primary-foreground size-1 rounded-full" />)}</span></div>
   );
 }
 

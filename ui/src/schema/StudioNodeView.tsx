@@ -159,6 +159,7 @@ function StudioOpen({ node, state, row }: { node: StudioNode; state: Row; row: R
         levelSteps={node.level_steps}
         exportLabel={node.export_label}
         exportNleLabel={node.export_nle_label}
+        exportPlacement={node.export_placement}
         exportDisabledReason={node.export_disabled_reason}
         onExport={exportAction ? onExport : undefined}
         onExportNle={exportNleAction ? onExportNle : undefined}

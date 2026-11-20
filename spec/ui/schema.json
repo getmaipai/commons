@@ -978,6 +978,7 @@
         },
         "export_label": { "type": "string", "minLength": 1, "maxLength": 40, "default": "Export as a new clip" },
         "export_nle_label": { "type": "string", "minLength": 1, "maxLength": 40, "default": "Export for editing" },
+        "export_placement": { "type": "string", "enum": ["top", "auto", "bottom"], "default": "top", "description": "Where the export actions appear. `top` keeps the current layout; `auto` moves them to a sticky phone bottom bar and keeps the top block at large widths; `bottom` always uses the bottom bar." },
         "export_disabled_reason": { "type": "string", "minLength": 1, "maxLength": 120, "description": "A plain line that disables Export and is shown beside it (for example while the engine cannot take an edit job)." },
         "make_more": {
           "type": "array",

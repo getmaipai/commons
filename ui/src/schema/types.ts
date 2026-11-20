@@ -1080,6 +1080,7 @@ export const StudioNodeSchema = z.object({
   handlers: z.object({ export: FeedHandlerSchema.optional(), export_nle: FeedHandlerSchema.optional(), add: FeedHandlerSchema.optional() }).strict().optional(),
   export_label: z.string().min(1).max(40).optional(),
   export_nle_label: z.string().min(1).max(40).optional(),
+  export_placement: z.enum(["top", "auto", "bottom"]).default("top").optional(),
   export_disabled_reason: z.string().min(1).max(120).optional(),
   make_more: z
     .array(

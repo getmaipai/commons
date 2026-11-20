@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, mock, spyOn, test } from "bun:
 import { act, cleanup, fireEvent, render, waitFor, within } from "@testing-library/react";
 import { stubMatchMedia } from "../../tests/stubMatchMedia";
 import { FakeAudioContext, flush, installFakeMedia } from "../../tests/fakeMedia";
-import { TrackStudio, HELP_LINE, PREVIEW_LINE, SPLIT_LABEL, type StudioPlan, type TrackStudioProps } from "./track-studio";
+import { TrackStudio, HELP_LINE, PREVIEW_LINE, SPLIT_LABEL, fitZoomPps, type StudioPlan, type TrackStudioProps } from "./track-studio";
 
 const SECRET = { title: "Zorblax Nightshade", label: "zorblax-label", src: "/api/videos/zorblax.mp4", poster: "/api/videos/zorblax-poster.jpg", voice: "/api/files/zorblax-voice.wav", ref: "clip-secret-77" };
 const lanes = (tag = "a") => [
@@ -312,6 +312,16 @@ describe("focus and pointer", () => {
     fireEvent.click(getByRole("button", { name: "Undo" }));
     expect(getByRole("slider", { name: "Trim end of Paper boat A" }).getAttribute("aria-valuenow")).toBe("4");
     expect((getByRole("button", { name: "Undo" }) as HTMLButtonElement).disabled).toBe(true);
+  });
+  test("trim handles keep a 40px visual height, 12/16px width and 48px hit layer", () => {
+    const { container, getByRole } = open();
+    fireEvent.click(pieces(container, "video")[0]!);
+    const handle = getByRole("slider", { name: "Trim start of Paper boat A" });
+    expect(handle.className).toContain("min-h-[40px]");
+    expect(handle.className).toContain("w-[12px]");
+    expect(handle.className).toContain("max-sm:w-[16px]");
+    expect(handle.className).toContain("before:inset-[min(0px,calc((100%-49px)/2))]");
+    expect(handle.querySelectorAll("[aria-hidden='true'] span")).toHaveLength(3);
   });
   test("every control is a real button, slider or switch with a name", async () => {
     const { container } = open();
@@ -785,6 +795,20 @@ describe("the transport does not float over the Tracks card in an audio studio",
     cleanup();
     const video = open();
     expect(video.container.querySelector("[data-slot='track-studio-transport']")!.className).toContain("max-sm:sticky");
+  });
+});
+
+describe("phone studio layout and fit zoom", () => {
+  test("fits a three second film into the available ruler width", () => {
+    expect(fitZoomPps(500, 112, 3)).toBe(74);
+  });
+  test("places preview, transport, tracks, panels and the sticky export bar in phone order", () => {
+    stubMatchMedia({ "(max-width: 639.98px)": true });
+    const { container } = open({ exportPlacement: "auto", onExport: () => undefined });
+    const slots = [...container.querySelectorAll("[data-slot='track-studio-monitor'], [data-slot='track-studio-transport'], [data-slot='track-studio-tracks'], [data-slot='track-studio-panels'], [data-slot='track-studio-export-bar']")];
+    expect(slots.map((el) => el.getAttribute("data-slot"))).toEqual(["track-studio-monitor", "track-studio-transport", "track-studio-tracks", "track-studio-panels", "track-studio-export-bar"]);
+    expect(slots.at(-1)?.className).toContain("sticky");
+    expect(slots.at(-1)?.className).toContain("var(--phone-nav-offset");
   });
 });
 
