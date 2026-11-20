@@ -930,9 +930,10 @@ export const ActionBarNodeSchema = z
     secondary: ActionBarButtonSchema.optional(),
     estimate: FieldPathSchema.optional(),
     reason: FieldPathSchema.optional(),
+    note: FieldPathSchema.optional(),
     sticky: z.boolean().optional(),
   })
-  .refine((n) => n.bind !== undefined || (n.estimate === undefined && n.reason === undefined), "estimate and reason need a bind");
+  .refine((n) => n.bind !== undefined || (n.estimate === undefined && n.reason === undefined && n.note === undefined), "estimate, reason and note need a bind");
 export type ActionBarNode = z.infer<typeof ActionBarNodeSchema>;
 export type ActionBarButton = z.infer<typeof ActionBarButtonSchema>;
 

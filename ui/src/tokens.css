@@ -3075,10 +3075,10 @@ html[data-pro-look] [data-slot="row-action"] [data-slot="row-action-label"] { di
   border-bottom-color: var(--header-edge-color, var(--border));
 }
 
-/* VIDEO-KIT-K6: the sticky action bar (elements/action-bar.tsx) sits above PhoneNav where it is drawn, the floating variant included. */
-[data-slot="action-bar"][data-sticky] { bottom: env(safe-area-inset-bottom, 0px); }
-html:has([data-slot="phone-nav"]) [data-slot="action-bar"][data-sticky] { bottom: calc(49px + env(safe-area-inset-bottom, 0px)); }
-html:has([data-slot="phone-nav"][data-floating]) [data-slot="action-bar"][data-sticky] { bottom: calc(5rem + env(safe-area-inset-bottom, 0px)); }
+/* VIDEO-KIT-K6: the sticky action bar (elements/action-bar.tsx) sits above the shell's bottom bar. PhoneNav publishes --phone-nav-offset on the page
+ * (its own height, the floating variant and the PRO look's extra gap included, and 0 from 640 px up), so the bar uses that one value instead of
+ * its own guess; with no bottom bar it keeps the device's safe area. */
+[data-slot="action-bar"][data-sticky] { bottom: max(var(--phone-nav-offset, 0px), env(safe-area-inset-bottom, 0px)); }
 
 /* VIDEO-KIT-K9: MediaStage (elements/media-stage.tsx). Theme tokens only: the scrim and the glass come from --background, the text from
  * --foreground, the progress from --status-progress-ink. Under 860px the stage is 4 / 3 with tighter padding, and a hero drops its title

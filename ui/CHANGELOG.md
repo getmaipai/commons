@@ -1,3 +1,7 @@
+## [ui-v0.5.706] - 2026-11-20
+
+- `ActionBar`: a sticky bar now sits above the shell's bottom bar at any width, using the one value PhoneNav publishes (`--phone-nav-offset`, which already includes the floating variant, the PRO look's gap and the device safe area, and is 0 from 640 px up) instead of its own guess (it hid under the floating bar at 375 px). New `note` prop and `action_bar.note` field (spec 0.1.453): a plain helper line that does not disable the primary action (VIDEO-KIT-01).
+
 ## [ui-v0.5.705] - 2026-11-20
 
 - `JobProgress` with shots and no stages: the job is finished only when no shot is queued, running or held (it read "done" with a running shot, and the Cancel control never drew). While a shot is active the header shows no outcome word and Cancel stays; when none is active the header reads done (all done), partial (some failed) or failed (none done), unless the caller sets `outcome` (VIDEO-KIT-01).

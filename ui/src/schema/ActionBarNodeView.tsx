@@ -60,9 +60,10 @@ function Bar({ node, state, row, waiting }: { node: ActionBarNode; state: Row; r
   const primary = action(node.primary, waiting)!;
   const reason = row && node.reason ? str(readField(row, node.reason)) : undefined;
   const estimate = row && node.estimate ? str(readField(row, node.estimate)) : undefined;
+  const note = row && node.note ? str(readField(row, node.note)) : undefined;
   return (
     <>
-      <ActionBar primary={primary} secondary={action(node.secondary, false)} estimate={estimate} reason={reason} sticky={node.sticky !== false} />
+      <ActionBar primary={primary} secondary={action(node.secondary, false)} estimate={estimate} reason={reason} note={note} sticky={node.sticky !== false} />
       {lastError ? <p role="alert" className="text-destructive px-4 text-sm">{lastError}</p> : null}
       {pendingConfirm ? <ConfirmDialog pendingConfirm={pendingConfirm} /> : null}
     </>

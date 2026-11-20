@@ -24,6 +24,8 @@ export interface ActionBarProps {
   estimate?: string;
   /** Why the primary action is not available right now, in plain words with the next step. Replaces the estimate while shown. */
   reason?: string;
+  /** A plain helper line under the estimate or reason ("Keeps the opening shots"). It explains; it never disables an action. */
+  note?: string;
   /** Stick to the foot of the window (default). On a phone it sits above the bottom bar. */
   sticky?: boolean;
   /** Names the bar for assistive tech. */
@@ -32,8 +34,9 @@ export interface ActionBarProps {
 }
 
 /** K6: a sticky bar with a primary action, an optional secondary action and a plain estimate line. A reason line explains an unavailable action. */
-export function ActionBar({ primary, secondary, estimate, reason, sticky = true, label = i18n._({ id: "ui.Actions", message: "Actions" }), className }: ActionBarProps) {
+export function ActionBar({ primary, secondary, estimate, reason, note, sticky = true, label = i18n._({ id: "ui.Actions", message: "Actions" }), className }: ActionBarProps) {
   const lineId = useId();
+  const noteId = useId();
   const blocked = Boolean(reason);
   const line = reason ?? estimate;
   return (
@@ -49,10 +52,15 @@ export function ActionBar({ primary, secondary, estimate, reason, sticky = true,
         className,
       )}
     >
-      {line ? (
-        <p data-slot="action-bar-line" id={lineId} role={blocked ? "status" : undefined} className={cn("min-w-0 text-[14px] leading-snug", blocked ? "text-foreground" : "text-muted-foreground")}>
-          {line}
-        </p>
+      {line || note ? (
+        <div className="flex min-w-0 flex-col gap-0.5">
+          {line ? (
+            <p data-slot="action-bar-line" id={lineId} role={blocked ? "status" : undefined} className={cn("min-w-0 text-[14px] leading-snug", blocked ? "text-foreground" : "text-muted-foreground")}>
+              {line}
+            </p>
+          ) : null}
+          {note ? <p data-slot="action-bar-note" id={noteId} className="text-muted-foreground min-w-0 text-[13px] leading-snug">{note}</p> : null}
+        </div>
       ) : <span />}
       <div className="flex shrink-0 items-center gap-2 max-sm:[&>*]:flex-1">
         {secondary ? (
@@ -66,7 +74,7 @@ export function ActionBar({ primary, secondary, estimate, reason, sticky = true,
           className="min-h-12 px-6"
           disabled={primary.disabled || blocked || primary.busy}
           aria-busy={primary.busy || undefined}
-          aria-describedby={line ? lineId : undefined}
+          aria-describedby={[line ? lineId : null, note ? noteId : null].filter(Boolean).join(" ") || undefined}
           onClick={primary.onSelect}
         >
           {primary.busy ? <Loader2Icon aria-hidden className="size-4 animate-spin motion-reduce:animate-none" /> : null}

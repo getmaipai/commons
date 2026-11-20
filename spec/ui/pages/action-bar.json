@@ -20,6 +20,7 @@
       },
       "estimate": "estimate",
       "reason": "reason",
+      "note": "note",
       "sticky": true
     }
   ]

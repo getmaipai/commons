@@ -1324,7 +1324,7 @@
       "type": "object",
       "additionalProperties": false,
       "required": ["type", "primary"],
-      "dependentRequired": { "estimate": ["bind"], "reason": ["bind"] },
+      "dependentRequired": { "estimate": ["bind"], "reason": ["bind"], "note": ["bind"] },
       "description": "UI-BLOCKS-01: a bar with the one thing a screen is for (`primary`), an optional quieter choice (`secondary`) and one plain line. `estimate` and `reason` are dotted paths into the first row of `bind` (a package data call), so the server words them and `bind` is required when either is set. `reason` says why the primary action is not available and replaces the estimate while it has text. A button is disabled while its `disabled_when` condition holds, and while its `busy_state` page-state key is truthy it shows `busy_label` and cannot be pressed again. `sticky` (default true) holds the bar at the foot of the window, above the bottom bar on a phone.",
       "properties": {
         "type": { "const": "action_bar" },
@@ -1355,6 +1355,7 @@
         },
         "estimate": { "type": "string", "minLength": 1, "description": "Dotted path, in the first row of `bind`, of a plain line beside the actions (a time or a cost the server worked out)." },
         "reason": { "type": "string", "minLength": 1, "description": "Dotted path, in the first row of `bind`, of the line that says why the primary action is not available and what to do. Replaces `estimate` while it has text." },
+        "note": { "type": "string", "minLength": 1, "description": "Dotted path, in the first row of `bind`, of a plain helper line drawn under the estimate or reason. It explains something about the screen (for example what a render will keep) and never disables a button; use `reason` for that." },
         "sticky": { "type": "boolean", "default": true }
       }
     },

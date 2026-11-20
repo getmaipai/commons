@@ -31,6 +31,20 @@ describe("action_bar node", () => {
     expect(view.container.querySelector('[data-slot="action-bar"]')?.hasAttribute("data-sticky")).toBe(true);
   });
 
+  test("a note is a plain helper line that never disables the primary action", async () => {
+    hub({ "render-plan": [{ estimate: "About 45 minutes to render", reason: null, note: "Shots you kept stay as they are." }] });
+    const view = mountBlock(node(), { state: { film: "f1", ready: true } });
+    expect(await view.findByText("Shots you kept stay as they are.")).toBeTruthy();
+    expect(view.container.querySelector('[data-slot="action-bar-note"]')).not.toBeNull();
+    expect(button(view, "Render film").disabled).toBe(false);
+    expect(view.getByText("About 45 minutes to render")).toBeTruthy();
+  });
+
+  test("a note with no bind is refused", () => {
+    const parsed = ActionBarNodeSchema.parse(node());
+    expect(ActionBarNodeSchema.safeParse({ type: "action_bar", primary: parsed.primary, note: "note" }).success).toBe(false);
+  });
+
   test("an answered empty list draws nothing", async () => {
     hub({ "render-plan": [] });
     const view = mountBlock(node(), { state: { film: "f1", ready: true } });

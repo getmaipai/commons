@@ -1,3 +1,7 @@
+## [spec-v0.1.453] - 2026-11-20
+
+- `action_bar` takes an optional `note` (a dotted path into the first bound row): a plain helper line under the estimate or reason that explains and never disables a button (`reason` stays the disabled reason). It needs a `bind`, like `estimate` and `reason` (VIDEO-KIT-01).
+
 ## [spec-v0.1.451] - 2026-11-20
 
 - `job_progress` and `clip_compare` are allowed on a package page (VIDEO-KIT-01): `job_progress` takes the same binding, field-path and action checks as the other data-driven blocks (a failed shot's own actions come from the server at runtime and are not checked statically); `clip_compare` media addresses are field paths. `job_progress` takes an optional `poll_while` (`field`, `values`) that refreshes it while any row is still queued, running or held. A new test keeps the schema's node union reconciled with the package-page allowlist: a block must be allowed or sit in an explicit exclusions list with a reason.
