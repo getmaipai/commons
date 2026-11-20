@@ -1,3 +1,7 @@
+## [spec-v0.1.472] - 2026-11-20
+
+- `voice.talk_over` defaults to `off` again (owner decision 2026-11-20; it was `gentle` since spec-v0.1.371). The pre-recorded spoken cue before an answer is retired as a default: replies start about a second after the person stops, and any acknowledgement should come from the household's own model. The key, its options and its copy are unchanged, so a household can still choose Gentle or Natural.
+
 ## [spec-v0.1.471] - 2026-11-20
 
 - `character_sheet`: `kind` gains `place` (`object` stays the prop kind); optional request `compose` asks for one composed sheet picture as well; the result gains optional `composed` (that picture's file) beside `panels`. Model pack: a job may carry `sheet_angles` (the panel instructions per kind) and `sheet_layout` (the composed sheet's width, height, place panel width, gap and place cap) (PLACE-SHEET-01).

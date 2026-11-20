@@ -4539,7 +4539,7 @@
         "natural"
       ]
     },
-    "default": "gentle",
+    "default": "off",
     "label": "Talk before I finish",
     "help": "Home gives a short spoken cue the moment your sentence sounds finished, then answers. If you keep talking, Home goes quiet and answers everything you said. Adults only; it needs Start answering early to be on.",
     "copy": {
