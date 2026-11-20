@@ -1,0 +1,28 @@
+{
+  "type": "page",
+  "id": "new-character",
+  "title": "New character",
+  "body": [
+    {
+      "type": "proposal_card",
+      "bind": { "source": "package", "path": "proposal", "params": { "id": "$state.proposal" } },
+      "title": "name",
+      "description": "description",
+      "description_state": "description",
+      "pictures": {
+        "bind": { "source": "package", "path": "proposal-pictures", "params": { "id": "$state.proposal" } },
+        "item_fields": { "src": "picture.url", "alt": "alt", "badge": "source", "caption": "caption" }
+      },
+      "status": "status",
+      "approve": {
+        "label": "Approve",
+        "action": { "call": { "target": "/api/plugins/characters/approve/{id}", "args": { "description": "{description}" }, "then": { "navigate": { "to": "/apps/characters" } } } },
+        "disabled_when": "!description"
+      },
+      "change": { "label": "Change", "action": { "call": { "target": "/api/plugins/characters/change/{id}", "args": { "description": "{description}" } } } },
+      "discard": { "label": "Discard", "action": { "confirm": { "prompt": "Discard this proposal?", "on_confirm": { "call": { "target": "/api/plugins/characters/discard/{id}", "method": "DELETE" } } } } },
+      "note": "note",
+      "error": "error"
+    }
+  ]
+}

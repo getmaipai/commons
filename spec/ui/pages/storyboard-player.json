@@ -1,0 +1,29 @@
+{
+  "type": "page",
+  "id": "storyboard",
+  "title": "Storyboard",
+  "body": [
+    {
+      "type": "storyboard_player",
+      "bind": { "source": "package", "path": "shots", "params": { "id": "$state.film" } },
+      "item_fields": {
+        "shot_id": "id",
+        "caption": "caption",
+        "duration_sec": "seconds",
+        "still": "picture.url",
+        "clip": "clip.url",
+        "status": "state",
+        "line_speaker": "line.speaker",
+        "line_text": "line.text",
+        "line_start_sec": "line.start",
+        "line_audio": "line.voice.url",
+        "line_wave": "line.voice.wave"
+      },
+      "bed": "bed.url",
+      "selected": "shot",
+      "on_select": { "navigate": { "to": "/apps/videos/storyboard", "state": { "shot": "{shot_id}" } } },
+      "loading_text": "Getting your storyboard ready",
+      "empty_state": { "type": "empty_state", "icon": "film", "text": "No shots yet. Describe the first scene and it shows up here." }
+    }
+  ]
+}

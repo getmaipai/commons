@@ -489,3 +489,69 @@ describe("CLIPS-FEED-02: a clip_feed on a package page", () => {
     expect(checkAppPackage("clips", clipsContributes, withBody([{ type: "clip_reel" }])).join("\n")).toContain('node type "clip_reel" is not allowed');
   });
 });
+
+describe("UI-BLOCKS-01: the five new blocks on a package page", () => {
+  const pageOf = (file: string) => JSON.parse(readFileSync(join(import.meta.dir, "..", "..", "ui", "pages", file), "utf-8"));
+  const withData = (ids: string[]): AppContributes => ({ pages: [{ id: "index", label: "Page", icon: "film", nav: true, kind: "schema", module: "m" }], data: ids.map((id) => ({ id, rows: "list" })) });
+  const check = (pkg: string, ids: string[], page: unknown) => checkAppPackage(pkg, withData(ids), () => page);
+  const only = (n: unknown) => ({ type: "page", id: "index", title: "Page", body: [n] });
+  const fixtures = [
+    ["storyboard-player.json", "videos", ["shots"]],
+    ["action-bar.json", "videos", ["render-plan"]],
+    ["proposal-card.json", "characters", ["proposal", "proposal-pictures"]],
+    ["voice-line.json", "scripts", ["line"]],
+    ["media-stage.json", "videos", ["stage"]],
+  ] as const;
+  const idsOf = (file: string) => [...fixtures.find((f) => f[0] === file)![2]];
+  const pkgOf = (file: string) => fixtures.find((f) => f[0] === file)![1];
+  const node = (file: string) => pageOf(file).body[0];
+
+  for (const [file, pkg, ids] of fixtures) {
+    test(`${file} passes the package-page checker, and a foreign bind or a missing data entry is refused`, () => {
+      const page = pageOf(file);
+      expect(check(pkg, [...ids], page)).toEqual([]);
+      const foreign = { ...page, body: [{ ...page.body[0], bind: { source: "route", path: "/api/media" } }] };
+      expect(check(pkg, [...ids], foreign).join("\n")).toContain('bind.source must be "package"');
+      expect(check(pkg, [], page).join("\n")).toContain("is not a contributes.data id of this package");
+    });
+  }
+
+  test("every action of the five blocks must stay under the package", () => {
+    const bad = { call: { target: "/api/plugins/other/x" } };
+    const cases: [string, string, Record<string, unknown>][] = [
+      ["storyboard-player.json", "storyboard_player.on_select", { on_select: { navigate: { to: "/apps/news" } } }],
+      ["action-bar.json", "action_bar.primary.action", { primary: { label: "Go", action: bad } }],
+      ["action-bar.json", "action_bar.secondary.action", { secondary: { label: "Go", action: bad } }],
+      ["proposal-card.json", "proposal_card.approve.action", { approve: { label: "Go", action: bad } }],
+      ["proposal-card.json", "proposal_card.change.action", { change: { label: "Go", action: bad } }],
+      ["proposal-card.json", "proposal_card.discard.action", { discard: { label: "Go", action: bad } }],
+      ["voice-line.json", "voice_line.actions.say_differently.action", { actions: { say_differently: { action: bad } } }],
+      ["voice-line.json", "voice_line.actions.use_other_reading.action", { actions: { use_other_reading: { action: bad } } }],
+      ["media-stage.json", "media_stage.pills[0].action", { pills: [{ label: "Go", action: bad }] }],
+      ["media-stage.json", "media_stage.error_actions[0].action", { error_actions: [{ label: "Go", action: bad }] }],
+    ];
+    for (const [file, where, change] of cases) expect(check(pkgOf(file), idsOf(file), only({ ...node(file), ...change })).join("\n")).toContain(`${where}: `);
+  });
+
+  test("a picture, voice or bed field must be a field path, never an address", () => {
+    const addr = "https://example.test/a.png";
+    const cases: [string, string, Record<string, unknown>][] = [
+      ["storyboard-player.json", "storyboard_player.item_fields: still must be a field path", { item_fields: { ...node("storyboard-player.json").item_fields, still: addr } }],
+      ["storyboard-player.json", "storyboard_player: bed must be a field path", { bed: addr }],
+      ["proposal-card.json", "proposal_card.pictures.item_fields: src must be a field path", { pictures: { ...node("proposal-card.json").pictures, item_fields: { src: addr, alt: "alt" } } }],
+      ["voice-line.json", "voice_line: audio must be a field path", { audio: addr }],
+      ["voice-line.json", "voice_line: speaker_picture must be a field path", { speaker_picture: "//example.test/a.png" }],
+      ["media-stage.json", "media_stage.media: loop must be a field path", { media: { still: "still.url", loop: addr } }],
+    ];
+    for (const [file, message, change] of cases) expect(check(pkgOf(file), idsOf(file), only({ ...node(file), ...change })).join("\n")).toContain(message);
+  });
+
+  test("an action_bar with no estimate needs no bind, and a media_stage's children are checked like any page node", () => {
+    expect(check("videos", [], only({ type: "action_bar", primary: { label: "Go", action: { call: { target: "/api/plugins/videos/go" } } } }))).toEqual([]);
+    const stage = node("media-stage.json");
+    const badChild = { ...stage, children: [{ type: "prompt_bar", label: "Describe", submit_label: "Make", submit: { call: { target: "/api/plugins/other/make" } } }] };
+    expect(check("videos", ["stage"], only(badChild)).join("\n")).toContain("prompt_bar.submit: call.target");
+    const foreignChild = { ...stage, children: [{ type: "widget_card", bind: { source: "route", path: "/x" } }] };
+    expect(check("videos", ["stage"], only(foreignChild)).join("\n")).toContain('node type "widget_card" is not allowed');
+  });
+});

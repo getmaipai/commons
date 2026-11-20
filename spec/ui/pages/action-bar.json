@@ -1,0 +1,26 @@
+{
+  "type": "page",
+  "id": "render",
+  "title": "Render",
+  "body": [
+    {
+      "type": "action_bar",
+      "bind": { "source": "package", "path": "render-plan", "params": { "id": "$state.film" } },
+      "primary": {
+        "label": "Render film",
+        "action": { "call": { "target": "/api/plugins/videos/render", "args": { "film": "{film}" } } },
+        "busy_state": "rendering",
+        "busy_label": "Rendering",
+        "disabled_when": "!ready"
+      },
+      "secondary": {
+        "label": "Save as draft",
+        "action": { "call": { "target": "/api/plugins/videos/draft", "args": { "film": "{film}" }, "success_label": "Saved" } },
+        "disabled_when": "rendering"
+      },
+      "estimate": "estimate",
+      "reason": "reason",
+      "sticky": true
+    }
+  ]
+}

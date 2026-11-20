@@ -1,0 +1,40 @@
+{
+  "type": "page",
+  "id": "stage",
+  "title": "Stage",
+  "body": [
+    {
+      "type": "media_stage",
+      "bind": { "source": "package", "path": "stage", "params": { "id": "$state.film" } },
+      "size": "hero",
+      "media": { "still": "still.url", "loop": "loop.url", "position": "still.position" },
+      "description": "description",
+      "scrim": "strong",
+      "state": "state",
+      "eyebrow": "eyebrow",
+      "title": "title",
+      "subtitle": "subtitle",
+      "pills": [
+        { "label": "Library", "icon": "folder", "action": { "navigate": { "to": "/apps/videos/library" } } },
+        { "label": "Share", "icon": "share", "action": { "share": { "to": "/apps/videos/watch?id={id}", "title": "{title}" } } }
+      ],
+      "title_pill": "pill",
+      "progress": "progress",
+      "compact": false,
+      "children": [
+        {
+          "type": "prompt_bar",
+          "label": "Describe your film",
+          "placeholder": "Juniper and Atlas find a lighthouse at dusk",
+          "submit_label": "Make",
+          "submit": { "call": { "target": "/api/plugins/videos/make", "args": { "prompt": "{prompt}" } } }
+        }
+      ],
+      "error_message": "error",
+      "error_actions": [
+        { "label": "Try again", "icon": "refresh-cw", "action": { "call": { "target": "/api/plugins/videos/retry/{id}" } } },
+        { "label": "Change the words", "action": { "navigate": { "to": "/apps/videos/stage" } } }
+      ]
+    }
+  ]
+}

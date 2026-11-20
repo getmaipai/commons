@@ -20,7 +20,7 @@ export interface AppContributes { pages?: AppPageEntry[]; data?: AppDataEntry[];
  * (message_thread, settings_editor) is refused: a package page draws only its
  * own data, through the package nodes and the layout nodes. MEDIA-POLISH-01: a
  * split_view is a layout node; its children are checked like any other. */
-export const PACKAGE_PAGE_NODE_TYPES: readonly string[] = ["page", "section", "empty_state", "progress", "answer_blocks", "picker", "search", "detail_pane", "tabs", "list", "media_shelf", "billboard", "player", "reader", "split_view", "creation_header", "prompt_bar", "quick_tiles", "top_result", "category_tiles", "track_rows", "result_feed", "studio", "clip_feed", "image_editor"];
+export const PACKAGE_PAGE_NODE_TYPES: readonly string[] = ["page", "section", "empty_state", "progress", "answer_blocks", "picker", "search", "detail_pane", "tabs", "list", "media_shelf", "billboard", "player", "reader", "split_view", "creation_header", "prompt_bar", "quick_tiles", "top_result", "category_tiles", "track_rows", "result_feed", "studio", "clip_feed", "image_editor", "storyboard_player", "action_bar", "proposal_card", "voice_line", "media_stage"];
 
 /** The role ladder, highest first; a page's `min_role` may only sit at or above the package's. */
 export const ROLE_LADDER: readonly string[] = ["owner", "admin", "adult", "teen", "child", "guest"];
@@ -178,6 +178,39 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
     if (isObject(node.actions)) for (const [key, handler] of Object.entries(node.actions)) checkAction(handler, packageId, `${where} clip_feed.actions.${key}`, out);
     checkAction(node.on_close, packageId, `${where} clip_feed.on_close`, out);
   }
+  // UI-BLOCKS-01: the five new blocks bind the package's own rows. Every field is a field path (a picture or a voice file is never an
+  // address), and every action stays under the package. A media_stage's children are page nodes and are checked like any other.
+  if (type === "storyboard_player") {
+    checkBinding(node.bind, `${where} storyboard_player`, data, "list", out);
+    if (isObject(node.item_fields)) for (const [name, value] of Object.entries(node.item_fields)) checkFieldPath(value, `${where} storyboard_player.item_fields`, name, out);
+    checkFieldPath(node.bed, `${where} storyboard_player`, "bed", out);
+    checkAction(node.on_select, packageId, `${where} storyboard_player.on_select`, out);
+  }
+  if (type === "action_bar") {
+    if (node.bind !== undefined) checkBinding(node.bind, `${where} action_bar`, data, "list", out);
+    for (const key of ["primary", "secondary"]) if (isObject(node[key])) checkAction(node[key].action, packageId, `${where} action_bar.${key}.action`, out);
+  }
+  if (type === "proposal_card") {
+    checkBinding(node.bind, `${where} proposal_card`, data, "list", out);
+    if (isObject(node.pictures)) {
+      checkBinding(node.pictures.bind, `${where} proposal_card.pictures`, data, "list", out);
+      if (isObject(node.pictures.item_fields)) for (const [name, value] of Object.entries(node.pictures.item_fields)) checkFieldPath(value, `${where} proposal_card.pictures.item_fields`, name, out);
+    }
+    for (const key of ["approve", "change", "discard"]) if (isObject(node[key])) checkAction(node[key].action, packageId, `${where} proposal_card.${key}.action`, out);
+  }
+  if (type === "voice_line") {
+    checkBinding(node.bind, `${where} voice_line`, data, "list", out);
+    for (const key of ["speaker_picture", "audio", "wave"]) checkFieldPath(node[key], `${where} voice_line`, key, out);
+    if (isObject(node.actions)) for (const [key, button] of Object.entries(node.actions)) if (isObject(button)) checkAction(button.action, packageId, `${where} voice_line.actions.${key}.action`, out);
+  }
+  if (type === "media_stage") {
+    checkBinding(node.bind, `${where} media_stage`, data, "list", out);
+    if (isObject(node.media)) for (const [name, value] of Object.entries(node.media)) checkFieldPath(value, `${where} media_stage.media`, name, out);
+    for (const key of ["pills", "error_actions"]) {
+      const buttons = node[key];
+      if (Array.isArray(buttons)) buttons.forEach((button, i) => isObject(button) && checkAction(button.action, packageId, `${where} media_stage.${key}[${i}].action`, out));
+    }
+  }
   if (type === "billboard") {
     checkBinding(node.bind, `${where} billboard`, data, "list", out);
     if (isObject(node.primary)) checkAction(node.primary.action, packageId, `${where} billboard.primary`, out, true);
@@ -235,7 +268,7 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
   }
   // VIDEO-STUDIO-02 (K1b): a page draws as the plain page or as the studio pane; any other word would silently draw as the plain page.
   if (type === "page" && node.surface !== undefined && node.surface !== "page" && node.surface !== "studio") out.push(`${where} page: surface "${String(node.surface)}" is not "page" or "studio"`);
-  const kids = type === "page" ? node.body : type === "section" ? node.children : type === "detail_pane" ? node.body : undefined;
+  const kids = type === "page" ? node.body : type === "section" ? node.children : type === "detail_pane" ? node.body : type === "media_stage" ? node.children : undefined;
   if (Array.isArray(kids)) kids.forEach((kid, i) => walk(kid, packageId, data, `${where}/${type}[${i}]`, out));
   if (type === "split_view") {
     for (const part of ["main", "aside"] as const) {

@@ -36,7 +36,12 @@
     { "$ref": "#/$defs/track_rows" },
     { "$ref": "#/$defs/result_feed" },
     { "$ref": "#/$defs/studio" },
-    { "$ref": "#/$defs/image_editor" }
+    { "$ref": "#/$defs/image_editor" },
+    { "$ref": "#/$defs/storyboard_player" },
+    { "$ref": "#/$defs/action_bar" },
+    { "$ref": "#/$defs/proposal_card" },
+    { "$ref": "#/$defs/voice_line" },
+    { "$ref": "#/$defs/media_stage" }
   ],
   "$defs": {
     "binding": {
@@ -1215,6 +1220,306 @@
         "on_close": { "$ref": "#/$defs/action", "description": "Fired by the feed's always-visible Close button. Absent: Close goes back one page." },
         "autoplay": { "type": "boolean", "default": true, "description": "False: nothing plays or advances by itself (poster and a Play button), the setting for a child band. Prefers-reduced-motion does the same whatever this says." },
         "autoplay_field": { "type": "string", "minLength": 1, "description": "Dotted path to a boolean on the first row; false turns autoplay off, so the data call can decide per person (a child band). Combined with `autoplay`: autoplay happens only when both allow it." }
+      }
+    },
+    "storyboard_shot_row": {
+      "type": "object",
+      "required": ["shot_id", "caption", "duration_sec", "status"],
+      "description": "UI-BLOCKS-01: one row of a storyboard_player bind, as the kit reads it after applying `item_fields` (the key names here are the mapping names; the row's own keys are whatever the paths say). `still` and `clip` are same-origin addresses or null; `status` is `ready`, `no_picture` (no picture yet: a calm placeholder) or `changing` (the picture is being redone). A shot has at most one spoken line, the `line_*` values; `line_wave` is loudness samples, numbers from 0 up (scaled to the largest).",
+      "properties": {
+        "shot_id": { "type": "string", "minLength": 1 },
+        "caption": { "type": "string" },
+        "duration_sec": { "type": "number", "exclusiveMinimum": 0 },
+        "still": { "type": ["string", "null"] },
+        "clip": { "type": ["string", "null"] },
+        "status": { "type": "string", "enum": ["ready", "no_picture", "changing"] },
+        "line_speaker": { "type": ["string", "null"] },
+        "line_text": { "type": ["string", "null"] },
+        "line_start_sec": { "type": ["number", "null"], "minimum": 0 },
+        "line_audio": { "type": ["string", "null"] },
+        "line_wave": { "type": ["array", "null"], "items": { "type": "number", "minimum": 0 } }
+      }
+    },
+    "storyboard_player": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "bind", "item_fields", "loading_text", "empty_state"],
+      "description": "UI-BLOCKS-01: a player for a storyboard, a row of shots (a picture, a short caption, a length and at most one spoken line each) that plays shot by shot, with a strip of the shots and a scrub bar. `bind` is a package data call returning one row per shot (see `storyboard_shot_row` for the values the kit reads); `item_fields` maps each value to a dotted path in the row. `bed` is the dotted path, in the first row, of one audio address that plays under the whole storyboard. `selected` names the page-state key that holds the `shot_id` of the shot on screen; `on_select` fires when the person picks a shot, with the row's own fields as placeholders (`{shot_id}`). Every sentence the block draws that is not a row value (`loading_text`, `empty_state`) is supplied here; the kit has no copy of its own to fall back on. A shot with status `no_picture` or `changing` draws a placeholder, never a broken image; a clip file that cannot load leaves the still. Nothing plays by itself.",
+      "properties": {
+        "type": { "const": "storyboard_player" },
+        "bind": { "$ref": "#/$defs/package_binding" },
+        "item_fields": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["shot_id", "caption", "duration_sec", "still", "status"],
+          "dependentRequired": { "line_text": ["line_speaker"], "line_speaker": ["line_text"], "line_start_sec": ["line_text"], "line_audio": ["line_text"], "line_wave": ["line_text"] },
+          "description": "Dotted paths into each row. `duration_sec` is seconds (a number); `status` is `ready`, `no_picture` or `changing`. `line_speaker` and `line_text` come together; the other `line_*` paths need them. `still`, `clip`, `line_audio` and `line_wave` are field paths, never addresses.",
+          "properties": {
+            "shot_id": { "type": "string", "minLength": 1 },
+            "caption": { "type": "string", "minLength": 1 },
+            "duration_sec": { "type": "string", "minLength": 1 },
+            "still": { "type": "string", "minLength": 1 },
+            "clip": { "type": "string", "minLength": 1 },
+            "status": { "type": "string", "minLength": 1 },
+            "line_speaker": { "type": "string", "minLength": 1 },
+            "line_text": { "type": "string", "minLength": 1 },
+            "line_start_sec": { "type": "string", "minLength": 1 },
+            "line_audio": { "type": "string", "minLength": 1 },
+            "line_wave": { "type": "string", "minLength": 1 }
+          }
+        },
+        "bed": { "type": "string", "minLength": 1, "description": "Dotted path, in the first row, of the audio address of a bed (music or room tone) that plays under the whole storyboard. Absent: no bed." },
+        "selected": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 40, "description": "The page-state name that holds the `shot_id` of the shot on screen. The block writes it when the person picks a shot; a page may also set it." },
+        "on_select": { "$ref": "#/$defs/action", "description": "Fired when the person picks a shot, with the shot's row as placeholders (`{shot_id}`)." },
+        "loading_text": { "type": "string", "minLength": 1, "maxLength": 120, "description": "Said while the bound call is loading." },
+        "empty_state": { "$ref": "#/$defs/empty_state" }
+      }
+    },
+    "action_bar": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "primary"],
+      "dependentRequired": { "estimate": ["bind"], "reason": ["bind"] },
+      "description": "UI-BLOCKS-01: a bar with the one thing a screen is for (`primary`), an optional quieter choice (`secondary`) and one plain line. `estimate` and `reason` are dotted paths into the first row of `bind` (a package data call), so the server words them and `bind` is required when either is set. `reason` says why the primary action is not available and replaces the estimate while it has text. A button is disabled while its `disabled_when` condition holds, and while its `busy_state` page-state key is truthy it shows `busy_label` and cannot be pressed again. `sticky` (default true) holds the bar at the foot of the window, above the bottom bar on a phone.",
+      "properties": {
+        "type": { "const": "action_bar" },
+        "bind": { "$ref": "#/$defs/package_binding" },
+        "primary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["label", "action"],
+          "properties": {
+            "label": { "type": "string", "minLength": 1, "maxLength": 40 },
+            "action": { "$ref": "#/$defs/action" },
+            "busy_state": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 40, "description": "A page-state name; while it is truthy the button is disabled and shows `busy_label`." },
+            "busy_label": { "type": "string", "minLength": 1, "maxLength": 40 },
+            "disabled_when": { "type": "string", "minLength": 1, "description": "A condition, as `section.condition`: a bare page-state name, `!name`, `name == 'value'` or `!name == 'value'`. While it holds the button is disabled." }
+          }
+        },
+        "secondary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["label", "action"],
+          "properties": {
+            "label": { "type": "string", "minLength": 1, "maxLength": 40 },
+            "action": { "$ref": "#/$defs/action" },
+            "busy_state": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 40, "description": "A page-state name; while it is truthy the button is disabled and shows `busy_label`." },
+            "busy_label": { "type": "string", "minLength": 1, "maxLength": 40 },
+            "disabled_when": { "type": "string", "minLength": 1, "description": "A condition, as `section.condition`. While it holds the button is disabled." }
+          }
+        },
+        "estimate": { "type": "string", "minLength": 1, "description": "Dotted path, in the first row of `bind`, of a plain line beside the actions (a time or a cost the server worked out)." },
+        "reason": { "type": "string", "minLength": 1, "description": "Dotted path, in the first row of `bind`, of the line that says why the primary action is not available and what to do. Replaces `estimate` while it has text." },
+        "sticky": { "type": "boolean", "default": true }
+      }
+    },
+    "proposal_picture_row": {
+      "type": "object",
+      "required": ["src", "alt"],
+      "description": "UI-BLOCKS-01: one row of a proposal_card `pictures` bind, as the kit reads it after applying `item_fields`. `src` is a same-origin address; `badge` says where the picture came from: `from_photo` (made from the person's own photo) or `guessed` (the maker's guess).",
+      "properties": {
+        "src": { "type": "string", "minLength": 1 },
+        "alt": { "type": "string", "minLength": 1 },
+        "badge": { "type": ["string", "null"], "enum": ["from_photo", "guessed", null] },
+        "caption": { "type": ["string", "null"] }
+      }
+    },
+    "proposal_card_row": {
+      "type": "object",
+      "required": ["title", "description", "status"],
+      "description": "UI-BLOCKS-01: the row of a proposal_card bind, as the kit reads it after applying the node's paths. `status` is `ready` (the buttons work), `making` (the proposal is being made: a placeholder and no buttons) or `saving` (the person's approval is being saved: the buttons wait).",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "status": { "type": "string", "enum": ["ready", "making", "saving"] },
+        "note": { "type": ["string", "null"] },
+        "error": { "type": ["string", "null"] }
+      }
+    },
+    "proposal_card": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "bind", "title", "description", "pictures", "status", "approve", "change", "discard"],
+      "description": "UI-BLOCKS-01: a card that proposes something the household may keep (a new character, a place) and waits for the person: a title, a description the person may edit, up to a few pictures, and Approve, Change and Discard. `bind` is a package data call; the first row is the proposal (see `proposal_card_row`). `title`, `description`, `status`, `note` and `error` are dotted paths into that row, so the server words them. `description_state` names the page-state key the edited description is written to; an action reads it as `{<name>}` in its call args, the way a prompt_bar's call reads its state. Absent: the description is read only. `pictures` is its own bound call (rows, see `proposal_picture_row`). `note` is a quiet line under the card and `error` a plain line with the next step; the card draws neither when the path is empty. A button is disabled while its `disabled_when` condition holds, and every button waits while `status` is not `ready`.",
+      "properties": {
+        "type": { "const": "proposal_card" },
+        "bind": { "$ref": "#/$defs/package_binding" },
+        "title": { "type": "string", "minLength": 1, "description": "Dotted path of the title in the row." },
+        "description": { "type": "string", "minLength": 1, "description": "Dotted path of the description text in the row." },
+        "description_state": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 40, "description": "The page-state name that holds the description while the person edits it. Absent: not editable." },
+        "pictures": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["bind", "item_fields"],
+          "properties": {
+            "bind": { "$ref": "#/$defs/package_binding" },
+            "item_fields": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["src", "alt"],
+              "description": "Dotted paths into each picture row. `src` is a field path, never an address.",
+              "properties": {
+                "src": { "type": "string", "minLength": 1 },
+                "alt": { "type": "string", "minLength": 1 },
+                "badge": { "type": "string", "minLength": 1 },
+                "caption": { "type": "string", "minLength": 1 }
+              }
+            }
+          }
+        },
+        "status": { "type": "string", "minLength": 1, "description": "Dotted path of the status in the row: `ready`, `making` or `saving`." },
+        "approve": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["label", "action"],
+          "properties": { "label": { "type": "string", "minLength": 1, "maxLength": 40 }, "action": { "$ref": "#/$defs/action" }, "disabled_when": { "type": "string", "minLength": 1, "description": "A condition, as `section.condition`. While it holds the button is disabled." } }
+        },
+        "change": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["label", "action"],
+          "properties": { "label": { "type": "string", "minLength": 1, "maxLength": 40 }, "action": { "$ref": "#/$defs/action" }, "disabled_when": { "type": "string", "minLength": 1, "description": "A condition, as `section.condition`. While it holds the button is disabled." } }
+        },
+        "discard": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["label", "action"],
+          "properties": { "label": { "type": "string", "minLength": 1, "maxLength": 40 }, "action": { "$ref": "#/$defs/action" }, "disabled_when": { "type": "string", "minLength": 1, "description": "A condition, as `section.condition`. While it holds the button is disabled." } }
+        },
+        "note": { "type": "string", "minLength": 1, "description": "Dotted path of a quiet line in the row." },
+        "error": { "type": "string", "minLength": 1, "description": "Dotted path of a plain error line (with the next step) in the row." }
+      }
+    },
+    "voice_line_row": {
+      "type": "object",
+      "required": ["speaker", "text", "reading_index", "reading_count", "status"],
+      "description": "UI-BLOCKS-01: the row of a voice_line bind, as the kit reads it after applying the node's paths. `reading_index` (counting from 1) is which reading of the line is on screen out of `reading_count`; `status` is `ready` or `making` (a new reading is being made). `audio` is a same-origin address or null; `wave` is loudness samples, numbers from 0 up.",
+      "properties": {
+        "speaker": { "type": "string", "minLength": 1 },
+        "speaker_picture": { "type": ["string", "null"] },
+        "text": { "type": "string" },
+        "audio": { "type": ["string", "null"] },
+        "reading_index": { "type": "integer", "minimum": 1 },
+        "reading_count": { "type": "integer", "minimum": 1 },
+        "wave": { "type": ["array", "null"], "items": { "type": "number", "minimum": 0 } },
+        "status": { "type": "string", "enum": ["ready", "making"] },
+        "error": { "type": ["string", "null"] }
+      }
+    },
+    "voice_line": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "bind", "speaker", "text", "reading_index", "reading_count", "status"],
+      "description": "UI-BLOCKS-01: one spoken line of a script: who says it (a name and a small picture), the words, a play button with a small waveform, which reading of the line is on screen (\"2 of 3\"), and two actions, Say it differently and Use the other reading. `bind` is a package data call; the first row is the line (see `voice_line_row`). Every other property except `actions` is a dotted path into that row, so the server supplies the words. With no `audio` the line is text only. While `status` is `making` the actions wait. `error` is a plain line with the next step, drawn only when the path has text. An action in `actions` fires with the row's own fields as placeholders (`{id}`); an action left out draws no button.",
+      "properties": {
+        "type": { "const": "voice_line" },
+        "bind": { "$ref": "#/$defs/package_binding" },
+        "speaker": { "type": "string", "minLength": 1, "description": "Dotted path of the speaker's name." },
+        "speaker_picture": { "type": "string", "minLength": 1, "description": "Dotted path of the speaker's small picture. A field path, never an address." },
+        "text": { "type": "string", "minLength": 1, "description": "Dotted path of the words." },
+        "audio": { "type": "string", "minLength": 1, "description": "Dotted path of the voice file's address. A field path, never an address." },
+        "reading_index": { "type": "string", "minLength": 1, "description": "Dotted path of the reading on screen, counting from 1 (an integer)." },
+        "reading_count": { "type": "string", "minLength": 1, "description": "Dotted path of how many readings the line has (an integer)." },
+        "wave": { "type": "string", "minLength": 1, "description": "Dotted path of loudness samples, numbers from 0 up." },
+        "status": { "type": "string", "minLength": 1, "description": "Dotted path of the status: `ready` or `making`." },
+        "actions": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "say_differently": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["action"],
+              "properties": { "label": { "type": "string", "minLength": 1, "maxLength": 40 }, "action": { "$ref": "#/$defs/action" } }
+            },
+            "use_other_reading": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["action"],
+              "properties": { "label": { "type": "string", "minLength": 1, "maxLength": 40 }, "action": { "$ref": "#/$defs/action" } }
+            }
+          }
+        },
+        "error": { "type": "string", "minLength": 1, "description": "Dotted path of a plain error line (with the next step)." }
+      }
+    },
+    "media_stage_row": {
+      "type": "object",
+      "required": ["still", "description", "state"],
+      "description": "UI-BLOCKS-01: the row of a media_stage bind, as the kit reads it after applying the node's paths. `still` and `loop` are same-origin addresses (`loop` is a short silent clip, played only in the `looping` state and never under reduced motion), `position` a CSS object-position (\"50% 30%\"), `progress` a number from 0 to 100. `state`: `idle` (the still, drifting slowly), `looping` (the loop plays), `paused` (the still only), `loading` (a skeleton), `waiting` (the still, dimmed) or `error` (the still and the error message).",
+      "properties": {
+        "still": { "type": ["string", "null"] },
+        "loop": { "type": ["string", "null"] },
+        "position": { "type": ["string", "null"] },
+        "description": { "type": "string", "minLength": 1 },
+        "state": { "type": "string", "enum": ["idle", "looping", "paused", "loading", "waiting", "error"] },
+        "eyebrow": { "type": ["string", "null"] },
+        "title": { "type": ["string", "null"] },
+        "subtitle": { "type": ["string", "null"] },
+        "title_pill": { "type": ["string", "null"] },
+        "progress": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+        "error_message": { "type": ["string", "null"] }
+      }
+    },
+    "media_stage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "bind", "size", "media", "description", "scrim", "state"],
+      "description": "UI-BLOCKS-01: a big picture stage: a still (with a slow drift, or a muted loop), a scrim, a title block, floating pills, an optional progress strip and, on `hero`, the page's own nodes (`children`, the composer) on a glass panel at the bottom. `bind` is a package data call; the first row is the stage (see `media_stage_row`). `media`, `description`, `state`, `eyebrow`, `title`, `subtitle`, `title_pill`, `progress` and `error_message` are dotted paths into that row, so the server supplies every word; `description` names the picture for assistive tech. `size`: `hero` is a page's top stage with the composer on it, `stage` a player or progress stage. `scrim`: how much of the bottom the picture fades under (`strong` for busy pictures). `compact` gives up the hero's minimum height because a result shows below it. In the `error` state the strip shows `error_message` and `error_actions` instead of the progress strip. A `pills` or `error_actions` action fires with the row's own fields as placeholders.",
+      "properties": {
+        "type": { "const": "media_stage" },
+        "bind": { "$ref": "#/$defs/package_binding" },
+        "size": { "type": "string", "enum": ["hero", "stage"] },
+        "media": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["still"],
+          "description": "Dotted paths into the row. `still` and `loop` are field paths, never addresses.",
+          "properties": {
+            "still": { "type": "string", "minLength": 1 },
+            "loop": { "type": "string", "minLength": 1 },
+            "position": { "type": "string", "minLength": 1 }
+          }
+        },
+        "description": { "type": "string", "minLength": 1, "description": "Dotted path of the sentence that names the picture for assistive tech." },
+        "scrim": { "type": "string", "enum": ["soft", "strong"] },
+        "state": { "type": "string", "minLength": 1, "description": "Dotted path of the state: `idle`, `looping`, `paused`, `loading`, `waiting` or `error`." },
+        "eyebrow": { "type": "string", "minLength": 1, "description": "Dotted path of the small line above the title." },
+        "title": { "type": "string", "minLength": 1, "description": "Dotted path of the title." },
+        "subtitle": { "type": "string", "minLength": 1, "description": "Dotted path of the line under the title." },
+        "pills": {
+          "type": "array",
+          "maxItems": 6,
+          "description": "Floating actions at the top right.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label", "action"],
+            "properties": { "label": { "type": "string", "minLength": 1, "maxLength": 40 }, "icon": { "type": "string", "description": "A lucide icon name." }, "action": { "$ref": "#/$defs/action" } }
+          }
+        },
+        "title_pill": { "type": "string", "minLength": 1, "description": "Dotted path of a small label at the top left." },
+        "progress": { "type": "string", "minLength": 1, "description": "Dotted path of a number from 0 to 100 drawn as a thin strip along the foot of the stage." },
+        "compact": { "type": "boolean", "default": false },
+        "children": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": { "$ref": "#" },
+          "description": "The page's own nodes, drawn on the glass panel of a `hero` (the composer)."
+        },
+        "error_message": { "type": "string", "minLength": 1, "description": "Dotted path of the plain error line, with the next step, shown in the `error` state." },
+        "error_actions": {
+          "type": "array",
+          "maxItems": 3,
+          "description": "Buttons drawn with the error message.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label", "action"],
+            "properties": { "label": { "type": "string", "minLength": 1, "maxLength": 40 }, "icon": { "type": "string", "description": "A lucide icon name." }, "action": { "$ref": "#/$defs/action" } }
+          }
+        }
       }
     },
     "detail_pane": {

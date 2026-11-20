@@ -683,3 +683,189 @@ describe("UI schema, package apps", () => {
     expect(validate({ ...shelf, item_progress: "p" })).toBe(false);
   });
 });
+
+describe("UI-BLOCKS-01: storyboard_player, action_bar, proposal_card, voice_line and media_stage", () => {
+  const bind = { source: "package", path: "rows" };
+  const action = { call: { target: "/api/plugins/videos/x/{id}" } };
+  const empty_state = { type: "empty_state", icon: "film", text: "Nothing here yet." };
+  const row = (name: string) => ajv.compile({ $schema: schema.$schema, $id: `https://example.com/${name}.schema.json`, $defs: schema.$defs, $ref: `#/$defs/${name}` });
+  const page = (file: string) => JSON.parse(readFileSync(join(UI_DIR, "pages", file), "utf-8"));
+  const refused = (node: unknown, bads: unknown[]) => bads.forEach((bad, i) => expect([i, validate({ ...(node as object), ...(bad as object) })]).toEqual([i, false]));
+
+  test("storyboard_player maps the shot fields, takes a bed, a selected state and on_select, and is strict", () => {
+    const item_fields = { shot_id: "id", caption: "c", duration_sec: "s", still: "p", status: "st" };
+    const node = { type: "storyboard_player", bind, item_fields, loading_text: "Loading", empty_state };
+    expect(validate(node)).toBe(true);
+    const full = { ...node, item_fields: { ...item_fields, clip: "k", line_speaker: "a", line_text: "b", line_start_sec: "c", line_audio: "d", line_wave: "e" }, bed: "bed.url", selected: "shot", on_select: { navigate: { to: "/y", state: { shot: "{shot_id}" } } } };
+    expect(validate(full)).toBe(true);
+    refused(node, [
+      { bind: { source: "route", path: "/api/shots" } },
+      { item_fields: { ...item_fields, extra: "x" } },
+      { item_fields: { shot_id: "id", caption: "c", duration_sec: "s", status: "st" } },
+      { item_fields: { ...item_fields, line_text: "b" } },
+      { item_fields: { ...item_fields, line_speaker: "a" } },
+      { item_fields: { ...item_fields, line_audio: "d" } },
+      { item_fields: { ...item_fields, still: "" } },
+      { loading_text: undefined },
+      { loading_text: "" },
+      { empty_state: undefined },
+      { selected: "Bad Name" },
+      { selected: "" },
+      { on_select: {} },
+      { bed: "" },
+      { speed: 2 },
+    ]);
+  });
+
+  test("storyboard_shot_row: status is ready, no_picture or changing, and a shot has a positive length", () => {
+    const shot = row("storyboard_shot_row");
+    const ok = { shot_id: "s1", caption: "Juniper opens the gate", duration_sec: 4, status: "ready", still: "/media/a.jpg", clip: null, line_speaker: "Juniper", line_text: "Come in.", line_start_sec: 0.5, line_audio: "/media/a.wav", line_wave: [0.1, 0.8] };
+    expect(shot(ok)).toBe(true);
+    for (const status of ["no_picture", "changing"]) expect(shot({ ...ok, status })).toBe(true);
+    for (const bad of [{ status: "done" }, { status: undefined }, { duration_sec: 0 }, { duration_sec: "4" }, { line_start_sec: -1 }, { line_wave: [-1] }, { shot_id: "" }]) expect(shot({ ...ok, ...bad })).toBe(false);
+  });
+
+  test("action_bar takes primary and secondary buttons, bound estimate and reason, and sticky", () => {
+    const button = { label: "Render film", action, busy_state: "rendering", busy_label: "Rendering", disabled_when: "!ready" };
+    const node = { type: "action_bar", primary: { label: "Render film", action } };
+    expect(validate(node)).toBe(true);
+    expect(validate({ ...node, bind, primary: button, secondary: { ...button, label: "Save as draft" }, estimate: "estimate", reason: "reason", sticky: false })).toBe(true);
+    refused(node, [
+      { primary: undefined },
+      { primary: { label: "Go" } },
+      { primary: { action } },
+      { primary: { label: "", action } },
+      { primary: { label: "x".repeat(41), action } },
+      { primary: { label: "Go", action, busy_state: "Not A State" } },
+      { primary: { label: "Go", action, disabled_when: "" } },
+      { primary: { label: "Go", action, other: 1 } },
+      { secondary: { label: "Later" } },
+      { bind, estimate: "" },
+      { estimate: "estimate" },
+      { reason: "reason" },
+      { bind: { source: "route", path: "/x" } },
+      { sticky: "yes" },
+      { tone: "loud" },
+    ]);
+  });
+
+  test("proposal_card takes a bound row, an editable description, bound pictures and three buttons", () => {
+    const button = (label: string) => ({ label, action });
+    const node = {
+      type: "proposal_card", bind, title: "name", description: "description", status: "status",
+      pictures: { bind: { source: "package", path: "pics" }, item_fields: { src: "u", alt: "a" } },
+      approve: button("Approve"), change: button("Change"), discard: button("Discard"),
+    };
+    expect(validate(node)).toBe(true);
+    expect(validate({ ...node, description_state: "description", note: "note", error: "error", pictures: { ...node.pictures, item_fields: { src: "u", alt: "a", badge: "b", caption: "c" } }, approve: { ...button("Approve"), disabled_when: "!description" } })).toBe(true);
+    refused(node, [
+      { title: undefined },
+      { status: undefined },
+      { approve: undefined },
+      { discard: { action } },
+      { change: { label: "Change", action, disabled_when: "" } },
+      { pictures: undefined },
+      { pictures: { bind: { source: "package", path: "pics" } } },
+      { pictures: { ...node.pictures, item_fields: { src: "u" } } },
+      { pictures: { ...node.pictures, item_fields: { src: "u", alt: "a", id: "i" } } },
+      { pictures: { ...node.pictures, bind: { source: "route", path: "/x" } } },
+      { description_state: "Not A State" },
+      { note: "" },
+      { error: "" },
+      { bind: { source: "route", path: "/x" } },
+      { extra: true },
+    ]);
+  });
+
+  test("proposal_card rows: status is ready, making or saving and a badge is from_photo or guessed", () => {
+    const card = row("proposal_card_row");
+    const ok = { title: "Willow", description: "A calm gardener.", status: "ready", note: null, error: null };
+    expect(card(ok)).toBe(true);
+    for (const status of ["making", "saving"]) expect(card({ ...ok, status })).toBe(true);
+    expect(card({ ...ok, status: "done" })).toBe(false);
+    const picture = row("proposal_picture_row");
+    for (const badge of ["from_photo", "guessed", null]) expect(picture({ src: "/media/w.jpg", alt: "Willow in a garden", badge, caption: null })).toBe(true);
+    expect(picture({ src: "/media/w.jpg", alt: "Willow", badge: "found" })).toBe(false);
+    expect(picture({ src: "/media/w.jpg" })).toBe(false);
+  });
+
+  test("voice_line takes a bound row, optional picture, audio and wave, and the two actions", () => {
+    const node = { type: "voice_line", bind, speaker: "who", text: "t", reading_index: "i", reading_count: "n", status: "st" };
+    expect(validate(node)).toBe(true);
+    expect(validate({ ...node, speaker_picture: "p", audio: "a", wave: "w", error: "e", actions: { say_differently: { label: "Say it differently", action }, use_other_reading: { action } } })).toBe(true);
+    expect(validate({ ...node, actions: {} })).toBe(true);
+    refused(node, [
+      { speaker: undefined },
+      { text: undefined },
+      { reading_index: undefined },
+      { reading_count: undefined },
+      { status: undefined },
+      { bind: undefined },
+      { audio: "" },
+      { actions: { say_differently: { label: "Say it differently" } } },
+      { actions: { say_differently: { label: "", action } } },
+      { actions: { use_other_reading: { action, extra: 1 } } },
+      { actions: { pick_voice: { action } } },
+      { error: "" },
+      { extra: true },
+    ]);
+  });
+
+  test("voice_line rows: status is ready or making and a reading counts from 1", () => {
+    const line = row("voice_line_row");
+    const ok = { speaker: "Atlas", speaker_picture: null, text: "Over here.", audio: "/media/l.wav", reading_index: 2, reading_count: 3, wave: [0.2, 0.9], status: "ready", error: null };
+    expect(line(ok)).toBe(true);
+    expect(line({ ...ok, status: "making" })).toBe(true);
+    for (const bad of [{ status: "saving" }, { reading_index: 0 }, { reading_count: 1.5 }, { wave: [-0.1] }]) expect(line({ ...ok, ...bad })).toBe(false);
+  });
+
+  test("media_stage takes a bound row, size, scrim, pills, a progress path, children and an error", () => {
+    const node = { type: "media_stage", bind, size: "stage", media: { still: "s" }, description: "d", scrim: "soft", state: "st" };
+    expect(validate(node)).toBe(true);
+    const pill = { label: "Share", icon: "share-2", action };
+    const full = {
+      ...node, size: "hero", scrim: "strong", media: { still: "s", loop: "l", position: "p" }, eyebrow: "e", title: "t", subtitle: "u", pills: [pill], title_pill: "tp", progress: "pr", compact: true,
+      children: [{ type: "empty_state", icon: "x", text: "Composer goes here" }, { type: "section", children: [empty_state] }],
+      error_message: "em", error_actions: [{ label: "Try again", action }],
+    };
+    expect(validate(full)).toBe(true);
+    for (const size of ["hero", "stage"]) for (const scrim of ["soft", "strong"]) expect(validate({ ...node, size, scrim })).toBe(true);
+    refused(node, [
+      { size: "huge" },
+      { size: undefined },
+      { scrim: "none" },
+      { scrim: undefined },
+      { state: undefined },
+      { description: undefined },
+      { media: {} },
+      { media: { still: "s", extra: "x" } },
+      { media: { still: "" } },
+      { bind: undefined },
+      { pills: [{ label: "Share" }] },
+      { pills: Array.from({ length: 7 }, () => pill) },
+      { error_actions: Array.from({ length: 4 }, () => pill) },
+      { children: [] },
+      { children: [{ type: "no_such_node" }] },
+      { children: [{ type: "media_stage", bind, size: "stage" }] },
+      { compact: "yes" },
+      { progress: "" },
+      { extra: true },
+    ]);
+  });
+
+  test("media_stage rows: state is one of six, and progress runs from 0 to 100", () => {
+    const stage = row("media_stage_row");
+    const ok = { still: "/media/s.jpg", loop: null, position: "50% 30%", description: "Sage walking a mountain path", state: "idle", progress: 40, error_message: null };
+    expect(stage(ok)).toBe(true);
+    for (const state of ["idle", "looping", "paused", "loading", "waiting", "error"]) expect(stage({ ...ok, state })).toBe(true);
+    for (const bad of [{ state: "playing" }, { progress: 101 }, { progress: -1 }, { description: "" }]) expect(stage({ ...ok, ...bad })).toBe(false);
+  });
+
+  test("each new block has an example page", () => {
+    for (const [file, type] of [["storyboard-player.json", "storyboard_player"], ["action-bar.json", "action_bar"], ["proposal-card.json", "proposal_card"], ["voice-line.json", "voice_line"], ["media-stage.json", "media_stage"]] as const) {
+      expect(pageFiles).toContain(file);
+      expect(validate(page(file))).toBe(true);
+      expect(page(file).body[0].type).toBe(type);
+    }
+  });
+});

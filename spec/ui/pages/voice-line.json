@@ -1,0 +1,24 @@
+{
+  "type": "page",
+  "id": "script-line",
+  "title": "Script line",
+  "body": [
+    {
+      "type": "voice_line",
+      "bind": { "source": "package", "path": "line", "params": { "id": "$state.line" } },
+      "speaker": "speaker.name",
+      "speaker_picture": "speaker.picture.url",
+      "text": "text",
+      "audio": "voice.url",
+      "reading_index": "reading.index",
+      "reading_count": "reading.count",
+      "wave": "voice.wave",
+      "status": "status",
+      "actions": {
+        "say_differently": { "label": "Say it differently", "action": { "call": { "target": "/api/plugins/scripts/say-differently/{id}" } } },
+        "use_other_reading": { "label": "Use the other reading", "action": { "call": { "target": "/api/plugins/scripts/use-other-reading/{id}" } } }
+      },
+      "error": "error"
+    }
+  ]
+}
