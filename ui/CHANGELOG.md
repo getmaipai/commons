@@ -1,6 +1,6 @@
 ## [ui-v0.5.695] - 2026-11-20
 
-- The UI schema renders five new blocks (VIDEO-KIT-01, spec 0.1.435): `storyboard_player`, `action_bar`, `proposal_card`, `voice_line` and `media_stage`, each mapped to its kit Element through the same bound data, state and action helpers `clip_feed` uses. A bad `disabled_when` keeps a button off instead of unmounting the page.
+- The UI schema renders five new blocks (VIDEO-KIT-01, spec 0.1.437): `storyboard_player`, `action_bar`, `proposal_card`, `voice_line` and `media_stage`, each mapped to its kit Element through the same bound data, state and action helpers `clip_feed` uses. A bad `disabled_when` keeps a button off instead of unmounting the page.
 
 ## [ui-v0.5.694] - 2026-11-20
 
