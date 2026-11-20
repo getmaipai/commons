@@ -59,12 +59,13 @@ describe("JobProgress shots", () => {
       { id: "r2", label: "Run with time", state: "running", etaSeconds: 180 },
     ]} />);
     const eta = (i: number) => v.getAllByRole("listitem")[i]!.querySelector("[data-slot=job-progress-shot-eta]")?.textContent;
-    expect(eta(0)).toBe("Time left unknown");
+    expect(eta(0)).toBeUndefined();
     expect(eta(1)).toBeUndefined();
     expect(eta(2)).toBeUndefined();
     expect(eta(3)).toBeUndefined();
     expect(eta(4)).toBe("About 3 minutes left");
-    expect(v.getAllByText("Time left unknown")).toHaveLength(1);
+    expect(v.queryByText(/unknown/i)).toBeNull();
+    expect(v.getAllByRole("listitem")[0]!.querySelector("[data-slot=job-progress-shot-eta]")).toBeNull();
   });
 
   test("a running row without progress draws no bar", () => {

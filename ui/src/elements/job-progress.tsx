@@ -51,7 +51,7 @@ export interface JobProgressShot {
   state: JobProgressShotState;
   /** Running only: how far along, 0 to 1. Unset draws no bar rather than a guess. */
   progress?: number;
-  /** Seconds left for this shot. Unset draws no time (a running shot then says "Time left unknown"). */
+  /** Seconds left for this shot. Unset draws no time line at all (a line saying the time is unknown is worse than none). */
   etaSeconds?: number;
   /** A picture for the shot (an image address). */
   thumb?: string;
@@ -108,7 +108,8 @@ function ShotRow({ shot }: { shot: JobProgressShot }) {
   const Alert = getIcon("circle-alert");
   const Film = getIcon("film");
   const { state } = shot;
-  const eta = state === "done" || state === "failed" ? undefined : knownEta(shot.etaSeconds) ? formatEta(shot.etaSeconds) : state === "running" ? i18n._({ id: "ui.Time left unknown", message: "Time left unknown" }) : undefined;
+  // No time line without a real estimate: a line saying the time is unknown is worse than none.
+  const eta = state === "done" || state === "failed" ? undefined : knownEta(shot.etaSeconds) ? formatEta(shot.etaSeconds) : undefined;
   const failure = state === "failed" ? shot.failure : undefined;
   return (
     <li data-slot="job-progress-shot" data-state={state} className={cn("flex flex-col gap-2 rounded-xl border p-2.5", state === "failed" ? "border-destructive/40 bg-muted/40" : "border-border/60")}>

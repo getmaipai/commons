@@ -1,3 +1,7 @@
+## [ui-v0.5.707] - 2026-11-20
+
+- `JobProgress` shots: a running shot with no `etaSeconds` draws no time line at all (it said "Time left unknown"; the bar and percent stay). A shot with a real estimate keeps its line (VIDEO-KIT-01).
+
 ## [ui-v0.5.706] - 2026-11-20
 
 - `ActionBar`: a sticky bar now sits above the shell's bottom bar at any width, using the one value PhoneNav publishes (`--phone-nav-offset`, which already includes the floating variant, the PRO look's gap and the device safe area, and is 0 from 640 px up) instead of its own guess (it hid under the floating bar at 375 px). New `note` prop and `action_bar.note` field (spec 0.1.453): a plain helper line that does not disable the primary action (VIDEO-KIT-01).
