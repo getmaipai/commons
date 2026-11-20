@@ -6,6 +6,7 @@ import { getIcon } from "@/kit/icons";
 import { i18n } from "@/kit/i18n";
 import { ConfirmDialog } from "@/kit/schema/ConfirmDialog";
 import { useBinding } from "@/kit/schema/binding";
+import { usePollWhile } from "@/kit/schema/usePollWhile";
 import { useDispatchAction } from "@/kit/schema/actions";
 import { readField } from "@/kit/schema/fieldPath";
 import { localPicture } from "@/kit/schema/mediaPath";
@@ -26,6 +27,8 @@ export function MediaStageNodeView({ node, state, renderChild }: { node: MediaSt
   const { dispatch, pendingConfirm, lastError } = useDispatchAction();
   const host = useContext(MediaHostContext) as HostWithNotice | null;
   const row = Array.isArray(query.data) ? query.data[0] : undefined;
+  const polling = Boolean(node.poll_while && row && node.poll_while.values.includes(String(readField(row, node.poll_while.field) ?? "")));
+  usePollWhile(polling, query.refetch);
   const text = (path: string | undefined): string | undefined => (row && path ? str(readField(row, path)) : undefined);
   const composer = node.children && node.children.length > 0 ? node.children.map(renderChild) : undefined;
   const loading = query.data === undefined;

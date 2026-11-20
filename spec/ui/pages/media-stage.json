@@ -6,6 +6,7 @@
     {
       "type": "media_stage",
       "bind": { "source": "package", "path": "stage", "params": { "id": "$state.film" } },
+      "poll_while": { "field": "state", "values": ["waiting"] },
       "size": "hero",
       "media": { "still": "still.url", "loop": "loop.url", "position": "still.position" },
       "description": "description",

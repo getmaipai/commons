@@ -1,15 +1,16 @@
 // UI-BLOCKS-01: the `media_stage` node maps the first bound row to the kit MediaStage, draws its `children` in the composer slot and runs the pills and error actions.
-import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { cleanup, fireEvent, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, jest, test } from "bun:test";
+import { act, cleanup, fireEvent, waitFor } from "@testing-library/react";
 import { stubMatchMedia } from "../../tests/stubMatchMedia";
 import { calls, fixtureNode, hub, mountBlock } from "../../tests/blockHarness";
 import { MediaStageNodeSchema, PageNodeSchema } from "@/kit/schema/types";
 import type { MediaHost } from "@/kit/schema/mediaHost";
+import { FEED_POLL_INTERVAL_MS } from "@/kit/schema/feedPolling";
 
 const realMatchMedia = window.matchMedia;
 const originalFetch = globalThis.fetch;
 beforeEach(() => stubMatchMedia({}));
-afterEach(() => { cleanup(); window.matchMedia = realMatchMedia; globalThis.fetch = originalFetch; });
+afterEach(() => { cleanup(); window.matchMedia = realMatchMedia; globalThis.fetch = originalFetch; jest.useRealTimers(); });
 
 const stage = {
   id: "f1", still: { url: "/media/f1.jpg", position: "50% 30%" }, loop: { url: "/media/f1-loop.mp4" }, description: "Juniper and Atlas at a lighthouse at dusk",
@@ -185,5 +186,22 @@ describe("media_stage node", () => {
     const view = mount();
     await view.findByText("Something went wrong.");
     expect(view.getByRole("button", { name: "Try again" })).toBeTruthy();
+  });
+  test("poll_while refetches the bound row while its state is in values and stops when it is not", async () => {
+    jest.useFakeTimers();
+    let row: Record<string, unknown> = { ...stage, state: "waiting", title: "Making your video" };
+    hub({ stage: () => [row] });
+    const view = mount({ poll_while: { field: "state", values: ["waiting"] } });
+    await waitFor(() => expect(view.getByText("Making your video")).toBeTruthy());
+    const reads = () => (globalThis.fetch as unknown as { mock: { calls: unknown[] } }).mock.calls.length;
+    const before = reads();
+    await act(async () => { jest.advanceTimersByTime(FEED_POLL_INTERVAL_MS); await Promise.resolve(); await Promise.resolve(); });
+    expect(reads()).toBeGreaterThan(before);
+    row = { ...stage, state: "idle", title: "Your video is ready" };
+    await act(async () => { jest.advanceTimersByTime(FEED_POLL_INTERVAL_MS); await Promise.resolve(); await Promise.resolve(); });
+    await waitFor(() => expect(view.getByText("Your video is ready")).toBeTruthy());
+    const stopped = reads();
+    await act(async () => { jest.advanceTimersByTime(FEED_POLL_INTERVAL_MS * 3); await Promise.resolve(); });
+    expect(reads()).toBe(stopped);
   });
 });

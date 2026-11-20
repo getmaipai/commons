@@ -1515,6 +1515,7 @@
       "properties": {
         "type": { "const": "media_stage" },
         "bind": { "$ref": "#/$defs/package_binding" },
+        "poll_while": { "$ref": "#/$defs/poll_while_field", "description": "Refetch `bind` on the feed interval while the FIRST row's `field` (a dotted path, normally the state) has a value in `values` (for example queued, running); stop when it does not, or when the page is hidden. Without it the stage never refetches." },
         "size": { "type": "string", "enum": ["hero", "stage"] },
         "media": {
           "type": "object",

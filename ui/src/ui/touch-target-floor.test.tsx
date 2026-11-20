@@ -181,3 +181,12 @@ describe("touch-target and type floor (docs/UI.md)", () => {
     expect(getByRole("radio").className).toContain("before:content-none");
   });
 });
+
+describe("dashboard pill tabs", () => {
+  test("a pill tab carries the 48 px hit layer on ::before (its ::after is the active underline)", async () => {
+    const { Tabs, TabsList, TabsTrigger } = await import("@/kit/dashboard/components/ui/tabs");
+    const { render } = await import("@testing-library/react");
+    const v = render(<Tabs defaultValue="a"><TabsList variant="pill"><TabsTrigger value="a">All videos</TabsTrigger></TabsList></Tabs>);
+    expect(v.getByRole("tab").className).toContain("before:inset-[min(0px,calc((100%-49px)/2))]");
+  });
+});

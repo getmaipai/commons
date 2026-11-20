@@ -979,6 +979,7 @@ const MediaStageButtonSchema = z.object({ label: ButtonLabelSchema, icon: z.stri
 const MediaStageBaseSchema = z.object({
   type: z.literal("media_stage"),
   bind: PackageBindingSchema,
+  poll_while: PollWhileFieldSchema.optional(),
   size: z.enum(["hero", "stage"]),
   media: z.object({ still: FieldPathSchema, loop: FieldPathSchema.optional(), position: FieldPathSchema.optional() }).strict(),
   description: FieldPathSchema,
