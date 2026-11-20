@@ -1,0 +1,9 @@
+{
+  "job": "stems",
+  "audience": "adult",
+  "song": "file-12",
+  "stems": [
+    "vocals"
+  ],
+  "origin": "somewhere_else"
+}

@@ -1,0 +1,10 @@
+{
+  "job": "song_edit",
+  "audience": "adult",
+  "song": "file-12",
+  "change": {
+    "kind": "extend",
+    "add_seconds": 10
+  },
+  "origin": "owned_file"
+}

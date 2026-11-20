@@ -766,6 +766,9 @@
           },
           "minItems": 1
         },
+        "origin": {
+          "const": "owned_file"
+        },
         "wait": {
           "type": "integer",
           "minimum": 0,

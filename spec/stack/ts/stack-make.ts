@@ -33,7 +33,7 @@ export const StackMakeRequest = z.discriminatedUnion("job", [
   req("song", { description: text, lyrics: text.optional(), style_words: z.array(text).optional(), seconds: secs, level: StackJobLevel.optional(), seed: z.number().int().min(0).optional(), bpm: z.number().positive().optional(), key: text.optional(), language: text.optional() }),
   req("song_edit", { song: text, change: StackSongChange, level: StackJobLevel.optional() }),
   req("sound_effect", { description: text, seconds: secs }),
-  req("stems", { song: text, stems: z.array(text).min(1) }),
+  req("stems", { song: text, stems: z.array(text).min(1), origin: z.literal("owned_file").optional() }),
   req("vocal_swap", { vocal: text, references: z.array(text).min(1), description: text.optional() }),
   req("lyric_timing", { song: text, lyrics: text }),
 ]);
