@@ -1,3 +1,7 @@
+## [spec-v0.1.436] - 2026-11-20
+
+- Correction of spec-v0.1.435: the help and option copy of `generation.video_tier` is back to the Standard and Boost wording. 0.1.435 named the Boost level "Full HD", which the screens do not mean (Full HD is the top level's HD recipe, not the Boost level). No key, value or default changed in either release.
+
 ## [spec-v0.1.435] - 2026-11-20
 
 - VF-UI-15 (copy only): the help and option copy of `generation.video_tier` use the names the Video screens show: Fast and Full HD, not Standard and Boost. Same key, same values, same default; no new key. Additive text change.
