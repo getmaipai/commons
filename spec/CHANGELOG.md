@@ -1,3 +1,7 @@
+## [spec-v0.1.469] - 2026-11-20
+
+- `media_stage` takes an optional `hide_when_empty` (default false): once the bound call has answered with no rows the stage draws nothing, and it still draws its loading state while the call is open. For a result stage with nothing to show before anything is made (VIDEO-KIT-01).
+
 ## [spec-v0.1.468] - 2026-11-20
 
 - Model pack: a clip job may carry `minor_recipes` (a recipe file per rating, `G` and `PG-13`) and `negative_prompt` (the terms an engine that takes a negative prompt always receives). Jobs catalog: an optional `minor_ratings` per job lists the ratings the Stack holds a minor recipe for; absent means none, and a caller keeps its own wording (VF-MINOR-RECIPE-01).

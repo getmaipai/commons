@@ -1,3 +1,7 @@
+## [ui-v0.5.721] - 2026-11-20
+
+- The `media_stage` block takes `hide_when_empty`: an answered empty list renders nothing; loading still draws the stage (VIDEO-KIT-01).
+
 ## [ui-v0.5.720] - 2026-11-20
 
 - `MediaStage` takes `waitingActions` and the `media_stage` block takes `waiting_actions` (at most 2 buttons): drawn under the progress strip while the stage state is `waiting`, for example Stop (VIDEO-KIT-01).
