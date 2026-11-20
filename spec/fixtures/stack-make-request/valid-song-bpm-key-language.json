@@ -1,0 +1,9 @@
+{
+  "job": "song",
+  "audience": "adult",
+  "description": "an upbeat song for a birthday morning",
+  "seconds": 90,
+  "bpm": 112.5,
+  "key": "D minor",
+  "language": "Spanish"
+}

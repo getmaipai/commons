@@ -29,7 +29,7 @@ export const StackMakeRequest = z.discriminatedUnion("job", [
   req("character_sheet", { references: z.array(text).min(1), description: text.optional(), kind: z.enum(["person", "object", "pet"]), level: StackJobLevel }),
   req("contact_sheet", { references: z.array(text).min(1), description: text.optional(), count: z.number().int().min(1), level: StackJobLevel }),
   // The music family. Ids are opaque, as above; the words are the person's own (never logged by the pack).
-  req("song", { description: text, lyrics: text.optional(), style_words: z.array(text).optional(), seconds: secs, level: StackJobLevel.optional(), seed: z.number().int().min(0).optional() }),
+  req("song", { description: text, lyrics: text.optional(), style_words: z.array(text).optional(), seconds: secs, level: StackJobLevel.optional(), seed: z.number().int().min(0).optional(), bpm: z.number().positive().optional(), key: text.optional(), language: text.optional() }),
   req("song_edit", { song: text, change: StackSongChange, level: StackJobLevel.optional() }),
   req("sound_effect", { description: text, seconds: secs }),
   req("stems", { song: text, stems: z.array(text).min(1) }),

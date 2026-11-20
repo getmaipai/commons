@@ -500,6 +500,18 @@
         "seed": {
           "type": "integer",
           "minimum": 0
+        },
+        "bpm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "language": {
+          "type": "string",
+          "minLength": 1
         }
       },
       "required": [
