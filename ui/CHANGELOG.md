@@ -1,3 +1,7 @@
+## [ui-v0.5.725] - 2026-11-20
+
+- `StoryboardPlayer` empty state is a 16:9 card (the stage's own shape), so an empty film page does not jump when shots arrive (VIDEO-KIT-01).
+
 ## [ui-v0.5.724] - 2026-11-20
 
 - A vertical `media_shelf` row keeps its `row_actions` words visible under the PRO look (outline pills with their label, for example Keep, Skip, Make again); rails and grids keep the icon-only ghost buttons (VIDEO-KIT-01).
