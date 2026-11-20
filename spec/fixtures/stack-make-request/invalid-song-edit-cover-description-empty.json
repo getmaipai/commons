@@ -1,0 +1,9 @@
+{
+  "job": "song_edit",
+  "audience": "adult",
+  "song": "media-3",
+  "change": {
+    "kind": "cover",
+    "description": ""
+  }
+}

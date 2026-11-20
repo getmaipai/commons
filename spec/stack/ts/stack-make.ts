@@ -14,7 +14,7 @@ const req = <J extends string, T extends z.ZodRawShape>(job: J, shape: T) => z.o
 
 // What song_edit changes. Trim, fade and loudness run no model, so no pack serves them and they are not here.
 export const StackSongChange = z.discriminatedUnion("kind", [
-  z.object({ kind: z.literal("cover"), strength: z.number().positive().max(1).optional(), style_words: z.array(text).optional() }).strict(),
+  z.object({ kind: z.literal("cover"), strength: z.number().positive().max(1).optional(), style_words: z.array(text).optional(), description: text.optional(), lyrics: text.optional() }).strict(),
   z.object({ kind: z.literal("repaint"), from_seconds: z.number().min(0), to_seconds: secs, description: text.optional(), lyrics: text.optional() }).strict(),
   z.object({ kind: z.literal("extend"), add_seconds: secs, at: z.enum(["start", "end"]).optional() }).strict(),
 ]);

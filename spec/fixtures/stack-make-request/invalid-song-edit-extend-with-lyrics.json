@@ -1,0 +1,10 @@
+{
+  "job": "song_edit",
+  "audience": "adult",
+  "song": "media-3",
+  "change": {
+    "kind": "extend",
+    "add_seconds": 20,
+    "lyrics": "[Verse]\nRain on the roof"
+  }
+}

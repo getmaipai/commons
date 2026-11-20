@@ -1,0 +1,14 @@
+{
+  "job": "song_edit",
+  "audience": "adult",
+  "song": "media-3",
+  "change": {
+    "kind": "cover",
+    "strength": 0.5,
+    "style_words": [
+      "jazz"
+    ],
+    "description": "the same song as a slow late-night jazz number",
+    "lyrics": "[Verse]\nRain on the roof"
+  }
+}
