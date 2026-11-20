@@ -1,3 +1,7 @@
+## [ui-v0.5.719] - 2026-11-20
+
+- `prompt_bar` submit arguments fall back to page state: a `{name}` in `submit.call.args` that the bar does not own (not its prompt, a field, a chip, a reference, the tier, the mode or a suggestion) is read from page state when it is set, so a rename page reached by `navigate {to, state: {id}}` posts the id instead of the literal "{id}" (the 404 on Video Templates and Elements rename). The bar's own names never fall back, so a hidden field's old value is still not sent (VIDEO-KIT-01).
+
 ## [ui-v0.5.718] - 2026-11-20
 
 - `TrackStudio` on a phone (VF-EDIT-01 fix): the sticky export bar is one compact row, about 60 px (the primary export button plus the secondary as an icon button, the hint moved to a screen-reader line and the bar's tooltip), and the transport bar is in flow under the preview instead of sticking over the video, for video and audio alike (VIDEO-KIT-01).
