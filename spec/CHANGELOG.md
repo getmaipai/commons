@@ -1,3 +1,7 @@
+## [spec-v0.1.461] - 2026-11-20
+
+- `media_shelf.row_actions` are now drawn on every orientation (VIDEO-KIT-01): vertical rows keep their labelled pills, rail and grid tiles open the same actions from a corner "⋮" menu with words. The package check no longer refuses `row_actions` on a non-vertical shelf (spec 0.1.457 and 0.1.460 carried that refusal; pin this tag or later, never those). New optional `row_actions[].group` (at most 40 characters): actions sharing a group open in one submenu named by it.
+
 ## [spec-v0.1.460] - 2026-11-20
 
 - `media_stage` takes an optional `poll_while` (`field`, `values`), the same shape as `media_shelf` and `job_progress`: it refetches `bind` while the first row's field is in `values` (for example waiting) and stops otherwise, so a stage can show a render's progress and then its finished result without a reload (VIDEO-KIT-01).

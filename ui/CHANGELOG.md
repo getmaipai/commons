@@ -1,3 +1,7 @@
+## [ui-v0.5.714] - 2026-11-20
+
+- `MediaShelf` rail and grid tiles take `renderMenu` and `hasMenu`: a small "⋮" overflow button at the tile's top corner (48 px hit layer, Tab stop, Enter or Space opens, arrows move, Escape closes and returns focus, pressing it never opens the tile) opens the row's `row_actions` with words and icons from the kit menu; a tile with no visible action draws no button; vertical rows keep their pills. `media_shelf` nodes feed it from `row_actions` (`show_when_field` and `hide_when_field` honoured, same dispatch), and `group` nests actions under one submenu item (spec 0.1.461, VIDEO-KIT-01).
+
 ## [ui-v0.5.713] - 2026-11-20
 
 - Pill tabs (the dashboard `TabsTrigger` in the pill variant, for example the Video app's section tabs) get a `::before` hit layer to 48 px: after the layer fix their only pseudo-element was the 1.8 px active underline, so they measured 44 px with no hit area. `media_stage` refetches with `poll_while` (spec 0.1.460); the polling loop is the shared `usePollWhile` hook (VIDEO-KIT-01).
