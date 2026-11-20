@@ -358,6 +358,22 @@
             "G",
             "PG-13"
           ]
+        },
+        "key_colour": {
+          "type": "string",
+          "enum": [
+            "green",
+            "magenta"
+          ],
+          "description": "VF-COMPANION-RECIPE-01. The plain background a companion take is made on (the keyed colour Home removes)."
+        },
+        "take_frame": {
+          "type": "string",
+          "enum": [
+            "state",
+            "gesture"
+          ],
+          "description": "VF-COMPANION-RECIPE-01. Which of the pack's two companion frames: `state` (the long locked head-and-shoulders loop, the default) or `gesture` (the short one)."
         }
       },
       "required": [
