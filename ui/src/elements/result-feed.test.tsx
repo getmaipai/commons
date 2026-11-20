@@ -37,6 +37,14 @@ describe("ResultFeed", () => {
     expect(view.getByText("Favorites").className).toContain("uppercase");
   });
 
+  test("a cancelled entry is one compact line: its words and the stopped note, no player", () => {
+    const view = render(<ResultFeed entries={[entry("1", "a fox", "Today", "cancelled")]} />);
+    const line = view.container.querySelector("[data-slot=result-feed-stopped]")!;
+    expect(line.textContent).toContain("a fox");
+    expect(line.textContent).toContain("Stopped. Nothing was kept.");
+    expect(view.container.querySelector("[data-slot=video-player]")).toBeNull();
+  });
+
   test("an entry in each status draws the player's own state", () => {
     const view = render(<ResultFeed grouping="none" entries={["queued", "generating", "ready", "failed", "cancelled"].map((s) => entry(s, `w ${s}`, undefined, s))} />);
     expect(view.getAllByRole("article").map((a) => a.getAttribute("data-status"))).toEqual(["queued", "generating", "ready", "failed", "cancelled"]);
@@ -266,7 +274,7 @@ describe("ResultFeed facts, overlayActions and the stage look (VIDEO-KIT-01)", (
     expect(pill.title).toBe("Videos are not ready yet.");
     for (const article of articles.slice(1)) {
       expect(article.querySelector("[data-slot=media-stage]")).toBeNull();
-      expect(article.querySelector("[data-slot=video-player]")).toBeTruthy();
+      if (article.getAttribute("data-status") !== "cancelled") expect(article.querySelector("[data-slot=video-player]")).toBeTruthy();
       expect(article.querySelectorAll("[data-slot=result-feed-words]").length).toBe(1);
     }
     expect(view.getByText("Waiting its turn")).toBeTruthy();

@@ -77,7 +77,7 @@ describe("MediaShelf", () => {
     const { getByRole, rerender } = render(<MediaShelf {...props} />);
     expect(getByRole("list").className).toContain("lg:grid-cols-3");
     rerender(<MediaShelf {...props} density="compact" />);
-    expect(getByRole("list").className).toContain("lg:grid-cols-5");
+    expect(getByRole("list").className).toContain("grid-cols-3");
     rerender(<MediaShelf {...props} variant="plain" />);
     expect(getByRole("list").className).toContain("xl:grid-cols-4");
   });
@@ -360,7 +360,7 @@ describe("MediaShelf", () => {
       expect(container.querySelector("li")!.className).toContain("w-[72%]");
       rerender(<MediaShelf {...props} density="compact" />);
       const li = container.querySelector("li")!;
-      expect(li.className).toContain("w-[44%]");
+      expect(li.className).toContain("w-[140px]");
       expect(li.className).not.toContain("w-[72%]");
     });
 

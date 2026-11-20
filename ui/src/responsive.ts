@@ -42,5 +42,5 @@ export const GRID_COLUMNS: Record<Density, string> = {
  * rail reads as scrollable. */
 export const SHELF_ITEM_WIDTH: Record<Density, string> = {
   default: "w-[72%] sm:w-[40%] lg:w-[27%]",
-  compact: "w-[44%] sm:w-[25%] lg:w-[17%]",
+  compact: "w-[140px] sm:w-[25%] lg:w-[17%]",
 };

@@ -242,6 +242,7 @@ export function MediaShelf<T>({
   const gridColumns = circle
     ? "grid-cols-[repeat(auto-fill,minmax(var(--media-artist-size),1fr))]"
     : sizeControl && layout === "grid" ? SIZED_COLUMNS
+    : density === "compact" ? "grid-cols-3 sm:grid-cols-4 lg:grid-cols-6"
     : variant === "plain" ? "grid-cols-2 sm:grid-cols-3 xl:grid-cols-4" : cn(GRID_COLUMNS[density], "grid-cols-2");
 
   if (items.length === 0 && !hasLocked && hideWhenEmpty) return null;
@@ -586,7 +587,7 @@ function TileFrame({ onPlay, playLabel, favorite, children }: { onPlay?: () => v
 const PLAIN_ITEM_WIDTH = "w-[72%] sm:w-[calc((100%-36px)/3.2)] xl:w-[calc((100%-48px)/4.3)]";
 // `density: "compact"` on a frameless row (MUSIC-TILES-01): the same peek, with smaller tiles, for a home screen whose rows are
 // many and short: a bit over two on a phone, about four and a fifth from 640, about six and a third from 1280.
-const PLAIN_ITEM_WIDTH_COMPACT = "w-[44%] sm:w-[calc((100%-48px)/4.2)] xl:w-[calc((100%-72px)/6.3)]";
+const PLAIN_ITEM_WIDTH_COMPACT = "w-[140px] sm:w-[calc((100%-48px)/4.2)] xl:w-[calc((100%-72px)/6.3)]";
 
 interface ShelfFrameProps {
   heading?: string;

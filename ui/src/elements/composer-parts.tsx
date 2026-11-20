@@ -245,7 +245,7 @@ export function ComposerAddButton({ onAdd, disabledReason }: { onAdd: () => void
 export function ComposerSlots({ slots }: { slots: readonly ComposerSlotData[] }) {
   if (slots.length === 0) return null;
   return (
-    <div data-slot="composer-slots" role="group" aria-label={i18n._({ id: "ui.References", message: "References" })} className="flex min-w-0 items-center gap-2 max-sm:shrink-0 max-sm:flex-nowrap sm:flex-wrap">
+    <div data-slot="composer-slots" role="group" aria-label={i18n._({ id: "ui.References", message: "References" })} className="flex min-w-0 flex-wrap items-center gap-2">
       {slots.map((slot) => {
         const Icon = SLOT_ICON[slot.kind];
         const ids = slot.value ? slot.value.split(",").filter(Boolean) : [];

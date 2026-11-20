@@ -261,7 +261,12 @@ export function ResultFeed({
               const picked = [...(entry.references?.map((r) => r.label) ?? []), ...(entry.tags ?? [])];
               return (
                 <article key={entry.key} data-slot="result-feed-entry" data-status={entry.player.status} data-first={first ? "true" : undefined} aria-label={shorten(entry.words)} className={cn("flex min-w-0 flex-col gap-2", first && "@2xl:col-span-2", inserted.has(entry.key) && "motion-list")}>
-                  {stage && isFinished(entry) ? (
+                  {entry.player.status === "cancelled" ? (
+                    <div data-slot="result-feed-stopped" className="border-border/60 bg-muted/30 flex min-h-12 min-w-0 flex-wrap items-center gap-x-3 gap-y-1 rounded-xl border px-3 py-2 text-sm">
+                      <p data-slot="result-feed-words" className="text-foreground min-w-0 flex-1 truncate">{entry.words}</p>
+                      <p className="text-muted-foreground shrink-0">{i18n._({ id: "ui.Stopped. Nothing was kept.", message: "Stopped. Nothing was kept." })}</p>
+                    </div>
+                  ) : stage && isFinished(entry) ? (
                     <>
                       <MediaStage
                         size="stage"
