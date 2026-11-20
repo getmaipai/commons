@@ -1,13 +1,9 @@
 {
-  "job": "picture_edit",
+  "job": "picture",
   "audience": "adult",
-  "picture": "media-1",
-  "description": "make the sky pink",
-  "references": [
-    "media-2"
-  ],
-  "mask": "media-3",
-  "level": "boost",
+  "description": "the person at a kitchen counter, morning light",
+  "shape": "landscape",
+  "level": "standard",
   "inputs": [
     {
       "role": "identity",
