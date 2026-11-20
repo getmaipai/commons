@@ -8,6 +8,7 @@ import { findClassShadows, findCssShadows, scanSurfaces, type SurfaceAllow } fro
 
 /** The only places a shadow may stay off the surface tokens or apart from a radius. */
 const ALLOW: SurfaceAllow[] = [
+  { file: "src/dashboard/lib/navItemStyle.ts", match: /primary/, reason: "The selected rail and menu row glow is an inset or soft halo in the primary token, set by the row itself; it sits on the row's own radius and is not a surface elevation." },
   { file: "src/tokens.css", match: /sidebar-menu-button.*color-mix/s, reason: "The active sidebar row's glow is a 1px inset ring plus a halo in the sidebar's own accent token; the radius is the row's own class, and it is an accent, not a surface." },
   { file: "src/tokens.css", match: /sidebar-inset.*var\(--hairline\)/s, reason: "An inset 1px hairline in the pro look (a border drawn inside, no outer shadow); the radius is the sidebar inset's own class." },
   { file: "src/dashboard/components/ui/sidebar.tsx", match: /shadow-\[0_0_0_1px_var\(--(?:sidebar-border|sidebar-accent)\)\]|bg-background shadow-\[0_0_0_1px/, reason: "Vendored shadcn sidebar menu-button outline variant: a 1px ring drawn with a shadow in a sidebar token colour; the radius is in the cva base string." },
