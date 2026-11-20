@@ -55,7 +55,9 @@
               "identity",
               "wardrobe",
               "voice_reference",
-              "edit_source"
+              "edit_source",
+              "object",
+              "place"
             ]
           }
         }

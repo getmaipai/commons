@@ -73,7 +73,9 @@
                   "identity",
                   "wardrobe",
                   "voice_reference",
-                  "edit_source"
+                  "edit_source",
+                  "object",
+                  "place"
                 ]
               },
               "file": {
@@ -241,7 +243,9 @@
                   "identity",
                   "wardrobe",
                   "voice_reference",
-                  "edit_source"
+                  "edit_source",
+                  "object",
+                  "place"
                 ]
               },
               "file": {
@@ -319,7 +323,10 @@
             "retake_from",
             "extend",
             "enhance",
-            "clip_film_shot"
+            "clip_film_shot",
+            "restyle",
+            "companion_take",
+            "reference_clip"
           ]
         },
         "at_seconds": {
@@ -329,6 +336,28 @@
         "take_of": {
           "type": "string",
           "minLength": 1
+        },
+        "style_strength": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 2
+        },
+        "conditioning": {
+          "type": "string",
+          "enum": [
+            "source",
+            "edges"
+          ]
+        },
+        "loop": {
+          "type": "boolean"
+        },
+        "rating": {
+          "type": "string",
+          "enum": [
+            "G",
+            "PG-13"
+          ]
         }
       },
       "required": [

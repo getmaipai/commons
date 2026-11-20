@@ -1,0 +1,33 @@
+{
+  "job": "clip",
+  "audience": "minor",
+  "description": "a kite flying",
+  "shape": "portrait",
+  "level": "max",
+  "seconds": 5,
+  "end_picture": "media-2",
+  "seed": 99,
+  "dialogue": [
+    {
+      "speaker": "sage",
+      "text": "I left it here.",
+      "language": "en"
+    },
+    {
+      "speaker": "marlow",
+      "text": "I thought you took it."
+    }
+  ],
+  "operation": "restyle",
+  "styles": [
+    "style-a"
+  ],
+  "style_strength": 0.8,
+  "conditioning": "edges",
+  "inputs": [
+    {
+      "role": "edit_source",
+      "file": "/v1/videos/generations/job1/video.mp4"
+    }
+  ]
+}

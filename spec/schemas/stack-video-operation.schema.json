@@ -7,6 +7,9 @@
     "retake_from",
     "extend",
     "enhance",
-    "clip_film_shot"
+    "clip_film_shot",
+    "restyle",
+    "companion_take",
+    "reference_clip"
   ]
 }

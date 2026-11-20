@@ -49,5 +49,7 @@ export const StackVideoReceipt = z.object({
   route: z.object({ name: text, reason: text }).strict().optional(),
   // VF-TAKES-01: the first take this clip is another take of (a sibling link; the first take is never overwritten).
   take_of: text.optional(),
+  // VF-MINOR-RECIPE-01: the recipe that wrote the prompt, by id and version (never its text).
+  recipe: z.object({ id: text, version: text }).strict().optional(),
 }).strict();
 export type StackVideoReceipt = z.infer<typeof StackVideoReceipt>;

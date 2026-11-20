@@ -1,0 +1,22 @@
+{
+  "job": "clip",
+  "audience": "minor",
+  "description": "a kite flying",
+  "shape": "portrait",
+  "level": "max",
+  "seconds": 5,
+  "end_picture": "media-2",
+  "seed": 99,
+  "dialogue": [
+    {
+      "speaker": "sage",
+      "text": "I left it here.",
+      "language": "en"
+    },
+    {
+      "speaker": "marlow",
+      "text": "I thought you took it."
+    }
+  ],
+  "rating": "G"
+}
