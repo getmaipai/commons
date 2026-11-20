@@ -1,3 +1,7 @@
+## [ui-v0.5.712] - 2026-11-20
+
+- FIX (regression from ui-v0.5.702, A11Y-DEBT-01): the touch-floor rules in `tokens.css` were plain CSS, and an unlayered rule beats every layered Tailwind utility, so `position: relative` forced on every focusable element overrode `.absolute` (the Studio's trim handles and playhead could not be dragged, the Play button on a clip card and the phone menu button sat in the wrong place) and the pseudo-element rule overrode every `after:` utility. Both rules, and the text-field minimum height, now live in `@layer base`, under the utilities, so a class such as `absolute`, `fixed`, `sticky` or `after:inset-0` wins. The 48 px hit areas stay. A test keeps the rules inside the layer. Any global CSS rule change must ship with a before and after layout comparison (VIDEO-KIT-01).
+
 ## [ui-v0.5.711] - 2026-11-20
 
 - No sideways scroll on a phone from a media stage or an ambient glow: the schema page body clips horizontal overflow (a glow bleeds past the stage box, and the waiting and error stage keeps its drift inside), `AmbientGlow` clips its own blurred blobs, and the waiting and error stage clips only sideways so it still grows to fit its overlay. Measured at 375 px: scroller width equals its client width for idle, waiting and error (it was 5 px wider). Row actions and the subtitle wrap items are in ui 0.5.710; the package check for them is spec 0.1.457 (VIDEO-KIT-01).
