@@ -62,6 +62,11 @@ import { StudioNodeView } from "@/kit/schema/StudioNodeView";
 import { ImageEditorNodeView } from "@/kit/schema/ImageEditorNodeView";
 import { ResultFeedNodeView } from "@/kit/schema/ResultFeedNodeView";
 import { ClipFeedNodeView } from "@/kit/schema/ClipFeedNodeView";
+import { StoryboardPlayerNodeView } from "@/kit/schema/StoryboardPlayerNodeView";
+import { ActionBarNodeView } from "@/kit/schema/ActionBarNodeView";
+import { ProposalCardNodeView } from "@/kit/schema/ProposalCardNodeView";
+import { VoiceLineNodeView } from "@/kit/schema/VoiceLineNodeView";
+import { MediaStageNodeView } from "@/kit/schema/MediaStageNodeView";
 import { isOwnBlobUrl, localPicture } from "@/kit/schema/mediaPath";
 import { evaluateCondition } from "@/kit/schema/condition";
 import { fillTemplate, readField, writeField } from "@/kit/schema/fieldPath";
@@ -2562,6 +2567,16 @@ export function NodeRenderer({ node, state = {} }: { node: UiNode; state?: Row }
       return <ResultFeedNodeView node={node} state={state} />;
     case "clip_feed":
       return <ClipFeedNodeView node={node} state={state} />;
+    case "storyboard_player":
+      return <StoryboardPlayerNodeView node={node} state={state} />;
+    case "action_bar":
+      return <ActionBarNodeView node={node} state={state} />;
+    case "proposal_card":
+      return <ProposalCardNodeView node={node} state={state} />;
+    case "voice_line":
+      return <VoiceLineNodeView node={node} state={state} />;
+    case "media_stage":
+      return <MediaStageNodeView node={node} state={state} renderChild={(child, i) => <NodeRenderer key={i} node={child} state={state} />} />;
     case "studio":
       return <StudioNodeView node={node} state={state} />;
     case "image_editor":

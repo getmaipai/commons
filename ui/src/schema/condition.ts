@@ -41,3 +41,15 @@ export function evaluateCondition(condition: string | undefined, state: Record<s
   const truthy = Boolean(value);
   return negated ? !truthy : truthy;
 }
+
+/** UI-BLOCKS-01: a button's `disabled_when`. A condition that cannot be read keeps the button off (and says so in the console) rather
+ * than letting an action through; a bad string must not unmount the page either, so it is caught here. */
+export function disabledWhen(condition: string | undefined, state: Record<string, unknown>): boolean {
+  if (!condition) return false;
+  try {
+    return evaluateCondition(condition, state);
+  } catch (e) {
+    console.error(`kit/schema: a button stays disabled - ${e instanceof Error ? e.message : e}`);
+    return true;
+  }
+}

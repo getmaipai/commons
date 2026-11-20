@@ -1,3 +1,7 @@
+## [ui-v0.5.695] - 2026-11-20
+
+- The UI schema renders five new blocks (VIDEO-KIT-01, spec 0.1.435): `storyboard_player`, `action_bar`, `proposal_card`, `voice_line` and `media_stage`, each mapped to its kit Element through the same bound data, state and action helpers `clip_feed` uses. A bad `disabled_when` keeps a button off instead of unmounting the page.
+
 ## [ui-v0.5.694] - 2026-11-20
 
 - New `MediaStage` (`elements/media-stage`, VIDEO-KIT-01, K9): a big picture stage in two sizes, `hero` (the composer sits on the picture) and `stage` (a player or progress stage). A still with a slow drift or a muted loop, a token scrim, an eyebrow, display title and subtitle, floating `pills`, a `titlePill`, a bottom `overlay` with `MediaStageProgress`, an optional centered play button, and the states idle, looping, paused, loading, waiting and error. The drift is off under reduced motion and while a loop plays. `option-cards` now exports its `useMatches` hook.

@@ -17,7 +17,7 @@ type Row = Record<string, unknown>;
 type HostWithNotice = MediaHost & { makingNotice?(kind: "picture" | "video"): string | null | undefined };
 
 /** The empty state's button words: the page's `action_label`, else a plain word for the kind of action (the same fallback the `empty_state` node uses). */
-function emptyActionLabel(node: ClipFeedNode["empty_state"]): string | undefined {
+export function emptyActionLabel(node: ClipFeedNode["empty_state"]): string | undefined {
   const action = node.action;
   if (!action) return undefined;
   if (node.action_label) return node.action_label;

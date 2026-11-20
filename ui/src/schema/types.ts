@@ -850,6 +850,128 @@ export const ClipFeedNodeSchema = z.object({
 });
 export type ClipFeedNode = z.infer<typeof ClipFeedNodeSchema>;
 
+/** UI-BLOCKS-01: the five blocks of the creation kit's schema half. They mirror spec/ui/schema.json `storyboard_player`, `action_bar`,
+ * `proposal_card`, `voice_line` and `media_stage`. Every value of a row is a dotted path (`readField`); a picture, voice or bed
+ * field is a path, never an address. `sticky` and `compact` carry no zod default (a recursive node type cannot have one): absent
+ * reads as the schema's default (`true` and `false`). */
+const StateNameSchema = z.string().regex(/^[a-z][a-z0-9_]*$/).max(40);
+const FieldPathSchema = z.string().min(1);
+const ButtonLabelSchema = z.string().min(1).max(40);
+
+export const StoryboardPlayerNodeSchema = z.object({
+  type: z.literal("storyboard_player"),
+  bind: PackageBindingSchema,
+  item_fields: z
+    .object({
+      shot_id: FieldPathSchema,
+      caption: FieldPathSchema,
+      duration_sec: FieldPathSchema,
+      still: FieldPathSchema,
+      status: FieldPathSchema,
+      clip: FieldPathSchema.optional(),
+      line_speaker: FieldPathSchema.optional(),
+      line_text: FieldPathSchema.optional(),
+      line_start_sec: FieldPathSchema.optional(),
+      line_audio: FieldPathSchema.optional(),
+      line_wave: FieldPathSchema.optional(),
+    })
+    .strict()
+    .refine(
+      (f) => (f.line_speaker === undefined) === (f.line_text === undefined) && (f.line_text !== undefined || (f.line_start_sec === undefined && f.line_audio === undefined && f.line_wave === undefined)),
+      "line_speaker and line_text come together, and the other line_* paths need them",
+    ),
+  bed: FieldPathSchema.optional(),
+  selected: StateNameSchema.optional(),
+  on_select: ActionSchema.optional(),
+  loading_text: z.string().min(1).max(120),
+  empty_state: EmptyStateNodeSchema,
+});
+export type StoryboardPlayerNode = z.infer<typeof StoryboardPlayerNodeSchema>;
+
+const ActionBarButtonSchema = z.object({
+  label: ButtonLabelSchema,
+  action: ActionSchema,
+  busy_state: StateNameSchema.optional(),
+  busy_label: ButtonLabelSchema.optional(),
+  disabled_when: z.string().min(1).optional(),
+}).strict();
+export const ActionBarNodeSchema = z
+  .object({
+    type: z.literal("action_bar"),
+    bind: PackageBindingSchema.optional(),
+    primary: ActionBarButtonSchema,
+    secondary: ActionBarButtonSchema.optional(),
+    estimate: FieldPathSchema.optional(),
+    reason: FieldPathSchema.optional(),
+    sticky: z.boolean().optional(),
+  })
+  .refine((n) => n.bind !== undefined || (n.estimate === undefined && n.reason === undefined), "estimate and reason need a bind");
+export type ActionBarNode = z.infer<typeof ActionBarNodeSchema>;
+export type ActionBarButton = z.infer<typeof ActionBarButtonSchema>;
+
+const ProposalButtonSchema = z.object({ label: ButtonLabelSchema, action: ActionSchema, disabled_when: z.string().min(1).optional() }).strict();
+export const ProposalCardNodeSchema = z.object({
+  type: z.literal("proposal_card"),
+  bind: PackageBindingSchema,
+  title: FieldPathSchema,
+  description: FieldPathSchema,
+  description_state: StateNameSchema.optional(),
+  pictures: z.object({
+    bind: PackageBindingSchema,
+    item_fields: z.object({ src: FieldPathSchema, alt: FieldPathSchema, badge: FieldPathSchema.optional(), caption: FieldPathSchema.optional() }).strict(),
+  }).strict(),
+  status: FieldPathSchema,
+  approve: ProposalButtonSchema,
+  change: ProposalButtonSchema,
+  discard: ProposalButtonSchema,
+  note: FieldPathSchema.optional(),
+  error: FieldPathSchema.optional(),
+});
+export type ProposalCardNode = z.infer<typeof ProposalCardNodeSchema>;
+export type ProposalButton = z.infer<typeof ProposalButtonSchema>;
+
+const VoiceLineActionSchema = z.object({ label: ButtonLabelSchema.optional(), action: ActionSchema }).strict();
+export const VoiceLineNodeSchema = z.object({
+  type: z.literal("voice_line"),
+  bind: PackageBindingSchema,
+  speaker: FieldPathSchema,
+  speaker_picture: FieldPathSchema.optional(),
+  text: FieldPathSchema,
+  audio: FieldPathSchema.optional(),
+  reading_index: FieldPathSchema,
+  reading_count: FieldPathSchema,
+  wave: FieldPathSchema.optional(),
+  status: FieldPathSchema,
+  actions: z.object({ say_differently: VoiceLineActionSchema.optional(), use_other_reading: VoiceLineActionSchema.optional() }).strict().optional(),
+  error: FieldPathSchema.optional(),
+});
+export type VoiceLineNode = z.infer<typeof VoiceLineNodeSchema>;
+
+const MediaStageButtonSchema = z.object({ label: ButtonLabelSchema, icon: z.string().optional(), action: ActionSchema }).strict();
+const MediaStageBaseSchema = z.object({
+  type: z.literal("media_stage"),
+  bind: PackageBindingSchema,
+  size: z.enum(["hero", "stage"]),
+  media: z.object({ still: FieldPathSchema, loop: FieldPathSchema.optional(), position: FieldPathSchema.optional() }).strict(),
+  description: FieldPathSchema,
+  scrim: z.enum(["soft", "strong"]),
+  state: FieldPathSchema,
+  eyebrow: FieldPathSchema.optional(),
+  title: FieldPathSchema.optional(),
+  subtitle: FieldPathSchema.optional(),
+  pills: z.array(MediaStageButtonSchema).max(6).optional(),
+  title_pill: FieldPathSchema.optional(),
+  progress: FieldPathSchema.optional(),
+  compact: z.boolean().optional(),
+  error_message: FieldPathSchema.optional(),
+  error_actions: z.array(MediaStageButtonSchema).max(3).optional(),
+});
+export type MediaStageNode = z.infer<typeof MediaStageBaseSchema> & { children?: UiNode[] };
+export type MediaStageButton = z.infer<typeof MediaStageButtonSchema>;
+export const MediaStageNodeSchema: z.ZodType<MediaStageNode> = z.lazy(() =>
+  MediaStageBaseSchema.extend({ children: z.array(UiNodeSchema).min(1).max(8).optional() }),
+);
+
 /** IMG-STUDIO-01: the picture Studio (ImageEditor). Mirrors spec/ui/schema.json `image_editor`. */
 export const IMAGE_EDITOR_TOOLS = ["markup", "comment", "remove_background", "erase", "resize", "crop", "adjust", "more"] as const;
 const ImageEditorReason = z.string().min(1).max(120);
@@ -1045,6 +1167,11 @@ export type UiNode =
   | TrackRowsNode
   | ResultFeedNode
   | ClipFeedNode
+  | StoryboardPlayerNode
+  | ActionBarNode
+  | ProposalCardNode
+  | VoiceLineNode
+  | MediaStageNode
   | StudioNode
   | ImageEditorNode
   | TabsNode;
@@ -1080,6 +1207,11 @@ export const UiNodeSchema: z.ZodType<UiNode> = z.lazy(() =>
     TrackRowsNodeSchema,
     ResultFeedNodeSchema,
     ClipFeedNodeSchema,
+    StoryboardPlayerNodeSchema,
+    ActionBarNodeSchema,
+    ProposalCardNodeSchema,
+    VoiceLineNodeSchema,
+    MediaStageNodeSchema,
     StudioNodeSchema,
     ImageEditorNodeSchema,
     TabsNodeSchema,
@@ -1119,6 +1251,11 @@ export const NODE_TYPES = [
   "track_rows",
   "result_feed",
   "clip_feed",
+  "storyboard_player",
+  "action_bar",
+  "proposal_card",
+  "voice_line",
+  "media_stage",
   "studio",
   "image_editor",
 ] as const;
