@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://getmaipai.github.io/shared/spec/schemas/stack-rough-cut-result.schema.json",
   "title": "StackRoughCutResult",
-  "description": "VF-ROUGHCUT-01. The result of `media.rough_cut`, and the shape the kit storyboard_player block plays: the file, the total length, each shot's start and end in the file, and each voiced line's audio with its start and length. Times are seconds on the file's own clock. No render estimate and no memory figure (E4).",
+  "description": "VF-ROUGHCUT-01. The result of `media.rough_cut`, and the shape the kit storyboard_player block plays: the file, the total length, each shot's start and end in the file, and each voiced line's audio with its start and length. Times are seconds on the file's own clock. No render estimate and no memory figure (E4). A line may carry `wave`: loudness samples from 0 to 1 (at most 200, evenly spaced over the line's audio, scaled so the loudest is 1) for the player's small waveform.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
@@ -70,6 +70,16 @@
           "audio": {
             "type": "string",
             "minLength": 1
+          },
+          "wave": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 200,
+            "items": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
           }
         },
         "required": [

@@ -29,7 +29,7 @@ export const StackRoughCutResult = z.object({
   file: text,
   total_s: z.number().min(0),
   shots: z.array(z.object({ id, start_s: z.number().min(0), end_s: z.number().min(0) }).strict()).min(1),
-  lines: z.array(z.object({ shot_id: id, speaker: text, start_s: z.number().min(0), length_s: z.number().positive(), audio: text }).strict()),
+  lines: z.array(z.object({ shot_id: id, speaker: text, start_s: z.number().min(0), length_s: z.number().positive(), audio: text, wave: z.array(z.number().min(0).max(1)).min(1).max(200).optional() }).strict()),
 }).strict();
 export type StackRoughCutResult = z.infer<typeof StackRoughCutResult>;
 
@@ -42,7 +42,7 @@ export type StackRoughCutResult = z.infer<typeof StackRoughCutResult>;
 export function roughCutShotRows(
   result: StackRoughCutResult,
   own: { captions: Readonly<Record<string, string>>; stills: Readonly<Record<string, string>>; /** The text of each line by shot id: Home has it (it sent the dialogue); the result does not repeat it. */ lineTexts: Readonly<Record<string, string>> },
-): Array<{ shot_id: string; caption: string; duration_sec: number; still: string | null; clip: null; status: "ready" | "no_picture"; line_speaker: string | null; line_text: string | null; line_start_sec: number | null; line_audio: string | null }> {
+): Array<{ shot_id: string; caption: string; duration_sec: number; still: string | null; clip: null; status: "ready" | "no_picture"; line_speaker: string | null; line_text: string | null; line_start_sec: number | null; line_audio: string | null; line_wave: number[] | null }> {
   return result.shots.map((shot) => {
     const line = result.lines.find((entry) => entry.shot_id === shot.id);
     const still = own.stills[shot.id] ?? null;
@@ -50,7 +50,7 @@ export function roughCutShotRows(
       shot_id: shot.id, caption: own.captions[shot.id] ?? "", duration_sec: Math.round((shot.end_s - shot.start_s) * 1000) / 1000,
       still, clip: null, status: still ? "ready" : "no_picture",
       line_speaker: line?.speaker ?? null, line_text: line ? own.lineTexts[shot.id] ?? null : null,
-      line_start_sec: line ? Math.round((line.start_s - shot.start_s) * 1000) / 1000 : null, line_audio: line?.audio ?? null,
+      line_start_sec: line ? Math.round((line.start_s - shot.start_s) * 1000) / 1000 : null, line_audio: line?.audio ?? null, line_wave: line?.wave ?? null,
     };
   });
 }

@@ -36,4 +36,9 @@ describe("a rough-cut result maps 1:1 to the storyboard_player rows", () => {
     expect(rows[0]!.status).toBe("ready"); expect(rows[1]!.status).toBe("no_picture");
     for (const r of rows) expect(row(r)).toBe(true);
   });
+  test("a line's wave becomes the row's line_wave", () => {
+    const rows = roughCutShotRows(fixture("valid-line-wave.json"), own);
+    expect(rows[1]!.line_wave).toEqual([0.1, 0.6, 1, 0.8, 0.4, 0.2]); expect(rows[2]!.line_wave).toBeNull();
+    for (const r of rows) expect(row(r)).toBe(true);
+  });
 });

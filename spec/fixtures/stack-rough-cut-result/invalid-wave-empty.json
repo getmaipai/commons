@@ -1,0 +1,60 @@
+{
+  "file": "/media/out/rough-cut.mp4",
+  "total_s": 30,
+  "shots": [
+    {
+      "id": "shot-1",
+      "start_s": 0,
+      "end_s": 5
+    },
+    {
+      "id": "shot-2",
+      "start_s": 5,
+      "end_s": 10
+    },
+    {
+      "id": "shot-3",
+      "start_s": 10,
+      "end_s": 15
+    },
+    {
+      "id": "shot-4",
+      "start_s": 15,
+      "end_s": 20
+    },
+    {
+      "id": "shot-5",
+      "start_s": 20,
+      "end_s": 25
+    },
+    {
+      "id": "shot-6",
+      "start_s": 25,
+      "end_s": 30
+    }
+  ],
+  "lines": [
+    {
+      "shot_id": "shot-2",
+      "speaker": "iris",
+      "start_s": 5.2,
+      "length_s": 2.1,
+      "audio": "/media/out/line-1.wav",
+      "wave": []
+    },
+    {
+      "shot_id": "shot-3",
+      "speaker": "iris",
+      "start_s": 10.2,
+      "length_s": 1.8,
+      "audio": "/media/out/line-2.wav"
+    },
+    {
+      "shot_id": "shot-5",
+      "speaker": "iris",
+      "start_s": 20.2,
+      "length_s": 2.3,
+      "audio": "/media/out/line-3.wav"
+    }
+  ]
+}
