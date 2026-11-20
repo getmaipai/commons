@@ -1,3 +1,7 @@
+## [spec-v0.1.466] - 2026-11-20
+
+- Model pack: a clip job may carry `reference_clip` rules (`max_people`, `face_gate`, `clip_face_low`, `clip_face_frames`, `redraws`, `seconds`), the numbers of the reference clip and its face checks. Video receipt: optional `face_check` (gate and low echo, first-picture score and pass per placed person with the re-draw count, clip median and low flag per person), by position only, no pictures or names (VF-REFCLIP-01, VF-FACE-ROLE-01).
+
 ## [spec-v0.1.464] - 2026-11-20
 
 - `studio` takes an optional `export_placement` (`top` default, `auto`, `bottom`): where the export actions sit. `bottom` always uses a sticky bottom bar above the phone's bottom bar, `auto` uses it below the lg breakpoint only, `top` keeps today's layout (VIDEO-KIT-01, VF-EDIT-01).

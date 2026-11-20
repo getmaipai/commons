@@ -694,6 +694,60 @@
                 "prompt_format"
               ]
             }
+          },
+          "reference_clip": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "max_people": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "face_gate": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "clip_face_low": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "clip_face_frames": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "redraws": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "seconds": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "min": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "max": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                },
+                "required": [
+                  "min",
+                  "max"
+                ]
+              }
+            },
+            "required": [
+              "max_people",
+              "face_gate",
+              "clip_face_low",
+              "clip_face_frames",
+              "redraws",
+              "seconds"
+            ]
           }
         },
         "required": [

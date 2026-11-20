@@ -51,5 +51,13 @@ export const StackVideoReceipt = z.object({
   take_of: text.optional(),
   // VF-MINOR-RECIPE-01: the recipe that wrote the prompt, by id and version (never its text).
   recipe: z.object({ id: text, version: text }).strict().optional(),
+  // VF-FACE-ROLE-01: a reference clip's face checks, by role and position only (no pictures, no names). `first_picture`: each placed person's face against their own photo, with the
+  // re-draw count used; `clip`: the per-person median over the sampled frames and whether it fell below the pack's low flag. `gate`/`low` echo the pack numbers the checks used.
+  face_check: z.object({
+    gate: z.number().min(0).max(1),
+    low: z.number().min(0).max(1),
+    first_picture: z.object({ redraws: z.number().int().min(0), people: z.array(z.object({ index: z.number().int().min(0), score: z.number().nullable(), pass: z.boolean() }).strict()) }).strict().optional(),
+    clip: z.object({ frames: z.number().int().min(0), people: z.array(z.object({ index: z.number().int().min(0), median: z.number().nullable(), low: z.boolean() }).strict()) }).strict().optional(),
+  }).strict().optional(),
 }).strict();
 export type StackVideoReceipt = z.infer<typeof StackVideoReceipt>;

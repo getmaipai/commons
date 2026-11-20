@@ -69,6 +69,19 @@ export const StackLevelRecipe = z.object({
 }).strict();
 export type StackLevelRecipe = z.infer<typeof StackLevelRecipe>;
 
+// VF-FACE-ROLE-01: the numbers of the reference clip and its face checks, as pack data (the Stack's face measure is SFace cosine, so the numbers belong to the pack, rule E7).
+// `max_people` people are placed in the first picture; `face_gate` is the lowest cosine a placed face may score against its own photo; `clip_face_low` is the clip's per-person
+// median below which the receipt flags the clip; `clip_face_frames` is how many frames of the finished clip are measured; `redraws` bounds the first-picture re-draw loop.
+export const StackReferenceClipRules = z.object({
+  max_people: z.number().int().min(1),
+  face_gate: z.number().min(0).max(1),
+  clip_face_low: z.number().min(0).max(1),
+  clip_face_frames: z.number().int().min(1),
+  redraws: z.number().int().min(0),
+  seconds: z.object({ min: z.number().positive(), max: z.number().positive() }).strict(),
+}).strict();
+export type StackReferenceClipRules = z.infer<typeof StackReferenceClipRules>;
+
 const PackJob = z.object({
   job: StackJobName,
   limits: z.object({ ...StackJobLimitsBase, steps_fixed: z.boolean().optional() }).strict(),
@@ -77,6 +90,7 @@ const PackJob = z.object({
   recipe: text,
   adapter: text.optional(),
   profiles: z.array(StackLevelRecipe).optional(),
+  reference_clip: StackReferenceClipRules.optional(),
   peaks: z.array(z.object({ shape: StackJobShape.optional(), level: StackJobLevel.optional(), bytes: z.number().int().min(0), status: z.enum(["measured", "unverified"]), measured_on: text.optional() }).strict()),
 }).strict();
 

@@ -498,6 +498,108 @@
         "id",
         "version"
       ]
+    },
+    "face_check": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "gate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "low": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "first_picture": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "redraws": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "people": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "index": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "score": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "pass": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "index",
+                  "score",
+                  "pass"
+                ]
+              }
+            }
+          },
+          "required": [
+            "redraws",
+            "people"
+          ]
+        },
+        "clip": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "frames": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "people": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "index": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "median": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "low": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "index",
+                  "median",
+                  "low"
+                ]
+              }
+            }
+          },
+          "required": [
+            "frames",
+            "people"
+          ]
+        }
+      },
+      "required": [
+        "gate",
+        "low"
+      ]
     }
   },
   "required": [
