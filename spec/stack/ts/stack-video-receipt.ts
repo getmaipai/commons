@@ -47,5 +47,7 @@ export const StackVideoReceipt = z.object({
   prompt: z.object({ bytes: count, sha256: sha, writer: z.object({ id: text, version: text }).strict().optional(), hints: z.array(text).optional() }).strict(),
   // VF-ROUTE-01: the route the Stack chose for a generic-door clip and why (additive; absent on the legacy door).
   route: z.object({ name: text, reason: text }).strict().optional(),
+  // VF-TAKES-01: the first take this clip is another take of (a sibling link; the first take is never overwritten).
+  take_of: text.optional(),
 }).strict();
 export type StackVideoReceipt = z.infer<typeof StackVideoReceipt>;

@@ -312,6 +312,22 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 120
+        },
+        "operation": {
+          "type": "string",
+          "enum": [
+            "retake_from",
+            "extend",
+            "enhance"
+          ]
+        },
+        "at_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "take_of": {
+          "type": "string",
+          "minLength": 1
         }
       },
       "required": [
