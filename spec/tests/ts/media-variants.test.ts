@@ -78,7 +78,7 @@ describe("media shelf library additions (VIDEO-UI-05, K12)", () => {
 
 describe("media variants package conformance", () => {
   const contributes: AppContributes = { pages: [{ id: "index", module: "index" }], data: [{ id: "items", rows: "list" }] };
-  const check = (row_actions: unknown[]) => checkAppPackage("music", contributes, () => ({ type: "page", body: [{ ...shelf, row_actions }] }));
+  const check = (row_actions: unknown[]) => checkAppPackage("music", contributes, () => ({ type: "page", body: [{ ...shelf, orientation: "vertical", row_actions }] }));
 
   test("row actions allow play and own-package calls, like on_select", () => {
     expect(check([play, save])).toEqual([]);
