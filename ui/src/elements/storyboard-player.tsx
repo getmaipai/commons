@@ -32,6 +32,11 @@ export interface StoryboardShot {
   clip?: string;
   /** `ready` (default), `no_picture` (calm placeholder) or `changing` (the picture is being redone). */
   status?: StoryboardShotStatus;
+  framing?: string;
+  place?: string;
+  roomSound?: string;
+  changedBy?: string;
+  reading?: { index: number; count: number };
   line?: StoryboardLine;
 }
 
@@ -76,6 +81,8 @@ export interface StoryboardPlayerProps {
   shots: readonly StoryboardShot[];
   /** A bed track (music or room sound) that plays under the whole storyboard. */
   bedSrc?: string;
+  affectedShotIds?: string[];
+  note?: string;
   /** The selected shot id. Leave it out and the player keeps its own. */
   value?: string;
   onValueChange?: (shotId: string) => void;
@@ -138,7 +145,7 @@ function followClock(el: HTMLMediaElement | null, offset: number, playing: boole
 }
 
 /** A storyboard that plays: stills (or clips) for their length, a voice line per shot, an optional bed, a scrub bar with a tick at each shot, and a strip of shots. */
-export function StoryboardPlayer({ shots, bedSrc, value, onValueChange, onTimeChange, loading = false, labels, className }: StoryboardPlayerProps) {
+export function StoryboardPlayer({ shots, bedSrc, affectedShotIds, note, value, onValueChange, onTimeChange, loading = false, labels, className }: StoryboardPlayerProps) {
   const text = { ...defaultStoryboardLabels(), ...labels };
   const starts = useMemo(() => {
     let at = 0;
@@ -309,6 +316,7 @@ export function StoryboardPlayer({ shots, bedSrc, value, onValueChange, onTimeCh
         ) : (
           <p className="text-base text-[var(--muted-foreground)]">{shot?.caption}</p>
         )}
+        {note ? <p data-slot="storyboard-note" className="text-sm text-[var(--muted-foreground)]">{note}</p> : null}
       </div>
 
       <div className="flex items-center gap-3">
@@ -357,7 +365,7 @@ export function StoryboardPlayer({ shots, bedSrc, value, onValueChange, onTimeCh
       <ol ref={strip} data-slot="storyboard-strip" aria-label={text.shots} className="m-0 flex list-none snap-x gap-3 overflow-x-auto p-0 pb-2">
         {shots.map((item, i) => {
           const selected = i === index;
-          const itemStatus = item.status ?? "ready";
+          const itemStatus = affectedShotIds?.includes(item.id) ? "changing" : item.status ?? "ready";
           const length = safeDuration(item);
           const done = selected && length > 0 ? Math.min(1, Math.max(0, (time - starts[i]!) / length)) : 0;
           return (
@@ -384,6 +392,7 @@ export function StoryboardPlayer({ shots, bedSrc, value, onValueChange, onTimeCh
                 <span className="flex h-5 items-center gap-1 px-1 text-[var(--primary)]">
                   {item.line?.wave && item.line.wave.length > 0 ? <Wave wave={item.line.wave} /> : item.line ? <MicIcon data-slot="storyboard-line-marker" className="size-3.5" aria-hidden /> : null}
                 </span>
+                {item.framing || item.place ? <span data-slot="storyboard-shot-context" className="max-w-full truncate px-1 text-xs text-[var(--muted-foreground)]">{[item.framing, item.place].filter(Boolean).join(" · ")}</span> : null}
               </button>
             </li>
           );

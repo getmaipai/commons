@@ -34,6 +34,22 @@ describe("storyboard_player node", () => {
     expect(StoryboardPlayerNodeSchema.safeParse({ ...parsed, item_fields: { ...fields, line_text: "t" } }).success).toBe(false);
     expect(StoryboardPlayerNodeSchema.safeParse({ ...parsed, item_fields: { ...fields, line_audio: "a" } }).success).toBe(false);
     expect(StoryboardPlayerNodeSchema.safeParse({ ...parsed, item_fields: fields }).success).toBe(true);
+    expect(StoryboardPlayerNodeSchema.safeParse({ ...parsed, item_fields: { ...fields, reading_index: "reading.index" } }).success).toBe(false);
+    expect(StoryboardPlayerNodeSchema.safeParse({ ...parsed, item_fields: { ...fields, reading_index: "reading.index", reading_count: "reading.count" } }).success).toBe(true);
+  });
+
+  test("maps optional storyboard metadata and first-row note and affected ids", async () => {
+    const richRows = [shot("s1", "Juniper opens the gate", 6, { framing: "Wide", place: "Kitchen", room: { sound: "Rain" }, changed_by: "Mira", reading: { index: 2, count: 5 }, bed: { url: "/bed.mp3", note: "Soft room tone" }, edit: { note: "Adjusted the doorway." , affected: ["s1"] } })];
+    const base = node();
+    hub({ shots: richRows });
+    const view = mountBlock(node({
+      item_fields: { ...(base.type === "storyboard_player" ? base.item_fields : {}), framing: "framing", place: "place", room_sound: "room.sound", changed_by: "changed_by", reading_index: "reading.index", reading_count: "reading.count" },
+      note: "edit.note", affected: "edit.affected",
+    }));
+    await view.findByText("Adjusted the doorway.");
+    expect(view.getByText("Wide · Kitchen")).toBeTruthy();
+    expect(view.container.querySelector('[data-slot="storyboard-strip"] li button')?.className).toContain("border-[var(--primary)]");
+    expect(view.container.querySelector('audio[src="/bed.mp3"]')).toBeTruthy();
   });
 
   test("draws one strip item per shot, the first shot's words and length, and the bed", async () => {

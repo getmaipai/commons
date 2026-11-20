@@ -715,7 +715,7 @@ describe("UI-BLOCKS-01: storyboard_player, action_bar, proposal_card, voice_line
     const item_fields = { shot_id: "id", caption: "c", duration_sec: "s", still: "p", status: "st" };
     const node = { type: "storyboard_player", bind, item_fields, loading_text: "Loading", empty_state };
     expect(validate(node)).toBe(true);
-    const full = { ...node, item_fields: { ...item_fields, clip: "k", line_speaker: "a", line_text: "b", line_start_sec: "c", line_audio: "d", line_wave: "e" }, bed: "bed.url", selected: "shot", on_select: { navigate: { to: "/y", state: { shot: "{shot_id}" } } } };
+    const full = { ...node, item_fields: { ...item_fields, clip: "k", line_speaker: "a", line_text: "b", line_start_sec: "c", line_audio: "d", line_wave: "e", framing: "framing", place: "place", room_sound: "sound", changed_by: "editor", reading_index: "reading.index", reading_count: "reading.count" }, bed: "bed.url", bed_note: "bed.note", note: "edit.note", affected: "edit.affected", selected: "shot", on_select: { navigate: { to: "/y", state: { shot: "{shot_id}" } } } };
     expect(validate(full)).toBe(true);
     refused(node, [
       { bind: { source: "route", path: "/api/shots" } },
@@ -738,9 +738,11 @@ describe("UI-BLOCKS-01: storyboard_player, action_bar, proposal_card, voice_line
 
   test("storyboard_shot_row: status is ready, no_picture or changing, and a shot has a positive length", () => {
     const shot = row("storyboard_shot_row");
-    const ok = { shot_id: "s1", caption: "Juniper opens the gate", duration_sec: 4, status: "ready", still: "/media/a.jpg", clip: null, line_speaker: "Juniper", line_text: "Come in.", line_start_sec: 0.5, line_audio: "/media/a.wav", line_wave: [0.1, 0.8] };
+    const ok = { shot_id: "s1", caption: "Juniper opens the gate", duration_sec: 4, status: "ready", still: "/media/a.jpg", clip: null, framing: "wide", place: "Kitchen", room_sound: "Rain", changed_by: "Mira", reading_index: 2, reading_count: 5, line_speaker: "Juniper", line_text: "Come in.", line_start_sec: 0.5, line_audio: "/media/a.wav", line_wave: [0.1, 0.8] };
     expect(shot(ok)).toBe(true);
     for (const status of ["no_picture", "changing"]) expect(shot({ ...ok, status })).toBe(true);
+    expect(shot({ shot_id: "s1", caption: "Only required row fields", duration_sec: 1, status: "ready" })).toBe(true);
+    expect(shot({ ...ok, reading_count: undefined })).toBe(false);
     for (const bad of [{ status: "done" }, { status: undefined }, { duration_sec: 0 }, { duration_sec: "4" }, { line_start_sec: -1 }, { line_wave: [-1] }, { shot_id: "" }]) expect(shot({ ...ok, ...bad })).toBe(false);
   });
 

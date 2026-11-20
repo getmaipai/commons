@@ -1,3 +1,7 @@
+## [spec-v0.1.442] - 2026-11-20
+
+- UI schema additions (VIDEO-KIT-01), all additive: new blocks `job_progress` (bound per-shot rows: id, label, state queued|running|done|held|failed, progress, eta seconds, thumb, note, held reason, failure message and actions; shared file `spec/fixtures/job-progress-shots/valid-five-shots.json`) and `clip_compare` (before and after, side by side or wipe); `retake_from` on the player action list; `time` per level and `facts` on the quality choice; `facts` and `variant: "display"` on `creation_header`; optional storyboard_player row keys `framing`, `place`, `room_sound`, `changed_by`, `reading_index` and `reading_count`, and block paths `bed_note`, `note` and `affected`.
+
 ## [spec-v0.1.441] - 2026-11-20
 
 - `media_stage` (VIDEO-KIT-01): a pill and an error action may carry `starts: "video" | "picture"` (disabled with the host's one making-notice line while that kind is not ready); a pill takes an optional `states` list (by default pills are not drawn in `waiting`, `loading` or `error`); `aspect` (`wide`, `standard`, `short`) sets the stage shape. Additive.

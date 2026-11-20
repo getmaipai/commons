@@ -109,6 +109,20 @@ describe("StoryboardPlayer", () => {
     expect(getByRole("status").textContent).toBe("Changing this shot");
   });
 
+  test("optional shot context truncates into a calm strip line; affected ids use the changing look and note sits under the caption", () => {
+    const extended = [
+      { id: "a", caption: "A caption", durationSec: 3, framing: "Wide", place: "Kitchen" },
+      { id: "b", caption: "Another", durationSec: 3 },
+    ];
+    const { container, getByText } = render(<StoryboardPlayer shots={extended} affectedShotIds={["b"]} note="One sentence after the edit." />);
+    expect(getByText("Wide · Kitchen")).toBeTruthy();
+    expect(container.querySelector('[data-slot="storyboard-shot-context"]')?.className).toContain("truncate");
+    expect(getByText("One sentence after the edit.")).toBeTruthy();
+    expect(container.querySelectorAll('[data-slot="storyboard-strip"] img').length).toBe(0);
+    expect(container.querySelectorAll('[data-slot="storyboard-strip"] [data-slot="storyboard-no-picture"]').length).toBe(0);
+    expect(container.querySelectorAll('[data-slot="storyboard-strip"] li')[1]?.querySelector("button")?.textContent).toContain("2");
+  });
+
   test("loading draws a skeleton and no controls", () => {
     const { getByRole, queryByRole } = render(<StoryboardPlayer shots={shots} loading />);
     expect(getByRole("status", { name: "Loading the storyboard" }).getAttribute("aria-busy")).toBe("true");

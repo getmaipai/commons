@@ -29,6 +29,8 @@ function shotOf(row: Row, f: StoryboardPlayerNode["item_fields"]): StoryboardSho
   const speaker = f.line_speaker ? str(readField(row, f.line_speaker)) : undefined;
   const words = f.line_text ? str(readField(row, f.line_text)) : undefined;
   const wave = f.line_wave ? readField(row, f.line_wave) : undefined;
+  const readingIndex = f.reading_index ? num(readField(row, f.reading_index)) : undefined;
+  const readingCount = f.reading_count ? num(readField(row, f.reading_count)) : undefined;
   return {
     id: String(id),
     caption: String(readField(row, f.caption) ?? ""),
@@ -36,6 +38,11 @@ function shotOf(row: Row, f: StoryboardPlayerNode["item_fields"]): StoryboardSho
     still,
     clip: f.clip ? localPicture(readField(row, f.clip)) ?? undefined : undefined,
     status,
+    framing: f.framing ? str(readField(row, f.framing)) : undefined,
+    place: f.place ? str(readField(row, f.place)) : undefined,
+    roomSound: f.room_sound ? str(readField(row, f.room_sound)) : undefined,
+    changedBy: f.changed_by ? str(readField(row, f.changed_by)) : undefined,
+    reading: readingIndex !== undefined && readingCount !== undefined ? { index: readingIndex, count: readingCount } : undefined,
     line: speaker && words
       ? {
           speaker,
@@ -59,6 +66,9 @@ export function StoryboardPlayerNodeView({ node, state }: { node: StoryboardPlay
   const rows = Array.isArray(query.data) ? query.data : EMPTY;
   const shots = useMemo(() => rows.flatMap((row) => { const shot = shotOf(row, f); return shot ? [shot] : []; }), [rows, f]);
   const bed = node.bed && rows[0] ? localPicture(readField(rows[0], node.bed)) ?? undefined : undefined;
+  const note = node.note && rows[0] ? str(readField(rows[0], node.note)) : undefined;
+  const affectedValue = node.affected && rows[0] ? readField(rows[0], node.affected) : undefined;
+  const affectedShotIds = Array.isArray(affectedValue) ? affectedValue.filter((id): id is string => typeof id === "string") : undefined;
 
   // A person is "touching" the player from a press or key down until a moment after the release (a click follows its pointer up). A shot
   // change in that window is a pick; any other shot change is playback moving on, which must not write the state or fire `on_select`.
@@ -116,7 +126,7 @@ export function StoryboardPlayerNodeView({ node, state }: { node: StoryboardPlay
         onClickCapture={() => { hold(); letGo(); }}
       >
         {/* A fresh player once the shots arrive: the kit starts on `value` only at mount. */}
-        <StoryboardPlayer key={loading ? "loading" : "ready"} shots={shots} bedSrc={bed} value={value} onValueChange={onShot} loading={loading} labels={{ loading: node.loading_text }} />
+        <StoryboardPlayer key={loading ? "loading" : "ready"} shots={shots} bedSrc={bed} affectedShotIds={affectedShotIds} note={note} value={value} onValueChange={onShot} loading={loading} labels={{ loading: node.loading_text }} />
       </div>
       {lastError ? <p role="alert" className="text-destructive px-4 text-sm">{lastError}</p> : null}
       {pendingConfirm ? <ConfirmDialog pendingConfirm={pendingConfirm} /> : null}

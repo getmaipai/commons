@@ -891,13 +891,24 @@ export const StoryboardPlayerNodeSchema = z.object({
       line_start_sec: FieldPathSchema.optional(),
       line_audio: FieldPathSchema.optional(),
       line_wave: FieldPathSchema.optional(),
+      framing: FieldPathSchema.optional(),
+      place: FieldPathSchema.optional(),
+      room_sound: FieldPathSchema.optional(),
+      changed_by: FieldPathSchema.optional(),
+      reading_index: FieldPathSchema.optional(),
+      reading_count: FieldPathSchema.optional(),
     })
     .strict()
     .refine(
       (f) => (f.line_speaker === undefined) === (f.line_text === undefined) && (f.line_text !== undefined || (f.line_start_sec === undefined && f.line_audio === undefined && f.line_wave === undefined)),
       "line_speaker and line_text come together, and the other line_* paths need them",
-    ),
+    )
+    // reading index and count are supplied as a pair.
+    .refine((f) => (f.reading_index === undefined) === (f.reading_count === undefined), "reading_index and reading_count come together"),
   bed: FieldPathSchema.optional(),
+  bed_note: FieldPathSchema.optional(),
+  note: FieldPathSchema.optional(),
+  affected: FieldPathSchema.optional(),
   selected: StateNameSchema.optional(),
   on_select: ActionSchema.optional(),
   loading_text: z.string().min(1).max(120),
