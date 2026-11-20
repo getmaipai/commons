@@ -1,3 +1,7 @@
+## [spec-v0.1.451] - 2026-11-20
+
+- `job_progress` and `clip_compare` are allowed on a package page (VIDEO-KIT-01): `job_progress` takes the same binding, field-path and action checks as the other data-driven blocks (a failed shot's own actions come from the server at runtime and are not checked statically); `clip_compare` media addresses are field paths. `job_progress` takes an optional `poll_while` (`field`, `values`) that refreshes it while any row is still queued, running or held. A new test keeps the schema's node union reconciled with the package-page allowlist: a block must be allowed or sit in an explicit exclusions list with a reason.
+
 ## [spec-v0.1.444] - 2026-11-20
 
 - `media.rough_cut` request: optional `caption` per shot (1 to 200 characters), the words shown for the whole shot when it has no voiced line, so Home can ask for the silent animatic. Additive.

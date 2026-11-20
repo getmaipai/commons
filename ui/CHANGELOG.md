@@ -1,3 +1,7 @@
+## [ui-v0.5.704] - 2026-11-20
+
+- `job_progress` refreshes itself with `poll_while` (spec 0.1.451); a bound `action_bar` draws nothing once its data answers with an empty list (it showed an enabled primary button with no reason); `job_progress` and `media_stage` draw no row-dependent controls (cancel, pills, error actions) for an empty answer. Empty answers: `storyboard_player` draws its empty state, `proposal_card` and `voice_line` draw nothing, `clip_compare` draws only when both clips resolve.
+
 ## [ui-v0.5.703] - 2026-11-20
 
 - Settings landmarks (A11Y-DEBT-01): a settings group drawn by `SettingsRenderer` is a named `role="group"` (it was a `<section>` region that repeated the name of the pane around it, which failed the audit's landmark-unique check), and the docked settings pane drops its own name when it equals the area's. No visible change.

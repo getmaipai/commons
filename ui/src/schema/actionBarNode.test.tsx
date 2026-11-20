@@ -31,6 +31,13 @@ describe("action_bar node", () => {
     expect(view.container.querySelector('[data-slot="action-bar"]')?.hasAttribute("data-sticky")).toBe(true);
   });
 
+  test("an answered empty list draws nothing", async () => {
+    hub({ "render-plan": [] });
+    const view = mountBlock(node(), { state: { film: "f1", ready: true } });
+    await waitFor(() => expect((globalThis.fetch as unknown as { mock: { calls: unknown[] } }).mock.calls.length).toBeGreaterThan(0));
+    expect(view.container.querySelector('[data-slot="action-bar"]')).toBeNull();
+  });
+
   test("the page's params reach the data call", async () => {
     hub({ "render-plan": plan });
     const view = mountBlock(node(), { state: { film: "f1", ready: true } });

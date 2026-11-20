@@ -23,6 +23,7 @@ function BoundActionBar({ node, state, bind }: { node: ActionBarNode; state: Row
   if (query.data === undefined && query.isError) {
     return <AsyncState data={null} error isFetching={query.isFetching} onRetry={() => query.refetch()} errorLayout="row">{() => null}</AsyncState>;
   }
+  if (Array.isArray(query.data) && query.data.length === 0) return null;
   const row = Array.isArray(query.data) ? query.data[0] : undefined;
   // While the first answer is on its way the reason is not known, so the primary action waits.
   return <Bar node={node} state={state} row={row} waiting={query.data === undefined} />;

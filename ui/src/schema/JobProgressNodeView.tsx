@@ -1,8 +1,10 @@
+import { useEffect } from "react";
 import { JobProgress } from "@/kit/elements/job-progress";
 import { useBinding } from "@/kit/schema/binding";
 import { useDispatchAction } from "@/kit/schema/actions";
 import { readField } from "@/kit/schema/fieldPath";
 import { localPicture } from "@/kit/schema/mediaPath";
+import { FEED_POLL_INTERVAL_MS } from "@/kit/schema/feedPolling";
 import type { JobProgressNode } from "@/kit/schema/types";
 
 type Row = Record<string, unknown>;
@@ -14,9 +16,26 @@ const rf = (row: Row, path: string | undefined): unknown => (path ? readField(ro
 
 export function JobProgressNodeView({ node, state }: { node: JobProgressNode; state: Row }) {
   const query = useBinding<Row[]>(node.bind, state);
+  const refetchQuery = query.refetch;
   const { dispatch } = useDispatchAction();
   const fields = node.item_fields;
   const rows = Array.isArray(query.data) ? query.data : [];
+  const isRunning = Boolean(node.poll_while && rows.some((row) => node.poll_while!.values.includes(String(readField(row, node.poll_while!.field) ?? ""))));
+  useEffect(() => {
+    if (!isRunning) return;
+    let alive = true;
+    let busy = false;
+    const refetch = async () => {
+      if (!alive || busy || document.visibilityState === "hidden") return;
+      busy = true;
+      try { if (alive) await refetchQuery(); } finally { busy = false; }
+    };
+    const timer = window.setInterval(() => void refetch(), FEED_POLL_INTERVAL_MS);
+    const onVisibility = () => { if (document.visibilityState === "visible") void refetch(); };
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => { alive = false; window.clearInterval(timer); document.removeEventListener("visibilitychange", onVisibility); };
+  }, [isRunning, refetchQuery]);
+  if (Array.isArray(query.data) && query.data.length === 0) return null;
   const shots = rows.flatMap((row) => {
     const id = rf(row, fields.shot_id);
     if ((typeof id !== "string" || !id) && typeof id !== "number") return [];

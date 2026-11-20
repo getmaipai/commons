@@ -87,7 +87,8 @@ export const ProgressNodeSchema = z.object({
 });
 export type ProgressNode = z.infer<typeof ProgressNodeSchema>;
 
-export const JobProgressNodeSchema = z.object({ type: z.literal("job_progress"), bind: BindingSchema, item_fields: z.object({ shot_id: z.string().min(1), label: z.string().min(1), state: z.string().min(1), progress: z.string().min(1).optional(), eta_seconds: z.string().min(1).optional(), thumb: z.string().min(1).optional(), note: z.string().min(1).optional(), held_reason: z.string().min(1).optional(), failure_message: z.string().min(1).optional(), failure_actions: z.string().min(1).optional() }).strict(), title: z.string().min(1).optional(), overall_eta_seconds: z.string().min(1).optional(), cancel: ActionSchema.optional() }).strict();
+export const PollWhileFieldSchema = z.object({ field: z.string().min(1), values: z.array(z.string().min(1)).min(1) }).strict();
+export const JobProgressNodeSchema = z.object({ type: z.literal("job_progress"), bind: BindingSchema, poll_while: PollWhileFieldSchema.optional(), item_fields: z.object({ shot_id: z.string().min(1), label: z.string().min(1), state: z.string().min(1), progress: z.string().min(1).optional(), eta_seconds: z.string().min(1).optional(), thumb: z.string().min(1).optional(), note: z.string().min(1).optional(), held_reason: z.string().min(1).optional(), failure_message: z.string().min(1).optional(), failure_actions: z.string().min(1).optional() }).strict(), title: z.string().min(1).optional(), overall_eta_seconds: z.string().min(1).optional(), cancel: ActionSchema.optional() }).strict();
 export type JobProgressNode = z.infer<typeof JobProgressNodeSchema>;
 const SameOriginMediaPathSchema = z.string().regex(/^\/(?!\/)[^\\]*$|^blob:/);
 export const ClipCompareNodeSchema = z.object({ type: z.literal("clip_compare"), before: z.object({ src: SameOriginMediaPathSchema, kind: z.enum(["video", "image"]), label: z.string().optional(), poster: SameOriginMediaPathSchema.optional() }).strict(), after: z.object({ src: SameOriginMediaPathSchema, kind: z.enum(["video", "image"]), label: z.string().optional(), poster: SameOriginMediaPathSchema.optional() }).strict(), mode: z.enum(["side_by_side", "wipe"]).default("side_by_side"), mode_state: z.string().min(1).optional() }).strict();
@@ -223,8 +224,6 @@ export const ReorderSchema = z.object({
 export type ReorderSpec = z.infer<typeof ReorderSchema>;
 
 /** Row-field condition shared by nodes that refetch a complete bound collection while work is active. */
-export const PollWhileFieldSchema = z.object({ field: z.string().min(1), values: z.array(z.string().min(1)).min(1) }).strict();
-
 export const MediaShelfNodeSchema = z.object({
   type: z.literal("media_shelf"),
   heading: z.string().min(1).max(60).optional(),

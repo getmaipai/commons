@@ -37,14 +37,14 @@ export function MediaStageNodeView({ node, state, renderChild }: { node: MediaSt
   const progress = row && node.progress ? readField(row, node.progress) : undefined;
 
   const notice = (starts: Starts | undefined) => starts ? host?.makingNotice?.(starts) ?? undefined : undefined;
-  const pills: MediaStagePill[] | undefined = node.pills?.map((pill, i) => { const reason = notice(pill.starts); return { id: String(i), label: pill.label, icon: pill.icon, starts: pill.starts, states: pill.states, disabledReason: reason, disabled: Boolean(reason), onSelect: () => dispatch(pill.action, [row ?? {}]) }; });
-  const errorActions = node.error_actions && node.error_actions.length > 0 ? (
+  const pills: MediaStagePill[] | undefined = row ? node.pills?.map((pill, i) => { const reason = notice(pill.starts); return { id: String(i), label: pill.label, icon: pill.icon, starts: pill.starts, states: pill.states, disabledReason: reason, disabled: Boolean(reason), onSelect: () => dispatch(pill.action, [row]) }; }) : undefined;
+  const errorActions = row && node.error_actions && node.error_actions.length > 0 ? (
     <>
       {node.error_actions.map((button, i) => {
         const Icon = button.icon ? getIcon(button.icon) : null;
         const reason = notice(button.starts);
         return (
-          <Button key={i} type="button" variant={i === 0 ? "default" : "outline"} className="min-h-12" disabled={Boolean(reason)} title={reason} onClick={() => dispatch(button.action, [row ?? {}])}>
+          <Button key={i} type="button" variant={i === 0 ? "default" : "outline"} className="min-h-12" disabled={Boolean(reason)} title={reason} onClick={() => dispatch(button.action, [row])}>
             {Icon ? <Icon aria-hidden className="size-4" /> : null}
             {button.label}
           </Button>

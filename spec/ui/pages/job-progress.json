@@ -9,6 +9,7 @@
         "source": "package",
         "path": "shots"
       },
+      "poll_while": { "field": "state", "values": ["queued", "running", "held"] },
       "title": "Juniper's film",
       "overall_eta_seconds": "overall_eta_seconds",
       "item_fields": {

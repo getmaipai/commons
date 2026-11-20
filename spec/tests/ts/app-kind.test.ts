@@ -4,7 +4,7 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { PackageManifest } from "../../gen/ts/manifest.js";
-import { checkAppPackage, type AppContributes } from "../../ui/app-check.js";
+import { checkAppPackage, PACKAGE_PAGE_NODE_TYPES, type AppContributes } from "../../ui/app-check.js";
 
 const BASE = {
   id: "weather", version: "0.1.0", kind: "plugin", category: "Info", display: "Weather", description: "A minimal manifest for app tests.",
@@ -553,5 +553,33 @@ describe("UI-BLOCKS-01: the five new blocks on a package page", () => {
     expect(check("videos", ["stage"], only(badChild)).join("\n")).toContain("prompt_bar.submit: call.target");
     const foreignChild = { ...stage, children: [{ type: "widget_card", bind: { source: "route", path: "/x" } }] };
     expect(check("videos", ["stage"], only(foreignChild)).join("\n")).toContain('node type "widget_card" is not allowed');
+  });
+});
+
+describe("VIDEO-KIT-01 package page blocks", () => {
+  const data: AppContributes = { pages: [{ id: "index", kind: "schema", module: "m" }], data: [{ id: "shots", rows: "list" }, { id: "blocks" }] };
+  const page = (block: unknown) => ({ type: "page", id: "index", title: "Page", body: [block] });
+  const run = (block: unknown) => checkAppPackage("films", data, () => page(block)).join("\n");
+  const progress = { type: "job_progress", bind: { source: "package", path: "shots" }, item_fields: { shot_id: "id", label: "label", state: "state", failure_actions: "failure.actions" }, overall_eta_seconds: "overall.eta", poll_while: { field: "state", values: ["queued", "running"] }, cancel: { call: { target: "/api/plugins/films/cancel" } } };
+  const compare = { type: "clip_compare", before: { src: "before.url", kind: "video" }, after: { src: "/clips/after.mp4", kind: "video" } };
+  test("both nodes pass, with package row bindings and same-origin or field-path media", () => {
+    expect(run(progress)).toBe("");
+    expect(run(compare)).toBe("");
+    expect(run({ ...progress, bind: { source: "route", path: "/api/shots" } })).toContain('bind.source must be "package"');
+    expect(run({ ...progress, bind: { source: "package", path: "blocks" } })).toContain('must be a "rows": "list" entry');
+    expect(run({ ...progress, bind: { source: "package", path: "other" } })).toContain('bind.path "other" is not a contributes.data id');
+    expect(run({ ...progress, cancel: { navigate: { to: "/apps/elsewhere" } } })).toContain("must stay under /apps/films");
+    expect(run({ ...compare, before: { src: "http://example.test/a.mp4", kind: "video" } })).toContain("src must be a field path, not an address");
+  });
+  test("the node union stays reconciled with the package-page allowlist and explicit exclusions", () => {
+    const schema = JSON.parse(readFileSync(join(import.meta.dir, "..", "..", "ui", "schema.json"), "utf-8"));
+    const union = schema.oneOf.map((entry: { $ref: string }) => entry.$ref.split("/").at(-1) as string);
+    const defs = schema.$defs as Record<string, { properties?: { type?: { const?: string } } }>;
+    const excluded: Record<string, string> = {
+      page: "route wrapper, not a child block", section: "layout shell rendered only by root pages", message_thread: "host chat surface", settings_editor: "settings-only host surface", form: "legacy form shell rendered by host routes", card_grid: "reads host-owned entities", widget_card: "host widget integration", widget_row: "host widget integration", widget_tiles: "host widget integration",
+    };
+    const types = union.map((ref) => defs[ref]?.properties?.type?.const).filter((v): v is string => typeof v === "string");
+    for (const type of types) expect(PACKAGE_PAGE_NODE_TYPES.includes(type) || excluded[type]).toBeTruthy();
+    for (const type of ["storyboard_player", "action_bar", "proposal_card", "voice_line", "media_stage", "job_progress", "clip_compare"]) expect(PACKAGE_PAGE_NODE_TYPES).toContain(type);
   });
 });

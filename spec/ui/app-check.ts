@@ -20,7 +20,7 @@ export interface AppContributes { pages?: AppPageEntry[]; data?: AppDataEntry[];
  * (message_thread, settings_editor) is refused: a package page draws only its
  * own data, through the package nodes and the layout nodes. MEDIA-POLISH-01: a
  * split_view is a layout node; its children are checked like any other. */
-export const PACKAGE_PAGE_NODE_TYPES: readonly string[] = ["page", "section", "empty_state", "progress", "answer_blocks", "picker", "search", "detail_pane", "tabs", "list", "media_shelf", "billboard", "player", "reader", "split_view", "creation_header", "prompt_bar", "quick_tiles", "top_result", "category_tiles", "track_rows", "result_feed", "studio", "clip_feed", "image_editor", "storyboard_player", "action_bar", "proposal_card", "voice_line", "media_stage"];
+export const PACKAGE_PAGE_NODE_TYPES: readonly string[] = ["page", "section", "empty_state", "progress", "answer_blocks", "picker", "search", "detail_pane", "tabs", "list", "media_shelf", "billboard", "player", "reader", "split_view", "creation_header", "prompt_bar", "quick_tiles", "top_result", "category_tiles", "track_rows", "result_feed", "studio", "clip_feed", "image_editor", "storyboard_player", "action_bar", "proposal_card", "voice_line", "media_stage", "job_progress", "clip_compare"];
 
 /** The role ladder, highest first; a page's `min_role` may only sit at or above the package's. */
 export const ROLE_LADDER: readonly string[] = ["owner", "admin", "adult", "teen", "child", "guest"];
@@ -119,6 +119,19 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
     // ADULT-LOCK-01: the locked and making flags are paths.
     checkFieldPath(node.locked_field, `${where} media_shelf`, "locked_field", out);
     checkFieldPath(node.making_field, `${where} media_shelf`, "making_field", out);
+  }
+  if (type === "job_progress") {
+    checkBinding(node.bind, `${where} job_progress`, data, "list", out);
+    if (isObject(node.item_fields)) for (const [name, value] of Object.entries(node.item_fields)) checkFieldPath(value, `${where} job_progress.item_fields`, name, out);
+    checkFieldPath(node.overall_eta_seconds, `${where} job_progress`, "overall_eta_seconds", out);
+    checkAction(node.cancel, packageId, `${where} job_progress.cancel`, out);
+    // failure_actions contains runtime row action objects supplied by the server; their targets cannot be checked statically.
+  }
+  if (type === "clip_compare") {
+    for (const side of ["before", "after"] as const) if (isObject(node[side])) {
+      checkFieldPath(node[side].src, `${where} clip_compare.${side}`, "src", out);
+      checkFieldPath(node[side].poster, `${where} clip_compare.${side}`, "poster", out);
+    }
   }
   // MUSIC-KIT-01: the music page blocks draw the package's own rows; selecting and playing may hand an item to the host.
   if (type === "quick_tiles" || type === "top_result" || type === "category_tiles" || type === "track_rows") {

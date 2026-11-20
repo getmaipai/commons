@@ -349,15 +349,16 @@
     },
     "job_progress": {
       "type": "object", "additionalProperties": false, "required": ["type", "bind", "item_fields"],
-      "description": "VIDEO-KIT-01 (K7): JobProgress with bound shot rows. Each action in failure_actions is {label, action} and dispatches with its shot row.",
+      "description": "VIDEO-KIT-01 (K7): JobProgress with bound shot rows. Each failure_actions row is {label: string, action: a UI action object}, for example {\"label\":\"Retry\",\"action\":{\"call\":{\"target\":\"/api/films/shots/{id}/retry\",\"method\":\"POST\",\"args\":{\"reason\":\"retry\"}}}}; actions dispatch with their shot row. Optional poll_while refetches the bound list every 3 seconds while any row's dotted field has one of the listed values, and pauses while the page is hidden.",
       "properties": {
         "type": { "const": "job_progress" }, "bind": { "$ref": "#/$defs/binding" },
+        "poll_while": { "$ref": "#/$defs/poll_while_field" },
         "title": { "type": "string", "minLength": 1 }, "overall_eta_seconds": { "type": "string", "minLength": 1, "description": "Dotted path in the first bound row to the overall ETA in seconds." },
         "cancel": { "$ref": "#/$defs/action", "description": "Fired with the bound shot rows." },
         "item_fields": { "type": "object", "additionalProperties": false, "required": ["shot_id", "label", "state"], "properties": {
           "shot_id": { "type": "string" }, "label": { "type": "string" }, "state": { "type": "string", "description": "Dotted path to the shot state: queued, running, done, held or failed." },
           "progress": { "type": "string", "description": "Dotted path to a number from 0 to 1 (or 0 to 100)." }, "eta_seconds": { "type": "string" }, "thumb": { "type": "string", "description": "Same-origin image path." }, "note": { "type": "string" }, "held_reason": { "type": "string" }, "failure_message": { "type": "string" },
-          "failure_actions": { "type": "string", "description": "Dotted path to an optional array of {label, action}; actions dispatch with their shot row." }
+          "failure_actions": { "type": "string", "description": "Dotted path to an optional array of {label: string, action: UI action object}; actions dispatch with their shot row. Action call args may be literal values." }
         } }
       }
     },
@@ -367,6 +368,7 @@
       "properties": { "type": { "const": "clip_compare" }, "before": { "$ref": "#/$defs/clip_compare_side" }, "after": { "$ref": "#/$defs/clip_compare_side" }, "mode": { "type": "string", "enum": ["side_by_side", "wipe"], "default": "side_by_side" }, "mode_state": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 40 } }
     },
     "clip_compare_side": { "type": "object", "additionalProperties": false, "required": ["src", "kind"], "properties": { "src": { "type": "string", "minLength": 1, "description": "Same-origin address." }, "kind": { "type": "string", "enum": ["video", "image"] }, "label": { "type": "string" }, "poster": { "type": "string", "description": "Same-origin poster address." } } },
+    "poll_while_field": { "type": "object", "additionalProperties": false, "required": ["field", "values"], "properties": { "field": { "type": "string", "minLength": 1, "description": "Dotted field path in each row." }, "values": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } } } },
     "batch_action": {
       "type": "object",
       "additionalProperties": false,

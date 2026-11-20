@@ -284,6 +284,13 @@ describe("UI schema", () => {
     expect(validate({ ...shelf, poll_while: { field: "badge", values: [] } })).toBe(false);
     expect(validate({ ...shelf, poll_while: { statuses: ["queued"], record: { path: "recent" } } })).toBe(false);
   });
+  test("job_progress poll_while names a dotted row field and active values", () => {
+    const block = JSON.parse(readFileSync(join(import.meta.dir, "..", "..", "ui", "pages", "job-progress.json"), "utf-8")).body[0];
+    expect(validate(block)).toBe(true);
+    expect(validate({ ...block, poll_while: { field: "failure.state", values: ["running"] } })).toBe(true);
+    expect(validate({ ...block, poll_while: { field: "state", values: [] } })).toBe(false);
+    expect(validate({ ...block, poll_while: { statuses: ["running"] } })).toBe(false);
+  });
 
   test("player marks take bind, field and heading and reject unknown keys", () => {
     const player = { type: "player", bind: { source: "package", path: "item" } };

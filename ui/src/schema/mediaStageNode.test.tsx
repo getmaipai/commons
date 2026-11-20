@@ -21,6 +21,16 @@ const root = (view: ReturnType<typeof mount>) => view.container.querySelector('[
 const drawWithHost = (change: Record<string, unknown>, host: Partial<MediaHost>) => mountBlock(node(change), { state: { film: "f1" }, host: host as MediaHost });
 
 describe("media_stage node", () => {
+  test("an answered empty list keeps the composer but hides actions that need row data", async () => {
+    hub({ stage: [] });
+    const view = mount();
+    await waitFor(() => expect((globalThis.fetch as unknown as { mock: { calls: unknown[] } }).mock.calls.length).toBeGreaterThan(0));
+    await waitFor(() => expect(root(view)?.getAttribute("data-state")).toBe("idle"));
+    expect(view.queryByRole("button", { name: "Library" })).toBeNull();
+    expect(view.queryByRole("button", { name: "Share" })).toBeNull();
+    expect(view.container.querySelector('[data-slot="media-stage-composer"] textarea')).not.toBeNull();
+  });
+
   test("the example page parses (children are page nodes), and a stage with no children is fine", () => {
     const parsed = MediaStageNodeSchema.parse(node());
     expect((parsed as { children?: { type: string }[] }).children?.[0]?.type).toBe("prompt_bar");
