@@ -172,6 +172,7 @@ export function ResultFeedNodeView({ node, state }: { node: ResultFeedNode; stat
         key: `action-${i}`,
         label: fillTemplate(a.label, row),
         icon: a.icon,
+        group: a.group,
         when: a.when,
         starts: a.starts,
         disabledReason: notice(a.starts),

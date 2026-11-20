@@ -1,7 +1,7 @@
 // VIDEO-UI-04 (K9, K10): the result_feed node. A running entry follows its job without a reload (fake timers), a hidden tab
 // catches up when shown, and only running rows' own records are read.
 import { afterEach, beforeEach, describe, expect, jest, mock, test } from "bun:test";
-import { act, cleanup, fireEvent } from "@testing-library/react";
+import { act, cleanup, fireEvent, within } from "@testing-library/react";
 import { useState } from "react";
 import { MemoryRouter } from "react-router-dom";
 import { renderWithQueryClient } from "../../tests/renderWithQueryClient";
@@ -168,6 +168,13 @@ describe("result_feed entries", () => {
     expect(ResultFeedNodeSchema.safeParse({ ...(feed as object), actions: [...many, many[0]] }).success).toBe(false);
   });
 
+  test("actions accept an optional group of at most 40 characters", () => {
+    const action = { label: "Grouped", action: { call: { target: "/api/plugins/videos/actions/grouped" } } };
+    expect(ResultFeedNodeSchema.safeParse({ ...(feed as object), actions: [action] }).success).toBe(true);
+    expect(ResultFeedNodeSchema.safeParse({ ...(feed as object), actions: [{ ...action, group: "G".repeat(40) }] }).success).toBe(true);
+    expect(ResultFeedNodeSchema.safeParse({ ...(feed as object), actions: [{ ...action, group: "G".repeat(41) }] }).success).toBe(false);
+  });
+
   test("show_when only draws a row action for a truthy dotted field", async () => {
     server = [queued("a", { flags: { nsfw: true }, status: "failed" }), queued("b", { flags: { nsfw: false }, status: "failed" })];
     const node = { ...(feed as object), actions: [
@@ -179,6 +186,27 @@ describe("result_feed entries", () => {
     const actionLabels = Array.from(view.container.querySelectorAll('[data-slot="video-player-actions"] button')).map((button) => button.textContent);
     expect(actionLabels.filter((label) => label?.includes("Unmark as NSFW"))).toHaveLength(1);
     expect(actionLabels.some((label) => label?.includes("Mark as NSFW"))).toBe(false);
+  });
+
+  test("a grouped action dispatches its call with the row", async () => {
+    server = [{ ...queued("grouped"), status: "ready", src: "/grouped.mp4" }];
+    const node = { ...(feed as object), actions_inline: 0, actions: [
+      { label: "Fine tune", group: "Edit", action: { call: { target: "/api/plugins/videos/actions/tune", args: { id: "{id}" } } } },
+      { label: "Another", action: { call: { target: "/api/plugins/videos/actions/another", args: { id: "{id}" } } } },
+    ] } as unknown as UiNode;
+    const view = renderWithQueryClient(<Harness node={node} />);
+    await advance(0);
+    const menu = view.getByRole("button", { name: "More" });
+    fireEvent.pointerDown(menu, { button: 0, ctrlKey: false });
+    await act(async () => { await Promise.resolve(); });
+    await act(async () => { await Promise.resolve(); });
+    const submenu = [...document.body.querySelectorAll('[role="menuitem"]')].find((item) => item.textContent?.includes("Edit")) as HTMLElement;
+    expect(submenu).toBeTruthy();
+    fireEvent.keyDown(submenu, { key: "ArrowRight" });
+    const item = await within(document.body).findByText("Fine tune");
+    fireEvent.click(item);
+    await advance(0);
+    expect(calls.some((call) => call.url.endsWith("/actions/tune") && call.body.id === "grouped")).toBe(true);
   });
 
   test("words, tags, a Start frame chip and a day heading draw for each entry", async () => {

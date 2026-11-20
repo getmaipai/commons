@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, waitFor, within } from "@testing-library/react";
 import { VideoPlayer, type VideoPlayerAction } from "./video-player";
 
 afterEach(cleanup);
@@ -110,6 +110,43 @@ describe("VideoPlayer actionItems", () => {
     expect(items[2]!.textContent).toContain("Not ready yet.");
     fireEvent.click(items[1]!);
     expect(n).toBe(1);
+  });
+  test("grouped actions share one More submenu and keep starts and disabled reasons", async () => {
+    const view = render(<VideoPlayer status="ready" prompt="x" src="/v.mp4" actionsInline={0} actionItems={[
+      { label: "First", onSelect: noop },
+      { label: "Trim", group: "Edit", icon: "scissors", starts: "video", disabledReason: "Videos are not ready yet.", onSelect: noop },
+      { label: "Caption", group: "Edit", icon: "captions", onSelect: noop },
+      { label: "Last", onSelect: noop },
+    ]} />);
+    fireEvent.pointerDown(view.getByRole("button", { name: "More" }), { button: 0, ctrlKey: false });
+    const trigger = await waitFor(() => { const el = [...document.body.querySelectorAll('[role="menuitem"]')].find((item) => item.textContent?.includes("Edit")); expect(el).toBeTruthy(); return el as HTMLElement; });
+    expect(trigger.textContent).toContain("Edit");
+    fireEvent.keyDown(trigger, { key: "ArrowRight" });
+    await waitFor(() => expect(document.body.querySelectorAll('[role="menuitem"][data-starts="video"]')).toHaveLength(1));
+    expect(document.body.textContent).toContain("Videos are not ready yet.");
+    expect(document.body.querySelector('[role="menuitem"][data-starts="video"]')).toBeTruthy();
+    expect(view.container.querySelector('[data-slot="video-player-overlay-pills"] [aria-label="Trim"]')).toBeNull();
+  });
+  test("overlay pills: a grouped action is never a pill; its group opens from one More pill", async () => {
+    const view = render(<VideoPlayer status="ready" prompt="x" src="/v.mp4" poster="/p.jpg" overlayActions actionItems={[
+      { label: "Another", onSelect: noop },
+      { label: "Trim", group: "Edit", icon: "scissors", onSelect: noop },
+    ]} />);
+    const pills = view.container.querySelector('[data-slot="video-player-overlay-pills"]')!;
+    expect(pills.querySelector('[aria-label="Another"]')).toBeTruthy();
+    expect(pills.querySelector('[aria-label="Trim"]')).toBeNull();
+    const more = pills.querySelector('[data-more]') as HTMLElement;
+    expect(more).toBeTruthy();
+    fireEvent.pointerDown(more, { button: 0, ctrlKey: false });
+    await waitFor(() => expect([...document.body.querySelectorAll('[role="menuitem"]')].some((item) => item.textContent?.includes("Edit"))).toBe(true));
+  });
+  test("ungrouped inline and More actions keep their existing placement", async () => {
+    const view = render(<VideoPlayer status="ready" prompt="x" src="/v.mp4" actionsInline={1} actionItems={[{ label: "First", onSelect: noop }, { label: "Second", onSelect: noop }, { label: "Third", onSelect: noop }]} />);
+    fireEvent.pointerDown(view.getByRole("button", { name: "More" }), { button: 0, ctrlKey: false });
+    await within(document.body).findAllByRole("menuitem");
+    const items = within(document.body).getAllByRole("menuitem").map((el) => el.textContent ?? "");
+    expect(items.some((text) => text.includes("Third"))).toBe(true);
+    expect(document.body.querySelector('[role="menuitem"][aria-haspopup="menu"]')).toBeNull();
   });
 });
 

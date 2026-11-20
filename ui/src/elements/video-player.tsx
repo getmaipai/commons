@@ -432,6 +432,7 @@ function VideoPlayerBody({
         icon: iconFor(item.icon),
         disabledReason: item.disabledReason,
         starts: item.starts,
+        group: item.group,
         note: item.note,
         busy: item.busy,
         reasonVisible: item.note !== undefined,
@@ -439,6 +440,7 @@ function VideoPlayerBody({
         onSelect: () => item.onSelect?.(),
       });
   const rowActions: RowAction[] = [...items.filter(item => item.placement === "start"), ...builtIns, ...items.filter(item => item.placement === "end")];
+  const menuActions = rowActions;
   const favoriteControl = control("favorite");
   const favoriteButton = onFavorite && (status === "ready" || status === "draft") ? (
     <FavoriteToggle label={text.favorite} pressed={favorite} icons={icons} disabledReason={favoriteControl.disabledReason} onToggle={() => onFavorite(!favorite)} />
@@ -547,7 +549,7 @@ function VideoPlayerBody({
             reveal && REVEAL,
           )}
         >
-          <ActionRow actions={rowActions} icons={icons} inline={actionsInline} moreLabel={text.more} slot={actions} className="justify-end" />
+          <ActionRow actions={menuActions} icons={icons} inline={actionsInline} moreLabel={text.more} slot={actions} className="justify-end" />
         </div>
       ) : null}
     </div>
@@ -599,7 +601,7 @@ function VideoPlayerBody({
         {status === "cancelled" ? <p className="text-muted-foreground text-sm">{text.stopped}</p> : null}
         {notice ? <p data-slot="video-player-notice" className="text-muted-foreground text-xs">{notice}</p> : null}
         {!overlay && !pills && (status === "draft" || status === "ready" || status === "failed" || status === "cancelled") ? (
-          <ActionRow actions={rowActions} icons={icons} inline={actionsInline} moreLabel={text.more} slot={actions} trailing={favoriteButton} className={reveal ? REVEAL : undefined} />
+          <ActionRow actions={menuActions} icons={icons} inline={actionsInline} moreLabel={text.more} slot={actions} trailing={favoriteButton} className={reveal ? REVEAL : undefined} />
         ) : null}
         {(status === "ready" || status === "draft") && prompt && caption ? <p className="text-muted-foreground line-clamp-2 text-xs">{prompt}</p> : null}
       </CardContent>}

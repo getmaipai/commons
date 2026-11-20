@@ -823,6 +823,7 @@ export const ResultFeedNodeSchema = z.object({
       z.object({
         label: z.string().min(1).max(40),
         icon: z.string().optional(),
+        group: z.string().min(1).max(40).optional(),
         starts: FeedStartsSchema.optional(),
         when: z.array(z.enum(["draft", "ready", "failed", "cancelled"])).min(1).optional(),
         show_when: z.string().min(1).optional(),

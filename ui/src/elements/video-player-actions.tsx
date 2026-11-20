@@ -1,11 +1,12 @@
 "use client";
 
 import { useId, useRef, type KeyboardEvent, type PointerEvent, type ReactNode } from "react";
-import { Loader2Icon, MoreHorizontalIcon } from "lucide-react";
+import { ArrowRightIcon, Loader2Icon, MoreHorizontalIcon } from "lucide-react";
 import { cn } from "cn";
+import { i18n } from "@/kit/i18n";
 import { getIcon } from "@/kit/icons";
 import { Button } from "@/kit/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/kit/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/kit/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/kit/ui/tooltip";
 
 /** What a control starts, so the host can disable it with one reason while that kind of making is not ready. */
@@ -19,6 +20,8 @@ export interface VideoPlayerAction {
   label: string;
   /** A kit icon name ("pencil", "sparkles"). Drawn beside the label, or alone in the icons variant. */
   icon?: string;
+  /** Named submenu in More. Such actions are never inline or overlay pills. */
+  group?: string;
   key?: string;
   when?: VideoPlayerActionWhen;
   /** One plain line. Present means the action is disabled and says why. */
@@ -43,6 +46,7 @@ export const VIDEO_PLAYER_ACTION_CAP = 24;
 export interface RowAction {
   key: string;
   label: string;
+  group?: string;
   icon: ReactNode;
   onSelect: () => void;
   disabledReason?: string;
@@ -122,6 +126,18 @@ function ActionButton({ action, icons }: { action: RowAction; icons: boolean }) 
   );
 }
 
+function MoreActionItem({ action }: { action: RowAction }) {
+  return (
+    <DropdownMenuItem key={action.key} disabled={Boolean(action.disabledReason) || Boolean(action.busy)} data-starts={action.starts} title={action.disabledReason} onSelect={action.onSelect}>
+      {action.busy ? <Loader2Icon aria-hidden className="motion-safe:animate-spin" /> : action.icon}
+      <span className="flex flex-col">
+        <span>{action.label}</span>
+        {action.disabledReason ? <span className="text-muted-foreground text-xs">{action.disabledReason}</span> : action.note ? <span className="text-muted-foreground text-xs">{action.note}</span> : null}
+      </span>
+    </DropdownMenuItem>
+  );
+}
+
 /** The glass the overlay pills sit on: the page background at 60% with a 10px blur, tokens only. */
 export const OVERLAY_GLASS = "bg-[color-mix(in_oklab,var(--background)_60%,transparent)] backdrop-blur-[10px]";
 
@@ -164,9 +180,36 @@ function OverlayPill({ action }: { action: RowAction }) {
  */
 export function OverlayPills({ actions, slot, trailing, className }: { actions: RowAction[]; slot?: ReactNode; trailing?: ReactNode; className?: string }) {
   const capped = actions.slice(0, VIDEO_PLAYER_ACTION_CAP);
+  // VF-EDIT-04: an action with a `group` never draws as a pill; the groups open from one "More" pill as nested submenus (the same menu the row uses).
+  const pills = capped.filter(action => !action.group);
+  const grouped = capped.filter(action => Boolean(action.group));
+  const entries: Array<{ group: string; actions: RowAction[] }> = [];
+  for (const action of grouped) {
+    const found = entries.find(entry => entry.group === action.group);
+    if (found) found.actions.push(action); else entries.push({ group: action.group!, actions: [action] });
+  }
+  const more = i18n._({ id: "ui.More", message: "More" });
   return (
     <div data-slot="video-player-overlay-pills" className={cn("absolute end-3 top-12 z-10 flex max-w-[80%] flex-wrap justify-end gap-2", className)}>
-      {capped.map(action => <OverlayPill key={action.key} action={action} />)}
+      {pills.map(action => <OverlayPill key={action.key} action={action} />)}
+      {entries.length > 0 ? (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button type="button" data-slot="video-player-pill" data-more="" aria-label={more} className={cn(OVERLAY_GLASS, "text-foreground border-border/60 inline-flex min-h-12 min-w-12 items-center justify-center gap-2 rounded-full border px-3 text-sm font-medium outline-none sm:px-4 focus-visible:ring-[3px] focus-visible:ring-ring/50 [&_svg]:size-4 [&_svg]:shrink-0")}>
+              <MoreHorizontalIcon aria-hidden />
+              <span className="hidden sm:inline">{more}</span>
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {entries.map((entry, index) => (
+              <DropdownMenuSub key={`group-${entry.group}-${index}`}>
+                <DropdownMenuSubTrigger>{entry.group}<ArrowRightIcon aria-hidden className="ms-auto" /></DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>{entry.actions.map(action => <MoreActionItem key={action.key} action={action} />)}</DropdownMenuSubContent>
+              </DropdownMenuSub>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ) : null}
       {slot}
       {trailing ? <span className={cn(OVERLAY_GLASS, "inline-flex items-center rounded-full")}>{trailing}</span> : null}
     </div>
@@ -196,9 +239,19 @@ export function ActionRow({
   className?: string;
 }) {
   const capped = actions.slice(0, VIDEO_PLAYER_ACTION_CAP);
+  const ungrouped = capped.filter(action => !action.group);
   const limit = typeof inline === "number" ? Math.max(0, Math.min(VIDEO_PLAYER_ACTION_CAP, Math.floor(inline))) : capped.length;
-  const shown = capped.length > limit ? capped.slice(0, limit) : capped;
-  const more = capped.length > limit ? capped.slice(limit) : [];
+  const effectiveLimit = Math.min(limit, ungrouped.length);
+  const shown = ungrouped.slice(0, effectiveLimit);
+  const more = capped.filter(action => Boolean(action.group) || ungrouped.indexOf(action) >= effectiveLimit);
+  const menuEntries: Array<{ group?: string; actions: RowAction[] }> = [];
+  const groups = new Map<string, RowAction[]>();
+  for (const action of more) {
+    if (!action.group) { menuEntries.push({ actions: [action] }); continue; }
+    let grouped = groups.get(action.group);
+    if (!grouped) { grouped = []; groups.set(action.group, grouped); menuEntries.push({ group: action.group, actions: grouped }); }
+    grouped.push(action);
+  }
   return (
     <TooltipProvider delayDuration={300}>
       <div data-slot="video-player-actions" data-variant={icons ? "icons" : "labelled"} className={cn(icons ? "flex flex-wrap items-center gap-1" : "flex flex-wrap items-center gap-2", className)}>
@@ -216,15 +269,12 @@ export function ActionRow({
               <TooltipContent>{moreLabel}</TooltipContent>
             </Tooltip>
             <DropdownMenuContent align="start">
-              {more.map(action => (
-                <DropdownMenuItem key={action.key} disabled={Boolean(action.disabledReason) || Boolean(action.busy)} data-starts={action.starts} title={action.disabledReason} onSelect={action.onSelect}>
-                  {action.busy ? <Loader2Icon aria-hidden className="motion-safe:animate-spin" /> : action.icon}
-                  <span className="flex flex-col">
-                    <span>{action.label}</span>
-                    {action.disabledReason ? <span className="text-muted-foreground text-xs">{action.disabledReason}</span> : action.note ? <span className="text-muted-foreground text-xs">{action.note}</span> : null}
-                  </span>
-                </DropdownMenuItem>
-              ))}
+              {menuEntries.map((entry, index) => entry.group ? (
+                <DropdownMenuSub key={`group-${entry.group}-${index}`}>
+                  <DropdownMenuSubTrigger>{entry.group}<ArrowRightIcon aria-hidden className="ms-auto" /></DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>{entry.actions.map(action => <MoreActionItem key={action.key} action={action} />)}</DropdownMenuSubContent>
+                </DropdownMenuSub>
+              ) : <MoreActionItem key={entry.actions[0]!.key} action={entry.actions[0]!} />)}
             </DropdownMenuContent>
           </DropdownMenu>
         ) : null}

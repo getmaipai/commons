@@ -773,6 +773,7 @@
             "properties": {
               "label": { "type": "string", "minLength": 1, "maxLength": 40 },
               "icon": { "type": "string" },
+              "group": { "type": "string", "minLength": 1, "maxLength": 40, "description": "Actions with the same group share one submenu in the More menu, at the position of their first action. Grouped actions are not inline or overlay pills." },
               "starts": { "type": "string", "enum": ["picture", "video"] },
               "when": { "type": "array", "minItems": 1, "items": { "type": "string", "enum": ["draft", "ready", "failed", "cancelled"] } },
               "show_when": { "type": "string", "minLength": 1, "description": "Dotted row-field path; truthy shows this action, falsy or missing hides it." },
