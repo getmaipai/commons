@@ -1,3 +1,7 @@
+## [spec-v0.1.427] - 2026-11-20
+
+- MODELPACK-SPEC-03: the song door and the style bases, under spec/stack/. Additive; nothing existing breaks. `StackMakeRequest`: `song` gains optional `bpm` (positive number), `key` and `language` (non-empty text); the `song_edit` cover change gains optional `description` and `lyrics` (non-empty text); every request gains optional `wait` (integer seconds, 0 to 120; 0 means answer 202 with the job id at once); `stems` gains optional `origin` (only `"owned_file"`). `StackMakeResult`: `made_with` is never null for `song`, `song_edit` and `stems` (running or done); the other jobs may still carry null. `StackModelPack`: a `style_bases` entry gains optional `short`, `media` (`"picture"` or `"video"`), `civitai_labels[]`, `text_patterns[]` and `generic_labels[]`, and `retired` gains optional `tested_on` (a base id) and `marks` ({`tested`, `no_effect`}, the meaning of each bench mark); `id`, `label`, `browse` and `retired.mark` are as before. `StackJobsCatalog`: each `styles.bases[]` entry gains optional `short`, `media`, `civitai_labels[]`, `text_patterns[]` and `generic_labels[]` (no `browse`, no `retired`: a retired base is not listed). No fixture names a model.
+
 ## [spec-v0.1.426] - 2026-11-20
 
 - DISK-GUARD-01 fix: `storage.warn_free_gb` in 0.1.425 was a copy of the wrong entry (boolean, default true). It is now a number, default 0 (use the rule), like `storage.critical_free_gb`. Use 0.1.426, not 0.1.425.
