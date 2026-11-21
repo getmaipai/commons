@@ -18,6 +18,12 @@ describe("VOICES-03 HouseholdVoice", () => {
   test.each([-12.5, 12.5])("pitch offset %p is refused", (pitch_semitones) => {
     expect(HouseholdVoice.safeParse({ ...base, pitch_semitones }).success).toBe(false);
   });
+  test("voice_text is optional, 1 to 2000 characters", () => {
+    expect(HouseholdVoice.parse({ ...base, voice_text: "The words in the clip." }).voice_text).toBe("The words in the clip.");
+    expect(HouseholdVoice.parse(base).voice_text).toBeUndefined();
+    expect(HouseholdVoice.safeParse({ ...base, voice_text: "" }).success).toBe(false);
+    expect(HouseholdVoice.safeParse({ ...base, voice_text: "x".repeat(2001) }).success).toBe(false);
+  });
   test("the id is a plain token and the record has no consent block", () => {
     expect(HouseholdVoice.safeParse({ ...base, id: "http://x/y" }).success).toBe(false);
     expect(HouseholdVoice.safeParse({ ...base, consent: { attested: true } }).success).toBe(false);

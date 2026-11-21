@@ -16,7 +16,7 @@ from pydantic import (
 
 class HouseholdVoice(BaseModel):
     """
-    VOICES-03: a voice an owner or admin made from one reference clip (6 to 30 seconds), usable by the whole household once made. The hub is the master: it keeps this record and the clip, and sends the clip to the voice engine with each request. No consent block: creation is admin-only and unrestricted (SAFETY.md, owner-approved 2026-10-18). `temperature` is the sampling temperature handed to the Chatterbox Turbo engine for this voice (0.1 to 2.0; absent means the engine default); it was chosen by ear at 1.05 for the robot voice, and a higher value also raises pitch. `pitch_semitones` shifts the rendered audio after generation with formants kept (-12 to 12; absent means 0), because a clone can come out one or two semitones off its reference. Both are set by the person making the voice and are the voice's own, never a request parameter.
+    VOICES-03: a voice an owner or admin made from one reference clip (6 to 30 seconds), usable by the whole household once made. The hub is the master: it keeps this record and the clip, and sends the clip to the voice engine with each request. No consent block: creation is admin-only and unrestricted (SAFETY.md, owner-approved 2026-10-18). `temperature` is the sampling temperature handed to the Chatterbox Turbo engine for this voice (0.1 to 2.0; absent means the engine default); it was chosen by ear at 1.05 for the robot voice, and a higher value also raises pitch. `pitch_semitones` shifts the rendered audio after generation with formants kept (-12 to 12; absent means 0), because a clone can come out one or two semitones off its reference. Both are set by the person making the voice and are the voice's own, never a request parameter. `voice_text` is the words spoken in the clip, kept so the VoxCPM2 engine can clone with the clip plus its transcript (it is sent to the engine as the `voice_text` form field; other engines ignore it). Optional: absent means the engine reads the words from the clip itself.
     """
 
     model_config = ConfigDict(
@@ -44,6 +44,10 @@ class HouseholdVoice(BaseModel):
     pitch_semitones: confloat(ge=-12.0, le=12.0) | None = Field(
         None,
         description='Pitch offset in semitones applied to the rendered audio, formants kept; absent means 0.',
+    )
+    voice_text: constr(min_length=1, max_length=2000) | None = Field(
+        None,
+        description='The words spoken in the reference clip (VoxCPM2 only; other engines ignore it). Absent means the engine reads them from the clip.',
     )
     created_at: AwareDatetime
     hlc: constr(pattern=r'^[0-9]+:[0-9]+:[a-z0-9]{6,}$') = Field(

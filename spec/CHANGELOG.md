@@ -1,3 +1,7 @@
+## [spec-v0.1.475] - 2026-11-21
+
+- `HouseholdVoice`: added the optional `voice_text` (1 to 2000 characters), the words spoken in the reference clip. Home sends it to the voice engine as the `voice_text` form field so VoxCPM2 can clone with the clip plus its transcript (other engines ignore it). Additive; absent means the engine reads the words from the clip itself (VOICE-VOXCPM2-01).
+
 ## [spec-v0.1.474] - 2026-11-21
 
 - Added the household setting `chat.specifics_check` (select: `off` or `shadow`, default `off`, advanced, lives in `household.ai_advanced`, honoured by Home). After an adult reply Home can count names, numbers or dates that lack a basis in the turn; `shadow` only counts and never changes the reply. Home had added the key without the spec, so its settings registry drifted from spec-v0.1.473; this is the spec-first definition (the entry is exactly the one in Home's `aiKeys.ts`).
