@@ -43,7 +43,10 @@
     { "$ref": "#/$defs/voice_line" },
     { "$ref": "#/$defs/media_stage" },
     { "$ref": "#/$defs/job_progress" },
-    { "$ref": "#/$defs/clip_compare" }
+    { "$ref": "#/$defs/clip_compare" },
+    { "$ref": "#/$defs/agent_thread" },
+    { "$ref": "#/$defs/code_changes" },
+    { "$ref": "#/$defs/terminal_log" }
   ],
   "$defs": {
     "binding": {
@@ -368,6 +371,47 @@
       "properties": { "type": { "const": "clip_compare" }, "before": { "$ref": "#/$defs/clip_compare_side" }, "after": { "$ref": "#/$defs/clip_compare_side" }, "mode": { "type": "string", "enum": ["side_by_side", "wipe"], "default": "side_by_side" }, "mode_state": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 40 } }
     },
     "clip_compare_side": { "type": "object", "additionalProperties": false, "required": ["src", "kind"], "properties": { "src": { "type": "string", "minLength": 1, "description": "Same-origin address." }, "kind": { "type": "string", "enum": ["video", "image"] }, "label": { "type": "string" }, "poster": { "type": "string", "description": "Same-origin poster address." } } },
+    "agent_thread": {
+      "type": "object", "additionalProperties": false, "required": ["type", "bind"],
+      "description": "CODE-SPEC-01 (Home docs/design/local-coding-2026-10-17.md section 4.5): the Code app's agent chat, drawn by the kit's assistant-ui thread with the composer, the message queue, the plan bar and the approval cards. `bind` is one session's event stream: a package data call with `stream: true` (the turn stream's assistant-stream transport), its `params` naming the session. The thread reads the messages and cards the stream carries; the node holds no words of its own beyond `placeholder`. `send` runs when the person sends a message, `stop` when they stop the run and `approve` when they answer an approval card (the card's choice and id are call arguments); every action stays under the package.",
+      "properties": {
+        "type": { "const": "agent_thread" },
+        "bind": { "$ref": "#/$defs/package_binding" },
+        "send": { "$ref": "#/$defs/action" }, "stop": { "$ref": "#/$defs/action" }, "approve": { "$ref": "#/$defs/action" },
+        "placeholder": { "type": "string", "minLength": 1, "maxLength": 120, "description": "The composer's hint text." }
+      }
+    },
+    "code_changes": {
+      "type": "object", "additionalProperties": false, "required": ["type", "bind", "item_fields"],
+      "description": "CODE-SPEC-01 (section 4.5): a session's changes as a file tree beside a diff, with line comments. `bind` is a package data call returning a list, one row per changed file. `item_fields` are dotted paths into each row. `selected_state` names the page-state key that holds the open file's path (default `file`). `on_line_comment` fires when a person comments on a line; it receives the file path and line number as call arguments. `compare_label` is a dotted path to a short label of what the diff compares against.",
+      "properties": {
+        "type": { "const": "code_changes" },
+        "bind": { "$ref": "#/$defs/package_binding" },
+        "item_fields": { "type": "object", "additionalProperties": false, "required": ["path", "status"], "properties": {
+          "path": { "type": "string", "minLength": 1, "description": "Dotted path to the file's path in the repository." },
+          "status": { "type": "string", "minLength": 1, "description": "Dotted path to added, modified, deleted or renamed." },
+          "additions": { "type": "string", "minLength": 1 }, "deletions": { "type": "string", "minLength": 1 },
+          "patch": { "type": "string", "minLength": 1, "description": "Dotted path to the file's unified diff text." }
+        } },
+        "selected_state": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 40 },
+        "compare_label": { "type": "string", "minLength": 1, "description": "Dotted path to a short label of what the diff compares against, in the first row." },
+        "on_line_comment": { "$ref": "#/$defs/action" }
+      }
+    },
+    "terminal_log": {
+      "type": "object", "additionalProperties": false, "required": ["type", "bind", "item_fields"],
+      "description": "CODE-SPEC-01 (section 4.5): a session's terminal as a list of command blocks. `bind` is a package data call returning a list, one row per command; with `stream: true` new rows and new output lines arrive as they happen. `item_fields` are dotted paths into each row. `follow_tail` keeps the newest output in view until the person scrolls away (default true).",
+      "properties": {
+        "type": { "const": "terminal_log" },
+        "bind": { "$ref": "#/$defs/package_binding" },
+        "item_fields": { "type": "object", "additionalProperties": false, "required": ["command", "output"], "properties": {
+          "command": { "type": "string", "minLength": 1, "description": "Dotted path to the command line." },
+          "output": { "type": "string", "minLength": 1, "description": "Dotted path to the output text or an array of lines." },
+          "exit_code": { "type": "string", "minLength": 1 }, "running": { "type": "string", "minLength": 1, "description": "Dotted path to a boolean: the command is still running." }
+        } },
+        "follow_tail": { "type": "boolean", "default": true }
+      }
+    },
     "poll_while_field": { "type": "object", "additionalProperties": false, "required": ["field", "values"], "properties": { "field": { "type": "string", "minLength": 1, "description": "Dotted field path in each row." }, "values": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } } } },
     "batch_action": {
       "type": "object",

@@ -99,7 +99,15 @@ describe("tier.max grants", () => {
     expect(vocab.minors_policy.child_max).toBe("never");
   });
   test("every category has a grant parameter", () => {
-    expect(vocab.categories.map((c: any) => c.grant_parameter)).toEqual(["chat", "image", "video", "music", "voice"]);
+    expect(vocab.categories.map((c: any) => c.grant_parameter)).toEqual(["chat", "image", "video", "music", "coding", "voice"]);
+  });
+  test("coding is a tier category and a child or teen runs it at Standard by role default", () => {
+    expect(vocab.categories.find((c: any) => c.id === "coding")).toMatchObject({ role: "coding", grant_parameter: "coding", options: [] });
+    expect(vocab.minors_policy.role_defaults.coding).toEqual({ child: "standard", teen: "standard" });
+    expect(vocab.minors_policy.teen_max_categories).not.toContain("coding");
+    expect(keyOf("engines.coding.tier.standard").default.model).toBe("recommended");
+    expect(keyOf("access.tier.boost").band_default.teen).not.toContain("coding");
+    expect(keyOf("access.tier.boost").band_default.adult).toContain("coding");
   });
 });
 

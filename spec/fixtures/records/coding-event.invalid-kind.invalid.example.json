@@ -1,0 +1,13 @@
+{
+  "id": "cevt-sage001",
+  "session_id": "csess-sage001",
+  "at": "2026-11-21T10:02:00Z",
+  "kind": "rm_rf",
+  "detail": {
+    "command": "npm test",
+    "exit_code": 0,
+    "duration_ms": 4200
+  },
+  "provenance": "Recorded by the sandbox",
+  "hlc": "1795255320000:0:sage01"
+}

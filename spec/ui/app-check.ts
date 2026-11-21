@@ -20,7 +20,7 @@ export interface AppContributes { pages?: AppPageEntry[]; data?: AppDataEntry[];
  * (message_thread, settings_editor) is refused: a package page draws only its
  * own data, through the package nodes and the layout nodes. MEDIA-POLISH-01: a
  * split_view is a layout node; its children are checked like any other. */
-export const PACKAGE_PAGE_NODE_TYPES: readonly string[] = ["page", "section", "empty_state", "progress", "answer_blocks", "picker", "search", "detail_pane", "tabs", "list", "media_shelf", "billboard", "player", "reader", "split_view", "creation_header", "prompt_bar", "quick_tiles", "top_result", "category_tiles", "track_rows", "result_feed", "studio", "clip_feed", "image_editor", "storyboard_player", "action_bar", "proposal_card", "voice_line", "media_stage", "job_progress", "clip_compare"];
+export const PACKAGE_PAGE_NODE_TYPES: readonly string[] = ["page", "section", "empty_state", "progress", "answer_blocks", "picker", "search", "detail_pane", "tabs", "list", "media_shelf", "billboard", "player", "reader", "split_view", "creation_header", "prompt_bar", "quick_tiles", "top_result", "category_tiles", "track_rows", "result_feed", "studio", "clip_feed", "image_editor", "storyboard_player", "action_bar", "proposal_card", "voice_line", "media_stage", "job_progress", "clip_compare", "agent_thread", "code_changes", "terminal_log"];
 
 /** The role ladder, highest first; a page's `min_role` may only sit at or above the package's. */
 export const ROLE_LADDER: readonly string[] = ["owner", "admin", "adult", "teen", "child", "guest"];
@@ -126,6 +126,22 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
     checkFieldPath(node.overall_eta_seconds, `${where} job_progress`, "overall_eta_seconds", out);
     checkAction(node.cancel, packageId, `${where} job_progress.cancel`, out);
     // failure_actions contains runtime row action objects supplied by the server; their targets cannot be checked statically.
+  }
+  // CODE-SPEC-01: the Code app's nodes draw the package's own session data; every action stays under the package.
+  if (type === "agent_thread") {
+    if (!isObject(node.bind) || node.bind.source !== "package") out.push(`${where} agent_thread: bind.source must be "package"`);
+    else if (!data.has(String(node.bind.path))) out.push(`${where} agent_thread: bind.path "${String(node.bind.path)}" is not a contributes.data id of this package`);
+    for (const key of ["send", "stop", "approve"]) checkAction(node[key], packageId, `${where} agent_thread.${key}`, out);
+  }
+  if (type === "code_changes") {
+    checkBinding(node.bind, `${where} code_changes`, data, "list", out);
+    if (isObject(node.item_fields)) for (const [name, value] of Object.entries(node.item_fields)) checkFieldPath(value, `${where} code_changes.item_fields`, name, out);
+    checkFieldPath(node.compare_label, `${where} code_changes`, "compare_label", out);
+    checkAction(node.on_line_comment, packageId, `${where} code_changes.on_line_comment`, out);
+  }
+  if (type === "terminal_log") {
+    checkBinding(node.bind, `${where} terminal_log`, data, "list", out);
+    if (isObject(node.item_fields)) for (const [name, value] of Object.entries(node.item_fields)) checkFieldPath(value, `${where} terminal_log.item_fields`, name, out);
   }
   if (type === "clip_compare") {
     for (const side of ["before", "after"] as const) if (isObject(node[side])) {

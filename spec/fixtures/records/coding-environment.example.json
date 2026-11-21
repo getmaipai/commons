@@ -1,0 +1,23 @@
+{
+  "id": "cenv-sage001",
+  "owner": {
+    "person_id": "person-sage01"
+  },
+  "name": "Default",
+  "image": "sandbox-base-1",
+  "setup_script": "npm install",
+  "env": {
+    "NODE_ENV": "development"
+  },
+  "network": {
+    "policy": "none",
+    "hosts": []
+  },
+  "resources": {
+    "cpus": 4,
+    "memory_gb": 4
+  },
+  "created_at": "2026-11-21T09:00:00Z",
+  "provenance": "Created on first use",
+  "hlc": "1795252800000:0:sage01"
+}

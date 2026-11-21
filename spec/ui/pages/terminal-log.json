@@ -1,0 +1,13 @@
+{
+  "type": "page",
+  "id": "terminal",
+  "title": "Terminal",
+  "body": [
+    {
+      "type": "terminal_log",
+      "bind": { "source": "package", "path": "session-terminal", "stream": true, "params": { "id": "$state.session" } },
+      "item_fields": { "command": "command", "output": "output", "exit_code": "exit_code", "running": "running" },
+      "follow_tail": true
+    }
+  ]
+}

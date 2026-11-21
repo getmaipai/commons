@@ -1986,6 +1986,54 @@
     ]
   },
   {
+    "key": "notifications.coding.needs_you.telegram",
+    "scope": "person",
+    "selector": "boolean",
+    "default": false,
+    "label": "Telegram me when a coding session needs me",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.telegram",
+    "honoured_by": [
+      "home"
+    ],
+    "copy": {
+      "does": "Sends a Telegram message when the coding agent waits on your answer."
+    }
+  },
+  {
+    "key": "notifications.coding.session_done.telegram",
+    "scope": "person",
+    "selector": "boolean",
+    "default": false,
+    "label": "Telegram me when a coding session finishes",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.telegram",
+    "honoured_by": [
+      "home"
+    ],
+    "copy": {
+      "does": "Sends a Telegram message when the agent has finished its work."
+    }
+  },
+  {
+    "key": "notifications.coding.workspace_expiring.telegram",
+    "scope": "person",
+    "selector": "boolean",
+    "default": false,
+    "label": "Telegram me when a coding workspace is about to expire",
+    "level": "basic",
+    "secret": false,
+    "lives_in": "person.telegram",
+    "honoured_by": [
+      "home"
+    ],
+    "copy": {
+      "does": "Sends a Telegram message before a coding workspace is removed."
+    }
+  },
+  {
     "key": "notifications.engines.problem.telegram",
     "scope": "person",
     "selector": "boolean",
@@ -6809,6 +6857,106 @@
     ]
   },
   {
+    "key": "engines.coding.tier.reduced",
+    "scope": "household",
+    "selector": "text",
+    "range": {
+      "value_schema": "tier-slot",
+      "category": "coding",
+      "tier": "reduced"
+    },
+    "default": {
+      "model": "off",
+      "options": {}
+    },
+    "label": "Coding at Reduced",
+    "help": "The model and options that fill the Reduced level of coding. A JSON object {model, options}; model is a catalog id, recommended, or off. Normally set from the AI and models page.",
+    "copy": {
+      "does": "Picks the model and settings for this level."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.ai_tiers",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.coding.tier.standard",
+    "scope": "household",
+    "selector": "text",
+    "range": {
+      "value_schema": "tier-slot",
+      "category": "coding",
+      "tier": "standard"
+    },
+    "default": {
+      "model": "recommended",
+      "options": {}
+    },
+    "label": "Coding at Standard",
+    "help": "The model and options that fill the Standard level of coding. A JSON object {model, options}; model is a catalog id, recommended, or off. Normally set from the AI and models page.",
+    "copy": {
+      "does": "Picks the model and settings for this level."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.ai_tiers",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.coding.tier.boost",
+    "scope": "household",
+    "selector": "text",
+    "range": {
+      "value_schema": "tier-slot",
+      "category": "coding",
+      "tier": "boost"
+    },
+    "default": {
+      "model": "off",
+      "options": {}
+    },
+    "label": "Coding at Boost",
+    "help": "The model and options that fill the Boost level of coding. A JSON object {model, options}; model is a catalog id, recommended, or off. Normally set from the AI and models page.",
+    "copy": {
+      "does": "Picks the model and settings for this level."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.ai_tiers",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
+    "key": "engines.coding.tier.max",
+    "scope": "household",
+    "selector": "text",
+    "range": {
+      "value_schema": "tier-slot",
+      "category": "coding",
+      "tier": "max"
+    },
+    "default": {
+      "model": "off",
+      "options": {}
+    },
+    "label": "Coding at Max",
+    "help": "The model and options that fill the Max level of coding. A JSON object {model, options}; model is a catalog id, recommended, or off. Normally set from the AI and models page.",
+    "copy": {
+      "does": "Picks the model and settings for this level."
+    },
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.ai_tiers",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "engines.tts.tier.reduced",
     "scope": "household",
     "selector": "text",
@@ -7209,6 +7357,7 @@
         "image",
         "video",
         "music",
+        "coding",
         "voice"
       ],
       "multiple": true
@@ -7224,6 +7373,7 @@
       "image",
       "video",
       "music",
+      "coding",
       "voice"
     ],
     "label": "Boost for",
@@ -7235,14 +7385,16 @@
         "image": "Pictures with extra power.",
         "video": "Videos with extra power.",
         "music": "Music with extra power.",
-        "voice": "Voices with extra power."
+        "voice": "Voices with extra power.",
+        "coding": "Coding with extra power."
       },
       "option_labels": {
         "chat": "Chat",
         "image": "Pictures",
         "video": "Videos",
         "music": "Music",
-        "voice": "Voice"
+        "voice": "Voice",
+        "coding": "Coding"
       }
     },
     "band_default": {
@@ -7259,6 +7411,7 @@
         "image",
         "video",
         "music",
+        "coding",
         "voice"
       ]
     },
@@ -7279,6 +7432,7 @@
         "image",
         "video",
         "music",
+        "coding",
         "voice"
       ],
       "multiple": true
@@ -7305,14 +7459,16 @@
         "image": "Pictures with full power.",
         "video": "Videos with full power.",
         "music": "Music with full power.",
-        "voice": "Voices with full power."
+        "voice": "Voices with full power.",
+        "coding": "Coding with full power."
       },
       "option_labels": {
         "chat": "Chat",
         "image": "Pictures",
         "video": "Videos",
         "music": "Music",
-        "voice": "Voice"
+        "voice": "Voice",
+        "coding": "Coding"
       }
     },
     "band_default": {

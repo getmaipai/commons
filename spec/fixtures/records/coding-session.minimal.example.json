@@ -1,0 +1,33 @@
+{
+  "id": "csess-marlow1",
+  "person_id": "person-marlow1",
+  "title": "Add a dark mode switch",
+  "repo": {
+    "kind": "none",
+    "base_branch": "main",
+    "work_branch": "code/practice"
+  },
+  "environment_id": "cenv-sage001",
+  "mode": "ask",
+  "state": "queued",
+  "network": {
+    "policy": "none",
+    "hosts": []
+  },
+  "usage": {
+    "input_tokens": 12000,
+    "output_tokens": 3400
+  },
+  "changes": {
+    "files": 3,
+    "additions": 42,
+    "deletions": 7
+  },
+  "pull_request": null,
+  "created_at": "2026-11-21T10:00:00Z",
+  "last_activity_at": "2026-11-21T10:06:00Z",
+  "deleted_at": null,
+  "trash_until": null,
+  "provenance": "Started in the Code app",
+  "hlc": "1795255560000:0:sage01"
+}

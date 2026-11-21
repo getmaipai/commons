@@ -1,0 +1,22 @@
+{
+  "id": "cenv-house001",
+  "owner": {
+    "household": true
+  },
+  "name": "Shared web tools",
+  "image": "sandbox-base-1",
+  "env": {},
+  "network": {
+    "policy": "hosts",
+    "hosts": [
+      "registry.example.com"
+    ]
+  },
+  "resources": {
+    "cpus": 2,
+    "memory_gb": 2
+  },
+  "created_at": "2026-11-21T09:00:00Z",
+  "provenance": "Shared by an admin",
+  "hlc": "1795252800000:0:sage01"
+}

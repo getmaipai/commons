@@ -578,6 +578,18 @@ describe("VIDEO-KIT-01 package page blocks", () => {
     expect(run({ ...progress, cancel: { navigate: { to: "/apps/elsewhere" } } })).toContain("must stay under /apps/films");
     expect(run({ ...compare, before: { src: "http://example.test/a.mp4", kind: "video" } })).toContain("src must be a field path, not an address");
   });
+  test("the Code app nodes bind package data and keep actions under the package", () => {
+    const withData: AppContributes = { pages: [{ id: "index", kind: "schema", module: "m" }], data: [{ id: "events" }, { id: "files", rows: "list" }] };
+    const go = (block: unknown) => checkAppPackage("code", withData, () => page(block)).join("\n");
+    const thread = { type: "agent_thread", bind: { source: "package", path: "events", stream: true }, send: { call: { target: "/api/plugins/code/send" } } };
+    const changes = { type: "code_changes", bind: { source: "package", path: "files" }, item_fields: { path: "path", status: "status" } };
+    const log = { type: "terminal_log", bind: { source: "package", path: "files" }, item_fields: { command: "c", output: "o" } };
+    for (const block of [thread, changes, log]) expect(go(block)).toBe("");
+    expect(go({ ...thread, bind: { source: "route", path: "/x" } })).toContain('bind.source must be "package"');
+    expect(go({ ...thread, stop: { navigate: { to: "/apps/elsewhere" } } })).toContain("must stay under /apps/code");
+    expect(go({ ...changes, bind: { source: "package", path: "events" } })).toContain('must be a "rows": "list" entry');
+    expect(go({ ...log, item_fields: { command: "http://example.test/x", output: "o" } })).toContain("must be a field path");
+  });
   test("the node union stays reconciled with the package-page allowlist and explicit exclusions", () => {
     const schema = JSON.parse(readFileSync(join(import.meta.dir, "..", "..", "ui", "schema.json"), "utf-8"));
     const union = schema.oneOf.map((entry: { $ref: string }) => entry.$ref.split("/").at(-1) as string);
@@ -587,6 +599,6 @@ describe("VIDEO-KIT-01 package page blocks", () => {
     };
     const types = union.map((ref) => defs[ref]?.properties?.type?.const).filter((v): v is string => typeof v === "string");
     for (const type of types) expect(PACKAGE_PAGE_NODE_TYPES.includes(type) || excluded[type]).toBeTruthy();
-    for (const type of ["storyboard_player", "action_bar", "proposal_card", "voice_line", "media_stage", "job_progress", "clip_compare"]) expect(PACKAGE_PAGE_NODE_TYPES).toContain(type);
+    for (const type of ["storyboard_player", "action_bar", "proposal_card", "voice_line", "media_stage", "job_progress", "clip_compare", "agent_thread", "code_changes", "terminal_log"]) expect(PACKAGE_PAGE_NODE_TYPES).toContain(type);
   });
 });

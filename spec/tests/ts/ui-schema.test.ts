@@ -891,7 +891,7 @@ describe("UI-BLOCKS-01: storyboard_player, action_bar, proposal_card, voice_line
   });
 
   test("each new block has an example page", () => {
-    for (const [file, type] of [["storyboard-player.json", "storyboard_player"], ["action-bar.json", "action_bar"], ["proposal-card.json", "proposal_card"], ["voice-line.json", "voice_line"], ["media-stage.json", "media_stage"]] as const) {
+    for (const [file, type] of [["storyboard-player.json", "storyboard_player"], ["action-bar.json", "action_bar"], ["proposal-card.json", "proposal_card"], ["voice-line.json", "voice_line"], ["media-stage.json", "media_stage"], ["agent-thread.json", "agent_thread"], ["code-changes.json", "code_changes"], ["terminal-log.json", "terminal_log"]] as const) {
       expect(pageFiles).toContain(file);
       expect(validate(page(file))).toBe(true);
       expect(page(file).body[0].type).toBe(type);

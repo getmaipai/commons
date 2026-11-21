@@ -1,0 +1,15 @@
+{
+  "type": "page",
+  "id": "session",
+  "title": "Session",
+  "body": [
+    {
+      "type": "agent_thread",
+      "bind": { "source": "package", "path": "session-events", "stream": true, "params": { "id": "$state.session" } },
+      "send": { "call": { "target": "/api/plugins/code/send", "args": { "session": "{session}" } } },
+      "stop": { "call": { "target": "/api/plugins/code/stop", "args": { "session": "{session}" } } },
+      "approve": { "call": { "target": "/api/plugins/code/approve", "args": { "session": "{session}" } } },
+      "placeholder": "Tell the agent what to change"
+    }
+  ]
+}

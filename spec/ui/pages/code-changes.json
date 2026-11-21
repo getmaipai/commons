@@ -1,0 +1,15 @@
+{
+  "type": "page",
+  "id": "changes",
+  "title": "Changes",
+  "body": [
+    {
+      "type": "code_changes",
+      "bind": { "source": "package", "path": "session-changes", "params": { "id": "$state.session" } },
+      "item_fields": { "path": "path", "status": "status", "additions": "additions", "deletions": "deletions", "patch": "patch" },
+      "selected_state": "file",
+      "compare_label": "compare.label",
+      "on_line_comment": { "call": { "target": "/api/plugins/code/comment", "args": { "session": "{session}" } } }
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/coding-event.schema.json",
+  "title": "CodingEvent",
+  "description": "CODE-SPEC-01 (Home docs/design/local-coding-2026-10-17.md section 4.2). One line of a Code session's audit trail: what the agent did. Person scope, owner only, exportable with the session. `secret_found` carries the path and line, never the value. Household logs never carry this record; they hold typed events with no person, text, path or id.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "session_id",
+    "at",
+    "kind",
+    "detail",
+    "provenance",
+    "hlc"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^cevt-[a-z0-9]{6,}$"
+    },
+    "session_id": {
+      "type": "string",
+      "pattern": "^csess-[a-z0-9]{6,}$"
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "command",
+        "file_write",
+        "host_allowed",
+        "host_blocked",
+        "approval",
+        "push",
+        "pull_request",
+        "secret_found",
+        "checkpoint_restored",
+        "stopped"
+      ]
+    },
+    "detail": {
+      "type": "object",
+      "description": "The fields for the kind. command: command, exit_code, duration_ms. file_write: path. host_allowed and host_blocked: host. approval: what, answer. push: branch. pull_request: url. secret_found: path, line. checkpoint_restored: checkpoint_id. stopped: reason.",
+      "additionalProperties": true
+    },
+    "provenance": {
+      "type": "string",
+      "minLength": 1
+    },
+    "hlc": {
+      "type": "string",
+      "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$",
+      "description": "Hybrid logical clock: wall_ms:counter:node."
+    }
+  }
+}

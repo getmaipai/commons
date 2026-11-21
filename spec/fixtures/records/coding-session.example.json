@@ -1,0 +1,50 @@
+{
+  "id": "csess-sage001",
+  "person_id": "person-sage01",
+  "title": "Add a dark mode switch",
+  "repo": {
+    "kind": "gitea",
+    "connection_id": "gitc-sage001",
+    "full_name": "sage/notes-app",
+    "base_branch": "main",
+    "work_branch": "code/dark-mode"
+  },
+  "environment_id": "cenv-sage001",
+  "mode": "ask",
+  "state": "working",
+  "tier": "boost",
+  "network": {
+    "policy": "hosts",
+    "hosts": [
+      "registry.example.com"
+    ]
+  },
+  "mounts": [
+    "file-sage0001"
+  ],
+  "model_id": "example-model-id",
+  "usage": {
+    "input_tokens": 12000,
+    "output_tokens": 3400
+  },
+  "changes": {
+    "files": 3,
+    "additions": 42,
+    "deletions": 7
+  },
+  "pull_request": null,
+  "checkpoints": [
+    {
+      "id": "cp-1",
+      "at": "2026-11-21T10:05:00Z",
+      "label": "Before the theme change",
+      "files": 2
+    }
+  ],
+  "created_at": "2026-11-21T10:00:00Z",
+  "last_activity_at": "2026-11-21T10:06:00Z",
+  "deleted_at": null,
+  "trash_until": null,
+  "provenance": "Started in the Code app",
+  "hlc": "1795255560000:0:sage01"
+}

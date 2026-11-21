@@ -190,6 +190,13 @@
       ]
     },
     {
+      "id": "coding",
+      "role": "coding",
+      "label": "Coding",
+      "grant_parameter": "coding",
+      "options": []
+    },
+    {
       "id": "voice",
       "role": "tts",
       "label": "Voice",
@@ -202,6 +209,13 @@
     "teen_max_categories": [
       "image"
     ],
-    "child_max": "never"
+    "child_max": "never",
+    "role_defaults": {
+      "$comment": "CODE-TIER-01 (Home docs/design/code-session-tiers-2026-11-21.md section 3.1; rules 8 and C3). The tier a child or a teen runs a category at when nothing else is set: a role default, not a hard limit. An admin may override it for one person or the household. Prohibited content and crisis handling stay fixed for everyone. A category absent here has no tier default for minors beyond the rules above.",
+      "coding": {
+        "child": "standard",
+        "teen": "standard"
+      }
+    }
   }
 }

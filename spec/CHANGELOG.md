@@ -1,3 +1,11 @@
+## [spec-v0.1.476] - 2026-11-21
+
+- Coding records (CODE-SPEC-01, phase 2): new schemas and fixtures `coding-session`, `coding-environment`, `coding-event` and `git-connection` (states, fields and scopes as in Home's local-coding design note, section 4.2). `coding-session.tier` (`standard`, `boost`, `max`, default `standard`) is the person's stored choice; `model_id` is provenance written by Home from the Stack's reply and is never a choice (CODE-TIER-01). `coding-environment` has no secret field; `git-connection` carries no token.
+- Resource tiers (CODE-TIER-01): `coding` becomes a category in `vocab/resource-tiers.json` (role `coding`, grant parameter `coding`, no options) and `minors_policy.role_defaults.coding` gives a child and a teen Standard, a role default an admin may override. The four `engines.coding.tier.*` slot keys are added (Standard `recommended`; Reduced, Boost and Max `off` until the coding benchmark justifies them), `access.tier.boost` and `access.tier.max` list `coding` (a teen's Boost default leaves it out), and the `tier.max:<category>` grant text names it. No new grant id; `grant-actions.json` keeps `use:code` as it was.
+- Notifications: `notifications.coding.session_done.telegram`, `notifications.coding.needs_you.telegram` and `notifications.coding.workspace_expiring.telegram` (the types themselves are declared by the Code package).
+- UI schema: nodes `agent_thread` (one session's event stream), `code_changes` (file tree and diff with line comments) and `terminal_log` (command blocks), allowed on package pages with example pages and app-check rules.
+- Regenerated `spec/gen/ts` and `spec/gen/py`. Additive; no existing field changes meaning.
+
 ## [spec-v0.1.475] - 2026-11-21
 
 - `HouseholdVoice`: added the optional `voice_text` (1 to 2000 characters), the words spoken in the reference clip. Home sends it to the voice engine as the `voice_text` form field so VoxCPM2 can clone with the clip plus its transcript (other engines ignore it). Additive; absent means the engine reads the words from the clip itself (VOICE-VOXCPM2-01).

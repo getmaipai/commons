@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/git-connection.schema.json",
+  "title": "GitConnection",
+  "description": "CODE-SPEC-01 (Home docs/design/local-coding-2026-10-17.md section 4.2). A person's link to a git host for Code sessions. The token is a write-only secret held by Home and never on the wire or in this record.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "person_id",
+    "kind",
+    "host",
+    "account",
+    "status",
+    "created_at",
+    "provenance",
+    "hlc"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^gitc-[a-z0-9]{6,}$"
+    },
+    "person_id": {
+      "type": "string",
+      "pattern": "^person-[a-z0-9]{6,}$"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "github",
+        "gitea"
+      ]
+    },
+    "host": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 253
+    },
+    "account": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "expired",
+        "revoked",
+        "failing"
+      ]
+    },
+    "expires_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "provenance": {
+      "type": "string",
+      "minLength": 1
+    },
+    "hlc": {
+      "type": "string",
+      "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$",
+      "description": "Hybrid logical clock: wall_ms:counter:node."
+    }
+  }
+}
