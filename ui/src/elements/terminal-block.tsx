@@ -1,6 +1,6 @@
 "use client";
 
-import type { ComponentProps } from "react";
+import { useLayoutEffect, useRef, type ComponentProps } from "react";
 import { CheckIcon, Loader2Icon, XIcon } from "lucide-react";
 import { cn } from "cn";
 import { mono, paper } from "./surfaces";
@@ -10,6 +10,8 @@ export function TerminalBlock({
   lines,
   visibleCount,
   done,
+  streaming = false,
+  followTail = streaming,
   variant = "paper",
   exitCode = 0,
   stderr = [],
@@ -21,13 +23,18 @@ export function TerminalBlock({
   ...props
 }: Omit<
   ComponentProps<"div">,
-  "children" | "command" | "lines" | "visibleCount" | "done" | "variant"
+  "children" | "command" | "lines" | "visibleCount" | "done" | "streaming" | "followTail" | "variant"
   | "exitCode" | "stderr" | "cwd" | "durationMs" | "truncated" | "maxCollapsedLines"
 > & {
   command: string;
   lines: readonly string[];
-  visibleCount: number;
+  /** Reveal animation: how many lines show. Ignored while `streaming`. */
+  visibleCount?: number;
   done: boolean;
+  /** `lines` and `stderr` grow as output arrives: every line shows, none re-animates. */
+  streaming?: boolean;
+  /** Keeps the view at the end as output arrives, until the person scrolls up. Defaults to `streaming`. */
+  followTail?: boolean;
   variant?: "paper" | "ink";
   exitCode?: number;
   stderr?: readonly string[];
@@ -38,7 +45,15 @@ export function TerminalBlock({
 }) {
   const ink = variant === "ink";
   const outputLines = [...lines.map((line) => ({ line, stderr: false })), ...stderr.map((line) => ({ line, stderr: true }))];
-  const limit = maxCollapsedLines ?? visibleCount;
+  const limit = streaming
+    ? (maxCollapsedLines ?? outputLines.length)
+    : (maxCollapsedLines ?? visibleCount ?? outputLines.length);
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const atTail = useRef(true);
+  useLayoutEffect(() => {
+    const el = bodyRef.current;
+    if (followTail && el && atTail.current) el.scrollTop = el.scrollHeight;
+  }, [followTail, outputLines.length]);
   const shownLines = outputLines.slice(0, Math.max(0, limit));
 
   return (
@@ -90,8 +105,20 @@ export function TerminalBlock({
       </div>
       {(cwd || durationMs !== undefined || truncated) && <div className="text-muted-foreground px-4 pb-1">{cwd}{cwd && durationMs !== undefined ? " · " : ""}{durationMs !== undefined ? `${Math.max(0, Math.round(durationMs / 1000))}s` : ""}{truncated ? " · output truncated" : ""}</div>}
       <div
+        ref={bodyRef}
+        role={streaming ? "log" : undefined}
+        data-follow-tail={followTail ? "" : undefined}
+        onScroll={
+          followTail
+            ? (event) => {
+                const el = event.currentTarget;
+                atTail.current = el.scrollHeight - el.scrollTop - el.clientHeight <= 8;
+              }
+            : undefined
+        }
         className={cn(
           "flex min-h-[8.5rem] flex-col gap-1 px-4 pt-1 pb-3.5",
+          followTail && "max-h-72 overflow-y-auto",
           ink
             ? "text-background/60 dark:text-muted-foreground"
             : "text-muted-foreground",
@@ -104,7 +131,7 @@ export function TerminalBlock({
               key={`${i}-${line}`}
               data-stream={isStderr ? "stderr" : "stdout"}
               className={cn(
-                "fade-in animate-in fill-mode-both duration-300",
+                !streaming && "fade-in animate-in fill-mode-both duration-300",
                 isStderr && "text-destructive",
                 (isLast && !isStderr) &&
                   (ink

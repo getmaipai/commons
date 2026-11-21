@@ -1,10 +1,10 @@
 "use client";
 
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import { CheckIcon, XIcon } from "lucide-react";
 import { cn } from "cn";
 import { codeScroll, codeSurface, inkButton, mono, paper } from "./surfaces";
-import type { DiffLine } from "./code-diff";
+import { defaultCommentLabel, LineCommentButton, type DiffLine } from "./code-diff";
 
 export type HunkDecision = "pending" | "kept" | "discarded";
 
@@ -23,17 +23,25 @@ export function ReviewableDiff({
   onKeep,
   onDiscard,
   onApply,
+  compareLabel,
+  onLineComment,
+  commentLabel = defaultCommentLabel,
   className,
   ...props
 }: Omit<
   ComponentProps<"div">,
-  "children" | "filename" | "hunks" | "onKeep" | "onDiscard" | "onApply"
+  "children" | "filename" | "hunks" | "onKeep" | "onDiscard" | "onApply" | "compareLabel"
 > & {
   filename: string;
   hunks: readonly DiffHunk[];
   onKeep?: (id: string) => void;
   onDiscard?: (id: string) => void;
   onApply?: () => void;
+  /** Names what the diff is compared against, for example "vs main". */
+  compareLabel?: ReactNode;
+  /** Hover a line to add a comment; receives the filename and line number. */
+  onLineComment?: (path: string, line: number) => void;
+  commentLabel?: (line: number) => string;
 }) {
   const kept = hunks.filter((hunk) => hunk.decision === "kept").length;
   const pending = hunks.filter((hunk) => hunk.decision === "pending").length;
@@ -51,6 +59,11 @@ export function ReviewableDiff({
     >
       <div className="flex items-center justify-between px-4 pt-3 pb-2">
         <span className="font-mono text-xs">{filename}</span>
+        {compareLabel ? (
+          <span className={cn(mono, "text-muted-foreground ms-2 me-auto")}>
+            {compareLabel}
+          </span>
+        ) : null}
         <span className={cn(mono, "text-muted-foreground tabular-nums")}>
           {kept} of {hunks.length} kept
         </span>
@@ -116,6 +129,7 @@ export function ReviewableDiff({
                   <div
                     key={`${hunk.id}-${i}`}
                     className={cn(
+                      onLineComment && "group/line",
                       "flex px-4 py-0.5 leading-relaxed whitespace-pre",
                       line.kind === "context" && "text-muted-foreground",
                       line.kind === "added" &&
@@ -128,6 +142,12 @@ export function ReviewableDiff({
                       {GUTTER[line.kind]}
                     </span>
                     <span>{line.text}</span>
+                    {onLineComment ? (
+                <LineCommentButton
+                  label={commentLabel(line.line ?? i + 1)}
+                  onClick={() => onLineComment(filename, line.line ?? i + 1)}
+                />
+              ) : null}
                   </div>
                 ))}
               </div>

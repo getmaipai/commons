@@ -1,3 +1,7 @@
+## [ui-v0.5.727] - 2026-11-21
+
+- Code app parts (CODE-KIT-01): `FileTree` takes `selectedPath`, `onSelect` (click, Enter, Space) and `live` (every node, no reveal animation); `CodeDiff` and `ReviewableDiff` take `onLineComment(path, line)`, `compareLabel` and `commentLabel`; `TerminalBlock` takes `streaming` and `followTail`; new `CodeView` (read-only file view with line numbers and a `streaming` flag). Without the new props the output is unchanged.
+
 ## [ui-v0.5.726] - 2026-11-20
 
 - `StoryboardPlayer`: while no shot has a picture or a clip the stage is one 4 rem line (icon and "No picture yet"), not a 16:9 box. `ActionBar` on a phone with a secondary button is one compact row: the buttons side by side, the estimate and note lines kept for assistive tech only, so the bar no longer covers the player (VIDEO-KIT-01).

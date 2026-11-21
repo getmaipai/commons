@@ -17,21 +17,34 @@ export interface FileTreeNode {
 
 export function FileTree({
   nodes,
-  visibleCount,
+  visibleCount = Number.POSITIVE_INFINITY,
+  live = false,
+  selectedPath,
+  onSelect,
   totalAdditions,
   totalDeletions,
   className,
   ...props
 }: Omit<
   ComponentProps<"div">,
-  "children" | "nodes" | "visibleCount" | "totalAdditions" | "totalDeletions"
+  "children" | "nodes" | "visibleCount" | "totalAdditions" | "totalDeletions" | "onSelect"
 > & {
   nodes: readonly FileTreeNode[];
-  visibleCount: number;
+  /** Reveal animation: how many rows show. Ignored when `live`. */
+  visibleCount?: number;
+  /** Live mode: every node shows at once, with no reveal animation. */
+  live?: boolean;
+  /** Path of the row marked selected (`aria-selected`). */
+  selectedPath?: string;
+  /** Makes rows focusable and fires on click, Enter and Space. */
+  onSelect?: (path: string) => void;
   totalAdditions: number;
   totalDeletions: number;
 }) {
   const files = nodes.filter((node) => node.kind === "file").length;
+  const interactive = onSelect !== undefined;
+  const selectable = interactive || selectedPath !== undefined;
+  const shown = live ? nodes : take(nodes, visibleCount);
 
   return (
     <div
@@ -56,11 +69,30 @@ export function FileTree({
         </span>
       </div>
 
-      <div className="flex flex-col">
-        {take(nodes, visibleCount).map((node) => (
+      <div className="flex flex-col" role={selectable ? "tree" : undefined}>
+        {shown.map((node) => (
           <div
             key={node.path}
-            className="fade-in slide-in-from-left-1 animate-in fill-mode-both hover:bg-foreground/[0.03] flex items-center gap-2 rounded-lg px-1 py-1 text-[13px] transition-colors duration-300"
+            role={selectable ? "treeitem" : undefined}
+            aria-selected={selectable ? node.path === selectedPath : undefined}
+            tabIndex={interactive ? 0 : undefined}
+            onClick={interactive ? () => onSelect(node.path) : undefined}
+            onKeyDown={
+              interactive
+                ? (event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      onSelect(node.path);
+                    }
+                  }
+                : undefined
+            }
+            className={cn(
+              !live && "fade-in slide-in-from-left-1 animate-in fill-mode-both",
+              "hover:bg-foreground/[0.03] flex items-center gap-2 rounded-lg px-1 py-1 text-[13px] transition-colors duration-300",
+              interactive && "cursor-pointer focus-visible:ring-ring/50 focus-visible:ring-2 focus-visible:outline-none",
+              node.path === selectedPath && "bg-foreground/[0.06]",
+            )}
             style={{ paddingInlineStart: `${0.25 + node.depth * 0.85}rem` }}
           >
             {node.kind === "folder" ? (
