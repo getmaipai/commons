@@ -71,3 +71,8 @@ test("chat.search_assist help describes what it does today, with no 'not active 
   expect(help.length).toBeGreaterThan(20);
   expect(help).not.toMatch(/not (active )?yet|for now|coming soon|isn't active|is not active/i);
 });
+
+test("chat.specifics_check is one household select, off by default, honoured by Home (spec-v0.1.474)", () => {
+  const key = (keys as unknown as Array<Record<string, unknown>>).find((k) => k.key === "chat.specifics_check");
+  expect(key).toMatchObject({ scope: "household", selector: "select", range: { options: ["off", "shadow"] }, default: "off", level: "advanced", lives_in: "household.ai_advanced", honoured_by: ["home"] });
+});

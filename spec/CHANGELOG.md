@@ -1,3 +1,7 @@
+## [spec-v0.1.474] - 2026-11-21
+
+- Added the household setting `chat.specifics_check` (select: `off` or `shadow`, default `off`, advanced, lives in `household.ai_advanced`, honoured by Home). After an adult reply Home can count names, numbers or dates that lack a basis in the turn; `shadow` only counts and never changes the reply. Home had added the key without the spec, so its settings registry drifted from spec-v0.1.473; this is the spec-first definition (the entry is exactly the one in Home's `aiKeys.ts`).
+
 ## [spec-v0.1.473] - 2026-11-20
 
 - Removed `voice.talk_over` and `voice.talk_over_window_ms`: the "Talk before I finish" feature (TALK-OVER-01, INSTANT-FILLER-01a) is retired by owner decision 2026-11-20. Home no longer plays a pre-recorded spoken cue when a sentence ends; replies start when the turn is committed, and any acknowledgement should come from the household's own model. Retirement note for rule 12: the behaviour it held (a canned cue and a protected overlap window) is retired, not ported; the speculative start (`voice.speculative_start`), the spoken thinking cues and the barge-in stop are separate features and stay. A stored value for either key is deleted by Home's migration.

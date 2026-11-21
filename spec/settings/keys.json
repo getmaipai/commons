@@ -1108,6 +1108,26 @@
     ]
   },
   {
+    "key": "chat.specifics_check",
+    "scope": "household",
+    "selector": "select",
+    "range": {
+      "options": [
+        "off",
+        "shadow"
+      ]
+    },
+    "default": "off",
+    "label": "Count unsupported specifics in replies",
+    "help": "After an adult reply, Home can ask the Stack whether specific names, numbers, or dates lack a basis. Shadow only counts the result; it never changes the reply.",
+    "level": "advanced",
+    "secret": false,
+    "lives_in": "household.ai_advanced",
+    "honoured_by": [
+      "home"
+    ]
+  },
+  {
     "key": "engines.stack.use_chat",
     "scope": "household",
     "selector": "boolean",
