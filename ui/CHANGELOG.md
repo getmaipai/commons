@@ -1,3 +1,7 @@
+## [ui-v0.5.733] - 2026-11-22
+
+- Fix: the compact composer text lines up with its controls. The text field is `display: block` (an inline textarea left a 5 px descender gap under it, so the placeholder and typed text sat 5 px above the centre line of the Add, mode, level and send buttons).
+
 ## [ui-v0.5.732] - 2026-11-22
 
 - Fix: header rows line up. The right pane header is 56 px (`h-14`) like the chat header, and a compact section sidebar title sits on the same centre line (`pt-3.5`), so the three headers of a page with a sidebar, a thread and a right pane no longer sit 2 to 4 px apart.

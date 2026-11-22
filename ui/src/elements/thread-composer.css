@@ -92,6 +92,7 @@
 
 [data-slot="aui_composer-shell"][data-density="compact"] textarea {
   box-sizing: border-box;
+  display: block; /* an inline textarea leaves a descender gap under it that lifts the text off the controls' centre line */
   min-height: var(--_field-min);
   max-height: var(--composer-compact-max-height, 160px);
   padding: calc((var(--_field-min) - var(--composer-compact-text-line, 22px)) / 2) 8px;
