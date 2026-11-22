@@ -3209,8 +3209,8 @@ html[data-pro-look] [data-slot="media-shelf"][data-orientation="vertical"] [data
  * these rules turned `.absolute` handles (the Studio's trim handles and playhead, the Play button on a clip card, the phone menu button) into
  * `position: relative` and overrode every `after:` utility. In the base layer a class (`absolute`, `fixed`, `sticky`, `after:inset-0`) wins. */
 @layer base {
-  :where(button, a[href], [role="button"], [role="link"], [role="checkbox"], [role="radio"], [role="switch"], [role="tab"], [role="menuitem"], [tabindex]:not([tabindex="-1"]):not(input, select, textarea)):not([data-touch-target-exempt], [data-touch-target-exempt] *) { position: relative; }
-  :where(button, a[href], [role="button"], [role="link"], [role="checkbox"], [role="radio"], [role="switch"], [role="tab"], [role="menuitem"], [tabindex]:not([tabindex="-1"]):not(input, select, textarea)):not([data-touch-target-exempt], [data-touch-target-exempt] *)::after {
+  :where(button, a[href], [role="button"], [role="link"], [role="checkbox"], [role="radio"], [role="switch"], [role="tab"], [role="menuitem"], [tabindex]:not([tabindex="-1"]):not(input, select, textarea, [role="tabpanel"], [role="dialog"], [role="alertdialog"], [role="region"], [data-slot="tabs-content"])):not([data-touch-target-exempt], [data-touch-target-exempt] *) { position: relative; }
+  :where(button, a[href], [role="button"], [role="link"], [role="checkbox"], [role="radio"], [role="switch"], [role="tab"], [role="menuitem"], [tabindex]:not([tabindex="-1"]):not(input, select, textarea, [role="tabpanel"], [role="dialog"], [role="alertdialog"], [role="region"], [data-slot="tabs-content"])):not([data-touch-target-exempt], [data-touch-target-exempt] *)::after {
     content: "";
     position: absolute;
     inset: min(0px, calc((100% - 49px) / 2));

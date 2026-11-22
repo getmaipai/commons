@@ -24,3 +24,17 @@ describe("the touch-floor rules sit under Tailwind's utilities", () => {
     expect(bad).toEqual([]);
   });
 });
+
+// 2026-11-21: Radix tab panels carry tabindex=0, so the touch floor gave each panel a full-size ::after that painted above its own buttons and
+// the Add voice dialog (and every tabbed page) ignored clicks. Focusable containers are not controls.
+describe("the touch floor leaves focusable containers alone", () => {
+  test("the tabindex clause excludes tab panels, dialogs and regions on both rules", () => {
+    const hits = css.split("\n").filter((l) => l.includes('[tabindex]:not([tabindex="-1"])'));
+    expect(hits.length).toBeGreaterThanOrEqual(2);
+    for (const l of hits) {
+      expect(l).toContain('[role="tabpanel"]');
+      expect(l).toContain('[role="dialog"]');
+      expect(l).toContain('[role="region"]');
+    }
+  });
+});
