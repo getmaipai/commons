@@ -1,3 +1,7 @@
+## [ui-v0.5.736] - 2026-11-22
+
+- Fix: in the composer footer row the notice shrinks (and truncates) before the mode, level and footer end wrap, so a phone keeps them on one line.
+
 ## [ui-v0.5.735] - 2026-11-22
 
 - Fix: the quiet (footer) mode list is as wide as its longest label and uses normal text size, so a long label no longer wraps.

@@ -1097,7 +1097,7 @@ const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
       </ComposerPrimitive.AttachmentDropzone>
       {composerModes?.placement === "footer" ? (
         <div data-slot="aui_composer-footer" className="text-muted-foreground flex w-full flex-wrap items-center justify-end gap-x-3 gap-y-0 px-2.5 text-xs leading-6">
-          {ComposerNotice ? <span data-slot="aui_composer-notice" className="mr-auto min-w-0 truncate"><ComposerNotice /></span> : null}
+          {ComposerNotice ? <span data-slot="aui_composer-notice" className="min-w-0 flex-1 basis-0 truncate"><ComposerNotice /></span> : null}
           <ComposerFooterControls composerModes={composerModes} />
           {ComposerFooterEnd ? <ComposerFooterEnd /> : null}
         </div>
