@@ -3,6 +3,7 @@
 import { i18n, kitLocaleTag } from "@/kit/i18n"
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Skeleton } from "./ui/skeleton";
 import { cn } from "cn";
 import {
@@ -32,6 +33,7 @@ import {
   PinOffIcon,
   PlusIcon,
   SearchIcon,
+  SlidersHorizontalIcon,
   TrashIcon,
 } from "lucide-react";
 import {
@@ -103,14 +105,16 @@ export type ThreadListProjectLabels = {
   /** Shown under a project with more than six chats. Defaults "Show more" and "Show less". */
   showMore?: string;
   showLess?: string;
-  /** Shown inside an open project with no chats. Default "No chats yet". */
+  /** Shown inside an open project with no chats. Default "No chats". */
   empty?: string;
   /** Accessible name of a project row's menu button. Default "Project options". */
   projectOptions?: string;
   /** Menu item that opens the project's settings (needs `onEdit`). Default "Edit project". */
   editProject?: string;
-  /** Link row after the projects (needs `onSeeAll`). Default "See all projects". */
+  /** Header button that browses every project (needs `onSeeAll`). Default "Browse all projects". */
   seeAll?: string;
+  /** Create button in the new project dialog. Default "Create". */
+  create?: string;
   /** Menu items when a host passes `onPin`. Defaults "Pin project" and "Unpin project". */
   pinProject?: string;
   unpinProject?: string;
@@ -155,7 +159,7 @@ export type ThreadListProjects = {
   onEdit?: (id: string) => void;
   /** Adds Pin / Unpin project to the row menu. */
   onPin?: (id: string, pinned: boolean) => void;
-  /** Adds a "See all projects" row after the list. */
+  /** Adds a "Browse all projects" icon button to the section header. */
   onSeeAll?: () => void;
   /** Opt into the project-page chat row presentation; absent keeps current rows unchanged. */
   rowVariant?: "page";
@@ -184,10 +188,11 @@ const projectLabelDefaults = (): Required<ThreadListProjectLabels> => ({
   cancel: i18n._({ id: "ui.Cancel", message: "Cancel" }),
   showMore: i18n._({ id: "ui.Show more", message: "Show more" }),
   showLess: i18n._({ id: "ui.Show less", message: "Show less" }),
-  empty: i18n._({ id: "ui.No chats yet", message: "No chats yet" }),
+  empty: i18n._({ id: "ui.No chats", message: "No chats" }),
   projectOptions: i18n._({ id: "ui.Project options", message: "Project options" }),
   editProject: i18n._({ id: "ui.Edit project", message: "Edit project" }),
-  seeAll: i18n._({ id: "ui.See all projects", message: "See all projects" }),
+  seeAll: i18n._({ id: "ui.Browse all projects", message: "Browse all projects" }),
+  create: i18n._({ id: "ui.Create", message: "Create" }),
   pinProject: i18n._({ id: "ui.Pin project", message: "Pin project" }),
   unpinProject: i18n._({ id: "ui.Unpin project", message: "Unpin project" }),
   toggleChats: i18n._({ id: "ui.Show or hide chats", message: "Show or hide chats" }),
@@ -606,30 +611,46 @@ const ThreadListProjectsSection: FC<{
             className={cn("size-3 shrink-0 transition-transform motion-reduce:transition-none", sectionOpen && "rotate-90")}
           />
         </button>
-        {canCreate ? (
-          <Button
-            variant="ghost"
-            size="icon"
-            data-slot="aui_thread-list-section-action"
-            aria-label={labels.newProject}
-            // A 24px box with a 12px transparent overhang: the 48px touch floor.
-            className="relative size-6 p-0 before:absolute before:inset-[min(0px,calc((100%-49px)/2))] before:content-['']"
-            onClick={() => setCreating(true)}
-          >
-            <PlusIcon className="size-3.5" />
-          </Button>
+        {canCreate || projects.onSeeAll ? (
+          <div className="flex items-center gap-0.5">
+            {projects.onSeeAll ? (
+              <Button
+                variant="ghost"
+                size="icon"
+                data-slot="aui_thread-list-projects-see-all"
+                aria-label={labels.seeAll}
+                className="relative size-6 p-0 before:absolute before:inset-[min(0px,calc((100%-49px)/2))] before:content-['']"
+                onClick={() => projects.onSeeAll?.()}
+              >
+                <SlidersHorizontalIcon className="size-3.5" />
+              </Button>
+            ) : null}
+            {canCreate ? (
+              <Button
+                variant="ghost"
+                size="icon"
+                data-slot="aui_thread-list-section-action"
+                aria-label={labels.newProject}
+                // A 24px box with a 12px transparent overhang: the 48px touch floor.
+                className="relative size-6 p-0 before:absolute before:inset-[min(0px,calc((100%-49px)/2))] before:content-['']"
+                onClick={() => setCreating(true)}
+              >
+                <PlusIcon className="size-3.5" />
+              </Button>
+            ) : null}
+          </div>
         ) : null}
       </div>
-      {creating && sectionOpen ? (
-        <ProjectNameField
-          label={labels.newProject}
-          placeholder={labels.projectName}
-          initial=""
-          onDone={async (name) => {
-            // The field closes whether or not the host's save succeeds;
+      {canCreate ? (
+        <NewProjectDialog
+          open={creating}
+          onOpenChange={setCreating}
+          labels={labels}
+          onCreate={async (name) => {
+            // The dialog closes whether or not the host's save succeeds;
             // the host says what went wrong.
             try {
-              if (name) await projects.onCreate?.(name);
+              await projects.onCreate?.(name);
             } finally {
               setCreating(false);
             }
@@ -656,17 +677,55 @@ const ThreadListProjectsSection: FC<{
           {allProjects ? labels.showLess : labels.showMore}
         </Button>
       ) : null}
-      {sectionOpen && projects.onSeeAll ? (
-        <Button
-          variant="ghost"
-          data-slot="aui_thread-list-projects-see-all"
-          className={cn("text-muted-foreground justify-start px-2.5 text-sm font-normal", density === "compact" ? "h-9 rounded-lg" : "h-8 rounded-md")}
-          onClick={() => projects.onSeeAll?.()}
-        >
-          {labels.seeAll}
-        </Button>
-      ) : null}
     </div>
+  );
+};
+
+/** The modal that makes a project: a name field and a Create button. */
+const NewProjectDialog: FC<{
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  labels: Required<ThreadListProjectLabels>;
+  onCreate: (name: string) => void | Promise<void>;
+}> = ({ open, onOpenChange, labels, onCreate }) => {
+  const [value, setValue] = useState("");
+  const name = value.trim();
+  useEffect(() => {
+    if (open) setValue("");
+  }, [open]);
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent data-slot="aui_thread-list-new-project-dialog" className="sm:max-w-md">
+        <form
+          className="flex flex-col gap-4"
+          onSubmit={(event) => {
+            event.preventDefault();
+            if (name) Promise.resolve(onCreate(name)).catch(() => {});
+          }}
+        >
+          <DialogHeader>
+            <DialogTitle>{labels.newProject}</DialogTitle>
+          </DialogHeader>
+          <Input
+            autoFocus
+            data-slot="aui_thread-list-new-project-name"
+            aria-label={labels.projectName}
+            placeholder={labels.projectName}
+            maxLength={80}
+            value={value}
+            onChange={(event) => setValue(event.target.value)}
+          />
+          <DialogFooter>
+            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+              {labels.cancel}
+            </Button>
+            <Button type="submit" disabled={!name}>
+              {labels.create}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };
 

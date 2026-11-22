@@ -193,7 +193,7 @@ describe("ThreadList projects mode", () => {
     await view.findByText("Alpha");
     expect(labels(view)).toEqual(["Pinned", "Projects"]);
     fireEvent.click((await projectRow(view, "Garden")).querySelector("[data-slot=aui_thread-list-project-trigger]") as HTMLElement);
-    await view.findByText("No chats yet");
+    await view.findByText("No chats");
     expect(view.getAllByText("Alpha")).toHaveLength(1);
   });
 
@@ -299,30 +299,59 @@ describe("ThreadList projects mode", () => {
     expect(more.className).toContain("before:inset-[min(0px,calc((100%-49px)/2))]");
   });
 
-  test("+ makes a project from an inline field", async () => {
+  test("+ opens a dialog with a name field and a Create button, and no inline row", async () => {
     const onCreate = mock(async () => {});
     const view = render(<Harness projects={{ folders: [], canManage: true, onCreate }} seeds={[{ remoteId: "a", title: "Alpha" }]} />);
     fireEvent.click(await view.findByLabelText("New project"));
-    const field = await view.findByPlaceholderText("Project name");
+    const dialog = await view.findByRole("dialog");
+    expect(view.container.querySelector("[data-slot=aui_thread-list-project-name]")).toBeNull();
+    const create = within(dialog).getByRole("button", { name: "Create" }) as HTMLButtonElement;
+    expect(create.disabled).toBe(true);
+    const field = within(dialog).getByPlaceholderText("Project name");
     fireEvent.change(field, { target: { value: "  Recipes " } });
-    fireEvent.keyDown(field, { key: "Enter" });
+    fireEvent.click(create);
     await waitFor(() => expect(onCreate).toHaveBeenCalledWith("Recipes"));
-    await waitFor(() => expect(view.queryByPlaceholderText("Project name")).toBeNull());
+    await waitFor(() => expect(view.queryByRole("dialog")).toBeNull());
   });
 
-  test("a failed save still closes the new project field", async () => {
+  test("Enter in the dialog creates, Cancel closes without creating", async () => {
+    const onCreate = mock(async () => {});
+    const view = render(<Harness projects={{ folders: [], canManage: true, onCreate }} seeds={[]} />);
+    fireEvent.click(await view.findByLabelText("New project"));
+    fireEvent.click(within(await view.findByRole("dialog")).getByRole("button", { name: "Cancel" }));
+    await waitFor(() => expect(view.queryByRole("dialog")).toBeNull());
+    expect(onCreate).not.toHaveBeenCalled();
+    fireEvent.click(view.getByLabelText("New project"));
+    const field = await view.findByPlaceholderText("Project name");
+    fireEvent.change(field, { target: { value: "Trip" } });
+    fireEvent.submit(field.closest("form") as HTMLFormElement);
+    await waitFor(() => expect(onCreate).toHaveBeenCalledWith("Trip"));
+  });
+
+  test("a failed save still closes the dialog", async () => {
     const onCreate = mock(async () => {
       throw new Error("hub said no");
     });
-    const view = render(<Harness projects={{ folders: [], canManage: true, onCreate }} seeds={[{ remoteId: "a", title: "Alpha" }]} />);
+    const view = render(<Harness projects={{ folders: [], canManage: true, onCreate }} seeds={[]} />);
     fireEvent.click(await view.findByLabelText("New project"));
     const field = await view.findByPlaceholderText("Project name");
     fireEvent.change(field, { target: { value: "Recipes" } });
-    fireEvent.keyDown(field, { key: "Enter" });
+    fireEvent.submit(field.closest("form") as HTMLFormElement);
     await waitFor(() => expect(onCreate).toHaveBeenCalled());
-    await waitFor(() => expect(view.queryByPlaceholderText("Project name")).toBeNull());
-    fireEvent.click(view.getByLabelText("New project"));
-    expect(await view.findByPlaceholderText("Project name")).toBeTruthy();
+    await waitFor(() => expect(view.queryByRole("dialog")).toBeNull());
+  });
+
+  test("onSeeAll puts a Browse all projects button in the header, not a row at the end", async () => {
+    const onSeeAll = mock(() => {});
+    const view = render(<Harness projects={{ folders, onSeeAll }} seeds={[]} />);
+    const header = (await view.findByText("Projects")).closest("[data-slot=aui_thread-list-group-label]") as HTMLElement;
+    fireEvent.click(within(header).getByLabelText("Browse all projects"));
+    expect(onSeeAll).toHaveBeenCalledTimes(1);
+    expect(view.queryByText("See all projects")).toBeNull();
+    view.unmount();
+    const plain = render(<Harness projects={{ folders }} seeds={[]} />);
+    await plain.findByText("Garden");
+    expect(plain.queryByLabelText("Browse all projects")).toBeNull();
   });
 
   test("rename and delete happen inline, and delete asks first", async () => {
@@ -376,12 +405,12 @@ describe("ThreadList projects mode", () => {
     expect(onOpen).toHaveBeenCalledTimes(1);
   });
 
-  test("Edit project, Pin project and See all projects appear only when the host passes them", async () => {
+  test("Edit project, Pin project and Browse all projects appear only when the host passes them", async () => {
     const onEdit = mock(() => {});
     const onPin = mock(() => {});
     const onSeeAll = mock(() => {});
     const plain = render(<Harness projects={{ folders, canManage: true }} seeds={[]} />);
-    expect(plain.container.querySelector("[data-slot=aui_thread-list-projects-see-all]")).toBeNull();
+    expect(plain.queryByLabelText("Browse all projects")).toBeNull();
     plain.unmount();
     const view = render(<Harness projects={{ folders, canManage: true, onEdit, onPin, onSeeAll }} seeds={[]} />);
     const more = (await projectRow(view, "Garden")).querySelector("[data-slot=aui_thread-list-project-more]") as HTMLElement;
@@ -391,7 +420,7 @@ describe("ThreadList projects mode", () => {
     fireEvent.pointerDown(more, { button: 0, pointerType: "mouse" });
     fireEvent.click(await view.findByText("Pin project"));
     expect(onPin).toHaveBeenCalledWith("folder-garden", true);
-    fireEvent.click(view.getByText("See all projects"));
+    fireEvent.click(view.getByLabelText("Browse all projects"));
     expect(onSeeAll).toHaveBeenCalledTimes(1);
   });
 

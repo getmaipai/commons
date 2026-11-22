@@ -460,12 +460,12 @@ msgid "ui.{name}: {label}"
 msgstr "{name}: {label}"
 
 #. js-lingui-explicit-id
-#: src/elements/composer-parts.tsx:427
+#: src/elements/composer-parts.tsx:430
 msgid "ui.{name}: {summary}"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:396
+#: src/elements/thread.aui.tsx:398
 #, needs-review
 msgid "ui.{name}. {reason}"
 msgstr "{name}. {reason}"
@@ -859,8 +859,8 @@ msgid "ui.Activity"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/composer-parts.tsx:263
-#: src/elements/composer-parts.tsx:284
+#: src/elements/composer-parts.tsx:266
+#: src/elements/composer-parts.tsx:287
 #: src/elements/prompt-bar.tsx:343
 #: src/elements/prompt-bar.tsx:545
 #: src/elements/prompt-bar.tsx:727
@@ -940,7 +940,7 @@ msgid "ui.Add Attachment"
 msgstr "Añadir adjunto"
 
 #. js-lingui-explicit-id
-#: src/elements/composer-parts.tsx:238
+#: src/elements/composer-parts.tsx:241
 msgid "ui.Add files"
 msgstr ""
 
@@ -1208,7 +1208,7 @@ msgid "ui.AQI {aqi}: {category}"
 msgstr "AQI {aqi}: {category}"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:1286
+#: src/elements/thread-list.aui.tsx:1375
 #, needs-review
 msgid "ui.Archive"
 msgstr "Archivar"
@@ -1267,13 +1267,13 @@ msgid "ui.asking"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:808
+#: src/elements/thread.aui.tsx:812
 #, needs-review
 msgid "ui.Assistant is speaking"
 msgstr "El asistente está hablando"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:799
+#: src/elements/thread.aui.tsx:803
 #, needs-review
 msgid "ui.Assistant said"
 msgstr "El asistente dijo"
@@ -1342,7 +1342,7 @@ msgstr "Bebé"
 #: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:398
 #: src/elements/composer-trigger-popover.aui.tsx:194
 #: src/elements/question-flow.tsx:48
-#: src/elements/thread-list.aui.tsx:177
+#: src/elements/thread-list.aui.tsx:183
 #: src/elements/tool-fallback.aui.tsx:567
 #: src/primitives/ArticleView.tsx:468
 #: src/primitives/DetailPane.tsx:31
@@ -1487,6 +1487,12 @@ msgid "ui.Bring your own from Hugging Face. The Stack checks its size and licenc
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/elements/thread-list.aui.tsx:194
+#, needs-review
+msgid "ui.Browse all projects"
+msgstr "Explorar todos los proyectos"
+
+#. js-lingui-explicit-id
 #: src/elements/image-editor.tsx:1282
 #: src/elements/image-editor.tsx:1284
 msgid "ui.Brush"
@@ -1544,8 +1550,8 @@ msgstr "Puede ver"
 #: src/elements/music-edit.tsx:62
 #: src/elements/project-home-page.tsx:29
 #: src/elements/project-settings.tsx:72
-#: src/elements/thread-list.aui.tsx:182
-#: src/elements/thread.aui.tsx:1657
+#: src/elements/thread-list.aui.tsx:188
+#: src/elements/thread.aui.tsx:1681
 #: src/elements/tier-segment.tsx:55
 #: src/elements/video-player.tsx:124
 #: src/primitives/Player.tsx:187
@@ -1748,7 +1754,7 @@ msgid "ui.Circle open"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/composer-parts.tsx:533
+#: src/elements/composer-parts.tsx:536
 #: src/elements/image-editor.tsx:1224
 #: src/elements/image-editor.tsx:1254
 #: src/elements/image-editor.tsx:1306
@@ -1968,7 +1974,7 @@ msgid "ui.completed"
 msgstr "completado"
 
 #. js-lingui-explicit-id
-#: src/elements/composer-parts.tsx:213
+#: src/elements/composer-parts.tsx:216
 msgid "ui.Composer modes"
 msgstr ""
 
@@ -2103,9 +2109,9 @@ msgstr "Enfriando"
 
 #. js-lingui-explicit-id
 #: src/elements/markdown-text.tsx:415
-#: src/elements/thread.aui.tsx:842
-#: src/elements/thread.aui.tsx:1408
-#: src/elements/thread.aui.tsx:1626
+#: src/elements/thread.aui.tsx:846
+#: src/elements/thread.aui.tsx:1432
+#: src/elements/thread.aui.tsx:1650
 #, needs-review
 msgid "ui.Copy"
 msgstr "Copiar"
@@ -2317,6 +2323,12 @@ msgid "ui.Cover art for {title}"
 msgstr "Carátula de {title}"
 
 #. js-lingui-explicit-id
+#: src/elements/thread-list.aui.tsx:195
+#, needs-review
+msgid "ui.Create"
+msgstr "Crear"
+
+#. js-lingui-explicit-id
 #: src/elements/image-editor.tsx:297
 msgid "ui.Crop"
 msgstr ""
@@ -2405,8 +2417,8 @@ msgid "ui.degrees Fahrenheit"
 msgstr "grados Fahrenheit"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:180
-#: src/elements/thread-list.aui.tsx:1295
+#: src/elements/thread-list.aui.tsx:186
+#: src/elements/thread-list.aui.tsx:1384
 #, needs-review
 msgid "ui.Delete"
 msgstr "Eliminar"
@@ -2433,7 +2445,7 @@ msgid "ui.Delete this project?"
 msgstr "¿Eliminar este proyecto?"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:181
+#: src/elements/thread-list.aui.tsx:187
 #, needs-review
 msgid "ui.Delete this project? Its chats stay."
 msgstr "¿Eliminar este proyecto? Tus chats se quedan."
@@ -2770,7 +2782,7 @@ msgid "ui.Each side can be at most {max} pixels."
 msgstr "Cada lado puede medir como máximo {max} píxeles."
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:377
+#: src/elements/thread-list.aui.tsx:386
 #: src/schema/NodeRenderer.tsx:1488
 #, needs-review
 msgid "ui.Earlier"
@@ -2789,7 +2801,7 @@ msgstr "Antes en {label}"
 #: src/elements/music-track.tsx:67
 #: src/elements/proposal-card.tsx:74
 #: src/elements/song-style.tsx:67
-#: src/elements/thread.aui.tsx:1621
+#: src/elements/thread.aui.tsx:1645
 #: src/elements/track-studio.tsx:409
 #: src/elements/track-studio.tsx:499
 #, needs-review
@@ -2828,7 +2840,7 @@ msgstr "Editar imagen: {title}"
 
 #. js-lingui-explicit-id
 #: src/elements/project-home-page.tsx:24
-#: src/elements/thread-list.aui.tsx:187
+#: src/elements/thread-list.aui.tsx:193
 #, needs-review
 msgid "ui.Edit project"
 msgstr "Editar proyecto"
@@ -2997,7 +3009,7 @@ msgid "ui.Export as a new clip"
 msgstr "Exportar como nuevo clip"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1469
+#: src/elements/thread.aui.tsx:1493
 #, needs-review
 msgid "ui.Export as Markdown"
 msgstr "Exportar como Markdown"
@@ -3463,7 +3475,7 @@ msgid "ui.Help"
 msgstr "Ayuda"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1431
+#: src/elements/thread.aui.tsx:1455
 #, needs-review
 msgid "ui.Helpful"
 msgstr "Útil"
@@ -3579,7 +3591,7 @@ msgid "ui.Household"
 msgstr "Hogar"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:869
+#: src/elements/thread.aui.tsx:873
 #, needs-review
 msgid "ui.How can I help you today?"
 msgstr "¿Cómo puedo ayudarte hoy?"
@@ -3686,7 +3698,7 @@ msgid "ui.Image preview"
 msgstr "Vista previa de la imagen"
 
 #. js-lingui-explicit-id
-#: src/elements/composer-parts.tsx:534
+#: src/elements/composer-parts.tsx:537
 msgid "ui.Improve"
 msgstr ""
 
@@ -4132,7 +4144,7 @@ msgid "ui.Loading article"
 msgstr "Cargando artículo"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:421
+#: src/elements/thread.aui.tsx:423
 #, needs-review
 msgid "ui.Loading conversation"
 msgstr "Cargando conversación"
@@ -4154,7 +4166,7 @@ msgid "ui.Loading the storyboard"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:996
+#: src/elements/thread-list.aui.tsx:1085
 #, needs-review
 msgid "ui.Loading threads"
 msgstr "Cargando hilos"
@@ -4480,7 +4492,7 @@ msgid "ui.Menu"
 msgstr "Menú"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:997
+#: src/elements/thread.aui.tsx:1002
 #, needs-review
 msgid "ui.Message input"
 msgstr "Entrada de mensaje"
@@ -4515,7 +4527,7 @@ msgid "ui.Mixing"
 msgstr "Mezclando"
 
 #. js-lingui-explicit-id
-#: src/elements/composer-parts.tsx:202
+#: src/elements/composer-parts.tsx:205
 msgid "ui.Mode: {label}"
 msgstr ""
 
@@ -4570,12 +4582,12 @@ msgstr "Fase lunar"
 
 #. js-lingui-explicit-id
 #: src/dashboard/components/ui/breadcrumb.tsx:113
-#: src/elements/composer-parts.tsx:511
+#: src/elements/composer-parts.tsx:514
 #: src/elements/creation-header.tsx:93
 #: src/elements/creation-header.tsx:137
 #: src/elements/image-editor.tsx:299
 #: src/elements/media-stage.tsx:59
-#: src/elements/thread.aui.tsx:1454
+#: src/elements/thread.aui.tsx:1478
 #: src/elements/video-player-actions.tsx:191
 #: src/elements/video-player.tsx:126
 #: src/PhoneNav.tsx:130
@@ -4619,7 +4631,7 @@ msgid "ui.More like this"
 msgstr "Ver más como esto"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:1196
+#: src/elements/thread-list.aui.tsx:1285
 #, needs-review
 msgid "ui.More options"
 msgstr "Más opciones"
@@ -4700,7 +4712,7 @@ msgid "ui.Move the playhead onto a piece to split it."
 msgstr "Mueve el cabezal de reproducción sobre un fragmento para dividirlo."
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:175
+#: src/elements/thread-list.aui.tsx:181
 #, needs-review
 msgid "ui.Move to project"
 msgstr "Mover a proyecto"
@@ -4802,22 +4814,22 @@ msgid "ui.New band picture"
 msgstr "Nueva foto de la banda"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:242
-#: src/elements/thread-list.aui.tsx:949
+#: src/elements/thread-list.aui.tsx:251
+#: src/elements/thread-list.aui.tsx:1038
 #, needs-review
 msgid "ui.New chat"
 msgstr "Nuevo chat"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:411
-#: src/elements/thread-list.aui.tsx:1085
-#: src/elements/thread-list.aui.tsx:1091
+#: src/elements/thread-list.aui.tsx:420
+#: src/elements/thread-list.aui.tsx:1174
+#: src/elements/thread-list.aui.tsx:1180
 #, needs-review
 msgid "ui.New Chat"
 msgstr "Nuevo chat"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:178
+#: src/elements/thread-list.aui.tsx:184
 #, needs-review
 msgid "ui.New chat in project"
 msgstr "Nuevo chat en el proyecto"
@@ -4842,7 +4854,7 @@ msgid "ui.New Moon"
 msgstr "Luna nueva"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:173
+#: src/elements/thread-list.aui.tsx:179
 #, needs-review
 msgid "ui.New project"
 msgstr "Nuevo proyecto"
@@ -4863,7 +4875,7 @@ msgstr "siguiente"
 #: src/elements/media-viewer.tsx:113
 #: src/elements/music-track.tsx:35
 #: src/elements/question-flow.tsx:47
-#: src/elements/thread.aui.tsx:1697
+#: src/elements/thread.aui.tsx:1721
 #: src/primitives/Player.tsx:179
 #: src/primitives/Tour.tsx:46
 #, needs-review
@@ -4949,8 +4961,13 @@ msgid "ui.No artifacts yet"
 msgstr "Aún no hay artefactos"
 
 #. js-lingui-explicit-id
+#: src/elements/thread-list.aui.tsx:191
+#, needs-review
+msgid "ui.No chats"
+msgstr "Sin chats"
+
+#. js-lingui-explicit-id
 #: src/elements/project-home-page.tsx:34
-#: src/elements/thread-list.aui.tsx:185
 #, needs-review
 msgid "ui.No chats yet"
 msgstr "Aún no hay chats"
@@ -5095,7 +5112,7 @@ msgid "ui.No thread matches “{query}”"
 msgstr "No hay hilos que coincidan con “{query}”"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:491
+#: src/elements/thread-list.aui.tsx:500
 #, needs-review
 msgid "ui.No threads found"
 msgstr "No se encontraron hilos"
@@ -5165,7 +5182,7 @@ msgid "ui.Not downloaded yet"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1439
+#: src/elements/thread.aui.tsx:1463
 #, needs-review
 msgid "ui.Not helpful"
 msgstr "No útil"
@@ -5926,7 +5943,7 @@ msgid "ui.Pictures"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:73
+#: src/elements/thread-list.aui.tsx:75
 #, needs-review
 msgid "ui.Pin"
 msgstr "Fijar"
@@ -5938,7 +5955,7 @@ msgid "ui.Pin {name} to the rail"
 msgstr "Fijar {name} en la barra"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:189
+#: src/elements/thread-list.aui.tsx:196
 #, needs-review
 msgid "ui.Pin project"
 msgstr "Fijar proyecto"
@@ -5957,7 +5974,7 @@ msgid "ui.pinned"
 msgstr "fijado"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:75
+#: src/elements/thread-list.aui.tsx:77
 #: src/schema/NodeRenderer.tsx:1513
 #, needs-review
 msgid "ui.Pinned"
@@ -6137,7 +6154,7 @@ msgid "ui.present"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/composer-parts.tsx:520
+#: src/elements/composer-parts.tsx:523
 msgid "ui.Presets"
 msgstr ""
 
@@ -6184,7 +6201,7 @@ msgstr "Vista previa: {label}"
 #. js-lingui-explicit-id
 #: src/elements/media-viewer.tsx:112
 #: src/elements/music-track.tsx:35
-#: src/elements/thread.aui.tsx:1689
+#: src/elements/thread.aui.tsx:1713
 #: src/primitives/Player.tsx:178
 #, needs-review
 msgid "ui.Previous"
@@ -6259,14 +6276,14 @@ msgstr "Perfil"
 
 #. js-lingui-explicit-id
 #: src/elements/project-settings.tsx:64
-#: src/elements/thread-list.aui.tsx:174
+#: src/elements/thread-list.aui.tsx:180
 #, needs-review
 msgid "ui.Project name"
 msgstr "Nombre del proyecto"
 
 #. js-lingui-explicit-id
 #: src/elements/project-home-page.tsx:23
-#: src/elements/thread-list.aui.tsx:186
+#: src/elements/thread-list.aui.tsx:192
 #, needs-review
 msgid "ui.Project options"
 msgstr "Opciones del proyecto"
@@ -6290,7 +6307,7 @@ msgid "ui.Project-only"
 msgstr "Solo para el proyecto"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:172
+#: src/elements/thread-list.aui.tsx:178
 #, needs-review
 msgid "ui.Projects"
 msgstr "Proyectos"
@@ -6346,7 +6363,7 @@ msgid "ui.Ratio"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1415
+#: src/elements/thread.aui.tsx:1439
 #, needs-review
 msgid "ui.Read aloud"
 msgstr "Leer en voz alta"
@@ -6488,12 +6505,12 @@ msgid "ui.Reference library"
 msgstr "Biblioteca de referencia"
 
 #. js-lingui-explicit-id
-#: src/elements/composer-parts.tsx:248
+#: src/elements/composer-parts.tsx:251
 msgid "ui.References"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1447
+#: src/elements/thread.aui.tsx:1471
 #, needs-review
 msgid "ui.Refresh"
 msgstr "Actualizar"
@@ -6586,7 +6603,7 @@ msgid "ui.Remove {count, plural, one {# model} other {# models}} and free {size}
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/composer-parts.tsx:272
+#: src/elements/composer-parts.tsx:275
 #: src/elements/prompt-bar.tsx:735
 #: src/elements/prompt-bar.tsx:779
 #, needs-review
@@ -6594,7 +6611,7 @@ msgid "ui.Remove {label}"
 msgstr "Quitar {label}"
 
 #. js-lingui-explicit-id
-#: src/elements/composer-parts.tsx:259
+#: src/elements/composer-parts.tsx:262
 #: src/elements/prompt-bar.tsx:726
 msgid "ui.Remove {label} {n}"
 msgstr ""
@@ -6672,7 +6689,7 @@ msgid "ui.Remove file"
 msgstr "Quitar archivo"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:176
+#: src/elements/thread-list.aui.tsx:182
 #, needs-review
 msgid "ui.Remove from project"
 msgstr "Quitar del proyecto"
@@ -6722,8 +6739,8 @@ msgid "ui.Removing"
 msgstr "Eliminando"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:179
-#: src/elements/thread-list.aui.tsx:1241
+#: src/elements/thread-list.aui.tsx:185
+#: src/elements/thread-list.aui.tsx:1330
 #: src/settings/LocationField.tsx:298
 #, needs-review
 msgid "ui.Rename"
@@ -6736,7 +6753,7 @@ msgid "ui.Rename place"
 msgstr "Cambiar nombre del lugar"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:1149
+#: src/elements/thread-list.aui.tsx:1238
 #, needs-review
 msgid "ui.Rename thread"
 msgstr "Renombrar hilo"
@@ -6904,7 +6921,7 @@ msgstr ""
 #: src/elements/error-state.tsx:40
 #: src/elements/job-progress.tsx:306
 #: src/elements/job-progress.tsx:380
-#: src/elements/thread.aui.tsx:1597
+#: src/elements/thread.aui.tsx:1621
 #, needs-review
 msgid "ui.Retry"
 msgstr "Reintentar"
@@ -6946,7 +6963,7 @@ msgid "ui.running"
 msgstr "en ejecución"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:1095
+#: src/elements/thread-list.aui.tsx:1184
 #, needs-review
 msgid "ui.Running"
 msgstr "En ejecución"
@@ -7094,7 +7111,7 @@ msgid "ui.Say it differently"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:854
+#: src/elements/thread.aui.tsx:858
 #, needs-review
 msgid "ui.Scroll to bottom"
 msgstr "Ir al final"
@@ -7148,8 +7165,8 @@ msgid "ui.Search apps"
 msgstr "Buscar apps"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:243
-#: src/elements/thread-list.aui.tsx:268
+#: src/elements/thread-list.aui.tsx:252
+#: src/elements/thread-list.aui.tsx:277
 #, needs-review
 msgid "ui.Search chats"
 msgstr "Buscar chats"
@@ -7239,12 +7256,6 @@ msgid "ui.See All Notifications"
 msgstr "Ver todas las notificaciones"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:188
-#, needs-review
-msgid "ui.See all projects"
-msgstr "Ver todos los proyectos"
-
-#. js-lingui-explicit-id
 #: src/elements/clip-feed.tsx:45
 #: src/elements/video-player.tsx:131
 msgid "ui.Seek"
@@ -7310,8 +7321,8 @@ msgid "ui.Send"
 msgstr "Enviar"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1069
-#: src/elements/thread.aui.tsx:1081
+#: src/elements/thread.aui.tsx:1076
+#: src/elements/thread.aui.tsx:1088
 #, needs-review
 msgid "ui.Send a message..."
 msgstr "Enviar un mensaje..."
@@ -7324,14 +7335,14 @@ msgstr "Enviar comentarios"
 
 #. js-lingui-explicit-id
 #: src/elements/composer.tsx:655
-#: src/elements/thread.aui.tsx:1127
-#: src/elements/thread.aui.tsx:1127
-#: src/elements/thread.aui.tsx:1127
-#: src/elements/thread.aui.tsx:1127
-#: src/elements/thread.aui.tsx:1181
-#: src/elements/thread.aui.tsx:1188
-#: src/elements/thread.aui.tsx:1196
-#: src/elements/thread.aui.tsx:1203
+#: src/elements/thread.aui.tsx:1151
+#: src/elements/thread.aui.tsx:1151
+#: src/elements/thread.aui.tsx:1151
+#: src/elements/thread.aui.tsx:1151
+#: src/elements/thread.aui.tsx:1205
+#: src/elements/thread.aui.tsx:1212
+#: src/elements/thread.aui.tsx:1220
+#: src/elements/thread.aui.tsx:1227
 #, needs-review
 msgid "ui.Send message"
 msgstr "Enviar mensaje"
@@ -7439,7 +7450,7 @@ msgid "ui.Settings scope"
 msgstr "Ámbito de la configuración"
 
 #. js-lingui-explicit-id
-#: src/elements/composer-parts.tsx:377
+#: src/elements/composer-parts.tsx:380
 msgid "ui.Settings sections"
 msgstr ""
 
@@ -7552,7 +7563,7 @@ msgstr "Mostrar menos"
 #. js-lingui-explicit-id
 #: src/elements/creation-header.tsx:131
 #: src/elements/creation-header.tsx:170
-#: src/elements/thread-list.aui.tsx:184
+#: src/elements/thread-list.aui.tsx:190
 #: src/schema/NodeRenderer.tsx:2165
 #, needs-review
 msgid "ui.Show less"
@@ -7561,14 +7572,14 @@ msgstr "Mostrar menos"
 #. js-lingui-explicit-id
 #: src/elements/creation-header.tsx:131
 #: src/elements/creation-header.tsx:170
-#: src/elements/thread-list.aui.tsx:183
+#: src/elements/thread-list.aui.tsx:189
 #: src/schema/NodeRenderer.tsx:2165
 #, needs-review
 msgid "ui.Show more"
 msgstr "Mostrar más"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:191
+#: src/elements/thread-list.aui.tsx:198
 #, needs-review
 msgid "ui.Show or hide chats"
 msgstr "Mostrar u ocultar chats"
@@ -7885,8 +7896,8 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/elements/composer-voice.aui.tsx:18
 #: src/elements/composer.tsx:621
-#: src/elements/thread.aui.tsx:1049
-#: src/elements/thread.aui.tsx:1152
+#: src/elements/thread.aui.tsx:1056
+#: src/elements/thread.aui.tsx:1176
 #, needs-review
 msgid "ui.Start voice input"
 msgstr "Iniciar entrada de voz"
@@ -7955,23 +7966,23 @@ msgid "ui.Stop {name}"
 msgstr "Detener {name}"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1053
-#: src/elements/thread.aui.tsx:1053
-#: src/elements/thread.aui.tsx:1162
+#: src/elements/thread.aui.tsx:1060
+#: src/elements/thread.aui.tsx:1060
+#: src/elements/thread.aui.tsx:1186
 #, needs-review
 msgid "ui.Stop dictation"
 msgstr "Detener dictado"
 
 #. js-lingui-explicit-id
 #: src/elements/composer.tsx:655
-#: src/elements/thread.aui.tsx:1130
-#: src/elements/thread.aui.tsx:1219
+#: src/elements/thread.aui.tsx:1154
+#: src/elements/thread.aui.tsx:1243
 #, needs-review
 msgid "ui.Stop generating"
 msgstr "Detener generación"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1422
+#: src/elements/thread.aui.tsx:1446
 #, needs-review
 msgid "ui.Stop reading"
 msgstr "Detener lectura"
@@ -7984,7 +7995,7 @@ msgstr "Detener grabación"
 
 #. js-lingui-explicit-id
 #: src/elements/composer-voice.aui.tsx:19
-#: src/elements/thread.aui.tsx:1168
+#: src/elements/thread.aui.tsx:1192
 #, needs-review
 msgid "ui.Stop voice input"
 msgstr "Detener entrada de voz"
@@ -8146,7 +8157,7 @@ msgid "ui.Table of contents"
 msgstr "Índice"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:589
+#: src/elements/thread.aui.tsx:593
 #, needs-review
 msgid "ui.Talk..."
 msgstr "Hablar..."
@@ -8495,7 +8506,7 @@ msgid "ui.Thinking"
 msgstr "Pensando"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1373
+#: src/elements/thread.aui.tsx:1397
 #, needs-review
 msgid "ui.Thinking…"
 msgstr "Pensando…"
@@ -8651,7 +8662,7 @@ msgstr "a"
 
 #. js-lingui-explicit-id
 #: src/elements/result-feed.tsx:59
-#: src/elements/thread-list.aui.tsx:375
+#: src/elements/thread-list.aui.tsx:384
 #: src/elements/weather-forecast-page.tsx:237
 #: src/elements/weather-forecast-page.tsx:239
 #: src/relativeTime.ts:56
@@ -8896,7 +8907,7 @@ msgid "ui.typically replies in a minute"
 msgstr "normalmente responde en un minuto"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:954
+#: src/elements/thread.aui.tsx:958
 #, needs-review
 msgid "ui.Unavailable"
 msgstr "No disponible"
@@ -8959,7 +8970,7 @@ msgid "ui.Unnamed file"
 msgstr "Archivo sin nombre"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:74
+#: src/elements/thread-list.aui.tsx:76
 #, needs-review
 msgid "ui.Unpin"
 msgstr "Desfijar"
@@ -8971,7 +8982,7 @@ msgid "ui.Unpin {name} from the rail"
 msgstr "Desfijar {name} de la barra"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:190
+#: src/elements/thread-list.aui.tsx:197
 #, needs-review
 msgid "ui.Unpin project"
 msgstr "Desfijar proyecto"
@@ -9010,7 +9021,7 @@ msgid "ui.Up next in {seconds}"
 msgstr "A continuación en {seconds}"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1666
+#: src/elements/thread.aui.tsx:1690
 #, needs-review
 msgid "ui.Update"
 msgstr "Actualizar"
@@ -9227,14 +9238,14 @@ msgid "ui.Voice"
 msgstr "Voz"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:784
+#: src/elements/thread.aui.tsx:788
 #, needs-review
 msgid "ui.Voice conversation"
 msgstr "Conversación por voz"
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:1049
-#: src/elements/thread.aui.tsx:1146
+#: src/elements/thread.aui.tsx:1056
+#: src/elements/thread.aui.tsx:1170
 #, needs-review
 msgid "ui.Voice input"
 msgstr "Entrada de voz"
@@ -9510,7 +9521,7 @@ msgid "ui.Wrench"
 msgstr "Llave inglesa"
 
 #. js-lingui-explicit-id
-#: src/elements/composer-parts.tsx:535
+#: src/elements/composer-parts.tsx:538
 msgid "ui.Write lyrics"
 msgstr ""
 
@@ -9542,7 +9553,7 @@ msgstr "Sí"
 
 #. js-lingui-explicit-id
 #: src/elements/result-feed.tsx:60
-#: src/elements/thread-list.aui.tsx:376
+#: src/elements/thread-list.aui.tsx:385
 #: src/relativeTime.ts:15
 #: src/relativeTime.ts:57
 #, needs-review
@@ -9562,7 +9573,7 @@ msgid "ui.You hear this in the preview. The saved song changes when you apply it
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/elements/thread.aui.tsx:799
+#: src/elements/thread.aui.tsx:803
 #, needs-review
 msgid "ui.You said"
 msgstr "Dijiste"
