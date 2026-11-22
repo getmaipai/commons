@@ -205,16 +205,28 @@ describe("ThreadList projects mode", () => {
     expect(view.queryByText("Projects")).toBeNull();
   });
 
-  test("Show more appears after six chats", async () => {
+  test("Show more appears after five chats", async () => {
     const seeds = Array.from({ length: 8 }, (_, i) => ({ remoteId: `t${i}`, title: `Chat ${i}`, folder: "folder-garden" }));
     const view = render(<Harness projects={{ folders }} seeds={seeds} />);
     fireEvent.click((await projectRow(view, "Garden")).querySelector("[data-slot=aui_thread-list-project-trigger]") as HTMLElement);
     await view.findByText("Show more");
     const items = view.container.querySelectorAll("[data-slot=aui_thread-list-project-items] [data-slot=aui_thread-list-item]");
-    expect(items).toHaveLength(6);
+    expect(items).toHaveLength(5);
     fireEvent.click(view.getByText("Show more"));
     await view.findByText("Show less");
     expect(view.container.querySelectorAll("[data-slot=aui_thread-list-project-items] [data-slot=aui_thread-list-item]")).toHaveLength(8);
+  });
+
+  test("the Projects heading collapses and reopens the section, the plus stays", async () => {
+    const view = render(<Harness projects={{ folders, canManage: true, onCreate: async () => {} }} seeds={[]} />);
+    await projectRow(view, "Garden");
+    const toggle = view.container.querySelector("[data-slot=aui_thread-list-projects-toggle]") as HTMLElement;
+    expect(toggle.getAttribute("aria-expanded")).toBe("true");
+    fireEvent.click(toggle);
+    expect(view.container.querySelector("[data-slot=aui_thread-list-project]")).toBeNull();
+    expect(view.container.querySelector("[data-slot=aui_thread-list-section-action]")).not.toBeNull();
+    fireEvent.click(toggle);
+    expect(view.container.querySelector("[data-slot=aui_thread-list-project]")).not.toBeNull();
   });
 
   test("Move to project lists the projects and moves through updateCustom", async () => {

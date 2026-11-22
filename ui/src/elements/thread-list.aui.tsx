@@ -208,7 +208,7 @@ export const threadFolderId = (custom: Record<string, unknown> | undefined): str
 /** A chat shows under its project only when that project is listed, the
  * list is not being searched, and (with pinning) the chat is not pinned:
  * a chat appears in exactly one place, and Pinned wins. */
-const PROJECT_PREVIEW_COUNT = 6;
+const PROJECT_PREVIEW_COUNT = 5;
 const THREAD_DRAG_TYPE = "application/x-maipai-thread";
 
 const menuContentClass =
@@ -576,6 +576,7 @@ const ThreadListProjectsSection: FC<{
   const density = useContext(ThreadListDensityContext);
   const { labels } = projects;
   const [creating, setCreating] = useState(false);
+  const [sectionOpen, setSectionOpen] = useState(true);
   const canCreate = projects.canManage && Boolean(projects.onCreate);
   if (projects.folders.length === 0 && !canCreate) return null;
   return (
@@ -584,7 +585,20 @@ const ThreadListProjectsSection: FC<{
         data-slot="aui_thread-list-group-label"
         className={cn("text-muted-foreground flex items-center justify-between px-2.5 pb-1 text-xs font-medium", density === "compact" ? "pt-4 first:pt-2" : "pt-3")}
       >
-        <span>{labels.projects}</span>
+        <button
+          type="button"
+          data-slot="aui_thread-list-projects-toggle"
+          aria-expanded={sectionOpen}
+          onClick={() => setSectionOpen((open) => !open)}
+          className="focus-visible:ring-ring/50 hover:text-foreground flex items-center gap-1 rounded-sm outline-none focus-visible:ring-1"
+        >
+          <span>{labels.projects}</span>
+          <ChevronRightIcon
+            aria-hidden
+            data-slot="aui_thread-list-projects-chevron"
+            className={cn("size-3 shrink-0 transition-transform motion-reduce:transition-none", sectionOpen && "rotate-90")}
+          />
+        </button>
         {canCreate ? (
           <Button
             variant="ghost"
@@ -599,7 +613,7 @@ const ThreadListProjectsSection: FC<{
           </Button>
         ) : null}
       </div>
-      {creating ? (
+      {creating && sectionOpen ? (
         <ProjectNameField
           label={labels.newProject}
           placeholder={labels.projectName}
@@ -615,7 +629,7 @@ const ThreadListProjectsSection: FC<{
           }}
         />
       ) : null}
-      {projects.folders
+      {(sectionOpen ? projects.folders : [])
         .filter((folder) => !skip?.has(folder.id))
         .map((folder) => (
           <ThreadListProjectRow
@@ -626,7 +640,7 @@ const ThreadListProjectsSection: FC<{
             row={row}
           />
         ))}
-      {projects.onSeeAll ? (
+      {sectionOpen && projects.onSeeAll ? (
         <Button
           variant="ghost"
           data-slot="aui_thread-list-projects-see-all"

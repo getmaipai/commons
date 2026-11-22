@@ -1,3 +1,7 @@
+## [ui-v0.5.737] - 2026-11-22
+
+- Change: the Projects heading in the thread list has a chevron that collapses and reopens the section (the plus stays), and a project lists five chats before Show more instead of six.
+
 ## [ui-v0.5.736] - 2026-11-22
 
 - Fix: in the composer footer row the notice shrinks (and truncates) before the mode, level and footer end wrap, so a phone keeps them on one line.
