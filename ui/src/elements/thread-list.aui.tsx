@@ -148,6 +148,8 @@ export type ThreadListProjects = {
   /** Move chats in and out (menu and drag). Default true. */
   canMove?: boolean;
   onCreate?: (name: string) => void | Promise<void>;
+  /** The host opens its own full new-project form: + calls this at once and the kit's name-only dialog stays shut. */
+  onNew?: () => void;
   onRename?: (id: string, name: string) => void | Promise<void>;
   onDelete?: (id: string) => void | Promise<void>;
   onNewChat?: (id: string) => void;
@@ -587,7 +589,7 @@ const ThreadListProjectsSection: FC<{
   const [creating, setCreating] = useState(false);
   const [sectionOpen, setSectionOpen] = useState(true);
   const [allProjects, setAllProjects] = useState(false);
-  const canCreate = projects.canManage && Boolean(projects.onCreate);
+  const canCreate = projects.canManage && Boolean(projects.onCreate || projects.onNew);
   if (projects.folders.length === 0 && !canCreate) return null;
   const listed = projects.folders.filter((folder) => !skip?.has(folder.id));
   const shownFolders = allProjects ? listed : listed.slice(0, PROJECT_LIST_PREVIEW_COUNT);
@@ -633,7 +635,7 @@ const ThreadListProjectsSection: FC<{
                 aria-label={labels.newProject}
                 // A 24px box with a 12px transparent overhang: the 48px touch floor.
                 className="relative size-6 p-0 before:absolute before:inset-[min(0px,calc((100%-49px)/2))] before:content-['']"
-                onClick={() => setCreating(true)}
+                onClick={() => (projects.onNew ? projects.onNew() : setCreating(true))}
               >
                 <PlusIcon className="size-3.5" />
               </Button>
@@ -641,7 +643,7 @@ const ThreadListProjectsSection: FC<{
           </div>
         ) : null}
       </div>
-      {canCreate ? (
+      {canCreate && !projects.onNew ? (
         <NewProjectDialog
           open={creating}
           onOpenChange={setCreating}

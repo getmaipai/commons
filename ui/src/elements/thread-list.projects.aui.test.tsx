@@ -314,6 +314,21 @@ describe("ThreadList projects mode", () => {
     await waitFor(() => expect(view.queryByRole("dialog")).toBeNull());
   });
 
+  test("onNew makes + call the host at once, with no name-only dialog", async () => {
+    const onNew = mock(() => {});
+    const onCreate = mock(async () => {});
+    const view = render(<Harness projects={{ folders: [], canManage: true, onCreate, onNew }} seeds={[]} />);
+    fireEvent.click(await view.findByLabelText("New project"));
+    expect(onNew).toHaveBeenCalledTimes(1);
+    expect(view.queryByRole("dialog")).toBeNull();
+    expect(onCreate).not.toHaveBeenCalled();
+  });
+
+  test("onNew alone is enough to show the +", async () => {
+    const view = render(<Harness projects={{ folders: [], canManage: true, onNew: () => {} }} seeds={[]} />);
+    expect(await view.findByLabelText("New project")).toBeTruthy();
+  });
+
   test("Enter in the dialog creates, Cancel closes without creating", async () => {
     const onCreate = mock(async () => {});
     const view = render(<Harness projects={{ folders: [], canManage: true, onCreate }} seeds={[]} />);
