@@ -20,7 +20,7 @@ export interface ChatHeaderChoice {
 }
 
 export interface ChatHeaderProps {
-  /** Leaves room at the end for a control the shell draws at the top right of the workspace (the ambient companion). */
+  /** Leaves room at the end for a control the shell draws at the top right of the workspace (the notification bell and account avatar, about 7rem wide). */
   reserveEnd?: boolean;
   name: string;
   media: ReactNode;
@@ -72,7 +72,7 @@ export function ChatHeader({ reserveEnd, name, media, onMenu, onCall, actions, e
     </DropdownMenuRadioGroup> : searchable && search ? <p className="px-3 py-2 text-sm text-muted-foreground">{i18n._({ id: "ui.No companion matches. Clear the search to see them all.", message: "No companion matches. Clear the search to see them all." })}</p> : null}
     {identityFooter ? <><DropdownMenuSeparator />{identityFooter}</> : null}
   </> : identityMenu;
-  return <header className={cn("grid h-14 w-full min-w-0 grid-cols-[1fr_auto_1fr] items-center gap-2 px-4", reserveEnd && "pe-16")}>
+  return <header className={cn("grid h-14 w-full min-w-0 grid-cols-[1fr_auto_1fr] items-center gap-2 px-4", reserveEnd && "pe-28")}>
     <div className="flex items-center justify-self-start">{onMenu ? <Button variant="ghost" size="icon" aria-label={i18n._({ id: "ui.Open menu", message: "Open menu" })} aria-expanded={menuExpanded} aria-controls={menuControls} onClick={onMenu}><MenuIcon aria-hidden="true" /></Button> : null}</div>
     {picker ? <DropdownMenu onOpenChange={(open) => { if (open) setSearch(""); }}>
       <DropdownMenuTrigger asChild>
