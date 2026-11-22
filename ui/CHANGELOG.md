@@ -1,3 +1,7 @@
+## [ui-v0.5.738] - 2026-11-22
+
+- Add: kit tokens for the thread list project rows (`--aui-thread-list-project-chevron-display`, `-project-items-indent`, `-project-note-padding-x`, `-project-note-font-size`, `-project-show-more-height`, `-project-show-more-font-size`), the group labels (`-group-label-pt`, `-group-label-first-pt`, `-group-label-pb`, `-group-label-font-size`) and the reply action bar (`--aui-assistant-action-bar-min-height`). Defaults equal the old look.
+
 ## [ui-v0.5.737] - 2026-11-22
 
 - Change: the Projects heading in the thread list has a chevron that collapses and reopens the section (the plus stays), and a project lists five chats before Show more instead of six.

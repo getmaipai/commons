@@ -542,6 +542,13 @@ body {
   padding-inline-end: var(--aui-thread-list-row-padding-x, 0.625rem);
 }
 
+/* Kit tokens a host sets to match a project row to its chat rows (rule 9, tokens only):
+ * --aui-thread-list-project-chevron-display (block; none hides the per-row chevron),
+ * -project-items-indent (1rem), -project-note-padding-x (0.625rem) and -project-note-font-size (0.75rem)
+ * for the empty note, -project-show-more-height (2rem) and -project-show-more-font-size (0.875rem),
+ * -group-label-pt (1rem compact, 0.75rem default), -group-label-first-pt (0.5rem), -group-label-pb
+ * (0.25rem) and -group-label-font-size (0.75rem); --aui-assistant-action-bar-min-height (auto).
+ * The defaults are read in thread-list.aui.tsx and thread.aui.tsx, so an unset token changes nothing. */
 [data-slot="aui_thread-list-item"][data-active="true"] {
   background-color: var(--sidebar-accent);
 }

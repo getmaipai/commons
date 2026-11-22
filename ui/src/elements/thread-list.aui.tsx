@@ -509,7 +509,7 @@ const ThreadListItemGroups: FC<{ searchQuery?: string }> = ({
   const pinnedLabel = (
     <div
       data-slot="aui_thread-list-group-label"
-      className={cn("text-muted-foreground px-2.5 pb-1 text-xs font-medium", density === "compact" ? "pt-4 first:pt-2" : "pt-3")}
+      className={cn("text-muted-foreground px-2.5 pb-[var(--aui-thread-list-group-label-pb,0.25rem)] text-[length:var(--aui-thread-list-group-label-font-size,0.75rem)] leading-4 font-medium", density === "compact" ? "pt-[var(--aui-thread-list-group-label-pt,1rem)] first:pt-[var(--aui-thread-list-group-label-first-pt,0.5rem)]" : "pt-[var(--aui-thread-list-group-label-pt,0.75rem)]")}
     >
       {pin.pinned}
     </div>
@@ -542,7 +542,7 @@ const ThreadListItemGroups: FC<{ searchQuery?: string }> = ({
     <Fragment key={group.label}>
       <div
         data-slot="aui_thread-list-group-label"
-        className={cn("text-muted-foreground px-2.5 pb-1 text-xs font-medium", density === "compact" ? "pt-4 first:pt-2" : "pt-3")}
+        className={cn("text-muted-foreground px-2.5 pb-[var(--aui-thread-list-group-label-pb,0.25rem)] text-[length:var(--aui-thread-list-group-label-font-size,0.75rem)] leading-4 font-medium", density === "compact" ? "pt-[var(--aui-thread-list-group-label-pt,1rem)] first:pt-[var(--aui-thread-list-group-label-first-pt,0.5rem)]" : "pt-[var(--aui-thread-list-group-label-pt,0.75rem)]")}
       >
         {group.label}
       </div>
@@ -583,7 +583,7 @@ const ThreadListProjectsSection: FC<{
     <div data-slot="aui_thread-list-projects" data-density={density} className={cn("flex flex-col", density === "compact" ? "gap-0" : "gap-0.5")}>
       <div
         data-slot="aui_thread-list-group-label"
-        className={cn("text-muted-foreground flex items-center justify-between px-2.5 pb-1 text-xs font-medium", density === "compact" ? "pt-4 first:pt-2" : "pt-3")}
+        className={cn("text-muted-foreground flex items-center justify-between px-2.5 pb-[var(--aui-thread-list-group-label-pb,0.25rem)] text-[length:var(--aui-thread-list-group-label-font-size,0.75rem)] leading-4 font-medium", density === "compact" ? "pt-[var(--aui-thread-list-group-label-pt,1rem)] first:pt-[var(--aui-thread-list-group-label-first-pt,0.5rem)]" : "pt-[var(--aui-thread-list-group-label-pt,0.75rem)]")}
       >
         <button
           type="button"
@@ -803,7 +803,7 @@ const ThreadListProjectRow: FC<{
                   aria-hidden
                   data-slot="aui_thread-list-project-chevron"
                   className={cn(
-                    "text-muted-foreground size-3.5 shrink-0 transition-transform motion-reduce:transition-none",
+                    "text-muted-foreground size-3.5 shrink-0 [display:var(--aui-thread-list-project-chevron-display,block)] transition-transform motion-reduce:transition-none",
                     open && "rotate-90",
                   )}
                 />
@@ -827,7 +827,7 @@ const ThreadListProjectRow: FC<{
                 aria-hidden
                 data-slot="aui_thread-list-project-chevron"
                 className={cn(
-                  "text-muted-foreground size-3.5 shrink-0 transition-transform motion-reduce:transition-none",
+                  "text-muted-foreground size-3.5 shrink-0 [display:var(--aui-thread-list-project-chevron-display,block)] transition-transform motion-reduce:transition-none",
                   open && "rotate-90",
                 )}
               />
@@ -931,11 +931,11 @@ const ThreadListProjectRow: FC<{
       ) : null}
       <CollapsibleContent
         data-slot="aui_thread-list-project-items"
-        className="overflow-hidden ps-4 data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down motion-reduce:animate-none"
+        className="overflow-hidden ps-[var(--aui-thread-list-project-items-indent,1rem)] data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down motion-reduce:animate-none"
       >
         <div className="flex flex-col gap-0.5 pt-0.5">
           {indices.length === 0 ? (
-            <div data-slot="aui_thread-list-project-empty" className="text-muted-foreground px-2.5 py-1.5 text-xs">
+            <div data-slot="aui_thread-list-project-empty" className="text-muted-foreground px-[var(--aui-thread-list-project-note-padding-x,0.625rem)] py-1.5 text-[length:var(--aui-thread-list-project-note-font-size,0.75rem)] leading-4">
               {labels.empty}
             </div>
           ) : (
@@ -945,7 +945,7 @@ const ThreadListProjectRow: FC<{
             <Button
               variant="ghost"
               data-slot="aui_thread-list-project-show-more"
-              className="text-muted-foreground h-8 justify-start rounded-md px-2.5 text-sm font-normal"
+              className="text-muted-foreground h-[var(--aui-thread-list-project-show-more-height,2rem)] justify-start rounded-md px-[var(--aui-thread-list-project-note-padding-x,0.625rem)] text-[length:var(--aui-thread-list-project-show-more-font-size,0.875rem)] leading-5 font-normal"
               onClick={() => setShowAll((all) => !all)}
             >
               {showAll ? labels.showLess : labels.showMore}

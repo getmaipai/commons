@@ -1426,7 +1426,7 @@ const AssistantActionBar: FC = () => {
     <ActionBarPrimitive.Root
       hideWhenRunning
       autohide={assistantActionBarAutohide}
-      className="aui-assistant-action-bar-root text-muted-foreground animate-in fade-in col-start-3 row-start-2 -ms-1 flex gap-1 duration-200"
+      className="aui-assistant-action-bar-root text-muted-foreground min-h-[var(--aui-assistant-action-bar-min-height,auto)] animate-in fade-in col-start-3 row-start-2 -ms-1 flex gap-1 duration-200"
     >
       <ActionBarPrimitive.Copy asChild>
         <TooltipIconButton tooltip={i18n._({ id: "ui.Copy", message: "Copy" })}>
