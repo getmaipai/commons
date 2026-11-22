@@ -35,6 +35,7 @@ describe("the touch floor leaves focusable containers alone", () => {
       expect(l).toContain('[role="tabpanel"]');
       expect(l).toContain('[role="dialog"]');
       expect(l).toContain('[role="region"]');
+      expect(l).toContain(':has(button');
     }
   });
 });

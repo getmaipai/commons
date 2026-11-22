@@ -1,3 +1,7 @@
+## [ui-v0.5.731] - 2026-11-22
+
+- Fix: the 0.5.730 fix missed focusable groups. A roving-focus group (the toggle group behind the Add voice filters) is `tabindex=0` too, and its layer still covered the buttons inside it. The touch floor now skips any `tabindex` element that holds buttons, links, inputs or other controls.
+
 ## [ui-v0.5.730] - 2026-11-22
 
 - Fix: buttons inside a tab panel, a dialog or a region did nothing (the Add voice window, any tabbed page). The 48 px touch floor gave every `tabindex` element an invisible full-size layer, and a Radix tab panel is `tabindex=0`, so its layer sat on top of its own buttons and swallowed the clicks. Focusable containers (`role` tabpanel, dialog, alertdialog, region) no longer get the layer.
