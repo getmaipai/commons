@@ -799,7 +799,7 @@ const ThreadListProjectRow: FC<{
               type="button"
               data-slot="aui_thread-list-project-open"
               onClick={() => projects.onOpen?.(folder.id)}
-              className="focus-visible:ring-ring/50 flex h-full min-w-0 flex-1 items-center gap-2 rounded-[inherit] text-start outline-none group-hover:pe-16 group-has-focus-visible:pe-16 group-has-data-[state=open]:pe-16 focus-visible:ring-1"
+              className="focus-visible:ring-ring/50 flex h-full min-w-0 flex-1 items-center gap-2 rounded-[inherit] text-start outline-none group-hover:pe-16 group-has-focus-visible:pe-16 group-has-data-[state=open]:pe-16 [@media(hover:none)]:pe-16 focus-visible:ring-1"
             >
               <ProjectMark icon={folder.icon} color={folder.color} />
               <span data-slot="aui_thread-list-project-title" className="min-w-0 flex-1 truncate">
@@ -833,7 +833,7 @@ const ThreadListProjectRow: FC<{
               type="button"
               data-slot="aui_thread-list-project-trigger"
               onKeyDown={onKeyDown}
-              className="focus-visible:ring-ring/50 flex h-full min-w-0 flex-1 items-center gap-2 rounded-[inherit] text-start outline-none group-hover:pe-9 group-has-focus-visible:pe-9 group-has-data-[state=open]:pe-9 focus-visible:ring-1"
+              className="focus-visible:ring-ring/50 flex h-full min-w-0 flex-1 items-center gap-2 rounded-[inherit] text-start outline-none group-hover:pe-9 group-has-focus-visible:pe-9 group-has-data-[state=open]:pe-9 [@media(hover:none)]:pe-9 focus-visible:ring-1"
             >
               <ProjectMark icon={folder.icon} color={folder.color} />
               <span data-slot="aui_thread-list-project-title" className="min-w-0 flex-1 truncate">
@@ -857,7 +857,7 @@ const ThreadListProjectRow: FC<{
                 variant="ghost"
                 size="icon"
                 data-slot="aui_thread-list-project-more"
-                className="data-[state=open]:bg-accent absolute end-1.5 top-1/2 size-6 -translate-y-1/2 p-0 opacity-0 group-hover:opacity-100 group-has-focus-visible:opacity-100 data-[state=open]:opacity-100 before:absolute before:inset-[min(0px,calc((100%-49px)/2))] before:content-['']"
+                className="data-[state=open]:bg-accent absolute end-1.5 top-1/2 size-6 -translate-y-1/2 p-0 opacity-0 [@media(hover:none)]:opacity-100 group-hover:opacity-100 group-has-focus-visible:opacity-100 data-[state=open]:opacity-100 before:absolute before:inset-[min(0px,calc((100%-49px)/2))] before:content-['']"
               >
                 <MoreHorizontalIcon className="size-3.5" />
                 <span className="sr-only">{labels.projectOptions}</span>
@@ -1088,7 +1088,7 @@ export const ThreadListItem: FC = () => {
           data-slot="aui_thread-list-item-trigger"
           data-density={density}
           className={cn(
-            "focus-visible:ring-ring/50 flex h-full min-w-0 flex-1 items-center px-2.5 text-start text-sm outline-none group-hover:pe-9 group-has-focus-visible:pe-9 group-has-data-[state=open]:pe-9 group-data-active:pe-9 focus-visible:ring-1",
+            "focus-visible:ring-ring/50 flex h-full min-w-0 flex-1 items-center px-2.5 text-start text-sm outline-none group-hover:pe-9 group-has-focus-visible:pe-9 group-has-data-[state=open]:pe-9 group-data-active:pe-9 [@media(hover:none)]:pe-9 focus-visible:ring-1",
             density === "compact" ? "rounded-lg" : "rounded-md",
             pageRow && "gap-3 py-2",
             density === "compact" ? "before:inset-[min(0px,calc((100%-49px)/2))]" : hitArea(2),
@@ -1220,7 +1220,7 @@ const ThreadListItemMore: FC<{ onRename: () => void }> = ({ onRename }) => {
           variant="ghost"
           size="icon"
           data-slot="aui_thread-list-item-more"
-          className="data-[state=open]:bg-accent absolute end-1.5 top-1/2 size-6 -translate-y-1/2 p-0 opacity-0 group-hover:opacity-100 group-has-focus-visible:opacity-100 group-data-active:opacity-100 data-[state=open]:opacity-100 before:absolute before:inset-[min(0px,calc((100%-49px)/2))] before:content-['']"
+          className="data-[state=open]:bg-accent absolute end-1.5 top-1/2 size-6 -translate-y-1/2 p-0 opacity-0 [@media(hover:none)]:opacity-100 group-hover:opacity-100 group-has-focus-visible:opacity-100 group-data-active:opacity-100 data-[state=open]:opacity-100 before:absolute before:inset-[min(0px,calc((100%-49px)/2))] before:content-['']"
         >
           <MoreHorizontalIcon className="size-3.5" />
           <span className="sr-only">{i18n._({ id: "ui.More options", message: "More options" })}</span>

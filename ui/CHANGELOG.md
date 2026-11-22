@@ -1,3 +1,7 @@
+## [ui-v0.5.740] - 2026-11-22
+
+- Fix: on a device with no hover (a phone or tablet) the "..." menu of every project row and chat row in the thread list is visible, and the row title leaves room for it; before, it showed only on hover or for the open chat.
+
 ## [ui-v0.5.739] - 2026-11-22
 
 - Add: `projects.defaultOpen` on the thread list; each project row starts open when true. Default false, so nothing changes for current callers.
