@@ -273,6 +273,8 @@ export type ThreadComponents = {
   ComposerExtra?: ComponentType | undefined;
   ComposerAddAttachmentOverride?: ComponentType | undefined;
   ComposerExtraEnd?: ComponentType | undefined;
+  /** With `composerModes.placement: "footer"`: drawn at the end of the footer row below the composer (a context ring, a count). */
+  ComposerFooterEnd?: ComponentType | undefined;
   /** Composer density. Omitted keeps the default composer; "compact" is the
    * slim single-row composer (thread-composer.css), tuned only through the
    * `--composer-compact-*` custom properties. */
@@ -438,6 +440,8 @@ export interface ThreadComposerModes {
   /** The picked mode id; the first mode when absent or unknown. */
   mode: string;
   onModeChange: (id: string) => void;
+  /** "inline" (default) draws the mode pill and Quality chip in the composer's action row. "footer" moves them, quiet and right-aligned, to a row below the composer (with `ComposerNotice` at its left and `ComposerFooterEnd` at its right). */
+  placement?: "inline" | "footer" | undefined;
   /** The Quality chip, in the trailing group beside the pill. The band comes in as data: a child or teen never sees Thinking or a model choice. */
   quality?: ComposerQualityData | undefined;
   /** A field tool was pressed. Without it `clear` empties the composer text. */
@@ -1009,7 +1013,7 @@ export const ComposerInputField: FC<ComponentProps<typeof ComposerPrimitive.Inpu
 };
 
 const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
-  const { ComposerInputOverride, ComposerQuotePreview, ComposerNotice, sendHeld: sendHeldProp, composerDensity, composerVariant, composerNoticeLayout, composerNoticeReserve, composerPlaceholder, composerTourId, composerModes } = useContext(ThreadComponentsContext);
+  const { ComposerInputOverride, ComposerQuotePreview, ComposerNotice, ComposerFooterEnd, sendHeld: sendHeldProp, composerDensity, composerVariant, composerNoticeLayout, composerNoticeReserve, composerPlaceholder, composerTourId, composerModes } = useContext(ThreadComponentsContext);
   const aui = useAui();
   const text = useAuiState((st) => st.composer.text);
   const currentMode = composerModes ? (composerModes.modes.find((m) => m.id === composerModes.mode) ?? composerModes.modes[0]) : undefined;
@@ -1091,7 +1095,13 @@ const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
           </div>
         </DraftRestoreRegionContext.Provider>
       </ComposerPrimitive.AttachmentDropzone>
-      {(ComposerNotice || composerNoticeReserve) && (
+      {composerModes?.placement === "footer" ? (
+        <div data-slot="aui_composer-footer" className="text-muted-foreground flex w-full flex-wrap items-center justify-end gap-x-3 gap-y-0 px-2.5 text-xs leading-6">
+          {ComposerNotice ? <span data-slot="aui_composer-notice" className="mr-auto min-w-0 truncate"><ComposerNotice /></span> : null}
+          <ComposerFooterControls composerModes={composerModes} />
+          {ComposerFooterEnd ? <ComposerFooterEnd /> : null}
+        </div>
+      ) : (ComposerNotice || composerNoticeReserve) && (
         <div
           data-slot="aui_composer-notice"
           className={cn(
@@ -1105,6 +1115,17 @@ const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
         </div>
       )}
     </ComposerPrimitive.Root>
+  );
+};
+
+/** The quiet footer form of the mode pill and the Quality chip (`composerModes.placement: "footer"`). */
+const ComposerFooterControls: FC<{ composerModes: ThreadComposerModes }> = ({ composerModes }) => {
+  const mode = composerModes.modes.find((m) => m.id === composerModes.mode) ?? composerModes.modes[0];
+  return (
+    <>
+      {composerModes.modes.length > 1 ? <ComposerModePill quiet modes={composerModes.modes} mode={composerModes.mode} onModeChange={composerModes.onModeChange} /> : null}
+      <ComposerChips quiet chips={mode?.chips ?? []} quality={qualityChipFor(composerModes.quality)} />
+    </>
   );
 };
 
@@ -1137,7 +1158,7 @@ const ComposerAction: FC<{ pill?: boolean }> = ({ pill = false }) => {
     <div className="aui-composer-action-wrapper relative flex min-w-0 items-center justify-between gap-2">
       <div className={cn("flex items-center gap-1.5", composerModes && "min-w-0 flex-1")}>
         {ComposerAddAttachmentOverride ? <ComposerAddAttachmentOverride /> : <ComposerAddAttachment />}
-        {composerModes ? <ComposerModeLeading composerModes={composerModes} /> : null}
+        {composerModes && composerModes.placement !== "footer" ? <ComposerModeLeading composerModes={composerModes} /> : null}
         {ComposerExtra && <ComposerExtra />}
       </div>
       <div className="flex items-center gap-1.5">

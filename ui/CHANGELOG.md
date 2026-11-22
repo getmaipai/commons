@@ -1,3 +1,7 @@
+## [ui-v0.5.734] - 2026-11-22
+
+- Add: `Thread` `composerModes.placement: "footer"` moves the mode pill and the Quality chip out of the composer into a quiet, right-aligned row below it (small muted words, no fill, no icons), with `ComposerNotice` at its left and the new `ComposerFooterEnd` slot at its right. `ComposerModePill` takes `quiet`; `ComposerChips` takes `quiet`; `ComposerChipPopover` has a `quiet` variant. Default placement is unchanged.
+
 ## [ui-v0.5.733] - 2026-11-22
 
 - Fix: the compact composer text lines up with its controls. The text field is `display: block` (an inline textarea left a 5 px descender gap under it, so the placeholder and typed text sat 5 px above the centre line of the Add, mode, level and send buttons).

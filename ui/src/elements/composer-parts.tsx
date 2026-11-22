@@ -162,6 +162,7 @@ const SLOT_ICON = { picture: ImageIcon, character: User, place: MapPin, prop: Bo
 // (a raised surface) and the Presets pill (a soft fill) are drawn as shapes.
 const CHIP = `flex min-h-12 shrink-0 items-center gap-2 whitespace-nowrap rounded-full bg-foreground/5 px-4 text-base text-foreground transition-colors hover:bg-foreground/10 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-expanded:bg-foreground/10 disabled:opacity-50 ${hitArea(1)}`;
 const RAISED = `flex min-h-12 shrink-0 items-center gap-2 rounded-full bg-[var(--surface-1)] px-4 text-base font-medium text-foreground shadow-sm ring-1 ring-inset ring-[var(--hairline)] transition-colors hover:bg-foreground/5 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 ${hitArea(1)}`;
+const QUIET = `flex min-h-6 shrink-0 items-center gap-1 whitespace-nowrap rounded-md px-1.5 text-xs font-medium leading-6 text-muted-foreground transition-colors hover:text-foreground outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50`;
 const SOFT = `flex min-h-12 shrink-0 whitespace-nowrap items-center gap-2 rounded-full bg-foreground/5 px-4 text-base text-foreground transition-colors hover:bg-foreground/10 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 ${hitArea(1)}`;
 
 function chosenLabel(chip: ComposerChipData): string {
@@ -170,7 +171,9 @@ function chosenLabel(chip: ComposerChipData): string {
 }
 
 /** The mode pill: an icon and the mode's words, opening the list of modes. A listbox with arrow keys, Enter and Escape. */
-export function ComposerModePill({ modes, mode, onModeChange, onChosen }: {
+export function ComposerModePill({ modes, mode, onModeChange, onChosen, quiet = false }: {
+  /** The footer look: small muted text and a chevron, no fill or ring; the list opens upward from its right edge. */
+  quiet?: boolean;
   modes: readonly ComposerModeData[];
   mode: string;
   onModeChange: (id: string) => void;
@@ -202,9 +205,9 @@ export function ComposerModePill({ modes, mode, onModeChange, onChosen }: {
         aria-label={i18n._({ id: "ui.Mode: {label}", message: "Mode: {label}", values: { label: current.label } })}
         onClick={() => (open ? setOpen(false) : openList())}
         onKeyDown={(e) => { if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); openList(); } }}
-        className={RAISED}
+        className={quiet ? QUIET : RAISED}
       >
-        <Icon className="size-4" aria-hidden="true" /><span>{current.label}</span><ChevronDown className="size-4" aria-hidden="true" />
+        {quiet ? null : <Icon className="size-4" aria-hidden="true" />}<span>{current.label}</span><ChevronDown className={quiet ? "size-3.5" : "size-4"} aria-hidden="true" />
       </button>
       {open ? (
         <div
@@ -212,7 +215,7 @@ export function ComposerModePill({ modes, mode, onModeChange, onChosen }: {
           role="listbox"
           aria-label={i18n._({ id: "ui.Composer modes", message: "Composer modes" })}
           tabIndex={-1}
-          className="absolute bottom-full left-0 z-50 mb-2 min-w-44 motion-reveal surface-menu p-1.5 text-popover-foreground"
+          className={cn("absolute bottom-full z-50 mb-2 min-w-44 motion-reveal surface-menu p-1.5 text-popover-foreground", quiet ? "right-0" : "left-0")}
           onKeyDown={(e) => {
             if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); setHighlighted((i) => (i + (e.key === "ArrowDown" ? 1 : -1) + modes.length) % modes.length); }
             if (e.key === "Enter") { e.preventDefault(); const chosen = modes[highlighted]; if (chosen) choose(chosen.id); }
@@ -402,7 +405,7 @@ function ChipTabs({ chips }: { chips: readonly ComposerChipData[] }) {
 
 /** Chips that share a `group` fold into one trigger and one popover (a bottom sheet on a phone). The trigger shows the chosen words. */
 export function ComposerChipPopover({ name, chips, icon, slot = "composer-chip-group", align = "start", showSummary = true, variant = "plain", iconOnlyTrigger = false, triggerLabel }: {
-  variant?: "plain" | "soft";
+  variant?: "plain" | "soft" | "quiet";
   /** Draw only the supplied icon and chevron, keeping the trigger fully named for assistive technology. */
   iconOnlyTrigger?: boolean;
   triggerLabel?: string;
@@ -435,9 +438,9 @@ export function ComposerChipPopover({ name, chips, icon, slot = "composer-chip-g
       aria-label={accessibleName}
       title={unavailable ? reason : (iconOnlyTrigger ? accessibleName : iconOnlyName)}
       onClick={phone ? () => setOpen(true) : undefined}
-      className={cn(variant === "soft" ? SOFT : CHIP, unavailable && "opacity-60")}
+      className={cn(variant === "soft" ? SOFT : variant === "quiet" ? QUIET : CHIP, unavailable && "opacity-60")}
     >
-      {iconOnlyTrigger ? icon ?? <GroupIcon chips={chips} /> : iconOnlyChip ? (ChosenIcon ? <ChosenIcon className="size-5 shrink-0" aria-hidden="true" /> : icon ?? <GroupIcon chips={chips} />) : icon ?? <GroupIcon chips={chips} />}{iconOnlyTrigger || iconOnlyChip ? null : <span className="min-w-0 truncate">{summary || name}</span>}<ChevronDown className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+      {variant === "quiet" ? null : iconOnlyTrigger ? icon ?? <GroupIcon chips={chips} /> : iconOnlyChip ? (ChosenIcon ? <ChosenIcon className="size-5 shrink-0" aria-hidden="true" /> : icon ?? <GroupIcon chips={chips} />) : icon ?? <GroupIcon chips={chips} />}{(iconOnlyTrigger || iconOnlyChip) && variant !== "quiet" ? null : <span className="min-w-0 truncate">{summary || name}</span>}<ChevronDown className={cn("shrink-0 text-muted-foreground", variant === "quiet" ? "size-3.5" : "size-4")} aria-hidden="true" />
     </button>
   );
   const body = chips.length >= 3 ? <ChipTabs chips={chips} /> : <div className="flex min-w-0 flex-col gap-4">{chips.map((c) => <OptionRadios key={c.id} chip={c} />)}</div>;
@@ -497,7 +500,7 @@ function useOverflowFade() {
 
 /** The mode's combined chips (each group one popover trigger, at most three, the rest under "More"), then the Quality chip. It is one
  * line: when it is wider than its room it scrolls with a fade at the edge. */
-export function ComposerChips({ chips, quality }: { chips: readonly ComposerChipData[]; quality?: ComposerChipData | null }) {
+export function ComposerChips({ chips, quality, quiet = false }: { chips: readonly ComposerChipData[]; quality?: ComposerChipData | null; /** The footer look (muted words, no icons or fills). */ quiet?: boolean }) {
   const row = useOverflowFade();
   const groups = groupComposerChips(chips);
   // A single group over the cap is drawn as itself (its own name, icon and words); "More" is only for two or more extra groups.
@@ -507,9 +510,9 @@ export function ComposerChips({ chips, quality }: { chips: readonly ComposerChip
   if (groups.length === 0 && !quality) return null;
   return (
     <div ref={row} data-slot="composer-chips" className="flex min-w-0 touch-pan-x flex-nowrap items-center gap-1.5 overflow-x-auto [scrollbar-width:none] data-[overflow=true]:[mask-image:linear-gradient(to_right,black_calc(100%-28px),transparent)] [&::-webkit-scrollbar]:hidden">
-      {shown.map((g) => <ComposerChipPopover key={g.name} name={g.name} chips={g.chips} />)}
+      {shown.map((g) => <ComposerChipPopover key={g.name} name={g.name} chips={g.chips} {...(quiet ? { variant: "quiet" as const } : {})} />)}
       {rest.length > 0 ? <ComposerChipPopover name={i18n._({ id: "ui.More", message: "More" })} chips={rest} showSummary={false} slot="composer-more" /> : null}
-      {quality ? <ComposerChipPopover name={quality.label} chips={[quality]} slot="composer-quality" icon={<Sparkles className="size-5 shrink-0" aria-hidden="true" />} iconOnlyTrigger triggerLabel={`${quality.label}: ${chosenOption(quality)?.label ?? quality.label}`} /> : null}
+      {quality ? <ComposerChipPopover name={quality.label} chips={[quality]} slot="composer-quality" icon={<Sparkles className="size-5 shrink-0" aria-hidden="true" />} iconOnlyTrigger={!quiet} {...(quiet ? { variant: "quiet" as const } : {})} triggerLabel={`${quality.label}: ${chosenOption(quality)?.label ?? quality.label}`} /> : null}
     </div>
   );
 }
