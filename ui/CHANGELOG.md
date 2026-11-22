@@ -1,3 +1,7 @@
+## [ui-v0.5.730] - 2026-11-22
+
+- Fix: buttons inside a tab panel, a dialog or a region did nothing (the Add voice window, any tabbed page). The 48 px touch floor gave every `tabindex` element an invisible full-size layer, and a Radix tab panel is `tabindex=0`, so its layer sat on top of its own buttons and swallowed the clicks. Focusable containers (`role` tabpanel, dialog, alertdialog, region) no longer get the layer.
+
 ## [ui-v0.5.729] - 2026-11-22
 
 - `Thread` `composerDensity: "compact"` now also works with `composerModes`. Before, a Thread with modes dropped compact and drew the large unified panel (about 170 px for an empty composer), so the Code app's composer took a third of the screen. Now compact wins: Add, the modes' chips (the Quality chip) or the mode pill, the text and Send share one slim row (about 62 px) that grows with the text, then moves the controls to a bottom bar. The unified panel stays the default when density is not set, so chat and Create are unchanged. On a phone a composer with a mode pill puts the text on its own row. Chips keep their own width with the common control height; the compact text field no longer shows scrollbars for a long placeholder.
