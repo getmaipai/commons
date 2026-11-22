@@ -374,7 +374,7 @@ export function SectionSidebar({
       )}
       data-collapsed={collapsible ? (collapsed ? collapsedStyle : "false") : undefined}
     >
-      <SidebarHeader className={cn("px-2 pt-4 pb-2", compact ? "gap-1" : "gap-3", rail && "items-center")}>
+      <SidebarHeader className={cn("px-2 pb-2", compact ? "pt-3.5 gap-1" : "pt-4 gap-3", rail && "items-center")}>
         {headerTop}
         {hasHeaderRow ? (
           <div data-slot="section-sidebar-header" className={cn("flex h-9 items-center gap-1", rail && "justify-center")}>

@@ -32,7 +32,7 @@ export function RightPane({ open, onOpenChange, pinned, onPinnedChange, companio
     if (selected !== activeTab) onActiveTabChange(companionTab.id);
   }, [activeTab, companionTab.id, onActiveTabChange, selected]);
   const panel = <>
-    <header className="flex h-13 shrink-0 items-center gap-2 border-b border-sidebar-border ps-4 pe-3">
+    <header className="flex h-14 shrink-0 items-center gap-2 border-b border-sidebar-border ps-4 pe-3">
       <div className="min-w-0 flex-1 truncate font-medium">{title ?? allTabs.find((tab) => tab.id === selected)?.label}</div>
       {headerActions ? <div className="flex shrink-0 items-center gap-1">{headerActions}</div> : null}
       <Button type="button" variant="ghost" size="icon-sm" aria-label={pinLabel} aria-pressed={pinned} onClick={() => onPinnedChange(!pinned)}><Pin aria-hidden="true" /></Button>

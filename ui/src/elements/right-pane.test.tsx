@@ -80,7 +80,7 @@ test("a closed desktop pane draws nothing", () => {
 test("the header row ends with pin, close, then the avatar, and shares the page bar's height", () => {
   const view = render(<RightPane {...props({ headerActions: <span>Header action</span> })} />);
   const header = view.container.querySelector("header")!;
-  expect(header.className).toContain("h-13");
+  expect(header.className).toContain("h-14");
   const order = [...header.querySelectorAll("button, span")].map((node) => node.getAttribute("aria-label") ?? node.textContent);
   expect(order.indexOf("Header action")).toBeLessThan(order.indexOf("Pin pane"));
   expect(order.indexOf("Pin pane")).toBeLessThan(order.indexOf("Close pane"));

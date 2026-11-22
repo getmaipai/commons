@@ -1,3 +1,7 @@
+## [ui-v0.5.732] - 2026-11-22
+
+- Fix: header rows line up. The right pane header is 56 px (`h-14`) like the chat header, and a compact section sidebar title sits on the same centre line (`pt-3.5`), so the three headers of a page with a sidebar, a thread and a right pane no longer sit 2 to 4 px apart.
+
 ## [ui-v0.5.731] - 2026-11-22
 
 - Fix: the 0.5.730 fix missed focusable groups. A roving-focus group (the toggle group behind the Add voice filters) is `tabindex=0` too, and its layer still covered the buttons inside it. The touch floor now skips any `tabindex` element that holds buttons, links, inputs or other controls.
