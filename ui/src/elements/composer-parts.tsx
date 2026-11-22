@@ -215,7 +215,7 @@ export function ComposerModePill({ modes, mode, onModeChange, onChosen, quiet = 
           role="listbox"
           aria-label={i18n._({ id: "ui.Composer modes", message: "Composer modes" })}
           tabIndex={-1}
-          className={cn("absolute bottom-full z-50 mb-2 min-w-44 motion-reveal surface-menu p-1.5 text-popover-foreground", quiet ? "right-0" : "left-0")}
+          className={cn("absolute bottom-full z-50 mb-2 min-w-44 motion-reveal surface-menu p-1.5 text-popover-foreground", quiet ? "right-0 w-max text-sm" : "left-0")}
           onKeyDown={(e) => {
             if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); setHighlighted((i) => (i + (e.key === "ArrowDown" ? 1 : -1) + modes.length) % modes.length); }
             if (e.key === "Enter") { e.preventDefault(); const chosen = modes[highlighted]; if (chosen) choose(chosen.id); }

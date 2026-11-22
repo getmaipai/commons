@@ -1,3 +1,7 @@
+## [ui-v0.5.735] - 2026-11-22
+
+- Fix: the quiet (footer) mode list is as wide as its longest label and uses normal text size, so a long label no longer wraps.
+
 ## [ui-v0.5.734] - 2026-11-22
 
 - Add: `Thread` `composerModes.placement: "footer"` moves the mode pill and the Quality chip out of the composer into a quiet, right-aligned row below it (small muted words, no fill, no icons), with `ComposerNotice` at its left and the new `ComposerFooterEnd` slot at its right. `ComposerModePill` takes `quiet`; `ComposerChips` takes `quiet`; `ComposerChipPopover` has a `quiet` variant. Default placement is unchanged.
