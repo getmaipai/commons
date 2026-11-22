@@ -1,3 +1,7 @@
+## [spec-v0.1.477] - 2026-11-21
+
+- `access.tier.boost` and `access.tier.max` return to their spec-v0.1.475 form (no `coding` option). 0.1.476 added the option before Home's access registry carried it, so Home's registry check failed. The option comes back with Home's own change (CODE-TIER-03). The `coding` tier category, the `engines.coding.tier.*` slots and the coding records are unchanged.
+
 ## [spec-v0.1.476] - 2026-11-21
 
 - Coding records (CODE-SPEC-01, phase 2): new schemas and fixtures `coding-session`, `coding-environment`, `coding-event` and `git-connection` (states, fields and scopes as in Home's local-coding design note, section 4.2). `coding-session.tier` (`standard`, `boost`, `max`, default `standard`) is the person's stored choice; `model_id` is provenance written by Home from the Stack's reply and is never a choice (CODE-TIER-01). `coding-environment` has no secret field; `git-connection` carries no token.

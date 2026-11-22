@@ -7357,7 +7357,6 @@
         "image",
         "video",
         "music",
-        "coding",
         "voice"
       ],
       "multiple": true
@@ -7373,7 +7372,6 @@
       "image",
       "video",
       "music",
-      "coding",
       "voice"
     ],
     "label": "Boost for",
@@ -7385,16 +7383,14 @@
         "image": "Pictures with extra power.",
         "video": "Videos with extra power.",
         "music": "Music with extra power.",
-        "voice": "Voices with extra power.",
-        "coding": "Coding with extra power."
+        "voice": "Voices with extra power."
       },
       "option_labels": {
         "chat": "Chat",
         "image": "Pictures",
         "video": "Videos",
         "music": "Music",
-        "voice": "Voice",
-        "coding": "Coding"
+        "voice": "Voice"
       }
     },
     "band_default": {
@@ -7411,7 +7407,6 @@
         "image",
         "video",
         "music",
-        "coding",
         "voice"
       ]
     },
@@ -7432,7 +7427,6 @@
         "image",
         "video",
         "music",
-        "coding",
         "voice"
       ],
       "multiple": true
@@ -7459,16 +7453,14 @@
         "image": "Pictures with full power.",
         "video": "Videos with full power.",
         "music": "Music with full power.",
-        "voice": "Voices with full power.",
-        "coding": "Coding with full power."
+        "voice": "Voices with full power."
       },
       "option_labels": {
         "chat": "Chat",
         "image": "Pictures",
         "video": "Videos",
         "music": "Music",
-        "voice": "Voice",
-        "coding": "Coding"
+        "voice": "Voice"
       }
     },
     "band_default": {

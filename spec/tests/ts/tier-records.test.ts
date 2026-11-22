@@ -106,8 +106,6 @@ describe("tier.max grants", () => {
     expect(vocab.minors_policy.role_defaults.coding).toEqual({ child: "standard", teen: "standard" });
     expect(vocab.minors_policy.teen_max_categories).not.toContain("coding");
     expect(keyOf("engines.coding.tier.standard").default.model).toBe("recommended");
-    expect(keyOf("access.tier.boost").band_default.teen).not.toContain("coding");
-    expect(keyOf("access.tier.boost").band_default.adult).toContain("coding");
   });
 });
 
