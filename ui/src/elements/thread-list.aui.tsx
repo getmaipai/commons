@@ -149,6 +149,8 @@ export type ThreadListProjects = {
   onNewChat?: (id: string) => void;
   /** The project's name opens its page; the chevron still folds the row. */
   onOpen?: (id: string) => void;
+  /** Each project row starts open (its chats show without a click); the row still folds. Default false. */
+  defaultOpen?: boolean;
   /** Adds "Edit project" to the row menu (the host opens its settings). */
   onEdit?: (id: string) => void;
   /** Adds Pin / Unpin project to the row menu. */
@@ -209,6 +211,8 @@ export const threadFolderId = (custom: Record<string, unknown> | undefined): str
  * list is not being searched, and (with pinning) the chat is not pinned:
  * a chat appears in exactly one place, and Pinned wins. */
 const PROJECT_PREVIEW_COUNT = 5;
+/** Projects listed before the section's own Show more row. */
+const PROJECT_LIST_PREVIEW_COUNT = 8;
 const THREAD_DRAG_TYPE = "application/x-maipai-thread";
 
 const menuContentClass =
@@ -577,8 +581,11 @@ const ThreadListProjectsSection: FC<{
   const { labels } = projects;
   const [creating, setCreating] = useState(false);
   const [sectionOpen, setSectionOpen] = useState(true);
+  const [allProjects, setAllProjects] = useState(false);
   const canCreate = projects.canManage && Boolean(projects.onCreate);
   if (projects.folders.length === 0 && !canCreate) return null;
+  const listed = projects.folders.filter((folder) => !skip?.has(folder.id));
+  const shownFolders = allProjects ? listed : listed.slice(0, PROJECT_LIST_PREVIEW_COUNT);
   return (
     <div data-slot="aui_thread-list-projects" data-density={density} className={cn("flex flex-col", density === "compact" ? "gap-0" : "gap-0.5")}>
       <div
@@ -629,8 +636,7 @@ const ThreadListProjectsSection: FC<{
           }}
         />
       ) : null}
-      {(sectionOpen ? projects.folders : [])
-        .filter((folder) => !skip?.has(folder.id))
+      {(sectionOpen ? shownFolders : [])
         .map((folder) => (
           <ThreadListProjectRow
             key={folder.id}
@@ -640,6 +646,16 @@ const ThreadListProjectsSection: FC<{
             row={row}
           />
         ))}
+      {sectionOpen && listed.length > PROJECT_LIST_PREVIEW_COUNT ? (
+        <Button
+          variant="ghost"
+          data-slot="aui_thread-list-projects-show-more"
+          className={cn("text-muted-foreground justify-start px-2.5 text-sm font-normal", density === "compact" ? "h-9 rounded-lg" : "h-8 rounded-md")}
+          onClick={() => setAllProjects((all) => !all)}
+        >
+          {allProjects ? labels.showLess : labels.showMore}
+        </Button>
+      ) : null}
       {sectionOpen && projects.onSeeAll ? (
         <Button
           variant="ghost"
@@ -708,7 +724,7 @@ const ThreadListProjectRow: FC<{
   const activeId = useAuiState((s) => s.threads.mainThreadId);
   const threadIds = useAuiState((s) => s.threads.threadIds);
   const holdsActive = indices.some((index) => threadIds[index] === activeId);
-  const [open, setOpen] = useState(holdsActive);
+  const [open, setOpen] = useState(projects.defaultOpen === true || holdsActive);
   const [showAll, setShowAll] = useState(false);
   const [mode, setMode] = useState<"idle" | "rename" | "confirm">("idle");
   const [dropping, setDropping] = useState(false);

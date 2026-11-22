@@ -1,3 +1,8 @@
+## [ui-v0.5.739] - 2026-11-22
+
+- Add: `projects.defaultOpen` on the thread list; each project row starts open when true. Default false, so nothing changes for current callers.
+- Change: the Projects section lists eight projects, then a Show more row that expands the rest inline (Show less folds it); See all projects still follows.
+
 ## [ui-v0.5.738] - 2026-11-22
 
 - Add: kit tokens for the thread list project rows (`--aui-thread-list-project-chevron-display`, `-project-items-indent`, `-project-note-padding-x`, `-project-note-font-size`, `-project-show-more-height`, `-project-show-more-font-size`), the group labels (`-group-label-pt`, `-group-label-first-pt`, `-group-label-pb`, `-group-label-font-size`) and the reply action bar (`--aui-assistant-action-bar-min-height`). Defaults equal the old look.

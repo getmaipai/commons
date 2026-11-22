@@ -31,3 +31,13 @@ describe("host-settable spacing tokens keep the current look as their defaults",
     expect(tokens).toContain("--aui-assistant-action-bar-min-height");
   });
 });
+
+describe("projects section (default-open prop and inline Show more)", () => {
+  test("a host can start every project open", () => {
+    expect(list).toContain("projects.defaultOpen === true || holdsActive");
+  });
+  test("the section lists eight projects then a Show more row", () => {
+    expect(list).toContain("PROJECT_LIST_PREVIEW_COUNT = 8");
+    expect(list).toContain("aui_thread-list-projects-show-more");
+  });
+});
