@@ -291,10 +291,10 @@ describe("ThreadList projects mode", () => {
     expect(item.getAttribute("draggable")).toBeNull();
   });
 
-  test("the + and the project menu button carry the 48px touch overhang", async () => {
+  test("the project menu button carries the 48px touch overhang and the + the packed layer", async () => {
     const view = render(<Harness projects={{ folders, canManage: true, onCreate: async () => {}, onRename: async () => {} }} seeds={[{ remoteId: "a", title: "Alpha" }]} />);
     const plus = await view.findByLabelText("New project");
-    expect(plus.className).toContain("before:inset-[min(0px,calc((100%-49px)/2))]");
+    expect(plus.className).toContain("before:inset-x-[-1px]");
     const more = (await projectRow(view, "Garden")).querySelector("[data-slot=aui_thread-list-project-more]") as HTMLElement;
     expect(more.className).toContain("before:inset-[min(0px,calc((100%-49px)/2))]");
   });
@@ -367,6 +367,17 @@ describe("ThreadList projects mode", () => {
     const plain = render(<Harness projects={{ folders }} seeds={[]} />);
     await plain.findByText("Garden");
     expect(plain.queryByLabelText("Browse all projects")).toBeNull();
+  });
+
+  test("the Projects header icons use the packed hit layer so neighbours never overlap", async () => {
+    const view = render(<Harness projects={{ folders, canManage: true, onCreate: async () => {}, onSeeAll: () => {} }} seeds={[]} />);
+    const header = (await view.findByText("Projects")).closest("[data-slot=aui_thread-list-group-label]") as HTMLElement;
+    for (const name of ["Browse all projects", "New project"]) {
+      const button = within(header).getByLabelText(name);
+      expect(button.className).toContain("before:inset-x-[-1px]");
+      expect(button.className).toContain("before:inset-y-[-3px]");
+      expect(button.className).not.toContain("49px");
+    }
   });
 
   test("rename and delete happen inline, and delete asks first", async () => {

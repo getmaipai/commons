@@ -14,6 +14,7 @@ import {
   SidebarMenuItem,
 } from "../dashboard/components/ui/sidebar";
 import { cn } from "../dashboard/lib/utils";
+import { HIT_PACKED } from "../utils";
 import { menuHover, menuSelected, navTransition } from "../dashboard/lib/navItemStyle";
 import { HitField } from "../settings/HitField";
 import { Chip } from "./Chip";
@@ -319,7 +320,8 @@ export function SectionSidebar({
               onCollapsedChange(peeking ? false : !collapsed);
             }}
             className={cn(
-              "relative inline-flex shrink-0 items-center justify-center rounded-[var(--settings-control-radius)] text-settings-helper outline-none before:absolute before:inset-[min(0px,calc((100%-49px)/2))] before:content-[''] hover:bg-settings-fill/60 hover:text-sidebar-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring",
+              HIT_PACKED,
+              "inline-flex shrink-0 items-center justify-center rounded-[var(--settings-control-radius)] text-settings-helper outline-none hover:bg-settings-fill/60 hover:text-sidebar-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring",
               compact ? "size-6" : "size-9",
             )}
           >
@@ -393,7 +395,7 @@ export function SectionSidebar({
                         if (collapsed && onCollapsedChange) onCollapsedChange(false);
                         setSearchOpen(true);
                       }}
-                      className="relative inline-flex size-6 shrink-0 items-center justify-center rounded-[var(--settings-control-radius)] text-settings-helper outline-none before:absolute before:inset-[min(0px,calc((100%-49px)/2))] before:content-[''] hover:bg-settings-fill/60 hover:text-sidebar-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+                      className={cn(HIT_PACKED, "inline-flex size-6 shrink-0 items-center justify-center rounded-[var(--settings-control-radius)] text-settings-helper outline-none hover:bg-settings-fill/60 hover:text-sidebar-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring")}
                     >
                       <SearchIcon aria-hidden className="size-4.5" />
                     </button>

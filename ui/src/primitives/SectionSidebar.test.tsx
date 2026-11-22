@@ -472,6 +472,17 @@ describe("SectionSidebar", () => {
     expect(toggle.getAttribute("aria-keyshortcuts")).toBe("Meta+B Control+B");
   });
 
+  // HIT-PACKED-01: the 49 px hit layer of a 24 px button reached 12 px into its neighbour, so hover and clicks landed on the wrong header icon.
+  test("the header's search and collapse buttons use the packed hit layer, never the 49 px one", () => {
+    const { container } = column({ density: "compact", standalone: true, onCollapsedChange: () => {}, search: { value: "", onChange: () => {}, label: "Search chats" } });
+    for (const slot of ["section-sidebar-search", "section-sidebar-toggle"]) {
+      const button = container.querySelector(`[data-slot="${slot}"]`) as HTMLButtonElement;
+      expect(button.className).toContain("before:inset-x-[-1px]");
+      expect(button.className).toContain("before:inset-y-[-3px]");
+      expect(button.className).not.toContain("49px");
+    }
+  });
+
   test("the compact column is exempt from the 48px tap-target audit, as Chat's rail is; the comfortable column is not", () => {
     const compactRender = column({ density: "compact" });
     expect(compactRender.container.querySelector('[data-touch-target-exempt]')).not.toBeNull();

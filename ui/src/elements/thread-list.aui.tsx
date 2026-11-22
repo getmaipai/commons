@@ -16,7 +16,7 @@ import {
 } from "@assistant-ui/react";
 import { ProjectMark } from "./project-mark";
 import { formatRelative } from "../relativeTime";
-import { hitArea } from "../utils";
+import { hitArea, HIT_PACKED } from "../utils";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 import {
@@ -621,7 +621,7 @@ const ThreadListProjectsSection: FC<{
                 size="icon"
                 data-slot="aui_thread-list-projects-see-all"
                 aria-label={labels.seeAll}
-                className="relative size-6 p-0 before:absolute before:inset-[min(0px,calc((100%-49px)/2))] before:content-['']"
+                className={cn("size-6 p-0", HIT_PACKED)}
                 onClick={() => projects.onSeeAll?.()}
               >
                 <SlidersHorizontalIcon className="size-3.5" />
@@ -633,8 +633,8 @@ const ThreadListProjectsSection: FC<{
                 size="icon"
                 data-slot="aui_thread-list-section-action"
                 aria-label={labels.newProject}
-                // A 24px box with a 12px transparent overhang: the 48px touch floor.
-                className="relative size-6 p-0 before:absolute before:inset-[min(0px,calc((100%-49px)/2))] before:content-['']"
+                // A 24px box with a packed hit layer: it never reaches the neighbouring icon.
+                className={cn("size-6 p-0", HIT_PACKED)}
                 onClick={() => (projects.onNew ? projects.onNew() : setCreating(true))}
               >
                 <PlusIcon className="size-3.5" />

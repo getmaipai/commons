@@ -37,6 +37,10 @@ export const FOCUS_RING_INSET =
 export const HIT_FLOOR =
   "relative before:absolute before:inset-[min(0px,calc((100%-49px)/2))] before:content-['']";
 
+/** The hit layer for icon buttons packed side by side or stacked tight (header actions, the Projects section icons): a transparent `::before` that reaches 1 px past the painted box sideways (under half of the 2 px gap between neighbours, so two layers never overlap) and 3 px above and below (a 22 to 24 px button gets at least a 24 by 28 px target, kept inside its own row). Used instead of HIT_FLOOR where a 49 px layer would cover the next button. */
+export const HIT_PACKED =
+  "relative before:absolute before:inset-x-[-1px] before:inset-y-[-3px] before:content-['']";
+
 export function hitArea(insetStep: 1 | 2 | 3): string {
   // A11Y-DEBT-01: spacing classes scale with the look's density (0.9 in the default look), so `before:-inset-3` on a 24 px control
   // reached only 43 px. The layer now reaches exactly 48 px whatever the density or the painted size (a no-op at 48 or more).
