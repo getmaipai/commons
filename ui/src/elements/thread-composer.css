@@ -61,10 +61,11 @@
 }
 
 /* A phone row cannot hold the text beside the model label (the selector
- * trigger, or the label-only value a single-model hub shows), so with either
- * present the text takes its own row from the start. */
+ * trigger, the label-only value a single-model hub shows, or the mode pill
+ * of a composer with several modes), so with any of them present the text takes its own row from the start. */
 @media (max-width: 639px) {
-  [data-slot="aui_composer-shell"][data-density="compact"]:has([data-slot="model-selector-trigger"], [data-slot="model-selector-value"]) {
+  [data-slot="aui_composer-shell"][data-density="compact"]:has([data-slot="model-selector-trigger"], [data-slot="model-selector-value"]),
+  [data-slot="aui_composer-shell"][data-density="compact"]:has([data-slot="composer-mode-pill"]) {
     grid-template-areas: "att att att" "above above above" "input input input" "lead . trail";
   }
 }
@@ -103,6 +104,7 @@
 [data-slot="aui_composer-shell"][data-density="compact"] textarea:placeholder-shown {
   white-space: nowrap;
   text-overflow: ellipsis;
+  overflow: hidden;
   max-height: var(--_field-min) !important;
 }
 
@@ -198,4 +200,37 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Compact with `composerModes` (the Code app, any composer with a Quality chip):
+ * the modes' chips ride in the one slim row beside Add. A chip (Quality, a
+ * combined group) and the mode pill keep their own width, with the common
+ * control height, so the chevron is never clipped. The references
+ * and presets row, when a mode has one, sits above the text like the attachments. */
+[data-slot="aui_composer-shell"][data-density="compact"] [data-slot="composer-mode-zone"] {
+  grid-area: above;
+  min-width: 0;
+}
+
+[data-slot="aui_composer-shell"][data-density="compact"] .aui-composer-action-wrapper [data-slot="composer-mode-pill"] button,
+[data-slot="aui_composer-shell"][data-density="compact"] .aui-composer-action-wrapper [data-group] {
+  width: auto;
+  padding-inline: 8px;
+  font-size: var(--composer-compact-label-size, 13px);
+}
+
+[data-slot="aui_composer-shell"][data-density="compact"] .aui-composer-action-wrapper [data-slot="composer-chips"] {
+  gap: 2px;
+  overflow: visible;
+  mask-image: none;
+}
+
+[data-slot="aui_composer-shell"][data-density="compact"] .aui-composer-action-wrapper > :first-child,
+[data-slot="aui_composer-shell"][data-density="compact"] .aui-composer-action-wrapper > :first-child > * {
+  flex: none;
+}
+
+[data-slot="aui_composer-shell"][data-density="compact"] [data-slot="composer-input-row"] {
+  align-items: center;
+  gap: 0;
 }

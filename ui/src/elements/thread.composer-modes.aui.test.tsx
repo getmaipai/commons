@@ -55,9 +55,19 @@ describe("Thread composerModes (COMPOSER-02)", () => {
     expect(chip.closest(".aui-composer-action-wrapper")).not.toBeNull();
   });
 
-  test("the unified panel replaces the compact density when modes are set", () => {
+  test("compact density wins over the unified panel when modes are set, and keeps the chips in the one slim row", () => {
     const view = render(<Harness compact />);
-    expect((view.container.querySelector('[data-slot="aui_composer-shell"]') as HTMLElement).getAttribute("data-density")).toBeNull();
+    const shell = view.container.querySelector('[data-slot="aui_composer-shell"]') as HTMLElement;
+    expect(shell.getAttribute("data-density")).toBe("compact");
+    expect(shell.hasAttribute("data-unified")).toBe(false);
+    expect(shell.className).not.toContain("surface-float");
+    expect(shell.querySelector('.aui-composer-action-wrapper [data-slot="composer-quality"]')).not.toBeNull();
+    expect(shell.querySelector("textarea")?.className ?? "").not.toContain("text-xl");
+    cleanup();
+    const unified = render(<Harness />);
+    const full = unified.container.querySelector('[data-slot="aui_composer-shell"]') as HTMLElement;
+    expect(full.getAttribute("data-density")).toBeNull();
+    expect(full.getAttribute("data-unified")).toBe("true");
     cleanup();
     const plain = render(<Harness compact withModes={false} />);
     expect((plain.container.querySelector('[data-slot="aui_composer-shell"]') as HTMLElement).getAttribute("data-density")).toBe("compact");

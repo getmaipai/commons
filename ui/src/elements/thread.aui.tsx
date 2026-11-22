@@ -456,7 +456,7 @@ export const Thread: FC<ThreadProps> = ({
   const isEmpty = useAuiState(isNewChatView);
 
   return (
-    <ThreadComponentsContext.Provider value={{ ...components, composerTourId, sendButtonTourId, ...(components.composerModes ? { composerDensity: undefined } : {}) }}>
+    <ThreadComponentsContext.Provider value={{ ...components, composerTourId, sendButtonTourId }}>
       <ThreadRoot isEmpty={isEmpty} autoFocus={autoFocus} temporary={temporary} scrollToBottomOffset={scrollToBottomOffset} tourId={tourId} />
     </ThreadComponentsContext.Provider>
   );
@@ -986,7 +986,8 @@ function useMultiline(shell: RefObject<HTMLElement | null>, enabled: boolean): b
 export const ComposerInputField: FC<ComponentProps<typeof ComposerPrimitive.Input>> = ({ className, placeholder, ...props }) => {
   // ONE-COMPOSER: with `composerModes` the field is the unified panel's large borderless field, and the picked mode's placeholder wins
   // (also for a host `ComposerInputOverride` that renders this field, so the host never has to know the mode).
-  const { composerModes, composerVariant } = useContext(ThreadComponentsContext);
+  const { composerModes, composerVariant, composerDensity } = useContext(ThreadComponentsContext);
+  const unified = Boolean(composerModes) && composerVariant !== "pill" && composerDensity !== "compact";
   const mode = composerModes && composerVariant !== "pill" ? (composerModes.modes.find((m) => m.id === composerModes.mode) ?? composerModes.modes[0]) : undefined;
   const shown = mode?.placeholder ?? placeholder;
   const fade = usePlaceholderFade(shown);
@@ -1000,7 +1001,7 @@ export const ComposerInputField: FC<ComponentProps<typeof ComposerPrimitive.Inpu
       data-placeholder-fade={fade}
       className={cn(
         "aui-composer-input caret-primary placeholder:text-muted-foreground max-h-48 min-h-10 w-full resize-none bg-transparent px-2.5 py-1 text-base leading-6 outline-none",
-        composerModes && composerVariant !== "pill" && "min-h-[4.5rem] px-1 text-xl leading-8 md:text-xl",
+        unified && "min-h-[4.5rem] px-1 text-xl leading-8 md:text-xl",
         className,
       )}
     />
@@ -1022,6 +1023,8 @@ const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
   const shellRef = useRef<HTMLDivElement>(null);
   const [aboveInputRegion, setAboveInputRegion] = useState<HTMLDivElement | null>(null);
   const multiline = useMultiline(shellRef, composerDensity === "compact");
+  // The unified panel (large field, 30px radius) is the default look with modes; compact density wins over it and keeps the modes' chips in the one slim row.
+  const unified = Boolean(composerModes) && composerVariant !== "pill" && composerDensity !== "compact";
   return (
     <ComposerPrimitive.Root data-tour={composerTourId} className="aui-composer-root relative flex w-full flex-col">
       <ComposerPrimitive.AttachmentDropzone asChild>
@@ -1031,10 +1034,10 @@ const Composer: FC<{ autoFocus: boolean }> = ({ autoFocus }) => {
             data-slot="aui_composer-shell"
             data-density={composerDensity}
             data-composer-variant={composerVariant}
-            data-unified={composerModes && composerVariant !== "pill" ? "true" : undefined}
-            style={composerModes && composerVariant !== "pill" ? ({ "--composer-radius": "30px", "--composer-padding": "20px" } as CSSProperties) : undefined}
+            data-unified={unified ? "true" : undefined}
+            style={unified ? ({ "--composer-radius": "30px", "--composer-padding": "20px" } as CSSProperties) : undefined}
             data-multiline={multiline ? "" : undefined}
-            className={cn(composerModes && composerVariant !== "pill" ? "surface-float [--elev-2-radius:30px] flex w-full cursor-text flex-col gap-2 p-(--composer-padding) transition-[border-color] data-[dragging=true]:border-ring" : cn("border-foreground/10 focus-within:border-foreground/25 data-[dragging=true]:border-ring flex w-full cursor-text border bg-(--composer-bg) transition-[border-color]", composerVariant === "pill" ? "items-center gap-1 rounded-full p-1" : "flex-col gap-2 rounded-(--composer-radius) p-(--composer-padding)"), "data-[dragging=true]:border-dashed data-[dragging=true]:bg-[color-mix(in_oklab,var(--color-accent)_50%,var(--color-background))]")}
+            className={cn(unified ? "surface-float [--elev-2-radius:30px] flex w-full cursor-text flex-col gap-2 p-(--composer-padding) transition-[border-color] data-[dragging=true]:border-ring" : cn("border-foreground/10 focus-within:border-foreground/25 data-[dragging=true]:border-ring flex w-full cursor-text border bg-(--composer-bg) transition-[border-color]", composerVariant === "pill" ? "items-center gap-1 rounded-full p-1" : "flex-col gap-2 rounded-(--composer-radius) p-(--composer-padding)"), "data-[dragging=true]:border-dashed data-[dragging=true]:bg-[color-mix(in_oklab,var(--color-accent)_50%,var(--color-background))]")}
           >
             {composerVariant !== "pill" ? <ComposerAttachments /> : null}
             {composerVariant !== "pill" && ComposerQuotePreview ? <ComposerQuotePreview /> : null}
