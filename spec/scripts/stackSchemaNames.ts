@@ -33,4 +33,20 @@ export const STACK_SCHEMA_NAMES: ReadonlySet<string> = new Set([
   // VF-ROUGHCUT-01: hand-written mirrors of the rough-cut request and result.
   "stack-rough-cut-request.schema.json",
   "stack-rough-cut-result.schema.json",
+  // STACK-MODELS-PAGE-01: hand-written mirrors of the choices API (the Zod file is the source; the generators would only add noise).
+  "stack-choices-view.schema.json",
+  "stack-choices-error.schema.json",
+  "stack-choices-pick-request.schema.json",
+  "stack-choices-pick-result.schema.json",
+  "stack-choices-order-request.schema.json",
+  "stack-choices-order-result.schema.json",
+  "stack-choices-recommended-request.schema.json",
+  "stack-choices-recommended-result.schema.json",
+  "stack-choices-unused.schema.json",
+  "stack-choices-remove-request.schema.json",
+  "stack-choices-remove-result.schema.json",
+  "stack-choices-add-model-request.schema.json",
+  "stack-choices-add-model-result.schema.json",
+  "stack-choices-migrate-request.schema.json",
+  "stack-choices-migrate-result.schema.json",
 ]);

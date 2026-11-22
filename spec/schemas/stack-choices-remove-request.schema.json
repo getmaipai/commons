@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/stack-choices-remove-request.schema.json",
+  "title": "StackChoicesRemoveRequest",
+  "description": "STACK-MODELS-PAGE-01. The body of `POST /stack/v1/choices/unused/remove`: the unused model ids to remove and whether to run the tidy too.",
+  "type": "object",
+  "properties": {
+    "ids": {
+      "description": "The unused models to remove. Each is judged again on fresh state.",
+      "maxItems": 20,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
+      }
+    },
+    "tidy": {
+      "description": "Also run the Stack's tidy of replaced and abandoned files.",
+      "type": "boolean"
+    }
+  }
+}

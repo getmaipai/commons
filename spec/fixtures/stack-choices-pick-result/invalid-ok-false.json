@@ -1,0 +1,12 @@
+{
+  "ok": false,
+  "category": "chat",
+  "tier": "standard",
+  "profile": "p64",
+  "model": null,
+  "changed": false,
+  "applied": false,
+  "pending_restart": false,
+  "install_job": null,
+  "note": null
+}

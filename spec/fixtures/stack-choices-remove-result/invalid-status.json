@@ -1,0 +1,14 @@
+{
+  "results": [
+    {
+      "id": "a",
+      "status": "gone",
+      "freed_bytes": 0,
+      "message": ""
+    }
+  ],
+  "tidy_removed": [],
+  "freed_bytes": 0,
+  "kept": 0,
+  "failed": 0
+}

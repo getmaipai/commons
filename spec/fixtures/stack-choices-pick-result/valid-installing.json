@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "category": "chat",
+  "tier": "standard",
+  "profile": "p64",
+  "model": "llama33-70b-q4",
+  "changed": true,
+  "applied": false,
+  "pending_restart": false,
+  "install_job": "job_01",
+  "note": "Downloading first; the pick applies when it is ready."
+}

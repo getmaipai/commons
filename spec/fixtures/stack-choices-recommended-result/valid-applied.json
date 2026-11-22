@@ -1,0 +1,12 @@
+{
+  "dry_run": false,
+  "changed": [],
+  "unchanged": 12,
+  "roles": {
+    "stack.roles.chat.enabled": true,
+    "stack.roles.chat.priority": 10
+  },
+  "installs": [],
+  "skipped": [],
+  "needs_licence": []
+}

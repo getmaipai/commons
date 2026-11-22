@@ -1,0 +1,72 @@
+// STACK-MODELS-PAGE-01. The one interface the shared AI and models page talks through. It never calls `fetch`: a host writes a thin adapter
+// (the Stack admin page over `/stack/v1/*` with its session cookie and CSRF header; Home over its own `/api/ai/*`, which forwards each call
+// to the Stack unchanged) and hands it to `StackModelsPage`. Every method maps to one Stack route, so an adapter holds no logic. Shapes come
+// from `@maipai/spec` (`stack/ts/stack-choices`); types only, so a host does not have to ship Zod to render the page.
+import type {
+  StackChoiceCategory, StackChoiceCategoryId, StackChoiceLevel, StackChoiceOptions, StackChoiceOrderRequest, StackChoiceOrderResult, StackChoicePickRequest, StackChoicePickResult,
+  StackChoicesAddModelRequest, StackChoicesAddModelResult, StackChoicesRecommendedResult, StackChoicesRemoveRequest, StackChoicesRemoveResult, StackChoicesUnused, StackChoicesView,
+} from "@maipai/spec/stack/ts/stack-choices";
+
+export type { StackChoiceCategory, StackChoicesView };
+export type StackLevel = StackChoiceLevel;
+export type StackCategoryId = StackChoiceCategoryId;
+export type StackCandidate = StackChoiceCategory["candidates"][number];
+export type StackLevelRow = StackChoiceCategory["tiers"][number];
+export type StackProfileAssignment = StackChoiceCategory["profiles"][number];
+export type StackPickBody = StackChoicePickRequest;
+export type StackPickResult = StackChoicePickResult;
+export type StackOrderBody = StackChoiceOrderRequest;
+export type StackOrderResult = StackChoiceOrderResult;
+export type StackRecommendedResult = StackChoicesRecommendedResult;
+export type StackUnused = StackChoicesUnused;
+export type StackRemoveBody = StackChoicesRemoveRequest;
+export type StackRemoveResult = StackChoicesRemoveResult;
+export type StackAddModelBody = StackChoicesAddModelRequest;
+export type StackAddModelResult = StackChoicesAddModelResult;
+export type StackOptions = StackChoiceOptions;
+
+/** What a host adapter throws: the Stack's own plain sentence (`message`) and its stable code (`unknown_model`, `does_not_fit`, ...). The page shows `message` as it is. */
+export class StackClientError extends Error {
+  readonly code: string | null;
+  constructor(message: string, code: string | null = null) {
+    super(message);
+    this.name = "StackClientError";
+    this.code = code;
+  }
+}
+
+export interface StackInstallStarted { job: string | null; part: string; already_installed?: true; joined?: boolean }
+export interface StackRemoved { part: string; freed_bytes: number; removed: boolean }
+
+export interface StackClient {
+  /** `GET /stack/v1/choices`: everything the page shows, in one read. Starts no work. */
+  readChoices(): Promise<StackChoicesView>;
+  /** `PUT /stack/v1/settings` with `stack.roles.<role>.enabled`. */
+  setRoleEnabled(role: string, enabled: boolean): Promise<void>;
+  /** `PUT /stack/v1/settings` with `stack.roles.<role>.priority` for each role (lower is served first). */
+  setRolePriorities(priorities: Readonly<Record<string, number>>): Promise<void>;
+  /** `PUT /stack/v1/choices/{category}/{level}`: the model for a category and level, for this computer or (with `profile`) for a hardware profile. */
+  chooseModel(category: StackCategoryId, level: StackLevel, body: StackPickBody): Promise<StackPickResult>;
+  /** `PUT /stack/v1/choices/{category}/order`: the order models are tried in and which are switched off. */
+  setOrder(category: StackCategoryId, body: StackOrderBody): Promise<StackOrderResult>;
+  /** `POST /stack/v1/choices/recommended`; `dryRun: true` answers what would change and writes nothing. */
+  recommended(dryRun: boolean): Promise<StackRecommendedResult>;
+  /** `POST /stack/v1/parts/{id}/install`. Progress shows as `percent` on the candidate in `readChoices`. */
+  installModel(id: string): Promise<StackInstallStarted>;
+  /** `DELETE /stack/v1/parts/{id}`. */
+  removeModel(id: string): Promise<StackRemoved>;
+  /** `GET /stack/v1/choices/unused`. */
+  readUnused(): Promise<StackUnused>;
+  /** `POST /stack/v1/choices/unused/remove`. */
+  removeUnused(body: StackRemoveBody): Promise<StackRemoveResult>;
+  /** `POST /stack/v1/choices/add-model`. */
+  addModel(body: StackAddModelBody): Promise<StackAddModelResult>;
+  /** Optional: call `onChange` whenever the Stack's event feed says choices, roles or installs changed (a choice made in the other app shows at once). Returns the unsubscribe. */
+  subscribe?(onChange: () => void): () => void;
+}
+
+/** The sentence to show for a failed call: the Stack's own plain sentence when it sent one, else `fallback`. */
+export function sentenceOf(error: unknown, fallback: string): string {
+  if (error instanceof StackClientError && error.message.trim()) return error.message;
+  return fallback;
+}

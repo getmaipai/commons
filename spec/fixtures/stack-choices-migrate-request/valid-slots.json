@@ -1,0 +1,16 @@
+{
+  "dry_run": true,
+  "slots": [
+    {
+      "role": "chat",
+      "tier": "standard",
+      "model": "qwen3-8b-q4"
+    }
+  ],
+  "features": [
+    {
+      "role": "music",
+      "enabled": false
+    }
+  ]
+}

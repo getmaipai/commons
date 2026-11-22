@@ -1,0 +1,28 @@
+{
+  "dry_run": false,
+  "already_done": false,
+  "results": [
+    {
+      "kind": "slot",
+      "key": "chat.standard",
+      "status": "accepted",
+      "reason": null
+    },
+    {
+      "kind": "order",
+      "key": "chat",
+      "status": "refused",
+      "reason": "One of the models is not offered here."
+    }
+  ],
+  "accepted": 1,
+  "refused": [
+    {
+      "kind": "order",
+      "key": "chat",
+      "status": "refused",
+      "reason": "One of the models is not offered here."
+    }
+  ],
+  "done_at": "2026-11-21T12:00:00.000Z"
+}

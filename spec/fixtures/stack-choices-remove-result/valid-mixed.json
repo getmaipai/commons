@@ -1,0 +1,20 @@
+{
+  "results": [
+    {
+      "id": "qwen2-7b-q4",
+      "status": "removed",
+      "freed_bytes": 4400000000,
+      "message": "Removed."
+    },
+    {
+      "id": "llama33-70b-q4",
+      "status": "kept",
+      "freed_bytes": 0,
+      "message": "Llama 3.3 70B is used by a level now, so it was kept."
+    }
+  ],
+  "tidy_removed": [],
+  "freed_bytes": 4400000000,
+  "kept": 1,
+  "failed": 0
+}

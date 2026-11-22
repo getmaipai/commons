@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/stack-choices-error.schema.json",
+  "title": "StackChoicesError",
+  "description": "STACK-MODELS-PAGE-01. A refusal from the choices routes: a plain sentence the page shows as it is, and a stable code.",
+  "type": "object",
+  "properties": {
+    "error": {
+      "type": "string",
+      "minLength": 1
+    },
+    "code": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "error",
+    "code"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "id": "llama-3.3-70b-instruct-q4-k-m",
+  "label": "Llama 3.3 70B Instruct",
+  "category": "chat",
+  "tier": "boost",
+  "chosen": true,
+  "state": "installing",
+  "install_job": "job_03",
+  "size_bytes": 42500000000,
+  "licence": "Llama 3.3 Community"
+}

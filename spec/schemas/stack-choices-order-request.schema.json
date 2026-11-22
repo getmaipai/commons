@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/stack-choices-order-request.schema.json",
+  "title": "StackChoiceOrderRequest",
+  "description": "STACK-MODELS-PAGE-01. The body of `PUT /stack/v1/choices/{category}/order`: candidate ids tried first to last, and optionally the switched-off list.",
+  "type": "object",
+  "properties": {
+    "order": {
+      "maxItems": 60,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
+      },
+      "description": "Candidate ids, tried first to last. Candidates left out keep their default place after these."
+    },
+    "off": {
+      "description": "The candidates switched off. Omitted leaves the off list as it is.",
+      "maxItems": 60,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
+      }
+    }
+  },
+  "required": [
+    "order"
+  ]
+}

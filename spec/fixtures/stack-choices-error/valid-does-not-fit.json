@@ -1,0 +1,4 @@
+{
+  "error": "Llama 3.3 70B needs 42 GB and this level has 24 GB. Pick a smaller model.",
+  "code": "does_not_fit"
+}

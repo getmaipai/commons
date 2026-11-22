@@ -48,6 +48,7 @@ import { StackMakeRequest, StackMakeResult, StackMakeRefusal, StackVideoOperatio
 import { StackJobsCatalog } from "../../stack/ts/stack-jobs-catalog";
 import { StackVideoReceipt } from "../../stack/ts/stack-video-receipt";
 import { StackRoughCutRequest, StackRoughCutResult } from "../../stack/ts/stack-rough-cut";
+import { STACK_CHOICES_SHAPES } from "../../stack/ts/stack-choices";
 
 const SPEC = join(import.meta.dir, "..", "..");
 const ajv = new Ajv2020({ strict: false, allErrors: true });
@@ -87,6 +88,8 @@ const SHAPES: Array<{ name: string; zod: ZodType }> = [
   { name: "stack-video-receipt", zod: StackVideoReceipt },
   { name: "stack-rough-cut-request", zod: StackRoughCutRequest },
   { name: "stack-rough-cut-result", zod: StackRoughCutResult },
+  // STACK-MODELS-PAGE-01: the choices API shapes.
+  ...Object.entries(STACK_CHOICES_SHAPES).map(([name, zod]) => ({ name, zod: zod as ZodType })),
 ];
 
 for (const shape of SHAPES) {

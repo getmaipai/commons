@@ -1,3 +1,7 @@
+## [ui-v0.5.728] - 2026-11-21
+
+- The shared AI and models page (STACK-MODELS-PAGE-01): `StackModelsPage` in `src/stack/`, with `useStackChoices`, the `StackClient` interface (`StackClientError`), a fake in-memory client for tests and screenshots, and host slots `extraSections`, `lockedItems` and `onNavigate`. One card per feature, search over name, id, repository, family, version, precision, licence, engine and description, a details sheet per feature, recommended setup (preview first), free up space, add a chat model, order and priority. Needs `@maipai/spec` 0.1.478 (`stack/ts/stack-choices`). See `docs/stack-models-page.md`. Additive; nothing existing changes.
+
 ## [ui-v0.5.727] - 2026-11-21
 
 - Code app parts (CODE-KIT-01): `FileTree` takes `selectedPath`, `onSelect` (click, Enter, Space) and `live` (every node, no reveal animation); `CodeDiff` and `ReviewableDiff` take `onLineComment(path, line)`, `compareLabel` and `commentLabel`; `TerminalBlock` takes `streaming` and `followTail`; new `CodeView` (read-only file view with line numbers and a `streaming` flag). Without the new props the output is unchanged.

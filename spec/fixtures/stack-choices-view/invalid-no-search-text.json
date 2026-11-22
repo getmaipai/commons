@@ -1,0 +1,285 @@
+{
+  "profile": "p64",
+  "memory_gb": 64,
+  "room_bytes": 48000000000,
+  "free_disk_bytes": 410000000000,
+  "categories": [
+    {
+      "id": "chat",
+      "label": "Chat",
+      "role": "chat",
+      "role_enabled": true,
+      "role_priority": 10,
+      "role_plan": {
+        "state": "resident",
+        "fit": "fits",
+        "reason": "Stays loaded so replies start at once."
+      },
+      "available": true,
+      "unavailable_reason": null,
+      "tiered": true,
+      "order": [
+        "qwen3-8b-q4",
+        "llama33-70b-q4"
+      ],
+      "disabled": [],
+      "candidates": [
+        {
+          "family": "Qwen3",
+          "version": "3",
+          "quantization": "4-bit, compact",
+          "quantization_raw": "Q4_K_M",
+          "license": "Apache-2.0",
+          "repo": "Qwen/Qwen3-8B-GGUF",
+          "engine": "llama.cpp",
+          "role": "chat",
+          "min_profile": "16 GB",
+          "min_profile_id": "p16",
+          "kind": "shipped",
+          "pickable": true,
+          "state": "installed",
+          "reason": null,
+          "size_bytes": 5030000000,
+          "download_bytes": 0,
+          "peak_bytes": null,
+          "peak_verified": null,
+          "percent": null,
+          "can_install": false,
+          "can_uninstall": true,
+          "licence_needed": false,
+          "enabled": true,
+          "rank": 1,
+          "id": "qwen3-8b-q4",
+          "label": "Qwen3 8B",
+          "summary": "Fast everyday chat with short, clear answers; weaker on long documents."
+        },
+        {
+          "family": "Llama",
+          "version": "3.3",
+          "quantization": "4-bit, compact",
+          "quantization_raw": "Q4_K_M",
+          "license": "Llama 3.3 Community",
+          "repo": "bartowski/Llama-3.3-70B-Instruct-GGUF",
+          "engine": "llama.cpp",
+          "role": "chat",
+          "min_profile": "64 GB",
+          "min_profile_id": "p64",
+          "kind": "shipped",
+          "pickable": true,
+          "state": "notInstalled",
+          "reason": "Not downloaded yet.",
+          "size_bytes": 42500000000,
+          "download_bytes": 42500000000,
+          "peak_bytes": null,
+          "peak_verified": null,
+          "percent": null,
+          "can_install": true,
+          "can_uninstall": false,
+          "licence_needed": false,
+          "enabled": true,
+          "rank": 2,
+          "id": "llama33-70b-q4",
+          "label": "Llama 3.3 70B",
+          "summary": "Careful, thorough answers; needs a lot of memory.",
+          "search_text": "llama 3.3 70b llama33-70b-q4 llama 3.3 4-bit, compact q4_k_m llama 3.3 community careful thorough llama.cpp chat"
+        }
+      ],
+      "tiers": [
+        {
+          "tier": "reduced",
+          "cap_bytes": null,
+          "chosen": "qwen3-8b-q4",
+          "chosen_by": "recommended",
+          "chosen_state": "installed",
+          "customization": null,
+          "problem": null,
+          "options": [
+            {
+              "model": "qwen3-8b-q4",
+              "fits": true,
+              "refusal": null
+            },
+            {
+              "model": "llama33-70b-q4",
+              "fits": false,
+              "refusal": "Too big for this level."
+            }
+          ],
+          "recommended": {
+            "model": "qwen3-8b-q4",
+            "why": "The best fit for 64 GB of memory."
+          }
+        },
+        {
+          "tier": "standard",
+          "cap_bytes": 48000000000,
+          "chosen": "qwen3-8b-q4",
+          "chosen_by": "household",
+          "chosen_state": "installed",
+          "customization": null,
+          "problem": null,
+          "options": [
+            {
+              "model": "qwen3-8b-q4",
+              "fits": true,
+              "refusal": null
+            },
+            {
+              "model": "llama33-70b-q4",
+              "fits": true,
+              "refusal": null
+            }
+          ],
+          "recommended": {
+            "model": "qwen3-8b-q4",
+            "why": "The best fit for 64 GB of memory."
+          }
+        },
+        {
+          "tier": "boost",
+          "cap_bytes": 48000000000,
+          "chosen": "qwen3-8b-q4",
+          "chosen_by": "recommended",
+          "chosen_state": "installed",
+          "customization": null,
+          "problem": null,
+          "options": [
+            {
+              "model": "qwen3-8b-q4",
+              "fits": true,
+              "refusal": null
+            },
+            {
+              "model": "llama33-70b-q4",
+              "fits": true,
+              "refusal": null
+            }
+          ],
+          "recommended": {
+            "model": "qwen3-8b-q4",
+            "why": "The best fit for 64 GB of memory."
+          }
+        },
+        {
+          "tier": "max",
+          "cap_bytes": 48000000000,
+          "chosen": null,
+          "chosen_by": "off",
+          "chosen_state": null,
+          "customization": null,
+          "problem": null,
+          "options": [
+            {
+              "model": "qwen3-8b-q4",
+              "fits": true,
+              "refusal": null
+            },
+            {
+              "model": "llama33-70b-q4",
+              "fits": true,
+              "refusal": null
+            }
+          ],
+          "recommended": {
+            "model": "qwen3-8b-q4",
+            "why": "The best fit for 64 GB of memory."
+          }
+        }
+      ],
+      "profiles": [
+        {
+          "profile": "p64",
+          "memory_gb": 64,
+          "current": true,
+          "assignments": [
+            {
+              "tier": "standard",
+              "model": "qwen3-8b-q4",
+              "customization": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "stt",
+      "label": "Speech to text",
+      "role": "stt",
+      "role_enabled": true,
+      "role_priority": 40,
+      "role_plan": null,
+      "available": true,
+      "unavailable_reason": null,
+      "tiered": false,
+      "order": [
+        "whisper-large-v3-turbo"
+      ],
+      "disabled": [],
+      "candidates": [
+        {
+          "family": "Whisper",
+          "version": "3",
+          "quantization": "8-bit",
+          "quantization_raw": "q8_0",
+          "license": "MIT",
+          "repo": "openai/whisper-large-v3-turbo",
+          "engine": "whisper.cpp",
+          "role": "stt",
+          "min_profile": "16 GB",
+          "min_profile_id": "p16",
+          "kind": "shipped",
+          "pickable": true,
+          "state": "installed",
+          "reason": null,
+          "size_bytes": 1600000000,
+          "download_bytes": 0,
+          "peak_bytes": null,
+          "peak_verified": null,
+          "percent": null,
+          "can_install": false,
+          "can_uninstall": true,
+          "licence_needed": false,
+          "enabled": true,
+          "rank": 1,
+          "id": "whisper-large-v3-turbo",
+          "label": "Whisper Large v3 Turbo",
+          "summary": "Turns speech into text in most languages.",
+          "search_text": "whisper large v3 turbo whisper-large-v3-turbo whisper 3 8-bit q8_0 mit speech into text whisper.cpp stt"
+        }
+      ],
+      "tiers": [
+        {
+          "tier": "standard",
+          "cap_bytes": 48000000000,
+          "chosen": "whisper-large-v3-turbo",
+          "chosen_by": "recommended",
+          "chosen_state": "installed",
+          "customization": null,
+          "problem": null,
+          "options": [
+            {
+              "model": "whisper-large-v3-turbo",
+              "fits": true,
+              "refusal": null
+            }
+          ],
+          "recommended": {
+            "model": "whisper-large-v3-turbo",
+            "why": "The only model for this feature."
+          }
+        }
+      ],
+      "profiles": []
+    }
+  ],
+  "unused": {
+    "count": 1,
+    "total_bytes": 8000000000
+  },
+  "migration": {
+    "done": true,
+    "done_at": "2026-11-21T12:00:00.000Z",
+    "accepted": 7,
+    "refused": 0
+  }
+}

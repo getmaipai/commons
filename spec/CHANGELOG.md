@@ -1,3 +1,7 @@
+## [spec-v0.1.478] - 2026-11-21
+
+- The Stack's choices API shapes (STACK-MODELS-PAGE-01): `stack-choices-view` (the read behind the shared AI and models page), `stack-choices-error`, the pick, order, recommended, unused, remove, add-model and migrate request and result bodies (15 schemas, fixtures for each, and one hand-written Zod file `stack/ts/stack-choices.ts` exporting `StackChoicesView`, `StackChoiceCandidate`, `StackChoiceLevelRow` and the rest, plus `STACK_CHOICES_SHAPES`). They mirror `backend/src/lib/choicesSchema.ts` in the Stack; answers are not strict so an additive Stack change does not break an older reader. Excluded from `gen:ts` and the bundle like the other Stack wire shapes. Additive; nothing existing changes.
+
 ## [spec-v0.1.477] - 2026-11-21
 
 - `access.tier.boost` and `access.tier.max` return to their spec-v0.1.475 form (no `coding` option). 0.1.476 added the option before Home's access registry carried it, so Home's registry check failed. The option comes back with Home's own change (CODE-TIER-03). The `coding` tier category, the `engines.coding.tier.*` slots and the coding records are unchanged.

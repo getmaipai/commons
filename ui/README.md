@@ -36,6 +36,10 @@ Dates and numbers use `Intl` with `kitLocaleTag()`. Edit strings in source, then
 `src/i18nLints.test.ts` fails on a new hardcoded string (`src/i18n-baseline.json` only shrinks, `src/i18n-allowlist.json` needs a
 reason per entry). Spanish entries are written by the household's own model and carry `#, needs-review` until a person accepts them.
 
+## The AI and models page (STACK-MODELS-PAGE-01)
+
+`src/stack/StackModelsPage.tsx` is the one page both the Stack admin page and Home render, over a `StackClient` (typed calls, no `fetch`). See [docs/stack-models-page.md](docs/stack-models-page.md). Its shapes are `@maipai/spec/stack/ts/stack-choices`. Its strings all use `i18n._`; the sample data in `src/stack/fakeStackData.ts` avoids label-like property names, so `i18n-baseline.json` needed no new entry (the baseline still only shrinks).
+
 ## Importing
 
 No barrel export, the same convention `@maipai/spec` and `@maipai/core`

@@ -1,0 +1,7 @@
+{
+  "ok": true,
+  "category": "chat",
+  "order": [
+    "qwen3-8b-q4"
+  ]
+}

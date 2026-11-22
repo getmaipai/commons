@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/stack-choices-add-model-request.schema.json",
+  "title": "StackChoicesAddModelRequest",
+  "description": "STACK-MODELS-PAGE-01. The body of `POST /stack/v1/choices/add-model`: a Hugging Face link, optionally the file, the level, and whether to use the model now.",
+  "type": "object",
+  "properties": {
+    "source": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500,
+      "description": "A huggingface.co link or `owner/repo`."
+    },
+    "file": {
+      "description": "The .gguf file when the repository has more than one.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "category": {
+      "type": "string",
+      "const": "chat"
+    },
+    "tier": {
+      "description": "Default standard.",
+      "type": "string",
+      "enum": [
+        "reduced",
+        "standard",
+        "boost",
+        "max"
+      ]
+    },
+    "use": {
+      "description": "Select the model for the category and level now. Default true.",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "source"
+  ]
+}

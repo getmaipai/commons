@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/stack-choices-recommended-result.schema.json",
+  "title": "StackChoicesRecommendedResult",
+  "description": "STACK-MODELS-PAGE-01. What applying (or previewing) the recommended setup changes: picks that move, the role settings written, the downloads started, what was skipped and why, and models that need a licence first.",
+  "type": "object",
+  "properties": {
+    "dry_run": {
+      "type": "boolean"
+    },
+    "changed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": [
+              "chat",
+              "coding",
+              "pictures",
+              "video",
+              "music",
+              "voice",
+              "stt",
+              "embeddings",
+              "vision",
+              "wakeword",
+              "stems"
+            ]
+          },
+          "tier": {
+            "type": "string",
+            "enum": [
+              "reduced",
+              "standard",
+              "boost",
+              "max"
+            ]
+          },
+          "from": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "to": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "category",
+          "tier",
+          "from",
+          "to"
+        ]
+      }
+    },
+    "unchanged": {
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991
+    },
+    "roles": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": [
+          "boolean",
+          "number",
+          "string"
+        ]
+      },
+      "description": "The role settings written (empty on a dry run)."
+    },
+    "installs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "model": {
+            "type": "string",
+            "minLength": 1
+          },
+          "job": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "model",
+          "job"
+        ]
+      }
+    },
+    "skipped": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "model": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "model",
+          "reason"
+        ]
+      }
+    },
+    "needs_licence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "label": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label"
+        ]
+      }
+    }
+  },
+  "required": [
+    "dry_run",
+    "changed",
+    "unchanged",
+    "roles",
+    "installs",
+    "skipped",
+    "needs_licence"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "dry_run": false,
+  "already_done": true,
+  "results": [
+    {
+      "kind": "persona",
+      "key": "x",
+      "status": "accepted",
+      "reason": null
+    }
+  ],
+  "accepted": 0,
+  "refused": [],
+  "done_at": null
+}

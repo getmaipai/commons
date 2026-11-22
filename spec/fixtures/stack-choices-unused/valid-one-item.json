@@ -1,0 +1,25 @@
+{
+  "items": [
+    {
+      "id": "qwen2-7b-q4",
+      "label": "Qwen2 7B",
+      "category": "chat",
+      "kind": "shipped",
+      "size_bytes": 4400000000,
+      "reason": "No level uses it and it is not in the order."
+    }
+  ],
+  "total_bytes": 4400000000,
+  "tidy": {
+    "reclaimable_bytes": 600000000,
+    "items": [
+      {
+        "id": "partial-whisper",
+        "kind": "partial_download",
+        "bytes": 600000000,
+        "reason": "A download that stopped part way.",
+        "blocked": null
+      }
+    ]
+  }
+}

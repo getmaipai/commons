@@ -1,0 +1,8 @@
+{
+  "model": "llama33-70b-q4",
+  "options": {
+    "thinking": true
+  },
+  "profile": "p128",
+  "install": false
+}

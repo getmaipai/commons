@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/stack-choices-pick-request.schema.json",
+  "title": "StackChoicePickRequest",
+  "description": "STACK-MODELS-PAGE-01. The body of `PUT /stack/v1/choices/{category}/{tier}`: the model for a category and level (a candidate id, `recommended` to clear the pick, or `off` to switch a level off), optional customization, optional hardware profile, and whether to start the download.",
+  "type": "object",
+  "properties": {
+    "model": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "description": "A model id from the category's candidates, `recommended` (clear the pick), or `off` (switch the level off; not for Standard)."
+    },
+    "options": {
+      "description": "Customization stored with the pick, for example `{ \"thinking\": true }`.",
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": [
+          "string",
+          "number",
+          "boolean"
+        ]
+      }
+    },
+    "profile": {
+      "description": "The hardware profile this assignment is for; omitted means this computer's own profile.",
+      "type": "string",
+      "enum": [
+        "p16",
+        "p32",
+        "p64",
+        "p128"
+      ]
+    },
+    "install": {
+      "description": "Start the download when the model is not installed (this computer's profile only). Default true.",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "model"
+  ]
+}

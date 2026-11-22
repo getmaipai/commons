@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/stack-choices-pick-result.schema.json",
+  "title": "StackChoicePickResult",
+  "description": "STACK-MODELS-PAGE-01. The answer of a pick: what was stored, whether a setting changed so it takes effect, and the install job when a download started.",
+  "type": "object",
+  "properties": {
+    "ok": {
+      "type": "boolean",
+      "const": true
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "chat",
+        "coding",
+        "pictures",
+        "video",
+        "music",
+        "voice",
+        "stt",
+        "embeddings",
+        "vision",
+        "wakeword",
+        "stems"
+      ]
+    },
+    "tier": {
+      "type": "string",
+      "enum": [
+        "reduced",
+        "standard",
+        "boost",
+        "max"
+      ]
+    },
+    "profile": {
+      "type": "string",
+      "enum": [
+        "p16",
+        "p32",
+        "p64",
+        "p128"
+      ]
+    },
+    "model": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "changed": {
+      "type": "boolean"
+    },
+    "applied": {
+      "type": "boolean",
+      "description": "True when the Stack changed a setting so the pick takes effect (voice engine, chat model)."
+    },
+    "pending_restart": {
+      "type": "boolean"
+    },
+    "install_job": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "note": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "ok",
+    "category",
+    "tier",
+    "profile",
+    "model",
+    "changed",
+    "applied",
+    "pending_restart",
+    "install_job",
+    "note"
+  ]
+}

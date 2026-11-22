@@ -1,0 +1,30 @@
+{
+  "dry_run": true,
+  "changed": [
+    {
+      "category": "chat",
+      "tier": "boost",
+      "from": null
+    }
+  ],
+  "unchanged": 11,
+  "roles": {},
+  "installs": [
+    {
+      "model": "llama33-70b-q4",
+      "job": "job_02"
+    }
+  ],
+  "skipped": [
+    {
+      "model": "qwen3-30b-moe",
+      "reason": "Not enough free disk space."
+    }
+  ],
+  "needs_licence": [
+    {
+      "id": "flux-dev",
+      "label": "FLUX.1 dev"
+    }
+  ]
+}

@@ -1,0 +1,647 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/stack-choices-view.schema.json",
+  "title": "StackChoicesView",
+  "description": "STACK-MODELS-PAGE-01. The answer of `GET /stack/v1/choices`: everything the shared AI and models page shows, in one read. Per category the role switch and priority, the candidates with their plain facts (label, summary, family, version, quantization, licence, repo, engine, role, size, search_text), whether each is installed, installing, not installed or unsupported and why, the order and the off list, and per level (Reduced, Standard, Boost, Max where they exist) the model in use, who chose it, every option with whether it fits and the recommended pick with its reason. `profiles` shows the picks saved per hardware profile.",
+  "type": "object",
+  "properties": {
+    "profile": {
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": [
+            "p16",
+            "p32",
+            "p64",
+            "p128"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "This computer's profile; null when its memory is below 16 GB."
+    },
+    "memory_gb": {
+      "type": "number"
+    },
+    "room_bytes": {
+      "type": "number"
+    },
+    "free_disk_bytes": {
+      "type": "number"
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": [
+              "chat",
+              "coding",
+              "pictures",
+              "video",
+              "music",
+              "voice",
+              "stt",
+              "embeddings",
+              "vision",
+              "wakeword",
+              "stems"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "role": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "role_enabled": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "role_priority": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "role_plan": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "state": {
+                    "type": "string"
+                  },
+                  "fit": {
+                    "type": "string"
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "state",
+                  "fit",
+                  "reason"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What the profile planner says about this category's role on this computer (state, fit, reason)."
+          },
+          "available": {
+            "type": "boolean"
+          },
+          "unavailable_reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "tiered": {
+            "type": "boolean",
+            "description": "False for single-model categories, which have only the `standard` level."
+          },
+          "order": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Every candidate id, tried first to last."
+          },
+          "disabled": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "label": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "The model's plain name."
+                },
+                "summary": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "One plain sentence: what it is good for and its limits."
+                },
+                "family": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "version": {
+                  "description": "The model version as people say it (for example 3.8); null when its name carries none.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "quantization": {
+                  "description": "The precision in plain words (for example `4-bit, compact`).",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "quantization_raw": {
+                  "description": "The catalog's own tag (for example `UD-IQ4_XS`).",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "license": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "repo": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "engine": {
+                  "description": "The engine that runs it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "role": {
+                  "description": "The role it serves.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "min_profile": {
+                  "description": "The smallest computer it is offered on, in plain words.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "min_profile_id": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "p16",
+                        "p32",
+                        "p64",
+                        "p128"
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "search_text": {
+                  "type": "string",
+                  "description": "Lowercase text for searching: label, id, repo, family, version, quantization (plain and raw), licence, summary, engine and role joined by spaces."
+                },
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "shipped",
+                    "added"
+                  ],
+                  "description": "`added` is a chat model an admin added by link."
+                },
+                "pickable": {
+                  "type": "boolean",
+                  "description": "False for a part that is ordered, switched off or removed here but never chosen for a level."
+                },
+                "state": {
+                  "type": "string",
+                  "enum": [
+                    "installed",
+                    "installing",
+                    "notInstalled",
+                    "failed",
+                    "unsupported"
+                  ]
+                },
+                "reason": {
+                  "description": "The plain sentence for the state, or null when it is installed and fine.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "size_bytes": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991,
+                  "description": "On disk when installed, else what installing it downloads."
+                },
+                "download_bytes": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991,
+                  "description": "What an install would still download; 0 when installed."
+                },
+                "peak_bytes": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "peak_verified": {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "percent": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "can_install": {
+                  "type": "boolean"
+                },
+                "can_uninstall": {
+                  "type": "boolean"
+                },
+                "licence_needed": {
+                  "type": "boolean"
+                },
+                "enabled": {
+                  "type": "boolean",
+                  "description": "False when it is on the category's off list."
+                },
+                "rank": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991,
+                  "description": "Position in the category's order (1 is tried first)."
+                }
+              },
+              "required": [
+                "id",
+                "label",
+                "summary",
+                "family",
+                "version",
+                "quantization",
+                "quantization_raw",
+                "license",
+                "repo",
+                "engine",
+                "role",
+                "min_profile",
+                "min_profile_id",
+                "search_text",
+                "kind",
+                "pickable",
+                "state",
+                "reason",
+                "size_bytes",
+                "download_bytes",
+                "peak_bytes",
+                "peak_verified",
+                "percent",
+                "can_install",
+                "can_uninstall",
+                "licence_needed",
+                "enabled",
+                "rank"
+              ]
+            }
+          },
+          "tiers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "tier": {
+                  "type": "string",
+                  "enum": [
+                    "reduced",
+                    "standard",
+                    "boost",
+                    "max"
+                  ]
+                },
+                "cap_bytes": {
+                  "description": "What this level may use on this computer, in bytes; null where no cap applies.",
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "chosen": {
+                  "description": "The model this level uses: the household's pick, else the recommended one. Null when the level is off or nothing fits.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "chosen_by": {
+                  "type": "string",
+                  "enum": [
+                    "household",
+                    "recommended",
+                    "off",
+                    "none"
+                  ]
+                },
+                "chosen_state": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "installed",
+                        "installing",
+                        "notInstalled",
+                        "failed",
+                        "unsupported"
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "customization": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "type": [
+                          "string",
+                          "number",
+                          "boolean"
+                        ]
+                      }
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "The options stored with the household's pick (for example `thinking`); null when none."
+                },
+                "problem": {
+                  "description": "A plain sentence when the saved pick is not offered here any more or no longer fits; the recommended model runs meanwhile.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "options": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "model": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "fits": {
+                        "type": "boolean"
+                      },
+                      "refusal": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "model",
+                      "fits",
+                      "refusal"
+                    ]
+                  },
+                  "description": "Every model that may be offered at this level, with whether it fits and the plain reason when it does not."
+                },
+                "recommended": {
+                  "type": "object",
+                  "properties": {
+                    "model": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "why": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "model",
+                    "why"
+                  ]
+                }
+              },
+              "required": [
+                "tier",
+                "cap_bytes",
+                "chosen",
+                "chosen_by",
+                "chosen_state",
+                "customization",
+                "problem",
+                "options",
+                "recommended"
+              ]
+            }
+          },
+          "profiles": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "profile": {
+                  "type": "string",
+                  "enum": [
+                    "p16",
+                    "p32",
+                    "p64",
+                    "p128"
+                  ]
+                },
+                "memory_gb": {
+                  "type": "number"
+                },
+                "current": {
+                  "type": "boolean",
+                  "description": "True for this computer's own profile."
+                },
+                "assignments": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "tier": {
+                        "type": "string",
+                        "enum": [
+                          "reduced",
+                          "standard",
+                          "boost",
+                          "max"
+                        ]
+                      },
+                      "model": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "customization": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "propertyNames": {
+                              "type": "string"
+                            },
+                            "additionalProperties": {
+                              "type": [
+                                "string",
+                                "number",
+                                "boolean"
+                              ]
+                            }
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "tier",
+                      "model",
+                      "customization"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "profile",
+                "memory_gb",
+                "current",
+                "assignments"
+              ]
+            }
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "role",
+          "role_enabled",
+          "role_priority",
+          "role_plan",
+          "available",
+          "unavailable_reason",
+          "tiered",
+          "order",
+          "disabled",
+          "candidates",
+          "tiers",
+          "profiles"
+        ]
+      }
+    },
+    "unused": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "total_bytes": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "count",
+        "total_bytes"
+      ]
+    },
+    "migration": {
+      "type": "object",
+      "properties": {
+        "done": {
+          "type": "boolean"
+        },
+        "done_at": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "accepted": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "refused": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "done",
+        "done_at",
+        "accepted",
+        "refused"
+      ]
+    }
+  },
+  "required": [
+    "profile",
+    "memory_gb",
+    "room_bytes",
+    "free_disk_bytes",
+    "categories",
+    "unused",
+    "migration"
+  ]
+}

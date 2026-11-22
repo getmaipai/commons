@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/stack-choices-migrate-result.schema.json",
+  "title": "StackChoicesMigrateResult",
+  "description": "STACK-MODELS-PAGE-01. Per-value results of the one-time import; refused values come back with a plain reason.",
+  "type": "object",
+  "properties": {
+    "dry_run": {
+      "type": "boolean"
+    },
+    "already_done": {
+      "type": "boolean",
+      "description": "True when the migration was done before: nothing was read or written."
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "slot",
+              "order",
+              "feature",
+              "added_model"
+            ]
+          },
+          "key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "unchanged",
+              "refused"
+            ]
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "kind",
+          "key",
+          "status",
+          "reason"
+        ]
+      }
+    },
+    "accepted": {
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991
+    },
+    "refused": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "slot",
+              "order",
+              "feature",
+              "added_model"
+            ]
+          },
+          "key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "unchanged",
+              "refused"
+            ]
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "kind",
+          "key",
+          "status",
+          "reason"
+        ]
+      },
+      "description": "The values the Stack refused; Home keeps them and shows the reason."
+    },
+    "done_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "dry_run",
+    "already_done",
+    "results",
+    "accepted",
+    "refused",
+    "done_at"
+  ]
+}

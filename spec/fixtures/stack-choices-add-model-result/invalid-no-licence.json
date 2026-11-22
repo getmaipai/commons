@@ -1,0 +1,11 @@
+{
+  "ok": true,
+  "id": "a",
+  "label": "A",
+  "category": "chat",
+  "tier": "standard",
+  "chosen": false,
+  "state": "installed",
+  "install_job": null,
+  "size_bytes": 1
+}

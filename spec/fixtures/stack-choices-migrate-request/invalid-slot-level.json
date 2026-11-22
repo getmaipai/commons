@@ -1,0 +1,9 @@
+{
+  "slots": [
+    {
+      "role": "chat",
+      "tier": "huge",
+      "model": "qwen3-8b-q4"
+    }
+  ]
+}

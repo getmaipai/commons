@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/stack-choices-unused.schema.json",
+  "title": "StackChoicesUnused",
+  "description": "STACK-MODELS-PAGE-01. The answer of `GET /stack/v1/choices/unused`: installed models no choice, order or fallback uses and what removing them frees, plus the Stack's own tidy list.",
+  "type": "object",
+  "properties": {
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "chat",
+              "coding",
+              "pictures",
+              "video",
+              "music",
+              "voice",
+              "stt",
+              "embeddings",
+              "vision",
+              "wakeword",
+              "stems"
+            ]
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "shipped",
+              "added"
+            ]
+          },
+          "size_bytes": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "category",
+          "kind",
+          "size_bytes",
+          "reason"
+        ]
+      }
+    },
+    "total_bytes": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "tidy": {
+      "type": "object",
+      "properties": {
+        "reclaimable_bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "superseded",
+                  "orphan_folder",
+                  "partial_download"
+                ]
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "reason": {
+                "type": "string"
+              },
+              "blocked": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "bytes",
+              "reason",
+              "blocked"
+            ]
+          }
+        }
+      },
+      "required": [
+        "reclaimable_bytes",
+        "items"
+      ]
+    }
+  },
+  "required": [
+    "items",
+    "total_bytes",
+    "tidy"
+  ]
+}

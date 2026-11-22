@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/stack-choices-add-model-result.schema.json",
+  "title": "StackChoicesAddModelResult",
+  "description": "STACK-MODELS-PAGE-01. The model that was added, whether it was chosen, its state and the download job.",
+  "type": "object",
+  "properties": {
+    "ok": {
+      "type": "boolean",
+      "const": true
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "label": {
+      "type": "string",
+      "minLength": 1
+    },
+    "category": {
+      "type": "string",
+      "const": "chat"
+    },
+    "tier": {
+      "type": "string",
+      "enum": [
+        "reduced",
+        "standard",
+        "boost",
+        "max"
+      ]
+    },
+    "chosen": {
+      "type": "boolean"
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "installed",
+        "installing",
+        "notInstalled",
+        "failed",
+        "unsupported"
+      ]
+    },
+    "install_job": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "size_bytes": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "licence": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "ok",
+    "id",
+    "label",
+    "category",
+    "tier",
+    "chosen",
+    "state",
+    "install_job",
+    "size_bytes",
+    "licence"
+  ]
+}

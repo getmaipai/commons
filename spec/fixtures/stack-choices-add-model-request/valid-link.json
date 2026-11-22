@@ -1,0 +1,6 @@
+{
+  "source": "https://huggingface.co/bartowski/Llama-3.3-70B-Instruct-GGUF",
+  "file": "Llama-3.3-70B-Instruct-Q4_K_M.gguf",
+  "tier": "boost",
+  "use": true
+}

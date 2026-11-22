@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/stack-choices-recommended-request.schema.json",
+  "title": "StackChoicesRecommendedRequest",
+  "description": "STACK-MODELS-PAGE-01. The body of `POST /stack/v1/choices/recommended`: `dry_run: true` answers what would change and writes nothing.",
+  "type": "object",
+  "properties": {
+    "dry_run": {
+      "description": "Answer what would change and write nothing. Default false.",
+      "type": "boolean"
+    }
+  }
+}

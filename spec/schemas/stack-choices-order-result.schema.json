@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/stack-choices-order-result.schema.json",
+  "title": "StackChoiceOrderResult",
+  "description": "STACK-MODELS-PAGE-01. The order and the off list after a change.",
+  "type": "object",
+  "properties": {
+    "ok": {
+      "type": "boolean",
+      "const": true
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "chat",
+        "coding",
+        "pictures",
+        "video",
+        "music",
+        "voice",
+        "stt",
+        "embeddings",
+        "vision",
+        "wakeword",
+        "stems"
+      ]
+    },
+    "order": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "disabled": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "ok",
+    "category",
+    "order",
+    "disabled"
+  ]
+}
