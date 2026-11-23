@@ -5334,7 +5334,7 @@ msgid "ui.Playback speed"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/MediaShelf.tsx:801
+#: src/primitives/MediaShelf.tsx:803
 msgid "ui.Played"
 msgstr ""
 
@@ -6231,12 +6231,12 @@ msgid "ui.Say it differently"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/MediaShelf.tsx:582
+#: src/primitives/MediaShelf.tsx:584
 msgid "ui.Scroll left"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/MediaShelf.tsx:585
+#: src/primitives/MediaShelf.tsx:587
 msgid "ui.Scroll right"
 msgstr ""
 

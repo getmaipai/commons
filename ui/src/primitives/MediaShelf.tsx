@@ -575,6 +575,8 @@ function ShelfScroller({ children }: { children: ReactNode }) {
   );
 
   return (
+    // Key events bubble up from the tile controls inside; the wrapper itself is not interactive.
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <div ref={host} className="group/shelf relative min-w-0" onKeyDown={onKeyDown}>
       {children}
       {state.overflow ? (
