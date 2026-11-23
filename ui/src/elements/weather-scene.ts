@@ -50,3 +50,5 @@ export function cloudWindFactor(wind?: number) { return wind === undefined ? 1 :
 export function cloudDuration(width: number, cloudWidth: number, speed: number, windFactor: number) { return (width + cloudWidth) / (speed * windFactor); }
 export function precipitationScale(width: number, height: number) { return clamp(Math.sqrt((width * height) / (scene.precipitation.area.width * scene.precipitation.area.height)), scene.precipitation.area.minScale, scene.precipitation.area.maxScale); }
 export function precipitationCount(base: number, intensity: number, scale: number, cap: number) { return Math.min(cap, Math.max(0, Math.round(base * intensity * scale))); }
+/** The stage is the top band of a tall sky where the sun, moon and clouds sit. */
+export function skyStageHeight(width: number, height: number): number { return Math.min(height, clamp((width * scene.stage.cqw) / 100, scene.stage.min, scene.stage.max)); }
