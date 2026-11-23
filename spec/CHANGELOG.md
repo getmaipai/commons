@@ -1,3 +1,10 @@
+## [spec-v0.1.479] - 2026-11-23
+
+- `Systems` (`schemas/systems.schema.json`, `maipai.systems/1`): the inside of a robot. Six layers, systems, five component types (`driver`, `service`, `behavior`, `asset`, `adapter`), one owning system per component, a status per body (`stackchan`, `reachy`, `none`), build switch and load mode, memory budget, calls in (`uses`) and out (`provides`), events, tools, settings keys, tests, docs and a safety class. Part ids and capability ids are referenced from `vocab/robot-api.json` and `vocab/capabilities.json`, never copied. No earlier spec shape overlapped it, so nothing is replaced here; the body profile it supersedes lives in the retiring bot repo.
+- `scripts/check-systems.ts`: the rule check a schema cannot express (a unit component never calls a higher layer, one owner per piece of state, tool, event, call, settings key and switch, every id resolves, every component has an owner, a switch needs a budget, a built system needs a doc). `bun run check:systems <manifest.json> [--root <repo>]`.
+- Fixture `fixtures/systems/valid-stackchan-example.json` (four systems, 19 components, from the StackChan foundation design) and `tests/ts/systems.test.ts`, which plants each violation and requires the check to fail.
+- Regenerated `spec/gen/ts` and `spec/gen/py`. New shape only; no existing field changes.
+
 ## [spec-v0.1.478] - 2026-11-21
 
 - The Stack's choices API shapes (STACK-MODELS-PAGE-01): `stack-choices-view` (the read behind the shared AI and models page), `stack-choices-error`, the pick, order, recommended, unused, remove, add-model and migrate request and result bodies (15 schemas, fixtures for each, and one hand-written Zod file `stack/ts/stack-choices.ts` exporting `StackChoicesView`, `StackChoiceCandidate`, `StackChoiceLevelRow` and the rest, plus `STACK_CHOICES_SHAPES`). They mirror `backend/src/lib/choicesSchema.ts` in the Stack; answers are not strict so an additive Stack change does not break an older reader. Excluded from `gen:ts` and the bundle like the other Stack wire shapes. Additive; nothing existing changes.

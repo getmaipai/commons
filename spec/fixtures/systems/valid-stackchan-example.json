@@ -1,0 +1,229 @@
+{
+  "schema": "maipai.systems/1",
+  "note": "Shape example for 90-system-and-component-model.md. Four systems are filled in; the other 20 are index rows. Status and budget values are stand-ins until they are filled from the feature ledger, schema/memory-budget.json and the bench.",
+  "bodies": [
+    {"id": "stackchan", "title": "StackChan desk robot"},
+    {"id": "reachy", "title": "Reachy Mini"},
+    {"id": "none", "title": "No body: a screen or voice-only bot"}
+  ],
+  "layers": [
+    {"n": 0, "id": "base", "title": "Base"},
+    {"n": 1, "id": "foundation", "title": "Foundation"},
+    {"n": 2, "id": "voice", "title": "Voice"},
+    {"n": 3, "id": "body", "title": "Body"},
+    {"n": 4, "id": "face", "title": "Face and character"},
+    {"n": 5, "id": "extras", "title": "Extras"}
+  ],
+  "systems": [
+    {"id": "bus", "title": "Events and logging", "layer": 1, "owner": "firmware track", "parts": ["log"]},
+    {"id": "guard", "title": "Safeguards", "layer": 1, "owner": "firmware track", "parts": ["system"]},
+    {"id": "store", "title": "Storage", "layer": 1, "owner": "firmware track", "parts": []},
+    {"id": "power", "title": "Power", "layer": 1, "owner": "firmware track", "parts": ["power", "battery"]},
+    {
+      "id": "net",
+      "title": "Network",
+      "layer": 1,
+      "owner": "firmware track",
+      "purpose": "Gets the robot onto a network and keeps it there. Link rides on top and never touches the radio.",
+      "parts": ["network"],
+      "capabilities": ["lan", "network"],
+      "switch": "CONFIG_MAIPAI_L1_FOUNDATION",
+      "load": "always",
+      "budget": {"internal_kb": null, "dma_kb": null, "psram_kb": null, "flash_kb": null, "cpu_pct": null, "basis": "unset"},
+      "never": ["open the hotspot unless asked", "show or log a password", "keep setup memory after setup ends"],
+      "docs": ["docs/design/foundation/50-adoption-and-pairing.md"],
+      "components": [
+        {
+          "id": "net.wifi", "type": "driver", "title": "Wi-Fi station", "runs_on": "unit",
+          "status": {"stackchan": "built", "reachy": "absent", "none": "absent"},
+          "owns": ["wifi_state"], "provides": ["net::state"], "uses": ["bus::publish", "net::saved"],
+          "events": ["net_up", "net_down"], "tools": ["self.wifi.switch", "self.network.test"],
+          "tests": ["host/tests/test_measure_wifi_cycle.py"], "safety": "none"
+        },
+        {
+          "id": "net.saved", "type": "service", "title": "Saved networks", "runs_on": "unit",
+          "status": {"stackchan": "built", "reachy": "absent", "none": "absent"},
+          "owns": ["saved_networks"], "provides": ["net::saved"], "uses": ["store::get", "store::set"],
+          "tools": ["self.wifi.add", "self.wifi.forget", "self.wifi.list_saved"],
+          "tests": ["host/tests/test_settings_p_network.py"], "safety": "trust"
+        },
+        {
+          "id": "net.reconnect", "type": "service", "title": "Reconnect policy", "runs_on": "unit",
+          "status": {"stackchan": "designed", "reachy": "absent", "none": "absent"},
+          "owns": ["wifi_retry_schedule", "path_in_use"], "provides": ["net::add_path"], "uses": ["net::state", "bus::publish", "guard::may"],
+          "events": ["net_path"], "listens": ["net_down"], "tools": ["self.network.prefer_tailnet"],
+          "tests": [], "safety": "none"
+        },
+        {
+          "id": "net.portal", "type": "service", "title": "Setup hotspot and page", "runs_on": "unit",
+          "status": {"stackchan": "built", "reachy": "absent", "none": "absent"},
+          "switch": "CONFIG_MAIPAI_WIFI_PORTAL", "load": "setup_only",
+          "budget": {"internal_kb": 24, "dma_kb": 0, "psram_kb": 32, "flash_kb": 90, "cpu_pct": 10, "basis": "cap"},
+          "owns": ["portal_state"], "provides": ["net::open_setup"], "uses": ["net::saved", "screen::post", "lights::claim"],
+          "events": ["net_setup"], "tests": [], "safety": "trust"
+        },
+        {
+          "id": "net.travel", "type": "service", "title": "Travel path (private network)", "runs_on": "unit",
+          "status": {"stackchan": "built", "reachy": "absent", "none": "absent"},
+          "switch": "CONFIG_MAIPAI_TAILNET", "load": "on_demand",
+          "budget": {"internal_kb": 18, "dma_kb": 0, "psram_kb": 32, "flash_kb": 120, "cpu_pct": 5, "basis": "cap"},
+          "owns": ["travel_state"], "uses": ["net::add_path", "guard::admit", "store::get"],
+          "tools": ["self.tailnet.set", "self.tailnet.status"],
+          "tests": ["host/tests/test_network_tabs.py"], "safety": "trust"
+        }
+      ]
+    },
+    {"id": "link", "title": "Link to the host", "layer": 1, "owner": "firmware track", "parts": ["connection", "state"]},
+    {"id": "ident", "title": "Identity and pairing", "layer": 1, "owner": "firmware track", "parts": ["system"]},
+    {"id": "update", "title": "Updater", "layer": 1, "owner": "firmware track", "parts": ["system"]},
+    {"id": "diag", "title": "Diagnostics", "layer": 1, "owner": "firmware track", "parts": ["diagnostics", "health"]},
+    {"id": "screen", "title": "Display and touch", "layer": 1, "owner": "firmware track", "parts": ["display"]},
+    {"id": "lights", "title": "Lights", "layer": 1, "owner": "firmware track", "parts": ["leds"]},
+    {"id": "baselink", "title": "Base link", "layer": 1, "owner": "firmware track", "parts": ["base"], "status": {"stackchan": "reserved", "reachy": "absent", "none": "absent"}},
+    {
+      "id": "hear",
+      "title": "Hearing",
+      "layer": 2,
+      "owner": "firmware track",
+      "purpose": "The one reader of the mics. Hears the wake word, opens a listening window and honors mute.",
+      "parts": ["audio"],
+      "capabilities": ["mic", "physical_mute"],
+      "switch": "CONFIG_MAIPAI_L2_VOICE",
+      "load": "always",
+      "budget": {"internal_kb": 10, "dma_kb": 4, "psram_kb": 224, "flash_kb": 50, "cpu_pct": 35, "basis": "cap"},
+      "never": ["capture while muted", "send audio outside a turn", "allow a second reader of the mics"],
+      "docs": ["docs/design/foundation/70-voice-wake-and-listening.md"],
+      "components": [
+        {
+          "id": "hear.mics", "type": "driver", "title": "Mic capture and taps", "runs_on": "unit",
+          "status": {"stackchan": "built", "reachy": "idea", "none": "absent"},
+          "owns": ["mics", "capture_ring"], "provides": ["hear::add_tap"], "uses": ["guard::beat"],
+          "tests": ["host/tests/test_measure_wake_doa.py"], "safety": "privacy"
+        },
+        {
+          "id": "hear.wake", "type": "service", "title": "Wake word engine", "runs_on": "unit",
+          "status": {"stackchan": "built", "reachy": "idea", "none": "idea"},
+          "owns": ["wake_settings"], "provides": ["hear::wake_config"], "uses": ["hear::add_tap", "hear::muted", "bus::publish"],
+          "events": ["wake_seen", "wake_selftest"], "tests": [], "safety": "privacy"
+        },
+        {
+          "id": "hear.wake_model", "type": "asset", "title": "Wake word model", "runs_on": "unit",
+          "status": {"stackchan": "built", "reachy": "idea", "none": "idea"},
+          "tests": [], "safety": "none"
+        },
+        {
+          "id": "hear.window", "type": "service", "title": "Listening window and pre-roll", "runs_on": "unit",
+          "status": {"stackchan": "designed", "reachy": "idea", "none": "idea"},
+          "owns": ["listen_window", "pre_roll"], "provides": ["hear::open"], "uses": ["hear::add_tap", "hear::muted", "link::send", "bus::publish"],
+          "events": ["listen_ended"], "listens": ["wake_seen"], "tests": [], "safety": "privacy"
+        },
+        {
+          "id": "hear.mute", "type": "service", "title": "Mute", "runs_on": "unit",
+          "status": {"stackchan": "built", "reachy": "idea", "none": "idea"},
+          "owns": ["mute"], "provides": ["hear::set_mute", "hear::muted"], "uses": ["store::get", "lights::claim"],
+          "tools": ["self.privacy.set", "self.privacy.get"], "settings": ["robot.muted", "robot.mute.local_unmute"],
+          "tests": [], "safety": "privacy"
+        }
+      ]
+    },
+    {"id": "speech", "title": "Speech", "layer": 2, "owner": "firmware track", "parts": ["audio"]},
+    {"id": "turn", "title": "Turn state", "layer": 2, "owner": "firmware track", "parts": []},
+    {
+      "id": "motion",
+      "title": "Motion",
+      "layer": 3,
+      "owner": "firmware track",
+      "purpose": "The one door to anything that moves.",
+      "parts": ["head", "lease", "estop"],
+      "capabilities": ["head_pan_tilt"],
+      "switch": "CONFIG_MAIPAI_L3_BODY",
+      "load": "always",
+      "budget": {"internal_kb": 4, "dma_kb": 0, "psram_kb": 0, "flash_kb": 50, "cpu_pct": 5, "basis": "cap"},
+      "never": ["let a file outside its folder write a servo", "mix two sources in one step", "pass a tilt outside the safe range"],
+      "docs": ["docs/design/foundation/10-movement-system.md"],
+      "components": [
+        {
+          "id": "motion.arbiter", "type": "service", "title": "Gates and arbiter", "runs_on": "unit",
+          "status": {"stackchan": "designed", "reachy": "idea", "none": "absent"},
+          "owns": ["motion_owner_table", "motion_gates", "source_budgets"], "provides": ["motion::request", "motion::release"],
+          "uses": ["turn::now", "sense::latest", "bus::publish"],
+          "events": ["motion_refused"], "tools": ["self.robot.set_head_angles", "self.motion.status"],
+          "tests": ["host/tests/test_motion_state.py", "host/tests/test_motion_state_hold.py"], "safety": "physical"
+        },
+        {
+          "id": "motion.limiter", "type": "service", "title": "Limiter", "runs_on": "unit",
+          "status": {"stackchan": "built", "reachy": "idea", "none": "absent"},
+          "owns": ["limiter_state"], "uses": ["power::read", "sense::latest"],
+          "listens": ["carried", "set_down", "low_battery"], "tools": ["self.motion.set"],
+          "tests": ["host/tests/test_motion_limit_usb_env.py", "host/tests/test_motion_state_carry.py"], "safety": "physical"
+        },
+        {
+          "id": "motion.servo", "type": "driver", "title": "Servo driver and clock", "runs_on": "unit",
+          "status": {"stackchan": "built", "reachy": "absent", "none": "absent"},
+          "owns": ["servos", "servo_clock"], "uses": ["guard::beat"], "tools": ["self.robot.get_head_angles"],
+          "tests": ["host/tests/test_motion_worker.py"], "safety": "physical"
+        },
+        {
+          "id": "motion.actuator2", "type": "driver", "title": "Second actuator slot", "runs_on": "unit",
+          "status": {"stackchan": "reserved", "reachy": "absent", "none": "absent"},
+          "tests": [], "safety": "physical"
+        }
+      ]
+    },
+    {"id": "sense", "title": "Body sense", "layer": 3, "owner": "firmware track", "parts": ["imu", "touch"]},
+    {"id": "timers", "title": "Timers", "layer": 3, "owner": "firmware track", "parts": []},
+    {"id": "anim", "title": "Animation", "layer": 4, "owner": "firmware track", "parts": ["eyes"]},
+    {
+      "id": "character",
+      "title": "Character",
+      "layer": 4,
+      "owner": "host track",
+      "purpose": "Who the robot is: identity, personality, look, behavior and memory. One model for every bot; a body fills in the facets it can.",
+      "parts": [],
+      "capabilities": [],
+      "switch": "CONFIG_MAIPAI_L4_FACE",
+      "load": "always",
+      "budget": {"internal_kb": null, "dma_kb": null, "psram_kb": null, "flash_kb": null, "cpu_pct": null, "basis": "unset"},
+      "never": ["touch a servo, a pixel or the speaker directly", "send persona or memory text to a hosted vendor"],
+      "docs": ["docs/design/characters.md"],
+      "components": [
+        {
+          "id": "character.identity", "type": "asset", "title": "Identity: id, name, language, wake phrase", "runs_on": "unit",
+          "status": {"stackchan": "built", "reachy": "idea", "none": "idea"},
+          "owns": ["active_character"], "uses": ["store::get", "hear::wake_config", "bus::publish"],
+          "events": ["character_changed"], "tools": ["self.character.set", "self.character.clear", "self.character.status"],
+          "tests": ["host/tests/test_characters.py", "host/tests/test_character_store.py"], "safety": "none"
+        },
+        {
+          "id": "character.personality", "type": "adapter", "title": "Personality: persona text and voice", "runs_on": "brain",
+          "status": {"stackchan": "built", "reachy": "idea", "none": "idea"},
+          "owns": ["persona_text", "voice_choice"], "uses": ["self.character.status"],
+          "tests": ["host/tests/test_character_voice.py"], "safety": "none"
+        },
+        {
+          "id": "character.look", "type": "asset", "title": "Look: face recipe, colors, pack", "runs_on": "unit",
+          "status": {"stackchan": "built", "reachy": "absent", "none": "idea"},
+          "uses": ["anim::play", "store::get"], "listens": ["character_changed"],
+          "tests": ["host/tests/test_character_pack.py"], "safety": "none"
+        },
+        {
+          "id": "character.behavior", "type": "behavior", "title": "Behavior: moods, idle habits, reactions", "runs_on": "unit",
+          "status": {"stackchan": "designed", "reachy": "idea", "none": "idea"},
+          "owns": ["mood"], "uses": ["anim::play", "lights::claim", "motion::request", "speech::play"],
+          "listens": ["turn_state", "head_touch", "low_battery"], "tools": ["self.character.pose", "self.mood.get"],
+          "settings": ["robot.idle.level", "robot.greetings.mode"],
+          "tests": ["host/tests/test_emotions_table.py"], "safety": "physical"
+        },
+        {
+          "id": "character.memory", "type": "adapter", "title": "Memory: what this character remembers", "runs_on": "brain",
+          "status": {"stackchan": "idea", "reachy": "idea", "none": "idea"},
+          "owns": ["character_memory"], "tests": [], "safety": "privacy"
+        }
+      ]
+    },
+    {"id": "vision", "title": "Vision", "layer": 5, "owner": "firmware track", "parts": ["camera"]},
+    {"id": "games", "title": "Games", "layer": 5, "owner": "firmware track", "parts": []},
+    {"id": "dance", "title": "Dance and music", "layer": 5, "owner": "firmware track", "parts": []},
+    {"id": "looks", "title": "Extra faces and overlays", "layer": 5, "owner": "firmware track", "parts": []}
+  ]
+}
