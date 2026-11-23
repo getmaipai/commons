@@ -285,7 +285,9 @@ export function CommandPalette({
                 );
                 const content = (
                   <>
-                    {command.iconUrl ? (
+                    {command.thumbnailUrl ? (
+                      <SafeImage src={command.thumbnailUrl} alt="" className="size-10 shrink-0 rounded-lg object-cover" />
+                    ) : command.iconUrl ? (
                       <SafeImage src={command.iconUrl} alt="" className="size-8 shrink-0 rounded-lg object-cover" />
                     ) : command.icon ? (
                       <span className="bg-foreground/[0.05] text-muted-foreground flex size-8 shrink-0 items-center justify-center rounded-lg [&_svg]:size-4">{command.icon}</span>
@@ -299,7 +301,6 @@ export function CommandPalette({
                       {command.description ? <span className="text-muted-foreground line-clamp-2 text-xs">{command.description}</span> : null}
                       {command.meta ? <span className="text-muted-foreground truncate pt-1 text-xs">{command.meta}</span> : null}
                     </span>
-                    {command.thumbnailUrl ? <SafeImage src={command.thumbnailUrl} alt="" className="h-16 w-28 shrink-0 rounded-lg object-cover" /> : null}
                     {command.actionLabel && command.id === activeId ? (
                       <span className={cn(field, "text-foreground shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium")}>{command.actionLabel}</span>
                     ) : null}
