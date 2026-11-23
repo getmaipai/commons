@@ -513,7 +513,6 @@ msgid "ui.{time} of {total}"
 msgstr "{time} of {total}"
 
 #. js-lingui-explicit-id
-#: src/elements/activity-popover.tsx:59
 #: src/elements/job-progress.tsx:387
 msgid "ui.{title} progress"
 msgstr "{title} progress"
@@ -740,8 +739,8 @@ msgid "ui.active"
 msgstr "active"
 
 #. js-lingui-explicit-id
-#: src/elements/activity-popover.tsx:43
-#: src/elements/activity-popover.tsx:49
+#: src/elements/activity-popover.tsx:68
+#: src/elements/activity-popover.tsx:74
 msgid "ui.Activity"
 msgstr "Activity"
 
@@ -1082,7 +1081,7 @@ msgid "ui.Artifacts created in this project will appear here."
 msgstr "Artifacts created in this project will appear here."
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:248
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:249
 msgid "ui.Ask"
 msgstr "Ask"
 
@@ -1092,7 +1091,7 @@ msgid "ui.Ask {name}"
 msgstr "Ask {name}"
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:248
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:249
 msgid "ui.Ask: {query}"
 msgstr "Ask: {query}"
 
@@ -1559,6 +1558,11 @@ msgid "ui.Clear selection"
 msgstr "Clear selection"
 
 #. js-lingui-explicit-id
+#: src/elements/activity-popover.tsx:86
+msgid "ui.Clear this"
+msgstr "Clear this"
+
+#. js-lingui-explicit-id
 #: src/elements/weather-forecast-page.tsx:244
 msgid "ui.Clear view"
 msgstr "Clear view"
@@ -1687,7 +1691,7 @@ msgid "ui.Command Palette"
 msgstr "Command Palette"
 
 #. js-lingui-explicit-id
-#: src/elements/command-palette.tsx:254
+#: src/elements/command-palette.tsx:395
 msgid "ui.Commands"
 msgstr "Commands"
 
@@ -2608,7 +2612,7 @@ msgid "ui.Error:"
 msgstr "Error:"
 
 #. js-lingui-explicit-id
-#: src/elements/command-palette.tsx:225
+#: src/elements/command-palette.tsx:364
 msgid "ui.esc"
 msgstr "esc"
 
@@ -4355,7 +4359,7 @@ msgid "ui.No clip."
 msgstr "No clip."
 
 #. js-lingui-explicit-id
-#: src/elements/command-palette.tsx:356
+#: src/elements/command-palette.tsx:424
 msgid "ui.No command matches “{query}”"
 msgstr "No command matches “{query}”"
 
@@ -4425,7 +4429,7 @@ msgid "ui.No preview for this page."
 msgstr "No preview for this page."
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:307
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:308
 msgid "ui.No results found."
 msgstr "No results found."
 
@@ -4495,7 +4499,7 @@ msgid "ui.No voice yet."
 msgstr "No voice yet."
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:312
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:313
 msgid "ui.No web results found."
 msgstr "No web results found."
 
@@ -4805,6 +4809,7 @@ msgid "ui.Only leftover files will be cleared."
 msgstr "Only leftover files will be cleared."
 
 #. js-lingui-explicit-id
+#: src/elements/activity-popover.tsx:82
 #: src/elements/cover-tile.tsx:22
 #: src/elements/media-viewer.tsx:125
 #: src/ui/media-tiles.tsx:53
@@ -4995,8 +5000,8 @@ msgid "ui.Page width"
 msgstr "Page width"
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:225
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:237
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:230
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:238
 msgid "ui.Pages"
 msgstr "Pages"
 
@@ -5397,7 +5402,7 @@ msgid "ui.Presets"
 msgstr "Presets"
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:353
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:356
 msgid "ui.Press Enter to search the web · Esc to close"
 msgstr "Press Enter to search the web · Esc to close"
 
@@ -5617,7 +5622,7 @@ msgid "ui.Reasoning"
 msgstr "Reasoning"
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:229
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:226
 msgid "ui.Recent"
 msgstr "Recent"
 
@@ -6013,7 +6018,7 @@ msgid "ui.Restore"
 msgstr "Restore"
 
 #. js-lingui-explicit-id
-#: src/elements/command-palette.tsx:230
+#: src/elements/command-palette.tsx:369
 msgid "ui.Result type"
 msgstr "Result type"
 
@@ -6057,7 +6062,7 @@ msgid "ui.Retake point {time}"
 msgstr "Retake point {time}"
 
 #. js-lingui-explicit-id
-#: src/elements/activity-popover.tsx:65
+#: src/elements/activity-popover.tsx:81
 #: src/elements/error-state.tsx:40
 #: src/elements/job-progress.tsx:306
 #: src/elements/job-progress.tsx:380
@@ -6246,8 +6251,8 @@ msgid "ui.Scroll to bottom"
 msgstr "Scroll to bottom"
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:319
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:337
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:320
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:338
 #: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:254
 #: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:254
 #: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:297
@@ -6260,24 +6265,24 @@ msgid "ui.Search"
 msgstr "Search"
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:319
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:332
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:337
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:320
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:333
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:338
 msgid "ui.Search {label}"
 msgstr "Search {label}"
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:353
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:356
 msgid "ui.Search {label} · Esc to close"
 msgstr "Search {label} · Esc to close"
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:338
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:339
 msgid "ui.Search {label}..."
 msgstr "Search {label}..."
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:353
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:356
 msgid "ui.Search anywhere in Home · Esc to close"
 msgstr "Search anywhere in Home · Esc to close"
 
@@ -6337,7 +6342,7 @@ msgid "ui.Search threads"
 msgstr "Search threads"
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:338
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:339
 msgid "ui.Search..."
 msgstr "Search..."
 
@@ -6352,7 +6357,7 @@ msgid "ui.Searching"
 msgstr "Searching"
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:311
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:312
 msgid "ui.Searching the web..."
 msgstr "Searching the web..."
 
@@ -6360,6 +6365,11 @@ msgstr "Searching the web..."
 #: src/elements/song-style.tsx:56
 msgid "ui.Seconds"
 msgstr "Seconds"
+
+#. js-lingui-explicit-id
+#: src/elements/activity-popover.tsx:64
+msgid "ui.See all"
+msgstr "See all"
 
 #. js-lingui-explicit-id
 #: src/dashboard/layouts/full/vertical/header/Notifications.tsx:105
@@ -6979,7 +6989,7 @@ msgid "ui.Step {step} of {total} · {label}"
 msgstr "Step {step} of {total} · {label}"
 
 #. js-lingui-explicit-id
-#: src/elements/activity-popover.tsx:64
+#: src/elements/activity-popover.tsx:84
 #: src/elements/image-generation.tsx:21
 #: src/elements/music-track.tsx:35
 #: src/elements/video-player.tsx:114
@@ -7604,6 +7614,16 @@ msgid "ui.to"
 msgstr "to"
 
 #. js-lingui-explicit-id
+#: src/elements/command-palette.tsx:434
+msgid "ui.to move"
+msgstr "to move"
+
+#. js-lingui-explicit-id
+#: src/elements/command-palette.tsx:438
+msgid "ui.to open"
+msgstr "to open"
+
+#. js-lingui-explicit-id
 #: src/elements/result-feed.tsx:59
 #: src/elements/thread-list.aui.tsx:386
 #: src/elements/weather-forecast-page.tsx:237
@@ -7650,6 +7670,11 @@ msgstr "Tools"
 #: src/elements/track-studio.tsx:750
 msgid "ui.Top"
 msgstr "Top"
+
+#. js-lingui-explicit-id
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:344
+msgid "ui.Top hit"
+msgstr "Top hit"
 
 #. js-lingui-explicit-id
 #: src/primitives/StoryFeed.tsx:247
@@ -7783,7 +7808,7 @@ msgid "ui.Two readings, you can play and switch"
 msgstr "Two readings, you can play and switch"
 
 #. js-lingui-explicit-id
-#: src/elements/command-palette.tsx:90
+#: src/elements/command-palette.tsx:92
 msgid "ui.Type a command"
 msgstr "Type a command"
 
@@ -7793,7 +7818,7 @@ msgid "ui.Type at least two letters."
 msgstr "Type at least two letters."
 
 #. js-lingui-explicit-id
-#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:305
+#: src/dashboard/layouts/full/vertical/header/HeaderSearch.tsx:306
 msgid "ui.Type to search {label}."
 msgstr "Type to search {label}."
 
