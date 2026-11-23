@@ -239,6 +239,8 @@ test("spotlight is one floating rounded panel with no fixed height, pill tabs an
   expect(cls).toContain("rounded-3xl");
   expect(cls).not.toContain("h-[min(40rem");
   expect(view.getByRole("tab", { name: "Files" }).className).toContain("rounded-full");
+  // the tab row must never be squeezed by a long result list
+  expect(view.getByRole("tablist").className).toContain("shrink-0");
   const hints = document.querySelector('[data-slot="command-palette-hints"]');
   expect(hints?.textContent).toContain("to move");
   expect(hints?.textContent).toContain("to open");

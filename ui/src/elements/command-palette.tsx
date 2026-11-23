@@ -366,7 +366,7 @@ export function CommandPalette({
       </div>
 
       {tabs && tabs.length > 0 ? (
-        <div role="tablist" aria-label={i18n._({ id: "ui.Result type", message: "Result type" })} className={cn("flex overflow-x-auto px-6", spotlight ? "gap-2" : "border-foreground/[0.07] gap-5 border-b")}>
+        <div role="tablist" aria-label={i18n._({ id: "ui.Result type", message: "Result type" })} className={cn("flex shrink-0 overflow-x-auto px-6", spotlight ? "gap-2 py-2" : "border-foreground/[0.07] gap-5 border-b")}>
           {tabs.map((tab) => (
             <button
               key={tab.id}
