@@ -540,3 +540,70 @@ describe("MediaShelf", () => {
     expect(container.querySelectorAll('[data-slot="media-tile-label"]')).toHaveLength(0);
   });
 });
+
+describe("MediaShelf scroll arrows", () => {
+  const many = Array.from({ length: 12 }, (_, i) => ({ id: String(i), title: `Song ${i}` }));
+  const props = { items: many, getKey: (t: Track) => t.id, renderItem: (t: Track) => <button type="button">{t.title}</button>, heading: "Recently played", variant: "plain" as const };
+  const proto = HTMLElement.prototype as unknown as Record<string, unknown>;
+  const saved: Record<string, PropertyDescriptor | undefined> = {};
+  function measure(scrollWidth: number, clientWidth: number) {
+    for (const [k, v] of [["scrollWidth", scrollWidth], ["clientWidth", clientWidth]] as const) {
+      saved[k] = Object.getOwnPropertyDescriptor(HTMLElement.prototype, k);
+      Object.defineProperty(proto, k, { configurable: true, get: () => v });
+    }
+  }
+  afterEach(() => {
+    for (const k of Object.keys(saved)) {
+      if (saved[k]) Object.defineProperty(proto, k, saved[k]!); else delete proto[k];
+    }
+  });
+
+  test("no arrows render when the shelf does not overflow", () => {
+    measure(300, 300);
+    const { queryByRole } = render(<MediaShelf {...props} />);
+    expect(queryByRole("button", { name: "Scroll right" })).toBeNull();
+    expect(queryByRole("button", { name: "Scroll left" })).toBeNull();
+  });
+
+  test("arrows render on overflow, previous is disabled at the start, next scrolls about one page", () => {
+    measure(2000, 500);
+    const { getByRole, container } = render(<MediaShelf {...props} />);
+    const rail = container.querySelector('[data-slot="media-shelf"]') as HTMLElement;
+    const scrollBy = mock((_: ScrollToOptions) => {});
+    rail.scrollBy = scrollBy as unknown as typeof rail.scrollBy;
+    expect((getByRole("button", { name: "Scroll left" }) as HTMLButtonElement).disabled).toBe(true);
+    const next = getByRole("button", { name: "Scroll right" }) as HTMLButtonElement;
+    expect(next.disabled).toBe(false);
+    fireEvent.click(next);
+    expect(scrollBy).toHaveBeenCalledTimes(1);
+    const arg = scrollBy.mock.calls[0]![0];
+    expect(arg.left).toBeGreaterThan(300);
+    expect(arg.left).toBeLessThanOrEqual(500);
+  });
+
+  test("next is disabled at the far end and previous scrolls back", () => {
+    measure(2000, 500);
+    const { getByRole, container } = render(<MediaShelf {...props} />);
+    const rail = container.querySelector('[data-slot="media-shelf"]') as HTMLElement;
+    rail.scrollLeft = 1500;
+    fireEvent.scroll(rail);
+    expect((getByRole("button", { name: "Scroll right" }) as HTMLButtonElement).disabled).toBe(true);
+    const prev = getByRole("button", { name: "Scroll left" }) as HTMLButtonElement;
+    expect(prev.disabled).toBe(false);
+    const scrollBy = mock((_: ScrollToOptions) => {});
+    rail.scrollBy = scrollBy as unknown as typeof rail.scrollBy;
+    fireEvent.click(prev);
+    expect(scrollBy.mock.calls[0]![0].left).toBeLessThan(0);
+  });
+
+  test("the arrow keys move focus between tiles", () => {
+    measure(2000, 500);
+    const { getByText } = render(<MediaShelf {...props} />);
+    const first = getByText("Song 0");
+    first.focus();
+    fireEvent.keyDown(first, { key: "ArrowRight" });
+    expect(document.activeElement).toBe(getByText("Song 1"));
+    fireEvent.keyDown(document.activeElement!, { key: "ArrowLeft" });
+    expect(document.activeElement).toBe(first);
+  });
+});
