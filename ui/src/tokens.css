@@ -2740,7 +2740,7 @@ html[data-ease-motion="calm"] body {
 [data-slot="weather-sky"][data-stage="top"] [data-fx="sun-group"] { top: calc(var(--wx-light-yn) * var(--wx-stage) / 100); }
 [data-slot="weather-sky"][data-stage="top"] [data-fx="moon-group"] { top: calc(var(--wx-moon-yn) * var(--wx-stage) / 100); }
 [data-slot="weather-sky"][data-stage="top"] .weather-sky-glow { background: radial-gradient(46% calc(var(--wx-stage) * .9) at var(--wx-light-x, 88%) calc(var(--wx-light-yn, 40) * var(--wx-stage) / 100), var(--wx-glow), transparent 64%); }
-[data-slot="weather-sky"][data-stage="top"] [data-fx="cloud"] { top: min(calc(var(--y) * var(--wx-stage) / 100), calc(.56 * var(--wx-stage) - var(--s) * var(--cloud-height-factor) * var(--cloud-scale))); }
+[data-slot="weather-sky"][data-stage="top"] [data-fx="cloud"] { top: max(0px, min(calc(var(--y) * var(--wx-stage) / 100), calc(.56 * var(--wx-stage) - var(--s) * var(--cloud-height-factor) * var(--cloud-scale)))); }
 /* WEATHER-SCENE-08 horizon: a static glow in the lower right corner, outside the text zone. The twilight layer peaks at
  * --wx-t .5 and is gone at night and by day; the day layer is the pale horizon of a clear sky and grows with --wx-t. */
 [data-slot="weather-sky"] .weather-sky-horizon { position:absolute; inset:0; pointer-events:none; opacity:calc(1 - abs(var(--wx-t) - .5) * 2); background:radial-gradient(85% 48% at 92% 100%, var(--weather-horizon-twilight), transparent 70%); }

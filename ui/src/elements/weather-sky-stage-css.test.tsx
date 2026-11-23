@@ -30,6 +30,7 @@ test("the sun and the moon are placed in the stage", () => {
 test("the clouds are placed in the stage", () => {
   const cloud = rule(`${stage} [data-fx="cloud"]`);
   expect(cloud).toContain("var(--y)"); expect(cloud).toContain("var(--wx-stage)");
+  expect(cloud).toContain("max(0px,"); // a tall near cloud is never pushed above the top of the pane
 });
 
 test("the sky marks the stage and carries the unitless light and moon heights", () => {
