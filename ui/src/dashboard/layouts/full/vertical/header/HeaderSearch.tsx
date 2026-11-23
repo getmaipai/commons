@@ -221,13 +221,14 @@ const HeaderSearch = ({ remote, recents: recentsProp, onAsk: onAskProp, webSearc
       return { commands: out, hrefs: to };
     }
     if (trimmed === "") {
-      for (const { item, heading } of pages) {
-        out.push({ id: `page:${item.key}`, label: item.name, group: heading || i18n._({ id: "ui.Pages", message: "Pages" }), keys: [], icon: item.icon ? <item.icon /> : undefined });
-        to.set(`page:${item.key}`, item.url);
-      }
+      // Recent first: the person's own pointers lead the empty state, the shell pages follow.
       for (const result of recents ?? []) {
         out.push({ id: `recent:${result.id}`, label: result.title, group: i18n._({ id: "ui.Recent", message: "Recent" }), keys: [], subtitle: result.subtitle, icon: KIND_ICONS[result.kind] });
         to.set(`recent:${result.id}`, result.href);
+      }
+      for (const { item, heading } of pages) {
+        out.push({ id: `page:${item.key}`, label: item.name, group: heading || i18n._({ id: "ui.Pages", message: "Pages" }), keys: [], icon: item.icon ? <item.icon /> : undefined });
+        to.set(`page:${item.key}`, item.url);
       }
       return { commands: out, hrefs: to };
     }
@@ -339,6 +340,8 @@ const HeaderSearch = ({ remote, recents: recentsProp, onAsk: onAskProp, webSearc
         emptyMessage={emptyMessage}
         prefiltered
         size={size}
+        variant="spotlight"
+        topHitLabel={commands[0] && commands[0].id !== ASK_ID && !onWebTab ? i18n._({ id: "ui.Top hit", message: "Top hit" }) : undefined}
         commands={commands}
         query={query}
         activeId={activeId}

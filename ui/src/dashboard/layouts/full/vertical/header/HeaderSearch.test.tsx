@@ -84,7 +84,8 @@ describe("HeaderSearch (SEARCH-MODAL-SIZE-02): the size prop", () => {
 
   test("is lg by default: a 48rem dialog at a viewport-bound height, the list scrolling inside", () => {
     const { dialog, list } = open();
-    expect(dialog).toContain("h-[min(40rem,calc(100dvh-4rem))]");
+    // spotlight: the panel grows with its results up to a viewport-bound cap
+    expect(dialog).toContain("max-h-[min(40rem,calc(100dvh-6rem))]");
     expect(document.querySelector('[data-slot="dialog-content"]')?.getAttribute("class")).toContain("sm:max-w-3xl");
     expect(list).toContain("min-h-0");
     expect(list).toContain("flex-1");
@@ -356,5 +357,56 @@ describe("HeaderSearch (MEDIA-HEADER-01): the scope prop", () => {
     expect(getByText("Blue Hour")).not.toBeNull();
     expect(queryByText(/^Ask:/)).toBeNull();
     expect(queryByRole("tab")).toBeNull();
+  });
+});
+
+describe("HeaderSearch (spotlight look)", () => {
+  const media: SearchGroup[] = [
+    { kind: "media", heading: "Media", results: [
+      { kind: "media", id: "m1", title: "Neon Rain", source: "Music", thumbnail: "/neon.jpg", href: "/media/m1" },
+      { kind: "media", id: "m2", title: "Neon Rain (Bass)", source: "Music", href: "/media/m2" },
+    ] },
+  ];
+
+  test("the palette uses the spotlight variant", () => {
+    const view = render(<Harness />);
+    fireEvent.click(view.getByRole("button", { name: "Search" }));
+    expect(document.querySelector('[data-slot="command-palette"]')?.getAttribute("data-variant")).toBe("spotlight");
+  });
+
+  test("a typed query shows the first result alone as the Top hit, with its picture in the tile", async () => {
+    const view = render(<Harness remote={async () => media} />);
+    fireEvent.click(view.getByRole("button", { name: "Search" }));
+    fireEvent.change(view.getByPlaceholderText("Search..."), { target: { value: "neon" } });
+    await settle();
+    const top = view.getByRole("group", { name: "Top hit" });
+    expect(top.textContent).toContain("Neon Rain");
+    expect(top.querySelector("img")?.getAttribute("src")).toBe("/neon.jpg");
+    expect(view.getByRole("group", { name: "Media" }).textContent).toContain("Neon Rain (Bass)");
+  });
+
+  test("when only the Ask row exists there is no Top hit", () => {
+    const view = render(
+      <MemoryRouter initialEntries={["/"]}>
+        <HeaderSearch onAsk={() => {}} />
+      </MemoryRouter>,
+    );
+    fireEvent.click(view.getByRole("button", { name: "Search" }));
+    fireEvent.change(view.getByPlaceholderText("Search..."), { target: { value: "zzzz nothing" } });
+    expect(view.queryByRole("group", { name: "Top hit" })).toBeNull();
+  });
+
+  test("the empty state lists Recent before the shell pages", () => {
+    const view = render(
+      <HeaderSearchOptionsContext.Provider value={{ recents: [{ kind: "conversation", id: "c9", title: "Pizza night plans", href: "/chat?conversation=c9" }] }}>
+        <MemoryRouter initialEntries={["/"]}>
+          <HeaderSearch />
+        </MemoryRouter>
+      </HeaderSearchOptionsContext.Provider>,
+    );
+    fireEvent.click(view.getByRole("button", { name: "Search" }));
+    const labels = view.getAllByRole("group").map((group) => group.getAttribute("aria-label"));
+    expect(labels[0]).toBe("Recent");
+    expect(labels.length).toBeGreaterThan(1);
   });
 });
