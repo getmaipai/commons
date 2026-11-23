@@ -208,7 +208,7 @@ export function WeatherForecastPage({ locations, selectedId, onSelect, onSearch,
       </div>)}</div>
     </aside>
     {selected && <main data-slot="weather-location-detail" className="relative isolate min-w-0 overflow-hidden pb-[calc(49px+env(safe-area-inset-bottom)+1.5rem)] lg:pb-8">
-      {d && <div data-weather-layer="detail-sky" className="pointer-events-none fixed inset-0 -z-10 overflow-hidden lg:absolute lg:bottom-auto lg:h-[100svh]"><WeatherSky cls={cls} isDay={d.isDay} code={d.code} sunrise={d.sunrise?.includes("T") ? d.sunrise : undefined} sunset={d.sunset?.includes("T") ? d.sunset : undefined} wind={d.wind?.speed}/></div>}
+      {d && <div data-weather-layer="detail-sky" className="pointer-events-none fixed inset-0 -z-10 overflow-hidden lg:absolute lg:bottom-auto lg:h-[100svh]"><WeatherSky cls={cls} isDay={d.isDay} code={d.code} sunrise={d.sunrise?.includes("T") ? d.sunrise : undefined} sunset={d.sunset?.includes("T") ? d.sunset : undefined} wind={d.wind?.speed} stage="top"/></div>}
       {d ? <>
         {alert ? <div className="mb-4"><WeatherAlertBanner alert={alert}/></div> : null}
         <section data-slot="weather-forecast-hero" data-class={cls} style={{ color: "var(--weather-ink)" }} className="relative -mx-4 mb-4 flex min-h-[42svh] flex-col items-center justify-center overflow-hidden bg-transparent p-6 text-center sm:mx-0 sm:min-h-72 sm:items-start sm:justify-end sm:rounded-3xl sm:p-7 sm:text-left">
