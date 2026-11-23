@@ -343,8 +343,10 @@ export function MediaShelf<T>({
     </li>
   );
 
-  // One tile list: the whole shelf, or one day's group.
-  const renderList = (listItems: readonly T[], listName: string | undefined, withLock = false) => (
+  // One tile list: the whole shelf, or one day's group. Grids wrap in place;
+  // rails go through ShelfScroller, which draws the scroll arrows on overflow.
+  const renderList = (listItems: readonly T[], listName: string | undefined, withLock = false) => {
+    const list = (
     <ul
       ref={reorder.containerRef as RefObject<HTMLUListElement>}
       data-slot="media-shelf"
@@ -451,7 +453,9 @@ export function MediaShelf<T>({
       })}
       {withLock ? lockLi : null}
     </ul>
-  );
+    );
+    return layout === "grid" ? list : <ShelfScroller>{list}</ShelfScroller>;
+  };
 
   // Day groups keep the lock out of every day (its day is not known): its own list after the groups.
   const renderLockOnly = (listName: string | undefined) => renderList([], listName, true);
@@ -498,6 +502,92 @@ export function MediaShelf<T>({
         </div>
       ) : content}
     </Frame>
+  );
+}
+
+const ShelfArrowLeft = getIcon("chevron-left");
+const ShelfArrowRight = getIcon("chevron-right");
+
+// A rail's arrows and arrow-key focus. The arrows only exist while the rail
+// actually overflows, and hide until the shelf is hovered or an arrow keeps
+// keyboard focus (pointer-fine screens only).
+function ShelfScroller({ children }: { children: ReactNode }) {
+  const host = useRef<HTMLDivElement | null>(null);
+  const [state, setState] = useState({ canPrev: false, canNext: false, overflow: false });
+
+  useEffect(() => {
+    const element = host.current;
+    if (!element) return;
+    const rail = element.querySelector<HTMLElement>("[data-slot=media-shelf]");
+    if (!rail) return;
+    let observer: ResizeObserver | undefined;
+    const update = () => {
+      const canPrev = rail.scrollLeft > 1;
+      const canNext = rail.scrollLeft + rail.clientWidth < rail.scrollWidth - 1;
+      const overflow = rail.scrollWidth > rail.clientWidth + 1;
+      setState((prev) => (prev.canPrev === canPrev && prev.canNext === canNext && prev.overflow === overflow ? prev : { canPrev, canNext, overflow }));
+    };
+    update();
+    rail.addEventListener("scroll", update);
+    window.addEventListener("resize", update);
+    if (typeof ResizeObserver !== "undefined") {
+      observer = new ResizeObserver(update);
+      observer.observe(rail);
+    }
+    return () => {
+      rail.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+      observer?.disconnect();
+    };
+  }, []);
+
+  const scroll = (dir: 1 | -1) => {
+    const rail = host.current?.querySelector<HTMLElement>("[data-slot=media-shelf]");
+    if (!rail) return;
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
+    rail.scrollBy({ left: dir * Math.round(rail.clientWidth * 0.85), behavior: reduced ? "auto" : "smooth" });
+  };
+
+  // Arrow keys move focus to the neighbouring tile's first control, the way
+  // a native listbox roves; the tile scrolls itself into view afterwards.
+  const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+    if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
+    const target = event.target as HTMLElement;
+    const tag = target.tagName;
+    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+    const li = target.closest<HTMLElement>("li");
+    if (!li || li.parentElement?.getAttribute("data-slot") !== "media-shelf") return;
+    const sibling = event.key === "ArrowRight" ? li.nextElementSibling : li.previousElementSibling;
+    if (!(sibling instanceof HTMLLIElement)) return;
+    const focusable = sibling.querySelector<HTMLElement>("button, a[href], [tabindex]:not([tabindex='-1'])");
+    if (!focusable) return;
+    event.preventDefault();
+    focusable.focus();
+    focusable.scrollIntoView?.({ inline: "nearest", block: "nearest" });
+  };
+
+  const arrowClasses = cn(
+    "hidden pointer-fine:flex items-center justify-center size-9 rounded-full border border-border/40 bg-[var(--surface-glass)] text-foreground shadow-lg backdrop-blur-[var(--glass-blur)]",
+    "z-10 opacity-0 transition-opacity pointer-fine:group-hover/shelf:opacity-100 focus-visible:opacity-100",
+    "disabled:pointer-events-none disabled:opacity-0 pointer-fine:group-hover/shelf:disabled:opacity-0",
+    HIT_FLOOR, FOCUS_RING,
+  );
+
+  return (
+    <div ref={host} className="group/shelf relative min-w-0" onKeyDown={onKeyDown}>
+      {children}
+      {state.overflow ? (
+        <>
+          <button type="button" aria-label={i18n._({ id: "ui.Scroll left", message: "Scroll left" })} disabled={!state.canPrev} onClick={() => scroll(-1)} className={cn(arrowClasses, "absolute top-1/2 -translate-y-1/2 left-1")}>
+            <ShelfArrowLeft aria-hidden className="size-5" />
+          </button>
+          <button type="button" aria-label={i18n._({ id: "ui.Scroll right", message: "Scroll right" })} disabled={!state.canNext} onClick={() => scroll(1)} className={cn(arrowClasses, "absolute top-1/2 -translate-y-1/2 right-1")}>
+            <ShelfArrowRight aria-hidden className="size-5" />
+          </button>
+        </>
+      ) : null}
+    </div>
   );
 }
 

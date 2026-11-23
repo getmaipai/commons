@@ -392,7 +392,7 @@ msgid "ui.{name}, {ring}"
 msgstr "{name}, {ring}"
 
 #. js-lingui-explicit-id
-#: src/primitives/MediaShelf.tsx:478
+#: src/primitives/MediaShelf.tsx:482
 msgid "ui.{name}, {text}"
 msgstr "{name}, {text}"
 
@@ -1052,7 +1052,7 @@ msgid "ui.AQI {aqi}: {category}"
 msgstr "AQI {aqi}: {category}"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:1375
+#: src/elements/thread-list.aui.tsx:1377
 msgid "ui.Archive"
 msgstr "Archive"
 
@@ -1168,7 +1168,7 @@ msgstr "Baby"
 #: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:398
 #: src/elements/composer-trigger-popover.aui.tsx:194
 #: src/elements/question-flow.tsx:48
-#: src/elements/thread-list.aui.tsx:183
+#: src/elements/thread-list.aui.tsx:185
 #: src/elements/tool-fallback.aui.tsx:567
 #: src/primitives/ArticleView.tsx:468
 #: src/primitives/DetailPane.tsx:31
@@ -1298,7 +1298,7 @@ msgid "ui.Bring your own from Hugging Face. The Stack checks its size and licenc
 msgstr "Bring your own from Hugging Face. The Stack checks its size and licence first."
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:194
+#: src/elements/thread-list.aui.tsx:196
 msgid "ui.Browse all projects"
 msgstr "Browse all projects"
 
@@ -1353,7 +1353,7 @@ msgstr "Can view"
 #: src/elements/music-edit.tsx:62
 #: src/elements/project-home-page.tsx:29
 #: src/elements/project-settings.tsx:72
-#: src/elements/thread-list.aui.tsx:188
+#: src/elements/thread-list.aui.tsx:190
 #: src/elements/thread.aui.tsx:1681
 #: src/elements/tier-segment.tsx:55
 #: src/elements/video-player.tsx:124
@@ -2036,7 +2036,7 @@ msgid "ui.Cover art for {title}"
 msgstr "Cover art for {title}"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:195
+#: src/elements/thread-list.aui.tsx:197
 msgid "ui.Create"
 msgstr "Create"
 
@@ -2118,8 +2118,8 @@ msgid "ui.degrees Fahrenheit"
 msgstr "degrees Fahrenheit"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:186
-#: src/elements/thread-list.aui.tsx:1384
+#: src/elements/thread-list.aui.tsx:188
+#: src/elements/thread-list.aui.tsx:1386
 msgid "ui.Delete"
 msgstr "Delete"
 
@@ -2142,7 +2142,7 @@ msgid "ui.Delete this project?"
 msgstr "Delete this project?"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:187
+#: src/elements/thread-list.aui.tsx:189
 msgid "ui.Delete this project? Its chats stay."
 msgstr "Delete this project? Its chats stay."
 
@@ -2441,7 +2441,7 @@ msgid "ui.Each side can be at most {max} pixels."
 msgstr "Each side can be at most {max} pixels."
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:386
+#: src/elements/thread-list.aui.tsx:388
 #: src/schema/NodeRenderer.tsx:1488
 msgid "ui.Earlier"
 msgstr "Earlier"
@@ -2492,7 +2492,7 @@ msgstr "Edit picture: {title}"
 
 #. js-lingui-explicit-id
 #: src/elements/project-home-page.tsx:24
-#: src/elements/thread-list.aui.tsx:193
+#: src/elements/thread-list.aui.tsx:195
 msgid "ui.Edit project"
 msgstr "Edit project"
 
@@ -3077,7 +3077,7 @@ msgstr "Hide settings sidebar"
 
 #. js-lingui-explicit-id
 #: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:399
-#: src/primitives/SectionSidebar.tsx:185
+#: src/primitives/SectionSidebar.tsx:186
 msgid "ui.Hide sidebar"
 msgstr "Hide sidebar"
 
@@ -3344,7 +3344,7 @@ msgstr "It is downloading first and starts being used when it is ready."
 
 #. js-lingui-explicit-id
 #: src/primitives/MediaShelf.tsx:217
-#: src/primitives/MediaShelf.tsx:433
+#: src/primitives/MediaShelf.tsx:435
 #: src/schema/NodeRenderer.tsx:1479
 msgid "ui.item"
 msgstr "item"
@@ -3393,7 +3393,7 @@ msgid "ui.Keep settings sidebar open"
 msgstr "Keep settings sidebar open"
 
 #. js-lingui-explicit-id
-#: src/primitives/SectionSidebar.tsx:185
+#: src/primitives/SectionSidebar.tsx:186
 msgid "ui.Keep sidebar open"
 msgstr "Keep sidebar open"
 
@@ -3647,7 +3647,7 @@ msgid "ui.Loading the storyboard"
 msgstr "Loading the storyboard"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:1085
+#: src/elements/thread-list.aui.tsx:1087
 msgid "ui.Loading threads"
 msgstr "Loading threads"
 
@@ -4031,7 +4031,7 @@ msgid "ui.More"
 msgstr "More"
 
 #. js-lingui-explicit-id
-#: src/primitives/MediaShelf.tsx:433
+#: src/primitives/MediaShelf.tsx:435
 msgid "ui.More actions for {name}"
 msgstr "More actions for {name}"
 
@@ -4056,7 +4056,7 @@ msgid "ui.More like this"
 msgstr "More like this"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:1285
+#: src/elements/thread-list.aui.tsx:1287
 msgid "ui.More options"
 msgstr "More options"
 
@@ -4127,7 +4127,7 @@ msgid "ui.Move the playhead onto a piece to split it."
 msgstr "Move the playhead onto a piece to split it."
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:181
+#: src/elements/thread-list.aui.tsx:183
 msgid "ui.Move to project"
 msgstr "Move to project"
 
@@ -4215,20 +4215,20 @@ msgid "ui.New band picture"
 msgstr "New band picture"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:251
-#: src/elements/thread-list.aui.tsx:1038
+#: src/elements/thread-list.aui.tsx:253
+#: src/elements/thread-list.aui.tsx:1040
 msgid "ui.New chat"
 msgstr "New chat"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:420
-#: src/elements/thread-list.aui.tsx:1174
-#: src/elements/thread-list.aui.tsx:1180
+#: src/elements/thread-list.aui.tsx:422
+#: src/elements/thread-list.aui.tsx:1176
+#: src/elements/thread-list.aui.tsx:1182
 msgid "ui.New Chat"
 msgstr "New Chat"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:184
+#: src/elements/thread-list.aui.tsx:186
 msgid "ui.New chat in project"
 msgstr "New chat in project"
 
@@ -4249,7 +4249,7 @@ msgid "ui.New Moon"
 msgstr "New Moon"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:179
+#: src/elements/thread-list.aui.tsx:181
 msgid "ui.New project"
 msgstr "New project"
 
@@ -4340,7 +4340,7 @@ msgid "ui.No artifacts yet"
 msgstr "No artifacts yet"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:191
+#: src/elements/thread-list.aui.tsx:193
 msgid "ui.No chats"
 msgstr "No chats"
 
@@ -4355,7 +4355,7 @@ msgid "ui.No clip."
 msgstr "No clip."
 
 #. js-lingui-explicit-id
-#: src/elements/command-palette.tsx:355
+#: src/elements/command-palette.tsx:356
 msgid "ui.No command matches “{query}”"
 msgstr "No command matches “{query}”"
 
@@ -4470,7 +4470,7 @@ msgid "ui.No thread matches “{query}”"
 msgstr "No thread matches “{query}”"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:500
+#: src/elements/thread-list.aui.tsx:502
 msgid "ui.No threads found"
 msgstr "No threads found"
 
@@ -5218,7 +5218,7 @@ msgid "ui.Pin {name} to the rail"
 msgstr "Pin {name} to the rail"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:196
+#: src/elements/thread-list.aui.tsx:198
 msgid "ui.Pin project"
 msgstr "Pin project"
 
@@ -5334,7 +5334,7 @@ msgid "ui.Playback speed"
 msgstr "Playback speed"
 
 #. js-lingui-explicit-id
-#: src/primitives/MediaShelf.tsx:711
+#: src/primitives/MediaShelf.tsx:801
 msgid "ui.Played"
 msgstr "Played"
 
@@ -5497,13 +5497,13 @@ msgstr "Profile"
 
 #. js-lingui-explicit-id
 #: src/elements/project-settings.tsx:64
-#: src/elements/thread-list.aui.tsx:180
+#: src/elements/thread-list.aui.tsx:182
 msgid "ui.Project name"
 msgstr "Project name"
 
 #. js-lingui-explicit-id
 #: src/elements/project-home-page.tsx:23
-#: src/elements/thread-list.aui.tsx:192
+#: src/elements/thread-list.aui.tsx:194
 msgid "ui.Project options"
 msgstr "Project options"
 
@@ -5523,7 +5523,7 @@ msgid "ui.Project-only"
 msgstr "Project-only"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:178
+#: src/elements/thread-list.aui.tsx:180
 msgid "ui.Projects"
 msgstr "Projects"
 
@@ -5627,7 +5627,7 @@ msgid "ui.recent runs"
 msgstr "recent runs"
 
 #. js-lingui-explicit-id
-#: src/primitives/SectionSidebar.tsx:468
+#: src/primitives/SectionSidebar.tsx:470
 msgid "ui.Recent searches"
 msgstr "Recent searches"
 
@@ -5858,7 +5858,7 @@ msgid "ui.Remove file"
 msgstr "Remove file"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:182
+#: src/elements/thread-list.aui.tsx:184
 msgid "ui.Remove from project"
 msgstr "Remove from project"
 
@@ -5902,8 +5902,8 @@ msgid "ui.Removing"
 msgstr "Removing"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:185
-#: src/elements/thread-list.aui.tsx:1330
+#: src/elements/thread-list.aui.tsx:187
+#: src/elements/thread-list.aui.tsx:1332
 #: src/settings/LocationField.tsx:298
 msgid "ui.Rename"
 msgstr "Rename"
@@ -5914,7 +5914,7 @@ msgid "ui.Rename place"
 msgstr "Rename place"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:1238
+#: src/elements/thread-list.aui.tsx:1240
 msgid "ui.Rename thread"
 msgstr "Rename thread"
 
@@ -6098,7 +6098,7 @@ msgid "ui.running"
 msgstr "running"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:1184
+#: src/elements/thread-list.aui.tsx:1186
 msgid "ui.Running"
 msgstr "Running"
 
@@ -6231,6 +6231,16 @@ msgid "ui.Say it differently"
 msgstr "Say it differently"
 
 #. js-lingui-explicit-id
+#: src/primitives/MediaShelf.tsx:582
+msgid "ui.Scroll left"
+msgstr "Scroll left"
+
+#. js-lingui-explicit-id
+#: src/primitives/MediaShelf.tsx:585
+msgid "ui.Scroll right"
+msgstr "Scroll right"
+
+#. js-lingui-explicit-id
 #: src/elements/thread.aui.tsx:858
 msgid "ui.Scroll to bottom"
 msgstr "Scroll to bottom"
@@ -6278,8 +6288,8 @@ msgid "ui.Search apps"
 msgstr "Search apps"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:252
-#: src/elements/thread-list.aui.tsx:277
+#: src/elements/thread-list.aui.tsx:254
+#: src/elements/thread-list.aui.tsx:279
 msgid "ui.Search chats"
 msgstr "Search chats"
 
@@ -6623,7 +6633,7 @@ msgstr "Show fewer"
 #. js-lingui-explicit-id
 #: src/elements/creation-header.tsx:131
 #: src/elements/creation-header.tsx:170
-#: src/elements/thread-list.aui.tsx:190
+#: src/elements/thread-list.aui.tsx:192
 #: src/schema/NodeRenderer.tsx:2165
 msgid "ui.Show less"
 msgstr "Show less"
@@ -6631,13 +6641,13 @@ msgstr "Show less"
 #. js-lingui-explicit-id
 #: src/elements/creation-header.tsx:131
 #: src/elements/creation-header.tsx:170
-#: src/elements/thread-list.aui.tsx:189
+#: src/elements/thread-list.aui.tsx:191
 #: src/schema/NodeRenderer.tsx:2165
 msgid "ui.Show more"
 msgstr "Show more"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:198
+#: src/elements/thread-list.aui.tsx:200
 msgid "ui.Show or hide chats"
 msgstr "Show or hide chats"
 
@@ -6659,8 +6669,8 @@ msgstr "Show settings sidebar"
 #. js-lingui-explicit-id
 #: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:405
 #: src/dashboard/layouts/full/vertical/rail/AppRail.tsx:431
-#: src/primitives/SectionSidebar.tsx:185
-#: src/primitives/SectionSidebar.tsx:553
+#: src/primitives/SectionSidebar.tsx:186
+#: src/primitives/SectionSidebar.tsx:555
 msgid "ui.Show sidebar"
 msgstr "Show sidebar"
 
@@ -7595,7 +7605,7 @@ msgstr "to"
 
 #. js-lingui-explicit-id
 #: src/elements/result-feed.tsx:59
-#: src/elements/thread-list.aui.tsx:384
+#: src/elements/thread-list.aui.tsx:386
 #: src/elements/weather-forecast-page.tsx:237
 #: src/elements/weather-forecast-page.tsx:239
 #: src/relativeTime.ts:56
@@ -7875,7 +7885,7 @@ msgid "ui.Unpin {name} from the rail"
 msgstr "Unpin {name} from the rail"
 
 #. js-lingui-explicit-id
-#: src/elements/thread-list.aui.tsx:197
+#: src/elements/thread-list.aui.tsx:199
 msgid "ui.Unpin project"
 msgstr "Unpin project"
 
@@ -8377,7 +8387,7 @@ msgstr "Yes"
 
 #. js-lingui-explicit-id
 #: src/elements/result-feed.tsx:60
-#: src/elements/thread-list.aui.tsx:385
+#: src/elements/thread-list.aui.tsx:387
 #: src/relativeTime.ts:15
 #: src/relativeTime.ts:57
 msgid "ui.Yesterday"
