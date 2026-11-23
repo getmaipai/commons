@@ -1,5 +1,5 @@
 import { afterEach, expect, mock, test } from "bun:test";
-import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, waitFor, within } from "@testing-library/react";
 import { useState } from "react";
 import { CommandPaletteDialog } from "./command-palette";
 
@@ -189,4 +189,74 @@ test("Enter on a tab that is not a submit tab never calls onSubmitQuery", () => 
   fireEvent.keyDown(view.getByRole("combobox"), { key: "Enter" });
   expect(onSubmitQuery).not.toHaveBeenCalled();
   expect(onRun).toHaveBeenCalledWith("new-chat");
+});
+
+const spotCommands = [
+  { id: "a", label: "Neon Rain", group: "Media", keys: [], source: "Music", thumbnailUrl: "/neon.jpg", match: [0, 4] as [number, number] },
+  { id: "b", label: "Neon Rain (Bass)", group: "Media", keys: [], source: "Music" },
+  { id: "c", label: "Neon notes", group: "Files", keys: [], source: "Library", icon: <span>f</span> },
+];
+
+function spotlight(extra: Record<string, unknown> = {}) {
+  return render(
+    <CommandPaletteDialog open onOpenChange={() => {}} title="Search" variant="spotlight" topHitLabel="Top hit" prefiltered
+      commands={spotCommands} query="neon" activeId="a" onRun={() => {}} {...extra} />,
+  );
+}
+
+test("spotlight puts the first result alone under the Top hit heading and the rest in their groups", () => {
+  const view = spotlight();
+  const groups = view.getAllByRole("group").map((group) => group.getAttribute("aria-label"));
+  expect(groups).toEqual(["Top hit", "Media", "Files"]);
+  expect(within(view.getByRole("group", { name: "Top hit" })).getAllByRole("option")).toHaveLength(1);
+  expect(within(view.getByRole("group", { name: "Media" })).getAllByRole("option")).toHaveLength(1);
+});
+
+test("spotlight keeps arrow-key order across the top hit and highlights the active row", () => {
+  const onActiveChange = mock((_id: string) => {});
+  const view = spotlight({ onActiveChange });
+  fireEvent.keyDown(view.getByRole("combobox"), { key: "ArrowDown" });
+  expect(onActiveChange).toHaveBeenCalledWith("b");
+  expect(view.getByRole("option", { name: /Neon Rain Music/ }).getAttribute("aria-selected")).toBe("true");
+});
+
+test("spotlight shows the picture in a rounded tile at the start of the row and the type label at the end", () => {
+  const view = spotlight();
+  const option = view.getAllByRole("option")[0]!;
+  const img = option.querySelector("img");
+  expect(img?.getAttribute("src")).toBe("/neon.jpg");
+  expect(option.firstElementChild?.contains(img!)).toBe(true);
+  expect(img?.className ?? "").not.toContain("w-28");
+  const label = within(option).getByText("Music");
+  expect(label.getAttribute("data-slot")).toBe("command-palette-type");
+});
+
+test("spotlight is one floating rounded panel with no fixed height, pill tabs and key hints", () => {
+  const view = spotlight({ tabs: [{ id: "all", label: "All" }, { id: "files", label: "Files" }], activeTab: "all" });
+  const palette = document.querySelector('[data-slot="command-palette"]');
+  expect(palette?.getAttribute("data-variant")).toBe("spotlight");
+  const cls = palette?.getAttribute("class") ?? "";
+  expect(cls).toContain("rounded-3xl");
+  expect(cls).not.toContain("h-[min(40rem");
+  expect(view.getByRole("tab", { name: "Files" }).className).toContain("rounded-full");
+  const hints = document.querySelector('[data-slot="command-palette-hints"]');
+  expect(hints?.textContent).toContain("to move");
+  expect(hints?.textContent).toContain("to open");
+});
+
+test("spotlight with no query shows no Top hit heading", () => {
+  const view = spotlight({ query: "" });
+  expect(view.queryByRole("group", { name: "Top hit" })).toBeNull();
+});
+
+test("spotlight dialog opens near the top third instead of dead centre", () => {
+  spotlight();
+  const cls = document.querySelector('[data-slot="dialog-content"]')?.getAttribute("class") ?? "";
+  expect(cls).toContain("translate-y-0");
+});
+
+test("the default variant has no Top hit and no key hints", () => {
+  const view = render(<CommandPaletteDialog open onOpenChange={() => {}} title="Search" topHitLabel="Top hit" prefiltered commands={spotCommands} query="neon" activeId="a" />);
+  expect(view.queryByRole("group", { name: "Top hit" })).toBeNull();
+  expect(document.querySelector('[data-slot="command-palette-hints"]')).toBeNull();
 });

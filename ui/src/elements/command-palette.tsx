@@ -52,6 +52,7 @@ export function CommandPaletteDialog({
   onOpenChange,
   title,
   size = "default",
+  variant = "default",
   ...paletteProps
 }: CommandPaletteDialogProps) {
   const returnFocusRef = useRef<HTMLElement | null>(null);
@@ -61,6 +62,7 @@ export function CommandPaletteDialog({
       <DialogContent
         variant="command"
         size={size}
+        className={variant === "spotlight" ? "top-[14%] translate-y-0" : undefined}
         showCloseButton={false}
         aria-describedby={undefined}
         onOpenAutoFocus={() => {
@@ -73,7 +75,7 @@ export function CommandPaletteDialog({
         }}
       >
         <DialogTitle className="sr-only">{title}</DialogTitle>
-        <CommandPalette size={size} {...paletteProps} />
+        <CommandPalette size={size} variant={variant} {...paletteProps} />
       </DialogContent>
     </Dialog>
   );
@@ -96,6 +98,8 @@ export function CommandPalette({
   onSubmitQuery,
   submittedQuery,
   footer,
+  variant = "default",
+  topHitLabel,
   className,
   ...props
 }: Omit<
@@ -132,6 +136,10 @@ export function CommandPalette({
   submittedQuery?: string;
   /** A line under the list, e.g. a hint about keys. */
   footer?: ReactNode;
+  /** Visual style. "spotlight" is the Mac Spotlight look: rounded panel, pill tabs, a large top hit and key hints. */
+  variant?: "default" | "spotlight";
+  /** In spotlight, with a non-empty query the first match is drawn alone under this heading. */
+  topHitLabel?: string;
 }) {
   const listId = useId();
   const optionId = (id: string) => `${listId}-${id}`;
@@ -145,6 +153,21 @@ export function CommandPalette({
   const ordered = groups.flatMap((group) =>
     matches.filter((command) => command.group === group),
   );
+
+  const spotlight = variant === "spotlight";
+  // spotlight: the first match in display order becomes a lone top hit; `ordered` keeps it first so ArrowDown moves
+  // from the top hit to the next row.
+  const topHit =
+    spotlight && topHitLabel && query.trim() !== "" && ordered.length > 0
+      ? ordered[0]
+      : undefined;
+  const rest = topHit
+    ? matches.filter((command) => command.id !== topHit.id)
+    : matches;
+  // a group whose only row was the top hit disappears
+  const bodyGroups = topHit
+    ? [...new Set(rest.map((command) => command.group))]
+    : groups;
 
   const move = (delta: number) => {
     if (ordered.length === 0) return;
@@ -183,20 +206,136 @@ export function CommandPalette({
     }
   };
 
+  const groupHeader = (label: string) => (
+    <span
+      aria-hidden
+      className={cn(mono, "text-muted-foreground px-3 pt-3 pb-1 text-[10px] font-medium uppercase tracking-wider")}
+    >
+      {label}
+    </span>
+  );
+
+  // One result row. In spotlight the picture sits in a leading rounded tile and the source
+  // trails as a muted type label; the default row is unchanged.
+  const row = (command: PaletteCommand, isTop = false) => {
+    const rich = Boolean(command.description || command.source || command.thumbnailUrl);
+    const className = cn(
+      "flex items-center gap-3 rounded-xl px-3 py-2 text-start transition-colors",
+      rich ? "min-h-20 py-3" : "min-h-14",
+      command.id === activeId
+        ? "bg-accent text-accent-foreground"
+        : onRun
+          ? "hover:bg-foreground/[0.03]"
+          : undefined,
+    );
+    const keys = (
+      <span className="flex shrink-0 gap-1">
+        {command.keys.map((key) => (
+          <span
+            key={key}
+            className={cn(
+              field,
+              mono,
+              "text-muted-foreground rounded-md px-1.5 py-0.5",
+            )}
+          >
+            {key}
+          </span>
+        ))}
+      </span>
+    );
+    const action = command.actionLabel && command.id === activeId ? (
+      <span className={cn(field, "text-foreground shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium")}>{command.actionLabel}</span>
+    ) : null;
+    const details = (
+      <>
+        {command.subtitle ? <span className="text-muted-foreground truncate text-xs">{command.subtitle}</span> : null}
+        {command.description ? <span className="text-muted-foreground line-clamp-2 text-xs">{command.description}</span> : null}
+        {command.meta ? <span className="text-muted-foreground truncate pt-1 text-xs">{command.meta}</span> : null}
+      </>
+    );
+    const tileImage = command.iconUrl ?? command.thumbnailUrl;
+    const content = spotlight ? (
+      <>
+        <span className={cn("bg-foreground/[0.05] text-muted-foreground flex shrink-0 items-center justify-center overflow-hidden rounded-xl [&_svg]:size-5", isTop ? "size-12" : "size-10")}>
+          {tileImage ? <SafeImage src={tileImage} alt="" className="size-full object-cover" /> : command.icon}
+        </span>
+        <span className="flex min-w-0 flex-1 flex-col">
+          <span className={cn("font-medium", isTop ? "text-base" : "text-sm", rich ? "" : "truncate")}>{highlighted(command.label, command.match)}</span>
+          {details}
+        </span>
+        {action}
+        {command.source ? <span data-slot="command-palette-type" className="text-supporting text-muted-foreground shrink-0 max-sm:hidden">{command.source}</span> : null}
+        {keys}
+      </>
+    ) : (
+      <>
+        {command.thumbnailUrl ? (
+          <SafeImage src={command.thumbnailUrl} alt="" className="size-10 shrink-0 rounded-lg object-cover" />
+        ) : command.iconUrl ? (
+          <SafeImage src={command.iconUrl} alt="" className="size-8 shrink-0 rounded-lg object-cover" />
+        ) : command.icon ? (
+          <span className="bg-foreground/[0.05] text-muted-foreground flex size-8 shrink-0 items-center justify-center rounded-lg [&_svg]:size-4">{command.icon}</span>
+        ) : (
+          <span aria-hidden className="bg-foreground/[0.05] size-8 shrink-0 rounded-lg" />
+        )}
+        <span className="flex min-w-0 flex-1 flex-col">
+          {command.source ? <span className="text-muted-foreground truncate text-xs">{command.source}</span> : null}
+          <span className={cn("text-sm font-medium", rich ? "" : "truncate")}>{highlighted(command.label, command.match)}</span>
+          {details}
+        </span>
+        {action}
+        {keys}
+      </>
+    );
+
+    return onRun ? (
+      <button
+        key={command.id}
+        id={optionId(command.id)}
+        type="button"
+        role="option"
+        tabIndex={-1}
+        aria-selected={command.id === activeId}
+        onMouseDown={(event) => event.preventDefault()}
+        onClick={() => onRun(command.id)}
+        className={className}
+      >
+        {content}
+      </button>
+    ) : (
+      <div
+        key={command.id}
+        id={optionId(command.id)}
+        role="option"
+        aria-selected={command.id === activeId}
+        className={className}
+      >
+        {content}
+      </div>
+    );
+  };
+
   return (
     <div
       data-slot="command-palette"
+      data-variant={spotlight ? "spotlight" : undefined}
       className={cn(
         "surface-dialog flex w-full flex-col overflow-hidden backdrop-blur-2xl",
-        size === "lg"
-          ? "h-[min(40rem,calc(100dvh-4rem))] max-w-none"
-          : "max-w-xl",
+        spotlight
+          ? size === "lg"
+            ? "max-h-[min(40rem,calc(100dvh-6rem))] max-w-none"
+            : "max-w-xl"
+          : size === "lg"
+            ? "h-[min(40rem,calc(100dvh-4rem))] max-w-none"
+            : "max-w-xl",
+        spotlight && "rounded-3xl",
         className,
       )}
 
       {...props}
     >
-      <div className="border-foreground/[0.07] flex items-center gap-4 border-b px-6 py-5">
+      <div className={cn("border-foreground/[0.07] flex items-center border-b", spotlight ? "gap-4 px-5 py-4" : "gap-4 px-6 py-5")}>
         <SearchIcon aria-hidden className="text-muted-foreground size-6 shrink-0" />
         <input
           value={query}
@@ -227,7 +366,7 @@ export function CommandPalette({
       </div>
 
       {tabs && tabs.length > 0 ? (
-        <div role="tablist" aria-label={i18n._({ id: "ui.Result type", message: "Result type" })} className="border-foreground/[0.07] flex gap-5 overflow-x-auto border-b px-6">
+        <div role="tablist" aria-label={i18n._({ id: "ui.Result type", message: "Result type" })} className={cn("flex overflow-x-auto px-6", spotlight ? "gap-2" : "border-foreground/[0.07] gap-5 border-b")}>
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -238,8 +377,10 @@ export function CommandPalette({
               onMouseDown={(event) => event.preventDefault()}
               onClick={() => onTabChange?.(tab.id)}
               className={cn(
-                "-mb-px shrink-0 border-b-2 py-2.5 text-sm transition-colors",
-                tab.id === activeTab ? "border-primary text-foreground font-medium" : "text-muted-foreground hover:text-foreground border-transparent",
+                "shrink-0 text-sm transition-colors",
+                spotlight
+                  ? cn("rounded-full px-3 py-1", tab.id === activeTab ? "bg-accent text-accent-foreground font-medium" : "text-muted-foreground hover:text-foreground")
+                  : cn("-mb-px border-b-2 py-2.5", tab.id === activeTab ? "border-primary text-foreground font-medium" : "text-muted-foreground hover:text-foreground border-transparent"),
               )}
             >
               {tab.label}
@@ -257,96 +398,23 @@ export function CommandPalette({
           size === "lg" ? "min-h-0 flex-1" : "max-h-72",
         )}
       >
-        {groups.map((group) => (
+        {topHit && topHitLabel ? (
+          <div role="group" aria-label={topHitLabel} className="flex flex-col gap-1 pb-2">
+            {groupHeader(topHitLabel)}
+            {row(topHit, true)}
+          </div>
+        ) : null}
+        {bodyGroups.map((group) => (
           <div
             key={group}
             role="group"
             aria-label={group}
               className="flex flex-col gap-1 pb-2"
           >
-            <span
-              aria-hidden
-              className={cn(mono, "text-muted-foreground px-3 pt-3 pb-1 text-[10px] font-medium uppercase tracking-wider")}
-            >
-              {group}
-            </span>
-            {matches
+            {groupHeader(group)}
+            {rest
               .filter((command) => command.group === group)
-              .map((command) => {
-                const rich = Boolean(command.description || command.source || command.thumbnailUrl);
-                const className = cn(
-                  "flex items-center gap-3 rounded-xl px-3 py-2 text-start transition-colors",
-                  rich ? "min-h-20 py-3" : "min-h-14",
-                  command.id === activeId
-                    ? "bg-accent text-accent-foreground"
-                    : onRun
-                      ? "hover:bg-foreground/[0.03]"
-                      : undefined,
-                );
-                const content = (
-                  <>
-                    {command.thumbnailUrl ? (
-                      <SafeImage src={command.thumbnailUrl} alt="" className="size-10 shrink-0 rounded-lg object-cover" />
-                    ) : command.iconUrl ? (
-                      <SafeImage src={command.iconUrl} alt="" className="size-8 shrink-0 rounded-lg object-cover" />
-                    ) : command.icon ? (
-                      <span className="bg-foreground/[0.05] text-muted-foreground flex size-8 shrink-0 items-center justify-center rounded-lg [&_svg]:size-4">{command.icon}</span>
-                    ) : (
-                      <span aria-hidden className="bg-foreground/[0.05] size-8 shrink-0 rounded-lg" />
-                    )}
-                    <span className="flex min-w-0 flex-1 flex-col">
-                      {command.source ? <span className="text-muted-foreground truncate text-xs">{command.source}</span> : null}
-                      <span className={cn("text-sm font-medium", rich ? "" : "truncate")}>{highlighted(command.label, command.match)}</span>
-                      {command.subtitle ? <span className="text-muted-foreground truncate text-xs">{command.subtitle}</span> : null}
-                      {command.description ? <span className="text-muted-foreground line-clamp-2 text-xs">{command.description}</span> : null}
-                      {command.meta ? <span className="text-muted-foreground truncate pt-1 text-xs">{command.meta}</span> : null}
-                    </span>
-                    {command.actionLabel && command.id === activeId ? (
-                      <span className={cn(field, "text-foreground shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium")}>{command.actionLabel}</span>
-                    ) : null}
-                    <span className="flex shrink-0 gap-1">
-                      {command.keys.map((key) => (
-                        <span
-                          key={key}
-                          className={cn(
-                            field,
-                            mono,
-                            "text-muted-foreground rounded-md px-1.5 py-0.5",
-                          )}
-                        >
-                          {key}
-                        </span>
-                      ))}
-                    </span>
-                  </>
-                );
-
-                return onRun ? (
-                  <button
-                    key={command.id}
-                    id={optionId(command.id)}
-                    type="button"
-                    role="option"
-                    tabIndex={-1}
-                    aria-selected={command.id === activeId}
-                    onMouseDown={(event) => event.preventDefault()}
-                    onClick={() => onRun(command.id)}
-                    className={className}
-                  >
-                    {content}
-                  </button>
-                ) : (
-                  <div
-                    key={command.id}
-                    id={optionId(command.id)}
-                    role="option"
-                    aria-selected={command.id === activeId}
-                    className={className}
-                  >
-                    {content}
-                  </div>
-                );
-              })}
+              .map((command) => row(command))}
           </div>
         ))}
       </div>
@@ -357,7 +425,23 @@ export function CommandPalette({
           </span>
         </div>
       )}
-      {footer ? <div className="border-foreground/[0.07] text-muted-foreground border-t px-6 py-3 text-center text-xs">{footer}</div> : null}
+      {spotlight ? (
+        <div className="border-foreground/[0.07] text-muted-foreground flex items-center gap-3 border-t px-6 py-3 text-xs">
+          {footer ? <span className="min-w-0 flex-1">{footer}</span> : null}
+          <div data-slot="command-palette-hints" className="max-sm:hidden ml-auto flex items-center gap-3">
+            <span className="flex items-center gap-1">
+              <span className={cn(field, mono, "rounded px-1.5 py-0.5")}>{"\u2191\u2193"}</span>
+              {i18n._({ id: "ui.to move", message: "to move" })}
+            </span>
+            <span className="flex items-center gap-1">
+              <span className={cn(field, mono, "rounded px-1.5 py-0.5")}>{"\u21B5"}</span>
+              {i18n._({ id: "ui.to open", message: "to open" })}
+            </span>
+          </div>
+        </div>
+      ) : footer ? (
+        <div className="border-foreground/[0.07] text-muted-foreground border-t px-6 py-3 text-center text-xs">{footer}</div>
+      ) : null}
     </div>
   );
 }
