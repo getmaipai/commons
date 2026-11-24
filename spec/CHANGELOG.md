@@ -1,6 +1,6 @@
 ## [spec-v0.1.482] - 2026-11-24
 
-- `access.tier.boost` and `access.tier.max` list the work `pictures` instead of `image` (follows 0.1.481's category rename), with its copy keys. Home migrates saved lists and grants.
+- `access.tier.boost` and `access.tier.max` list the work `pictures` instead of `image` (follows 0.1.481's category rename), with its copy keys. The per-role `engines.<role>.choice` keys keep their role names (`engines.image.choice`, `engines.tts.choice`): 0.1.481 renamed them by mistake, only the four tier slots follow the feature ids (`engines.pictures.tier.*`, `engines.voice.tier.*`). Home migrates saved lists, grants and tier slots.
 
 ## [spec-v0.1.481] - 2026-11-24
 

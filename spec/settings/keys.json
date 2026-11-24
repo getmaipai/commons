@@ -806,7 +806,7 @@
     ]
   },
   {
-    "key": "engines.pictures.choice",
+    "key": "engines.image.choice",
     "scope": "household",
     "selector": "select",
     "range": {
@@ -906,7 +906,7 @@
     ]
   },
   {
-    "key": "engines.voice.choice",
+    "key": "engines.tts.choice",
     "scope": "household",
     "selector": "select",
     "range": {
