@@ -1,3 +1,7 @@
+## [spec-v0.1.480] - 2026-11-23
+
+- `stack-choices-view` (and its schema and fixtures): each category carries `icon`, `description`, `steps` (installed, loaded, ready) and `requires` (the engines and drafts its models need), so a page needs nothing per feature.
+
 ## [spec-v0.1.479] - 2026-11-23
 
 - `Systems` (`schemas/systems.schema.json`, `maipai.systems/1`): the inside of a robot. Six layers, systems, five component types (`driver`, `service`, `behavior`, `asset`, `adapter`), one owning system per component, a status per body (`stackchan`, `reachy`, `none`), build switch and load mode, memory budget, calls in (`uses`) and out (`provides`), events, tools, settings keys, tests, docs and a safety class. Part ids and capability ids are referenced from `vocab/robot-api.json` and `vocab/capabilities.json`, never copied. No earlier spec shape overlapped it, so nothing is replaced here; the body profile it supersedes lives in the retiring bot repo.
