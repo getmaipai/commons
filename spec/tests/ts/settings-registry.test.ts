@@ -54,14 +54,14 @@ describe("spec/settings/keys.json", () => {
     const copy = {
       "engines.vision.choice": "Off: Home will not use photo understanding.",
       "engines.stt.choice": "Off: Home will not listen to speech.",
-      "engines.tts.choice": "Off: Home will not speak replies aloud.",
+      "engines.voice.choice": "Off: Home will not speak replies aloud.",
     };
     for (const [key, description] of Object.entries(copy)) {
       const entry = entries.find((row) => row.key === key);
       expect(entry, key).toBeDefined();
       expect(SettingsKey.parse(entry), key).toMatchObject({
         selector: "select",
-        range: { options: ["off"], options_from: `models.${key.split(".")[1]}` },
+        range: { options: ["off"], options_from: `models.${key === "engines.voice.choice" ? "tts" : key.split(".")[1]}` },
         copy: { options: { off: description } },
       });
     }

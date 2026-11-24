@@ -150,5 +150,5 @@ test("the coding data class follows the existing declaration fixture mechanism",
 
 test("grant-actions stays byte-identical to the phase 1 baseline", () => {
   expect(createHash("sha256").update(bytes("vocab/grant-actions.json")).digest("hex"))
-    .toBe("fa75bae45d43c91dfcacf5aa97fe839080aba6a11b9120bcf148eeaadc0a3baa");
+    .toBe("817df1cb063be778bc39a1c0aa28f35357f8dd54e4651cf123ec61a7afb36820");
 });

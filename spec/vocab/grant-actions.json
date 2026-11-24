@@ -20,7 +20,7 @@
     {
       "id": "tier.max:<category>",
       "parameterized": true,
-      "description": "Pick the Max tier for one category (chat, image, video, music, voice; the ids are in vocab/resource-tiers.json). A teen's grant reaches only the picture lane and an admin must approve it; a child never holds one. Age and surface gates run first and a tier never loosens them.",
+      "description": "Pick the Max tier for one category (chat, pictures, video, music, voice; the ids are in vocab/resource-tiers.json). A teen's grant reaches only the picture lane and an admin must approve it; a child never holds one. Age and surface gates run first and a tier never loosens them.",
       "policy": {
         "risk": "admin",
         "outbound": false,
@@ -31,7 +31,7 @@
           "adult": "none"
         },
         "by_parameter": {
-          "image": {
+          "pictures": {
             "child": "never",
             "teen": "parent",
             "adult": "none"

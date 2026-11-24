@@ -806,7 +806,7 @@
     ]
   },
   {
-    "key": "engines.image.choice",
+    "key": "engines.pictures.choice",
     "scope": "household",
     "selector": "select",
     "range": {
@@ -906,7 +906,7 @@
     ]
   },
   {
-    "key": "engines.tts.choice",
+    "key": "engines.voice.choice",
     "scope": "household",
     "selector": "select",
     "range": {
@@ -6557,12 +6557,12 @@
     ]
   },
   {
-    "key": "engines.image.tier.reduced",
+    "key": "engines.pictures.tier.reduced",
     "scope": "household",
     "selector": "text",
     "range": {
       "value_schema": "tier-slot",
-      "category": "image",
+      "category": "pictures",
       "tier": "reduced"
     },
     "default": {
@@ -6582,12 +6582,12 @@
     ]
   },
   {
-    "key": "engines.image.tier.standard",
+    "key": "engines.pictures.tier.standard",
     "scope": "household",
     "selector": "text",
     "range": {
       "value_schema": "tier-slot",
-      "category": "image",
+      "category": "pictures",
       "tier": "standard"
     },
     "default": {
@@ -6607,12 +6607,12 @@
     ]
   },
   {
-    "key": "engines.image.tier.boost",
+    "key": "engines.pictures.tier.boost",
     "scope": "household",
     "selector": "text",
     "range": {
       "value_schema": "tier-slot",
-      "category": "image",
+      "category": "pictures",
       "tier": "boost"
     },
     "default": {
@@ -6632,12 +6632,12 @@
     ]
   },
   {
-    "key": "engines.image.tier.max",
+    "key": "engines.pictures.tier.max",
     "scope": "household",
     "selector": "text",
     "range": {
       "value_schema": "tier-slot",
-      "category": "image",
+      "category": "pictures",
       "tier": "max"
     },
     "default": {
@@ -6957,7 +6957,7 @@
     ]
   },
   {
-    "key": "engines.tts.tier.reduced",
+    "key": "engines.voice.tier.reduced",
     "scope": "household",
     "selector": "text",
     "range": {
@@ -6982,7 +6982,7 @@
     ]
   },
   {
-    "key": "engines.tts.tier.standard",
+    "key": "engines.voice.tier.standard",
     "scope": "household",
     "selector": "text",
     "range": {
@@ -7007,7 +7007,7 @@
     ]
   },
   {
-    "key": "engines.tts.tier.boost",
+    "key": "engines.voice.tier.boost",
     "scope": "household",
     "selector": "text",
     "range": {
@@ -7032,7 +7032,7 @@
     ]
   },
   {
-    "key": "engines.tts.tier.max",
+    "key": "engines.voice.tier.max",
     "scope": "household",
     "selector": "text",
     "range": {

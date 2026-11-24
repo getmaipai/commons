@@ -41,7 +41,7 @@ describe("vocab/resource-tiers.json", () => {
     expect(vocab.switch_costs.map((s: any) => s.id)).toEqual(["option", "family", "cross"]);
   });
   test("each category's role has a slot key for every tier", () => {
-    for (const c of vocab.categories) for (const t of vocab.tiers) expect(keyOf(`engines.${c.role}.tier.${t.id}`)).toBeDefined();
+    for (const c of vocab.categories) for (const t of vocab.tiers) expect(keyOf(`engines.${c.id}.tier.${t.id}`)).toBeDefined();
   });
 });
 
@@ -60,8 +60,8 @@ describe("tier slot", () => {
     expect(checkTierSlotOptions("chat", { thinking: true, reasoning_budget: 2000 })).toEqual([]);
     expect(checkTierSlotOptions("chat", { steps: 8 })).toHaveLength(1);
     expect(checkTierSlotOptions("chat", { thinking: 1 })).toHaveLength(1);
-    expect(checkTierSlotOptions("image", { steps: 0 })).toHaveLength(1);
-    expect(checkTierSlotOptions("image", { steps: 12.5 })).toHaveLength(1);
+    expect(checkTierSlotOptions("pictures", { steps: 0 })).toHaveLength(1);
+    expect(checkTierSlotOptions("pictures", { steps: 12.5 })).toHaveLength(1);
     expect(checkTierSlotOptions("voice", { steps: 8 })).toHaveLength(1);
     expect(checkTierSlotOptions("nothing", {})).toHaveLength(1);
   });
@@ -70,12 +70,12 @@ describe("tier slot", () => {
     expect(optionsForBand("chat", slot, "adult")).toEqual(slot);
     expect(optionsForBand("chat", slot, "teen")).toEqual({ thinking: false, reasoning_budget: 0 });
     expect(optionsForBand("chat", slot, "child")).toEqual({ thinking: false, reasoning_budget: 0 });
-    expect(optionsForBand("image", { steps: 30 }, "child")).toEqual({ steps: 30 });
+    expect(optionsForBand("pictures", { steps: 30 }, "child")).toEqual({ steps: 30 });
   });
   test("every slot key defaults to a valid slot, and Reduced starts off", () => {
     for (const c of vocab.categories) {
       for (const t of vocab.tiers) {
-        const k = keyOf(`engines.${c.role}.tier.${t.id}`);
+        const k = keyOf(`engines.${c.id}.tier.${t.id}`);
         expect(slotSchema(k.default)).toBe(true);
         expect(k.range.value_schema).toBe("tier-slot");
         expect(k.range.category).toBe(c.id);
@@ -94,12 +94,12 @@ describe("tier.max grants", () => {
     const cat = find("tier.max:<category>").policy;
     expect(cat.approver.child).toBe("never");
     expect(cat.approver.teen).toBe("never");
-    expect(cat.by_parameter).toEqual({ image: { child: "never", teen: "parent", adult: "none" } });
-    expect(vocab.minors_policy.teen_max_categories).toEqual(["image"]);
+    expect(cat.by_parameter).toEqual({ pictures: { child: "never", teen: "parent", adult: "none" } });
+    expect(vocab.minors_policy.teen_max_categories).toEqual(["pictures"]);
     expect(vocab.minors_policy.child_max).toBe("never");
   });
   test("every category has a grant parameter", () => {
-    expect(vocab.categories.map((c: any) => c.grant_parameter)).toEqual(["chat", "image", "video", "music", "coding", "voice"]);
+    expect(vocab.categories.map((c: any) => c.grant_parameter)).toEqual(["chat", "pictures", "video", "music", "coding", "voice"]);
   });
   test("coding is a tier category and a child or teen runs it at Standard by role default", () => {
     expect(vocab.categories.find((c: any) => c.id === "coding")).toMatchObject({ role: "coding", grant_parameter: "coding", options: [] });

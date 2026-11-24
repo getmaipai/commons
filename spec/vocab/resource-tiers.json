@@ -89,10 +89,10 @@
       ]
     },
     {
-      "id": "image",
+      "id": "pictures",
       "role": "image",
       "label": "Pictures",
-      "grant_parameter": "image",
+      "grant_parameter": "pictures",
       "options": [
         {
           "id": "steps",
@@ -207,7 +207,7 @@
   "minors_policy": {
     "$comment": "RULES.md rules 2 and 8 and tiers-families F6. An option with `minors: false` (see each category) is forced to its default for every child and teen whatever a slot says. `tier.max` is never held by a child; a teen's Max reaches only the categories in `teen_max_categories`.",
     "teen_max_categories": [
-      "image"
+      "pictures"
     ],
     "child_max": "never",
     "role_defaults": {
