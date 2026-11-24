@@ -1,3 +1,7 @@
+## [spec-v0.1.482] - 2026-11-24
+
+- `access.tier.boost` and `access.tier.max` list the work `pictures` instead of `image` (follows 0.1.481's category rename), with its copy keys. Home migrates saved lists and grants.
+
 ## [spec-v0.1.481] - 2026-11-24
 
 - BREAKING (tier keys follow the Stack's feature ids): the resource-tier category `image` is now `pictures` (grant `tier.max:pictures`, `tier.boost:pictures`, `grant_parameter`, `teen_max_categories`), and the setting keys `engines.image.*` are now `engines.pictures.*` and `engines.tts.*` are now `engines.voice.*` (choice and the four tier slots each). The category id is the Stack feature id, so Home derives `engines.<category>.tier.<tier>` with no per-category map. The roles (`image`, `tts`) are unchanged. Home migrates saved values and grants once.

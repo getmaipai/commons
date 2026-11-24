@@ -7354,7 +7354,7 @@
     "range": {
       "options": [
         "chat",
-        "image",
+        "pictures",
         "video",
         "music",
         "voice"
@@ -7369,7 +7369,7 @@
     "merge": "override",
     "default": [
       "chat",
-      "image",
+      "pictures",
       "video",
       "music",
       "voice"
@@ -7380,14 +7380,14 @@
       "does": "Uses more of the home's power for a faster or better result.",
       "options": {
         "chat": "Chat replies with extra power.",
-        "image": "Pictures with extra power.",
+        "pictures": "Pictures with extra power.",
         "video": "Videos with extra power.",
         "music": "Music with extra power.",
         "voice": "Voices with extra power."
       },
       "option_labels": {
         "chat": "Chat",
-        "image": "Pictures",
+        "pictures": "Pictures",
         "video": "Videos",
         "music": "Music",
         "voice": "Voice"
@@ -7397,14 +7397,14 @@
       "child": [],
       "teen": [
         "chat",
-        "image",
+        "pictures",
         "video",
         "music",
         "voice"
       ],
       "adult": [
         "chat",
-        "image",
+        "pictures",
         "video",
         "music",
         "voice"
@@ -7424,7 +7424,7 @@
     "range": {
       "options": [
         "chat",
-        "image",
+        "pictures",
         "video",
         "music",
         "voice"
@@ -7439,7 +7439,7 @@
     "merge": "override",
     "default": [
       "chat",
-      "image",
+      "pictures",
       "video",
       "music",
       "voice"
@@ -7450,14 +7450,14 @@
       "does": "Uses the most of the home's power for one big job.",
       "options": {
         "chat": "Chat replies with full power.",
-        "image": "Pictures with full power.",
+        "pictures": "Pictures with full power.",
         "video": "Videos with full power.",
         "music": "Music with full power.",
         "voice": "Voices with full power."
       },
       "option_labels": {
         "chat": "Chat",
-        "image": "Pictures",
+        "pictures": "Pictures",
         "video": "Videos",
         "music": "Music",
         "voice": "Voice"
