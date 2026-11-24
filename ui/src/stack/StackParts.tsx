@@ -7,20 +7,13 @@ import { Progress } from "@/kit/ui/progress";
 import { getIcon } from "@/kit/icons";
 import { i18n } from "@/kit/i18n";
 import { cn } from "@/kit/utils";
-import type { StackCandidate, StackCategoryId } from "./StackClient";
+import type { StackCandidate } from "./StackClient";
 import type { Tone } from "./stackLogic";
 import { gb } from "./stackWords";
 
 const CheckIcon = getIcon("check");
 const CopyIcon = getIcon("copy");
 const AlertIcon = getIcon("circle-alert");
-
-const CATEGORY_ICON: Record<StackCategoryId, string> = {
-  chat: "sparkles", coding: "code", pictures: "image", video: "film", music: "music", voice: "mic-vocal", stt: "mic", embeddings: "layers", vision: "eye", wakeword: "ear", stems: "scissors",
-};
-export function categoryIconName(id: string): string {
-  return CATEGORY_ICON[id as StackCategoryId] ?? "box";
-}
 
 const TONE_VAR: Record<Tone, string> = { primary: "var(--primary)", ok: "var(--status-ok)", warn: "var(--status-warning)", bad: "var(--status-error)", muted: "var(--muted-foreground)" };
 

@@ -12,10 +12,10 @@ import type { StackCategoryId, StackChoiceCategory, StackLevel, StackProfileAssi
 import { ChoiceList } from "./StackChoiceList";
 import { LevelList } from "./StackLevelList";
 import { ModelList, OrderList } from "./StackModelList";
-import { IconChip, NoticeLine, Pill, categoryIconName } from "./StackParts";
+import { IconChip, NoticeLine, Pill } from "./StackParts";
 import type { Notice } from "./StackParts";
 import { candidateById, levelsOf, lockFor, toneOf, cardState } from "./stackLogic";
-import { categoryBlurb, cardStateWord, gb, levelName, profileName } from "./stackWords";
+import { cardStateWord, gb, levelName, profileName } from "./stackWords";
 import type { Outcome, StackChoicesState } from "./useStackChoices";
 
 const ChevronIcon = getIcon("chevron-down");
@@ -105,10 +105,10 @@ export function StackCategorySheet({ category, state, labelOf, locked, highlight
             <>
               <SheetHeader className="gap-3">
                 <div className="flex items-center gap-3 pe-10">
-                  <IconChip icon={categoryIconName(category.id)} tone={toneOf(head.state)} />
+                  <IconChip icon={category.icon} tone={toneOf(head.state)} />
                   <div className="min-w-0 flex-1">
                     <SheetTitle className="break-words">{category.label}</SheetTitle>
-                    <SheetDescription>{categoryBlurb(category.id)}</SheetDescription>
+                    <SheetDescription>{category.description}</SheetDescription>
                   </div>
                   {switchable && (
                     lockAll

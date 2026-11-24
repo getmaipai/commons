@@ -40,14 +40,14 @@ function level(spec: LevelSpec, candidates: StackCandidate[]): StackLevelRow {
   };
 }
 
-interface CategorySpec { id: StackChoiceCategory["id"]; feature: string; role: string | null; enabled?: boolean | null; priority?: number | null; plan?: StackChoiceCategory["role_plan"]; available?: boolean; why?: string | null; tiered: boolean; models: ModelSpec[]; levels: LevelSpec[]; profileAssignments?: Record<string, Array<[StackLevel, string]>> }
+interface CategorySpec { id: StackChoiceCategory["id"]; feature: string; icon: string; description: string; role: string | null; enabled?: boolean | null; priority?: number | null; plan?: StackChoiceCategory["role_plan"]; available?: boolean; why?: string | null; tiered: boolean; models: ModelSpec[]; levels: LevelSpec[]; profileAssignments?: Record<string, Array<[StackLevel, string]>> }
 
 const PROFILES = [["p16", 16], ["p32", 32], ["p64", 64], ["p128", 128]] as const;
 
 function category(spec: CategorySpec): StackChoiceCategory {
   const candidates = spec.models.map((m, i) => candidate(spec.role ?? spec.id, m, i + 1));
   return {
-    id: spec.id, label: spec.feature, role: spec.role, role_enabled: spec.enabled === undefined ? (spec.role ? true : null) : spec.enabled, role_priority: spec.role ? spec.priority ?? 100 : null, role_plan: spec.plan ?? null,
+    id: spec.id, label: spec.feature, icon: spec.icon, description: spec.description, role: spec.role, role_enabled: spec.enabled === undefined ? (spec.role ? true : null) : spec.enabled, role_priority: spec.role ? spec.priority ?? 100 : null, role_plan: spec.plan ?? null, steps: [], requires: [],
     available: spec.available ?? true, unavailable_reason: spec.why ?? null, tiered: spec.tiered, order: candidates.map((c) => c.id), disabled: [], candidates,
     tiers: spec.levels.map((l) => level(l, candidates)),
     profiles: PROFILES.map(([profile, memory]) => ({ profile, memory_gb: memory, current: profile === "p64", assignments: (spec.profileAssignments?.[profile] ?? []).map(([tier, model]) => ({ tier, model, customization: null })) })),
@@ -57,7 +57,7 @@ function category(spec: CategorySpec): StackChoiceCategory {
 export function seedChoicesView(): StackChoicesView {
   const categories: StackChoiceCategory[] = [
     category({
-      id: "chat", feature: "Chat", role: "chat", priority: 10, tiered: true, plan: { state: "resident", fit: "fits", reason: "Stays loaded so replies start at once." },
+      id: "chat", feature: "Chat", icon: "sparkles", description: "Talks, writes and answers questions.", role: "chat", priority: 10, tiered: true, plan: { state: "resident", fit: "fits", reason: "Stays loaded so replies start at once." },
       models: [
         { id: "qwen3-4b-q4", name: "Qwen3 4B", summary: "Very quick, short answers. Good when the computer is busy.", family: "Qwen3", version: "3", quant: ["4-bit, compact", "Q4_K_M"], license: "Apache-2.0", repo: "Qwen/Qwen3-4B-GGUF", engine: "llama.cpp", sizeGb: 2.4, state: "notInstalled", minProfile: ["16 GB", "p16"], peakGb: 3.4 },
         { id: "qwen3-8b-q4", name: "Qwen3 8B", summary: "Fast everyday chat with clear answers. Weaker on very long documents.", family: "Qwen3", version: "3", quant: ["4-bit, compact", "Q4_K_M"], license: "Apache-2.0", repo: "Qwen/Qwen3-8B-GGUF", engine: "llama.cpp", sizeGb: 4.7, minProfile: ["16 GB", "p16"], peakGb: 6.1 },
@@ -75,7 +75,7 @@ export function seedChoicesView(): StackChoicesView {
       profileAssignments: { p64: [["standard", "qwen3-8b-q4"]], p128: [["standard", "qwen3-30b-a3b-q4"], ["max", "qwen38-flash-next-177b"]] },
     }),
     category({
-      id: "coding", feature: "Coding", role: "coding", priority: 30, tiered: true,
+      id: "coding", feature: "Coding", icon: "code", description: "Helps write and fix code.", role: "coding", priority: 30, tiered: true,
       models: [
         { id: "qwen3-coder-30b-q4", name: "Qwen3 Coder 30B", summary: "Writes, explains and fixes code in most languages.", family: "Qwen3", version: "3", quant: ["4-bit, compact", "Q4_K_M"], license: "Apache-2.0", repo: "Qwen/Qwen3-Coder-30B-A3B-Instruct-GGUF", engine: "llama.cpp", sizeGb: 17.3, minProfile: ["32 GB", "p32"] },
         { id: "qwen25-coder-7b-q4", name: "Qwen2.5 Coder 7B", summary: "A lighter coding helper for small tasks.", family: "Qwen2.5", version: "2.5", quant: ["4-bit, compact", "Q4_K_M"], license: "Apache-2.0", repo: "Qwen/Qwen2.5-Coder-7B-Instruct-GGUF", engine: "llama.cpp", sizeGb: 4.4, minProfile: ["16 GB", "p16"] },
@@ -86,7 +86,7 @@ export function seedChoicesView(): StackChoicesView {
       ],
     }),
     category({
-      id: "pictures", feature: "Pictures", role: "image", priority: 20, tiered: true, plan: { state: "on_demand", fit: "queues", reason: "Loads when asked and waits its turn when memory is tight." },
+      id: "pictures", feature: "Pictures", icon: "image", description: "Makes and edits pictures.", role: "image", priority: 20, tiered: true, plan: { state: "on_demand", fit: "queues", reason: "Loads when asked and waits its turn when memory is tight." },
       models: [
         { id: "flux1-schnell-q8", name: "FLUX.1 schnell", summary: "Makes a picture in a few seconds. Good for quick ideas.", family: "FLUX.1", version: "1", quant: ["8-bit, high quality", "Q8_0"], license: "Apache-2.0", repo: "black-forest-labs/FLUX.1-schnell", engine: "stable-diffusion.cpp", sizeGb: 12.7, minProfile: ["32 GB", "p32"], peakGb: 15 },
         { id: "flux1-dev-q8", name: "FLUX.1 dev", summary: "More detail and better hands and text, but slower.", family: "FLUX.1", version: "1", quant: ["8-bit, high quality", "Q8_0"], license: "FLUX.1 dev Non-Commercial", repo: "black-forest-labs/FLUX.1-dev", engine: "stable-diffusion.cpp", sizeGb: 12.7, state: "notInstalled", minProfile: ["32 GB", "p32"], licenceNeeded: true },
@@ -97,7 +97,7 @@ export function seedChoicesView(): StackChoicesView {
       ],
     }),
     category({
-      id: "video", feature: "Video", role: "video", priority: 50, enabled: false, tiered: false,
+      id: "video", feature: "Video", icon: "film", description: "Makes short videos.", role: "video", priority: 50, enabled: false, tiered: false,
       models: [
         { id: "wan22-ti2v-5b-q8", name: "Wan 2.2 5B", summary: "Turns a picture or a sentence into a short clip.", family: "Wan", version: "2.2", quant: ["8-bit, high quality", "Q8_0"], license: "Apache-2.0", repo: "Wan-AI/Wan2.2-TI2V-5B", engine: "stable-diffusion.cpp", sizeGb: 9.6, minProfile: ["32 GB", "p32"] },
         { id: "ltx-video-098-q8", name: "LTX-Video 0.9.8", summary: "Faster clips with simpler motion.", family: "LTX-Video", version: "0.9.8", quant: ["8-bit, high quality", "Q8_0"], license: "LTX Video Open Weights", repo: "Lightricks/LTX-Video", engine: "stable-diffusion.cpp", sizeGb: 8.2, state: "notInstalled", minProfile: ["32 GB", "p32"] },
@@ -105,12 +105,12 @@ export function seedChoicesView(): StackChoicesView {
       levels: [{ tier: "standard", chosen: "wan22-ti2v-5b-q8", by: "recommended", options: ["wan22-ti2v-5b-q8", "ltx-video-098-q8"], recommended: ["wan22-ti2v-5b-q8", "The only video model tested to run alongside chat on this computer."] }],
     }),
     category({
-      id: "music", feature: "Music", role: "music", priority: 60, tiered: false,
+      id: "music", feature: "Music", icon: "music", description: "Makes songs and music.", role: "music", priority: 60, tiered: false,
       models: [{ id: "ace-step-15", name: "ACE-Step 1.5", summary: "Makes a full song with singing from a description.", family: "ACE-Step", version: "1.5", quant: ["16-bit, full quality", "bf16"], license: "Apache-2.0", repo: "ACE-Step/ACE-Step-v1.5", engine: "torch", sizeGb: 7.2, minProfile: ["32 GB", "p32"] }],
       levels: [{ tier: "standard", chosen: "ace-step-15", by: "recommended", options: ["ace-step-15"], recommended: ["ace-step-15", "The only music model for this feature."] }],
     }),
     category({
-      id: "voice", feature: "Voice", role: "tts", priority: 15, tiered: true, plan: { state: "resident", fit: "fits", reason: "Stays loaded so spoken replies start at once." },
+      id: "voice", feature: "Voice", icon: "mic-vocal", description: "Speaks out loud, in the voices you choose.", role: "tts", priority: 15, tiered: true, plan: { state: "resident", fit: "fits", reason: "Stays loaded so spoken replies start at once." },
       models: [
         { id: "kokoro-82m", name: "Kokoro 82M", summary: "A small, quick voice with several clear speakers.", family: "Kokoro", version: "1", quant: ["16-bit, full quality", "fp16"], license: "Apache-2.0", repo: "hexgrad/Kokoro-82M", engine: "mlx-audio", sizeGb: 0.3, minProfile: ["16 GB", "p16"] },
         { id: "chatterbox-turbo", name: "Chatterbox Turbo", summary: "Natural speech, and it can copy a voice from a short clip.", family: "Chatterbox", version: "1", quant: ["8-bit, high quality", "q8"], license: "MIT", repo: "ResembleAI/chatterbox-turbo", engine: "mlx-audio", sizeGb: 1.9, minProfile: ["16 GB", "p16"] },
@@ -122,7 +122,7 @@ export function seedChoicesView(): StackChoicesView {
       ],
     }),
     category({
-      id: "stt", feature: "Speech to text", role: "stt", priority: 40, tiered: false,
+      id: "stt", feature: "Speech to text", icon: "mic", description: "Turns what you say into text.", role: "stt", priority: 40, tiered: false,
       models: [
         { id: "whisper-large-v3-turbo", name: "Whisper Large v3 Turbo", summary: "Turns speech into text in most languages. Quick and accurate.", family: "Whisper", version: "3", quant: ["8-bit, high quality", "q8_0"], license: "MIT", repo: "openai/whisper-large-v3-turbo", engine: "whisper.cpp", sizeGb: 1.5, minProfile: ["16 GB", "p16"] },
         { id: "whisper-small-en", name: "Whisper Small (English)", summary: "Smaller and quicker, English only.", family: "Whisper", version: "2", quant: ["8-bit, high quality", "q8_0"], license: "MIT", repo: "openai/whisper-small.en", engine: "whisper.cpp", sizeGb: 0.3, minProfile: ["16 GB", "p16"] },
@@ -130,22 +130,22 @@ export function seedChoicesView(): StackChoicesView {
       levels: [{ tier: "standard", chosen: "whisper-large-v3-turbo", by: "recommended", options: ["whisper-large-v3-turbo", "whisper-small-en"], recommended: ["whisper-large-v3-turbo", "The most accurate model that fits."] }],
     }),
     category({
-      id: "embeddings", feature: "Search by meaning", role: "embed", priority: 70, tiered: false,
+      id: "embeddings", feature: "Search by meaning", icon: "layers", description: "Helps search by meaning, not just by words.", role: "embed", priority: 70, tiered: false,
       models: [{ id: "nomic-embed-text-v15", name: "Nomic Embed Text v1.5", summary: "Lets the Stack find notes and documents by meaning.", family: "Nomic Embed", version: "1.5", quant: ["16-bit, full quality", "f16"], license: "Apache-2.0", repo: "nomic-ai/nomic-embed-text-v1.5-GGUF", engine: "llama.cpp", sizeGb: 0.26, minProfile: ["16 GB", "p16"] }],
       levels: [{ tier: "standard", chosen: "nomic-embed-text-v15", by: "recommended", options: ["nomic-embed-text-v15"], recommended: ["nomic-embed-text-v15", "The only model for this feature."] }],
     }),
     category({
-      id: "vision", feature: "Looking at pictures", role: "vision", priority: 45, tiered: false,
+      id: "vision", feature: "Looking at pictures", icon: "eye", description: "Looks at pictures and describes them.", role: "vision", priority: 45, tiered: false,
       models: [{ id: "qwen25-vl-7b-q4", name: "Qwen2.5-VL 7B", summary: "Describes pictures and reads text in them.", family: "Qwen2.5-VL", version: "2.5", quant: ["4-bit, compact", "Q4_K_M"], license: "Apache-2.0", repo: "Qwen/Qwen2.5-VL-7B-Instruct-GGUF", engine: "llama.cpp", sizeGb: 5.4, minProfile: ["16 GB", "p16"] }],
       levels: [{ tier: "standard", chosen: "qwen25-vl-7b-q4", by: "recommended", options: ["qwen25-vl-7b-q4"], recommended: ["qwen25-vl-7b-q4", "The only model for this feature."] }],
     }),
     category({
-      id: "wakeword", feature: "Wake word", role: "wakeword", priority: 5, tiered: false,
+      id: "wakeword", feature: "Wake word", icon: "ear", description: "Listens for the wake word.", role: "wakeword", priority: 5, tiered: false,
       models: [{ id: "openwakeword", name: "openWakeWord", summary: "Listens for your wake word, all day, using almost no memory.", family: "openWakeWord", version: "0.6", license: "Apache-2.0", repo: "dscripka/openWakeWord", engine: "onnx", sizeGb: 0.05, minProfile: ["16 GB", "p16"] }],
       levels: [{ tier: "standard", chosen: "openwakeword", by: "recommended", options: ["openwakeword"], recommended: ["openwakeword", "The only model for this feature."] }],
     }),
     category({
-      id: "stems", feature: "Song splitter", role: null, enabled: null, tiered: false,
+      id: "stems", feature: "Song splitter", icon: "scissors", description: "Splits a song into voice, drums and the rest.", role: null, enabled: null, tiered: false,
       models: [{ id: "demucs-htdemucs", name: "Demucs", summary: "Splits a song into voice, drums, bass and the rest.", family: "Demucs", version: "4", quant: ["16-bit, full quality", "fp16"], license: "MIT", repo: "facebookresearch/demucs", engine: "torch", sizeGb: 0.3, state: "notInstalled", minProfile: ["16 GB", "p16"] }],
       levels: [{ tier: "standard", chosen: "demucs-htdemucs", by: "recommended", options: ["demucs-htdemucs"], recommended: ["demucs-htdemucs", "The only model for this feature."] }],
     }),

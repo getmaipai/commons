@@ -20,7 +20,7 @@ import type { StackChoiceCategory, StackChoicesView, StackClient } from "./Stack
 import { StackAddModelDialog } from "./StackAddModel";
 import { StackCategorySheet } from "./StackCategorySheet";
 import { StackFreeSpaceDialog } from "./StackFreeSpace";
-import { IconChip, NoticeLine, Pill, categoryIconName } from "./StackParts";
+import { IconChip, NoticeLine, Pill } from "./StackParts";
 import type { Notice } from "./StackParts";
 import { StackRecommendedSheet } from "./StackRecommended";
 import { byPriority, cardState, headlineModel, labelIndex, lockFor, toneOf } from "./stackLogic";
@@ -72,7 +72,7 @@ function FeatureCard({ category, state, lock, onOpen, onNotice }: { category: St
       <Card className="h-full gap-0 py-0" data-testid={`feature-${category.id}`}>
         <div className="flex items-start gap-3 p-4">
           <button type="button" onClick={onOpen} className="flex min-w-0 flex-1 items-start gap-3 rounded-xl text-start outline-none focus-visible:ring-2 focus-visible:ring-ring">
-            <IconChip icon={categoryIconName(category.id)} tone={toneOf(status.state)} />
+            <IconChip icon={category.icon} tone={toneOf(status.state)} />
             <span className="flex min-w-0 flex-1 flex-col gap-1">
               <span className="font-semibold break-words">{category.label}</span>
               <span className="text-sm break-words">{head ? head.candidate.label : <span className="text-muted-foreground">{cardStateWord(status.state, status.percent)}</span>}</span>
@@ -108,7 +108,7 @@ function SearchResults({ hits, query, onOpen }: { hits: SearchHit[]; query: stri
           <li key={`${category.id}:${candidate.id}`}>
             <Card className="gap-0 py-0">
               <button type="button" onClick={() => onOpen({ category, candidate })} className="flex w-full items-start gap-3 rounded-2xl p-3 text-start outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                <IconChip icon={categoryIconName(category.id)} size="sm" />
+                <IconChip icon={category.icon} size="sm" />
                 <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                   <span className="font-medium break-words">{candidate.label}</span>
                   <span className="text-sm text-muted-foreground">{candidate.summary}</span>

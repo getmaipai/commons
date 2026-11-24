@@ -2,7 +2,7 @@
 // translated or plain and are shown as sent). Functions, never module-level constants: they call `i18n._` while rendering so the language follows
 // the person (I18N-K1). Plain words for a household: no ids, no jargon.
 import { i18n, kitLocaleTag } from "@/kit/i18n";
-import type { StackCandidate, StackCategoryId, StackLevel } from "./StackClient";
+import type { StackCandidate, StackLevel } from "./StackClient";
 import type { CardState } from "./stackLogic";
 
 export function levelName(level: StackLevel): string {
@@ -33,22 +33,6 @@ export function gb(bytes: number): string {
 
 export function percentWord(percent: number | null): string {
   return percent === null ? "" : `${Math.round(Math.min(100, Math.max(0, percent)))}%`;
-}
-
-export function categoryBlurb(id: StackCategoryId): string {
-  switch (id) {
-    case "chat": return i18n._({ id: "ui.Talks, writes and answers questions.", message: "Talks, writes and answers questions." });
-    case "coding": return i18n._({ id: "ui.Helps write and fix code.", message: "Helps write and fix code." });
-    case "pictures": return i18n._({ id: "ui.Makes and edits pictures.", message: "Makes and edits pictures." });
-    case "video": return i18n._({ id: "ui.Makes short videos.", message: "Makes short videos." });
-    case "music": return i18n._({ id: "ui.Makes songs and music.", message: "Makes songs and music." });
-    case "voice": return i18n._({ id: "ui.Speaks out loud, in the voices you choose.", message: "Speaks out loud, in the voices you choose." });
-    case "stt": return i18n._({ id: "ui.Turns what you say into text.", message: "Turns what you say into text." });
-    case "embeddings": return i18n._({ id: "ui.Helps search by meaning, not just by words.", message: "Helps search by meaning, not just by words." });
-    case "vision": return i18n._({ id: "ui.Looks at pictures and describes them.", message: "Looks at pictures and describes them." });
-    case "wakeword": return i18n._({ id: "ui.Listens for the wake word.", message: "Listens for the wake word." });
-    case "stems": return i18n._({ id: "ui.Splits a song into voice, drums and the rest.", message: "Splits a song into voice, drums and the rest." });
-  }
 }
 
 export function cardStateWord(state: CardState, percent: number | null): string {
