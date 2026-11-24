@@ -7,6 +7,8 @@
     {
       "id": "chat",
       "label": "Chat",
+      "icon": "message-circle",
+      "description": "Answers questions and writes text with a local chat model.",
       "role": "chat",
       "role_enabled": true,
       "role_priority": 10,
@@ -15,6 +17,41 @@
         "fit": "fits",
         "reason": "Stays loaded so replies start at once."
       },
+      "steps": [
+        {
+          "id": "installed",
+          "label": "Installed",
+          "status": "done",
+          "reason": null
+        },
+        {
+          "id": "loaded",
+          "label": "Loaded",
+          "status": "done",
+          "reason": null
+        },
+        {
+          "id": "ready",
+          "label": "Ready",
+          "status": "current",
+          "reason": null
+        }
+      ],
+      "requires": [
+        {
+          "id": "llama-server",
+          "kind": "engine",
+          "label": "llama.cpp",
+          "state": "installed",
+          "reason": null,
+          "size_bytes": 1000000,
+          "can_install": false,
+          "can_uninstall": false,
+          "needed_by": [
+            "qwen3-8b-q4"
+          ]
+        }
+      ],
       "available": true,
       "unavailable_reason": null,
       "tiered": true,
@@ -205,10 +242,14 @@
     {
       "id": "stt",
       "label": "Speech to text",
+      "icon": "speech",
+      "description": "Turns speech into text on this computer.",
       "role": "stt",
       "role_enabled": true,
       "role_priority": 40,
       "role_plan": null,
+      "steps": [],
+      "requires": [],
       "available": true,
       "unavailable_reason": null,
       "tiered": false,

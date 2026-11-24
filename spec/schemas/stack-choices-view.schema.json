@@ -56,6 +56,16 @@
             "type": "string",
             "minLength": 1
           },
+          "icon": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The kit icon name for this feature."
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "description": "One plain sentence saying what the feature does."
+          },
           "role": {
             "type": [
               "string",
@@ -106,6 +116,114 @@
               }
             ],
             "description": "What the profile planner says about this category's role on this computer (state, fit, reason)."
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "enum": [
+                    "installed",
+                    "loaded",
+                    "ready"
+                  ]
+                },
+                "label": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "done",
+                    "current",
+                    "waiting",
+                    "failed"
+                  ]
+                },
+                "reason": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "label",
+                "status",
+                "reason"
+              ]
+            },
+            "description": "Readiness of the feature in order; empty when it has no role."
+          },
+          "requires": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "engine",
+                    "draft"
+                  ]
+                },
+                "label": {
+                  "type": "string"
+                },
+                "state": {
+                  "type": "string",
+                  "enum": [
+                    "installed",
+                    "installing",
+                    "notInstalled",
+                    "failed",
+                    "unsupported"
+                  ]
+                },
+                "reason": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "size_bytes": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "can_install": {
+                  "type": "boolean"
+                },
+                "can_uninstall": {
+                  "type": "boolean"
+                },
+                "needed_by": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "id",
+                "kind",
+                "label",
+                "state",
+                "reason",
+                "size_bytes",
+                "can_install",
+                "can_uninstall",
+                "needed_by"
+              ]
+            },
+            "description": "The engines and drafts the feature's models need."
           },
           "available": {
             "type": "boolean"
@@ -570,10 +688,14 @@
         "required": [
           "id",
           "label",
+          "icon",
+          "description",
           "role",
           "role_enabled",
           "role_priority",
           "role_plan",
+          "steps",
+          "requires",
           "available",
           "unavailable_reason",
           "tiered",
