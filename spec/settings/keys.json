@@ -7357,7 +7357,8 @@
         "pictures",
         "video",
         "music",
-        "voice"
+        "voice",
+        "coding"
       ],
       "multiple": true
     },
@@ -7372,7 +7373,8 @@
       "pictures",
       "video",
       "music",
-      "voice"
+      "voice",
+      "coding"
     ],
     "label": "Boost for",
     "help": "Which kinds of work may use Boost. Uses more of the home's power for a faster or better result.",
@@ -7383,14 +7385,16 @@
         "pictures": "Pictures with extra power.",
         "video": "Videos with extra power.",
         "music": "Music with extra power.",
-        "voice": "Voices with extra power."
+        "voice": "Voices with extra power.",
+        "coding": "Coding with extra power."
       },
       "option_labels": {
         "chat": "Chat",
         "pictures": "Pictures",
         "video": "Videos",
         "music": "Music",
-        "voice": "Voice"
+        "voice": "Voice",
+        "coding": "Coding"
       }
     },
     "band_default": {
@@ -7400,14 +7404,16 @@
         "pictures",
         "video",
         "music",
-        "voice"
+        "voice",
+        "coding"
       ],
       "adult": [
         "chat",
         "pictures",
         "video",
         "music",
-        "voice"
+        "voice",
+        "coding"
       ]
     },
     "level": "basic",
@@ -7427,7 +7433,8 @@
         "pictures",
         "video",
         "music",
-        "voice"
+        "voice",
+        "coding"
       ],
       "multiple": true
     },
@@ -7442,7 +7449,8 @@
       "pictures",
       "video",
       "music",
-      "voice"
+      "voice",
+      "coding"
     ],
     "label": "Max for",
     "help": "Which kinds of work may use Max. Uses the most of the home's power for one big job.",
@@ -7453,14 +7461,16 @@
         "pictures": "Pictures with full power.",
         "video": "Videos with full power.",
         "music": "Music with full power.",
-        "voice": "Voices with full power."
+        "voice": "Voices with full power.",
+        "coding": "Coding with full power."
       },
       "option_labels": {
         "chat": "Chat",
         "pictures": "Pictures",
         "video": "Videos",
         "music": "Music",
-        "voice": "Voice"
+        "voice": "Voice",
+        "coding": "Coding"
       }
     },
     "band_default": {
