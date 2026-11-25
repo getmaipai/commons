@@ -3,6 +3,9 @@ import { Button } from "@/kit/ui/button";
 import { Card } from "@/kit/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/kit/ui/dialog";
 import { Progress } from "@/kit/ui/progress";
+import { Checkbox } from "@/kit/ui/checkbox";
+import { Input } from "@/kit/ui/input";
+import { Label } from "@/kit/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/kit/ui/select";
 import { getIcon } from "@/kit/icons";
 import { i18n } from "@/kit/i18n";
@@ -24,6 +27,12 @@ export function StackDrives({ client, locked, pollMs = 2000 }: { client: StackDr
   const [planError, setPlanError] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
+  const [addLabel, setAddLabel] = useState("");
+  const [addPath, setAddPath] = useState("");
+  const [addRemovable, setAddRemovable] = useState(true);
+  const [addError, setAddError] = useState("");
+  const [driveError, setDriveError] = useState("");
 
   const refresh = useCallback(async () => {
     const [driveResult, featureResult, moveResult] = await Promise.all([client.list(), client.features(), client.moves()]);
@@ -55,6 +64,16 @@ export function StackDrives({ client, locked, pollMs = 2000 }: { client: StackDr
     catch (cause) { setError(sentenceOf(cause, fallback())); }
     finally { setBusy(false); }
   }
+  async function addDrive() {
+    setBusy(true); setAddError("");
+    try { await client.add({ label: addLabel.trim(), root_path: addPath.trim(), removable: addRemovable }); setAddOpen(false); setAddLabel(""); setAddPath(""); await refresh(); }
+    catch (cause) { setAddError(sentenceOf(cause, fallback())); }
+    finally { setBusy(false); }
+  }
+  async function removeDrive(id: string) {
+    setDriveError("");
+    try { await client.remove(id); await refresh(); } catch (cause) { setDriveError(sentenceOf(cause, fallback())); }
+  }
   async function cancelMove() { try { await client.cancel(); setMoves([]); setActive(null); } catch (cause) { setError(sentenceOf(cause, fallback())); } }
 
   return <section aria-labelledby="drives-heading" aria-label={i18n._({ id: "ui.Drives", message: "Drives" })} className="flex min-w-0 flex-col gap-3">
@@ -64,8 +83,11 @@ export function StackDrives({ client, locked, pollMs = 2000 }: { client: StackDr
         <DiskIcon aria-hidden="true" className="size-4 shrink-0 text-muted-foreground" />
         <span className="min-w-0 flex-1 break-words">{disk.label}</span>
         {disk.connected ? <span className="text-muted-foreground">{i18n._({ id: "ui.{free} free of {total}", message: "{free} free of {total}", values: { free: gb(disk.free_bytes), total: disk.total_bytes >= 1024 ** 4 ? `${Math.round(disk.total_bytes / 1024 ** 4)} TB` : gb(disk.total_bytes) } })}</span> : <span className="text-muted-foreground">{i18n._({ id: "ui.Not connected", message: "Not connected" })}</span>}
+        {disk.id !== "main" && <Button size="sm" variant="ghost" disabled={Boolean(locked)} aria-label={i18n._({ id: "ui.Remove {drive}", message: "Remove {drive}", values: { drive: disk.label } })} onClick={() => { void removeDrive(disk.id); }}>{i18n._({ id: "ui.Remove", message: "Remove" })}</Button>}
       </li>)}
     </ul>
+    {driveError && <p role="alert" className="text-sm text-destructive">{driveError}</p>}
+    <Button size="sm" variant="outline" className="w-fit" disabled={Boolean(locked)} onClick={() => { setAddError(""); setAddOpen(true); }}>{i18n._({ id: "ui.Add a drive", message: "Add a drive" })}</Button>
     <ul className="flex min-w-0 flex-col gap-2" aria-label={i18n._({ id: "ui.Features on drives", message: "Features on drives" })}>
       {features.map((feature) => {
         const names = [...new Set(feature.drives.map((drive) => drive.label))];
@@ -86,6 +108,18 @@ export function StackDrives({ client, locked, pollMs = 2000 }: { client: StackDr
         {activeMove && <div className="flex flex-col gap-2">{activeMove.state === "copying" ? <><p role="status">{i18n._({ id: "ui.Copying {done} of {total}", message: "Copying {done} of {total}", values: { done: driveGb(activeMove.bytes_done), total: driveGb(activeMove.bytes_total) } })}</p><Progress value={activeMove.bytes_total ? activeMove.bytes_done / activeMove.bytes_total * 100 : 0} aria-label={i18n._({ id: "ui.Move progress", message: "Move progress" })} /></> : activeMove.state === "verifying" ? <p role="status">{i18n._({ id: "ui.Checking the copy", message: "Checking the copy" })}</p> : activeMove.state === "failed" ? <><p role="alert" className="text-destructive">{activeMove.error}</p><p className="text-sm text-muted-foreground">{i18n._({ id: "ui.Your files are still where they were.", message: "Your files are still where they were." })}</p></> : activeMove.state === "done" ? <p role="status">{i18n._({ id: "ui.Moved to {drive}", message: "Moved to {drive}", values: { drive: diskById.get(activeMove.to_disk)?.label ?? activeMove.to_disk } })}</p> : <p role="status">{i18n._({ id: "ui.Moving files", message: "Moving files" })}</p>}</div>}
         {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
         <DialogFooter>{running ? <Button variant="secondary" onClick={() => { void cancelMove(); }}>{i18n._({ id: "ui.Cancel move", message: "Cancel move" })}</Button> : activeMove ? <Button onClick={() => setActive(null)}>{i18n._({ id: "ui.Done", message: "Done" })}</Button> : <><Button variant="secondary" onClick={() => setActive(null)}>{i18n._({ id: "ui.Cancel", message: "Cancel" })}</Button><Button disabled={planBytes === null || Boolean(planError) || busy} onClick={() => { void startMove(); }}>{i18n._({ id: "ui.Move", message: "Move" })}</Button></>}</DialogFooter>
+      </DialogContent>
+    </Dialog>
+    <Dialog open={addOpen} onOpenChange={setAddOpen}>
+      <DialogContent scroll="viewport" aria-describedby="drive-add-description">
+        <DialogHeader><DialogTitle>{i18n._({ id: "ui.Add a drive", message: "Add a drive" })}</DialogTitle><DialogDescription id="drive-add-description">{i18n._({ id: "ui.Pick a folder on the drive. Models you move there are kept in a maipai-models folder inside it.", message: "Pick a folder on the drive. Models you move there are kept in a maipai-models folder inside it." })}</DialogDescription></DialogHeader>
+        <div className="flex min-w-0 flex-col gap-3">
+          <div className="flex flex-col gap-1.5"><Label htmlFor="drive-add-name">{i18n._({ id: "ui.Name", message: "Name" })}</Label><Input id="drive-add-name" value={addLabel} onChange={(e) => setAddLabel(e.target.value)} placeholder={i18n._({ id: "ui.Backup drive", message: "Backup drive" })} /></div>
+          <div className="flex flex-col gap-1.5"><Label htmlFor="drive-add-path">{i18n._({ id: "ui.Folder on this computer", message: "Folder on this computer" })}</Label><Input id="drive-add-path" value={addPath} onChange={(e) => setAddPath(e.target.value)} placeholder="/Volumes/Backup" /></div>
+          <div className="flex items-center gap-2"><Checkbox id="drive-add-removable" checked={addRemovable} onCheckedChange={(value) => setAddRemovable(value === true)} /><Label htmlFor="drive-add-removable">{i18n._({ id: "ui.This drive can be unplugged", message: "This drive can be unplugged" })}</Label></div>
+          {addError && <p role="alert" className="text-sm text-destructive">{addError}</p>}
+        </div>
+        <DialogFooter><Button variant="secondary" onClick={() => setAddOpen(false)}>{i18n._({ id: "ui.Cancel", message: "Cancel" })}</Button><Button disabled={busy || !addLabel.trim() || !addPath.trim()} onClick={() => { void addDrive(); }}>{i18n._({ id: "ui.Add", message: "Add" })}</Button></DialogFooter>
       </DialogContent>
     </Dialog>
   </section>;

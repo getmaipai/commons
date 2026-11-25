@@ -51,6 +51,10 @@ export interface StackDrivesClient {
   move(featureId: string, toDiskId: string): Promise<StackDriveMovePlan>;
   moves(): Promise<{ moves: StackDriveMove[] }>;
   cancel(): Promise<{ cancelled: boolean }>;
+  /** `POST /stack/v1/disks`: tell the Stack about a folder on another drive that may hold models. */
+  add(body: { label: string; root_path: string; removable: boolean }): Promise<StackDrive>;
+  /** `DELETE /stack/v1/disks/{id}`: forget a drive (refused while models are on it; no file is touched). */
+  remove(id: string): Promise<{ ok: true }>;
 }
 
 export interface StackClient {

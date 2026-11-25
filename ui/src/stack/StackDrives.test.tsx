@@ -128,3 +128,30 @@ test("StackDrives can render with a drives client", async () => {
   render(<StackDrives client={client.drives!} locked={null} pollMs={0} />);
   await screen.findByRole("heading", { name: "Drives" });
 });
+
+describe("Drives: add and remove", () => {
+  test("adding a drive sends the name and folder, then lists it", async () => {
+    const client = await ready();
+    await click(screen.getByRole("button", { name: "Add a drive" }));
+    const dialog = await screen.findByRole("dialog");
+    const add = within(dialog).getByRole("button", { name: "Add" });
+    expect(add.hasAttribute("disabled")).toBe(true);
+    await act(async () => { fireEvent.change(within(dialog).getByLabelText("Name"), { target: { value: "Spare disk" } }); fireEvent.change(within(dialog).getByLabelText("Folder on this computer"), { target: { value: "/Volumes/Spare" } }); });
+    await click(within(dialog).getByRole("button", { name: "Add" }));
+    expect(calls(client, "drives.add")[0]?.args[0]).toEqual({ label: "Spare disk", root_path: "/Volumes/Spare", removable: true });
+    expect(await screen.findByText("Spare disk")).toBeTruthy();
+  });
+  test("a refused remove shows the Stack's sentence and keeps the drive", async () => {
+    await ready();
+    await click(screen.getByRole("button", { name: "Remove Backup drive" }));
+    expect(await screen.findByText(/still has files on that drive/)).toBeTruthy();
+    expect(screen.getAllByText("Backup drive").length).toBeGreaterThan(0);
+  });
+  test("main has no Remove button and lockedItems.move disables Add", async () => {
+    const client = createFakeStackClient();
+    render(<StackModelsPage client={client} pollMs={0} lockedItems={{ move: "Only an admin can do that." }} />);
+    await screen.findByRole("heading", { name: "Drives" });
+    expect(screen.queryByRole("button", { name: "Remove This computer" })).toBeNull();
+    expect(screen.getByRole("button", { name: "Add a drive" }).hasAttribute("disabled")).toBe(true);
+  });
+});
