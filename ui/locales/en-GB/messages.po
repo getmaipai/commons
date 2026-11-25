@@ -65,7 +65,7 @@ msgid "ui.{count, plural, one {# minute} other {# minutes}}"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:105
+#: src/stack/StackModelsPage.tsx:106
 msgid "ui.{count, plural, one {# model matches} other {# models match}}"
 msgstr ""
 
@@ -173,30 +173,35 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/stack/StackCategorySheet.tsx:116
-#: src/stack/StackModelsPage.tsx:89
+#: src/stack/StackModelsPage.tsx:90
 msgid "ui.{feature} is off. Anything it was running has stopped."
 msgstr ""
 
 #. js-lingui-explicit-id
 #: src/stack/StackCategorySheet.tsx:116
-#: src/stack/StackModelsPage.tsx:89
+#: src/stack/StackModelsPage.tsx:90
 msgid "ui.{feature} is on."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:137
+#: src/stack/StackModelsPage.tsx:138
 msgid "ui.{feature} moved down."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:137
+#: src/stack/StackModelsPage.tsx:138
 msgid "ui.{feature} moved up."
 msgstr ""
 
 #. js-lingui-explicit-id
 #: src/stack/StackCategorySheet.tsx:116
-#: src/stack/StackModelsPage.tsx:91
+#: src/stack/StackModelsPage.tsx:92
 msgid "ui.{feature} on or off"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackDrives.tsx:85
+msgid "ui.{free} free of {total}"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -322,7 +327,7 @@ msgid "ui.{max} characters each, {total} in all ({used} used)"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/stackWords.ts:91
+#: src/stack/stackWords.ts:75
 msgid "ui.{memory} GB computers"
 msgstr ""
 
@@ -667,7 +672,7 @@ msgid "ui.A minor"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:171
+#: src/stack/StackModelsPage.tsx:172
 msgid "ui.a model"
 msgstr ""
 
@@ -745,6 +750,11 @@ msgid "ui.Activity"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackDrives.tsx:122
+msgid "ui.Add"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/elements/composer-parts.tsx:266
 #: src/elements/composer-parts.tsx:287
 #: src/elements/prompt-bar.tsx:343
@@ -762,14 +772,20 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/stack/StackAddModel.tsx:40
-#: src/stack/StackModelsPage.tsx:250
 #: src/stack/StackModelsPage.tsx:253
+#: src/stack/StackModelsPage.tsx:256
 msgid "ui.Add a chat model"
 msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/track-studio.tsx:412
 msgid "ui.Add a clip"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackDrives.tsx:90
+#: src/stack/StackDrives.tsx:115
+msgid "ui.Add a drive"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -888,7 +904,7 @@ msgid "ui.Ahead {seconds} seconds"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:185
+#: src/stack/StackModelsPage.tsx:187
 msgid "ui.AI and models"
 msgstr ""
 
@@ -1194,6 +1210,11 @@ msgid "ui.Background removed"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackDrives.tsx:117
+msgid "ui.Backup drive"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/elements/track-studio-edit.ts:50
 msgid "ui.Balanced"
 msgstr ""
@@ -1292,7 +1313,7 @@ msgid "ui.Brightness"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:251
+#: src/stack/StackModelsPage.tsx:254
 msgid "ui.Bring your own from Hugging Face. The Stack checks its size and licence first."
 msgstr ""
 
@@ -1365,8 +1386,15 @@ msgstr ""
 #: src/settings/SettingRow.tsx:277
 #: src/settings/SettingRow.tsx:376
 #: src/stack/StackAddModel.tsx:73
+#: src/stack/StackDrives.tsx:110
+#: src/stack/StackDrives.tsx:122
 #: src/stack/StackFreeSpace.tsx:110
 msgid "ui.Cancel"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackDrives.tsx:110
+msgid "ui.Cancel move"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -1492,6 +1520,12 @@ msgid "ui.Checking"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackDrives.tsx:98
+#: src/stack/StackDrives.tsx:108
+msgid "ui.Checking the copy"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/stack/StackAddModel.tsx:74
 msgid "ui.Checking the model"
 msgstr ""
@@ -1499,6 +1533,16 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/elements/project-mark.tsx:99
 msgid "ui.Chef hat"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackDrives.tsx:106
+msgid "ui.Choose a connected drive for these files."
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackDrives.tsx:107
+msgid "ui.Choose a drive"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -1874,8 +1918,14 @@ msgid "ui.Copy image"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackParts.tsx:88
+#: src/stack/StackParts.tsx:81
 msgid "ui.Copy the ID of {name}"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackDrives.tsx:98
+#: src/stack/StackDrives.tsx:108
+msgid "ui.Copying {done} of {total}"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -2265,13 +2315,13 @@ msgid "ui.Discuss"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:260
+#: src/stack/StackModelsPage.tsx:263
 msgid "ui.Disk space"
 msgstr ""
 
 #. js-lingui-explicit-id
 #: src/primitives/reorder.tsx:169
-#: src/stack/StackParts.tsx:69
+#: src/stack/StackParts.tsx:62
 msgid "ui.Dismiss"
 msgstr ""
 
@@ -2321,6 +2371,7 @@ msgstr ""
 #: src/primitives/BatchBar.tsx:40
 #: src/primitives/reorder.tsx:155
 #: src/stack/StackAddModel.tsx:47
+#: src/stack/StackDrives.tsx:110
 #: src/stack/StackFreeSpace.tsx:108
 #: src/stack/StackRecommended.tsx:120
 msgid "ui.Done"
@@ -2371,14 +2422,14 @@ msgid "ui.Download progress for {model}"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/stackWords.ts:59
-#: src/stack/stackWords.ts:72
+#: src/stack/stackWords.ts:43
+#: src/stack/stackWords.ts:56
 msgid "ui.Download stopped"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/stackWords.ts:57
-#: src/stack/stackWords.ts:70
+#: src/stack/stackWords.ts:41
+#: src/stack/stackWords.ts:54
 msgid "ui.Downloading"
 msgstr ""
 
@@ -2388,8 +2439,8 @@ msgid "ui.Downloading {model}. This can take a while; its status changes when it
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/stackWords.ts:57
-#: src/stack/stackWords.ts:70
+#: src/stack/stackWords.ts:41
+#: src/stack/stackWords.ts:54
 msgid "ui.Downloading {percent}"
 msgstr ""
 
@@ -2411,6 +2462,22 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/elements/track-studio.tsx:112
 msgid "ui.Drag the handles at each end to trim. Press S to cut at the playhead."
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackDrives.tsx:98
+msgid "ui.Drive not connected. Plug in {drive}."
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackDrives.tsx:81
+msgid "ui.Drive space"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackDrives.tsx:79
+#: src/stack/StackDrives.tsx:80
+msgid "ui.Drives"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -2694,7 +2761,7 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/dashboard/layouts/full/vertical/sidebar/sidebaritems.ts:86
-#: src/stack/StackParts.tsx:106
+#: src/stack/StackParts.tsx:99
 msgid "ui.Family"
 msgstr ""
 
@@ -2719,8 +2786,13 @@ msgid "ui.Featured"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:238
+#: src/stack/StackModelsPage.tsx:240
 msgid "ui.Features"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackDrives.tsx:91
+msgid "ui.Features on drives"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -2872,6 +2944,11 @@ msgid "ui.Folder"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackDrives.tsx:118
+msgid "ui.Folder on this computer"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/primitives/StoryFeed.tsx:354
 msgid "ui.Follow"
 msgstr ""
@@ -2903,7 +2980,7 @@ msgid "ui.Free"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:196
+#: src/stack/StackModelsPage.tsx:198
 msgid "ui.Free up {size}"
 msgstr ""
 
@@ -3018,7 +3095,7 @@ msgid "ui.Hazy"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:262
+#: src/stack/StackModelsPage.tsx:265
 msgid "ui.Health"
 msgstr ""
 
@@ -3047,16 +3124,6 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/elements/thread.aui.tsx:1455
 msgid "ui.Helpful"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/stack/stackWords.ts:47
-msgid "ui.Helps search by meaning, not just by words."
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/stack/stackWords.ts:41
-msgid "ui.Helps write and fix code."
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -3189,7 +3256,7 @@ msgid "ui.Icon"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackParts.tsx:103
+#: src/stack/StackParts.tsx:96
 msgid "ui.ID"
 msgstr ""
 
@@ -3543,7 +3610,7 @@ msgid "ui.Library folder"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackParts.tsx:107
+#: src/stack/StackParts.tsx:100
 msgid "ui.Licence"
 msgstr ""
 
@@ -3602,11 +3669,6 @@ msgid "ui.Listening for you"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/stackWords.ts:49
-msgid "ui.Listens for the wake word."
-msgstr ""
-
-#. js-lingui-explicit-id
 #: src/primitives/Player.tsx:189
 msgid "ui.Live"
 msgstr ""
@@ -3621,7 +3683,7 @@ msgstr ""
 #: src/primitives/PageSkeleton.tsx:22
 #: src/primitives/RouteSkeleton.tsx:15
 #: src/schema/MediaStageNodeView.tsx:38
-#: src/stack/StackModelsPage.tsx:221
+#: src/stack/StackModelsPage.tsx:223
 msgid "ui.Loading"
 msgstr ""
 
@@ -3718,11 +3780,6 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/schema/NodeRenderer.tsx:2095
 msgid "ui.Looking for screens"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/stack/stackWords.ts:48
-msgid "ui.Looks at pictures and describes them."
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -3830,21 +3887,6 @@ msgid "ui.Make the video from this"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/stackWords.ts:42
-msgid "ui.Makes and edits pictures."
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/stack/stackWords.ts:43
-msgid "ui.Makes short videos."
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/stack/stackWords.ts:44
-msgid "ui.Makes songs and music."
-msgstr ""
-
-#. js-lingui-explicit-id
 #: src/elements/track-studio.tsx:804
 msgid "ui.Makeup"
 msgstr ""
@@ -3919,12 +3961,12 @@ msgid "ui.Memory"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:259
+#: src/stack/StackModelsPage.tsx:262
 msgid "ui.Memory and speed"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackParts.tsx:111
+#: src/stack/StackParts.tsx:104
 msgid "ui.Memory when running"
 msgstr ""
 
@@ -4029,7 +4071,7 @@ msgstr ""
 #: src/primitives/ArticleView.tsx:480
 #: src/schema/NodeRenderer.tsx:2482
 #: src/stack/StackCategorySheet.tsx:163
-#: src/stack/StackModelsPage.tsx:245
+#: src/stack/StackModelsPage.tsx:248
 #: src/ui/breadcrumb.tsx:102
 msgid "ui.More"
 msgstr ""
@@ -4075,12 +4117,24 @@ msgid "ui.More stories"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:150
+#: src/stack/StackDrives.tsx:99
+#: src/stack/StackDrives.tsx:110
+msgid "ui.Move"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackDrives.tsx:99
+#: src/stack/StackDrives.tsx:106
+msgid "ui.Move {feature}"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackModelsPage.tsx:151
 msgid "ui.Move {feature} down"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:149
+#: src/stack/StackModelsPage.tsx:150
 msgid "ui.Move {feature} up"
 msgstr ""
 
@@ -4120,6 +4174,11 @@ msgid "ui.Move down"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackDrives.tsx:108
+msgid "ui.Move progress"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/elements/track-studio-edit.ts:83
 msgid "ui.Move the playhead further from the edge of the piece to split it."
 msgstr ""
@@ -4131,6 +4190,11 @@ msgid "ui.Move the playhead onto a piece to split it."
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackDrives.tsx:107
+msgid "ui.Move to"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/elements/thread-list.aui.tsx:183
 msgid "ui.Move to project"
 msgstr ""
@@ -4138,6 +4202,22 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/settings/LocationField.tsx:300
 msgid "ui.Move up"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackDrives.tsx:100
+#: src/stack/StackDrives.tsx:108
+msgid "ui.Moved to {drive}"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackDrives.tsx:107
+msgid "ui.Moves {size} to {drive}. {feature} stops while it moves and starts again by itself."
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackDrives.tsx:108
+msgid "ui.Moving files"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -4179,7 +4259,12 @@ msgid "ui.N (compass north)"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:210
+#: src/stack/StackDrives.tsx:117
+msgid "ui.Name"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackModelsPage.tsx:212
 msgid "ui.Name, version or licence"
 msgstr ""
 
@@ -4189,7 +4274,7 @@ msgid "ui.Narrow"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/stackWords.ts:60
+#: src/stack/stackWords.ts:44
 msgid "ui.Needs a look"
 msgstr ""
 
@@ -4384,7 +4469,7 @@ msgid "ui.No matching items"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:101
+#: src/stack/StackModelsPage.tsx:102
 msgid "ui.No model matches \"{query}\". Try a name, a version such as 3.8, a licence or a feature."
 msgstr ""
 
@@ -4515,7 +4600,7 @@ msgid "ui.Normal"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/stackWords.ts:62
+#: src/stack/stackWords.ts:46
 msgid "ui.Not available here"
 msgstr ""
 
@@ -4526,13 +4611,18 @@ msgid "ui.Not available right now."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/stackWords.ts:73
+#: src/stack/stackWords.ts:57
 msgid "ui.Not available yet"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/stackWords.ts:58
-#: src/stack/stackWords.ts:71
+#: src/stack/StackDrives.tsx:85
+msgid "ui.Not connected"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/stackWords.ts:42
+#: src/stack/stackWords.ts:55
 msgid "ui.Not downloaded yet"
 msgstr ""
 
@@ -4600,7 +4690,7 @@ msgid "ui.Note"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/stackWords.ts:63
+#: src/stack/stackWords.ts:47
 msgid "ui.Nothing chosen yet"
 msgstr ""
 
@@ -4610,7 +4700,7 @@ msgid "ui.Nothing featured yet."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/stackWords.ts:86
+#: src/stack/stackWords.ts:70
 msgid "ui.Nothing fits"
 msgstr ""
 
@@ -4738,9 +4828,9 @@ msgstr ""
 #: src/elements/switch-tile.tsx:6
 #: src/primitives/SleepTimer.tsx:76
 #: src/stack/StackLevelList.tsx:38
-#: src/stack/StackModelsPage.tsx:148
-#: src/stack/stackWords.ts:61
-#: src/stack/stackWords.ts:85
+#: src/stack/StackModelsPage.tsx:149
+#: src/stack/stackWords.ts:45
+#: src/stack/stackWords.ts:69
 msgid "ui.Off"
 msgstr ""
 
@@ -5144,6 +5234,11 @@ msgid "ui.Pick a clip to open it in the Studio."
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackDrives.tsx:115
+msgid "ui.Pick a folder on the drive. Models you move there are kept in a maipai-models folder inside it."
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/schema/ImageEditorNodeView.tsx:150
 #: src/schema/ImageEditorNodeView.tsx:200
 msgid "ui.Pick a picture to open it in the Studio."
@@ -5387,7 +5482,7 @@ msgid "ui.Precipitation"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackParts.tsx:108
+#: src/stack/StackParts.tsx:101
 msgid "ui.Precision"
 msgstr ""
 
@@ -5475,7 +5570,7 @@ msgid "ui.Primary navigation"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:143
+#: src/stack/StackModelsPage.tsx:144
 msgid "ui.Priority order"
 msgstr ""
 
@@ -5605,8 +5700,8 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/elements/companion-preview.tsx:45
 #: src/elements/job-progress.tsx:98
-#: src/stack/stackWords.ts:56
-#: src/stack/stackWords.ts:69
+#: src/stack/stackWords.ts:40
+#: src/stack/stackWords.ts:53
 msgid "ui.Ready"
 msgstr ""
 
@@ -5642,12 +5737,12 @@ msgstr ""
 #: src/stack/StackCategorySheet.tsx:63
 #: src/stack/StackCategorySheet.tsx:69
 #: src/stack/StackLevelList.tsx:25
-#: src/stack/stackWords.ts:84
+#: src/stack/stackWords.ts:68
 msgid "ui.Recommended"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:194
+#: src/stack/StackModelsPage.tsx:196
 #: src/stack/StackRecommended.tsx:66
 msgid "ui.Recommended setup"
 msgstr ""
@@ -5720,7 +5815,7 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/primitives/ArticleView.tsx:299
 #: src/primitives/ArticleView.tsx:300
-#: src/stack/StackModelsPage.tsx:257
+#: src/stack/StackModelsPage.tsx:260
 msgid "ui.Related"
 msgstr ""
 
@@ -5769,6 +5864,7 @@ msgstr ""
 #: src/primitives/Chip.tsx:77
 #: src/settings/LocationField.tsx:279
 #: src/settings/LocationField.tsx:307
+#: src/stack/StackDrives.tsx:86
 #: src/stack/StackFreeSpace.tsx:111
 #: src/stack/StackFreeSpace.tsx:119
 #: src/stack/StackModelList.tsx:70
@@ -5784,6 +5880,11 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/stack/StackFreeSpace.tsx:117
 msgid "ui.Remove {count, plural, one {# model} other {# models}} and free {size}?"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackDrives.tsx:86
+msgid "ui.Remove {drive}"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -6113,7 +6214,7 @@ msgid "ui.Running elsewhere"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackParts.tsx:105
+#: src/stack/StackParts.tsx:98
 msgid "ui.Runs on"
 msgstr ""
 
@@ -6320,12 +6421,12 @@ msgid "ui.Search locations"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:211
+#: src/stack/StackModelsPage.tsx:213
 msgid "ui.Search models"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:106
+#: src/stack/StackModelsPage.tsx:107
 msgid "ui.Search results"
 msgstr ""
 
@@ -6568,6 +6669,11 @@ msgid "ui.seven"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackDrives.tsx:98
+msgid "ui.Several drives"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/elements/image-editor.tsx:1128
 #: src/elements/image-editor.tsx:1134
 #: src/elements/music-track.tsx:35
@@ -6725,7 +6831,7 @@ msgid "ui.Six-band equalizer"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackParts.tsx:110
+#: src/stack/StackParts.tsx:103
 msgid "ui.Size"
 msgstr ""
 
@@ -6786,7 +6892,7 @@ msgid "ui.Small"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackParts.tsx:109
+#: src/stack/StackParts.tsx:102
 msgid "ui.Smallest computer"
 msgstr ""
 
@@ -6856,7 +6962,7 @@ msgid "ui.Sound starts {seconds} s early"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackParts.tsx:104
+#: src/stack/StackParts.tsx:97
 msgid "ui.Source"
 msgstr ""
 
@@ -6888,18 +6994,8 @@ msgid "ui.Speaking"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/stackWords.ts:45
-msgid "ui.Speaks out loud, in the voices you choose."
-msgstr ""
-
-#. js-lingui-explicit-id
 #: src/elements/track-studio.tsx:114
 msgid "ui.Split at playhead"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/stack/stackWords.ts:50
-msgid "ui.Splits a song into voice, drums and the rest."
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -7169,11 +7265,6 @@ msgid "ui.Talk..."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/stackWords.ts:40
-msgid "ui.Talks, writes and answers questions."
-msgstr ""
-
-#. js-lingui-explicit-id
 #: src/elements/voice-conversation.tsx:171
 msgid "ui.Tap to interrupt"
 msgstr ""
@@ -7240,8 +7331,13 @@ msgid "ui.That could not be added. Try again."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/stackWords.ts:96
+#: src/stack/stackWords.ts:80
 msgid "ui.That could not be saved. Nothing was changed. Try again."
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackDrives.tsx:18
+msgid "ui.That could not be saved. Try again."
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -7353,12 +7449,12 @@ msgid "ui.The markup could not be saved on this picture. Try again."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/stackWords.ts:99
+#: src/stack/stackWords.ts:83
 msgid "ui.The model list could not be read. Try again in a moment."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:228
+#: src/stack/StackModelsPage.tsx:230
 msgid "ui.The models could not be shown"
 msgstr ""
 
@@ -7503,8 +7599,13 @@ msgid "ui.This computer"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:188
+#: src/stack/StackModelsPage.tsx:190
 msgid "ui.This computer has about {memory} GB of memory for AI and {disk} free on disk."
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackDrives.tsx:119
+msgid "ui.This drive can be unplugged"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -7750,7 +7851,7 @@ msgstr ""
 #: src/elements/music-track.tsx:35
 #: src/elements/video-player.tsx:118
 #: src/primitives/AsyncState.tsx:85
-#: src/stack/StackModelsPage.tsx:230
+#: src/stack/StackModelsPage.tsx:232
 msgid "ui.Try again"
 msgstr ""
 
@@ -7790,11 +7891,6 @@ msgstr ""
 #: src/elements/voice-conversation.tsx:189
 #: src/elements/voice-conversation.tsx:191
 msgid "ui.Turn the microphone on"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/stack/stackWords.ts:46
-msgid "ui.Turns what you say into text."
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -7949,7 +8045,7 @@ msgid "ui.Update"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:261
+#: src/stack/StackModelsPage.tsx:264
 msgid "ui.Updates"
 msgstr ""
 
@@ -8066,7 +8162,7 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/stack/StackModelList.tsx:52
-#: src/stack/StackModelsPage.tsx:119
+#: src/stack/StackModelsPage.tsx:120
 msgid "ui.Version {version}"
 msgstr ""
 
@@ -8263,7 +8359,7 @@ msgid "ui.What would change"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:141
+#: src/stack/StackModelsPage.tsx:142
 msgid "ui.When memory is tight, features higher in this list are served first."
 msgstr ""
 
@@ -8273,7 +8369,7 @@ msgid "ui.Where the reference library lives."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:140
+#: src/stack/StackModelsPage.tsx:141
 msgid "ui.Which feature goes first"
 msgstr ""
 
@@ -8435,8 +8531,14 @@ msgid "ui.You said"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/stackWords.ts:83
+#: src/stack/stackWords.ts:67
 msgid "ui.Your choice"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackDrives.tsx:100
+#: src/stack/StackDrives.tsx:108
+msgid "ui.Your files are still where they were."
 msgstr ""
 
 #. js-lingui-explicit-id

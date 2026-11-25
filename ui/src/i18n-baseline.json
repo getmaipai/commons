@@ -103,6 +103,8 @@
   "primitives/WizardCenteredShowcase.tsx": 9,
   "search/SearchResultGroups.tsx": 4,
   "settings/PhraseListFieldShowcase.tsx": 4,
+  "stack/fakeStackClient.ts": 10,
+  "stack/fakeStackData.ts": 11,
   "status.ts": 10,
   "ui/BadgeVariantsShowcase.tsx": 4,
   "ui/ButtonVariantsShowcase.tsx": 3,
