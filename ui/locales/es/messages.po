@@ -182,6 +182,11 @@ msgid "ui.{done}/{total} · rev {revision}"
 msgstr "{done}/{total} · rev {revision}"
 
 #. js-lingui-explicit-id
+#: src/stack/StackFeatureLocation.tsx:34
+msgid "ui.{drive}: {free} free of {total}"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/settings/PhraseListField.tsx:126
 #, needs-review
 msgid "ui.{error} {count} more were skipped."
@@ -199,13 +204,13 @@ msgid "ui.{favoriteCount} of {favoritesLimit} in the left rail"
 msgstr "{favoriteCount} de {favoritesLimit} en la barra izquierda"
 
 #. js-lingui-explicit-id
-#: src/stack/StackCategorySheet.tsx:116
+#: src/stack/StackCategorySheet.tsx:119
 #: src/stack/StackModelsPage.tsx:90
 msgid "ui.{feature} is off. Anything it was running has stopped."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackCategorySheet.tsx:116
+#: src/stack/StackCategorySheet.tsx:119
 #: src/stack/StackModelsPage.tsx:90
 msgid "ui.{feature} is on."
 msgstr ""
@@ -221,13 +226,13 @@ msgid "ui.{feature} moved up."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackCategorySheet.tsx:116
+#: src/stack/StackCategorySheet.tsx:119
 #: src/stack/StackModelsPage.tsx:92
 msgid "ui.{feature} on or off"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackDrives.tsx:85
+#: src/stack/StackDrives.tsx:62
 msgid "ui.{free} free of {total}"
 msgstr ""
 
@@ -347,17 +352,17 @@ msgid "ui.{lane} pieces"
 msgstr "Piezas de {lane}"
 
 #. js-lingui-explicit-id
-#: src/stack/StackCategorySheet.tsx:41
+#: src/stack/StackCategorySheet.tsx:43
 msgid "ui.{level} is off."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackCategorySheet.tsx:44
+#: src/stack/StackCategorySheet.tsx:46
 msgid "ui.{level} now uses {model}."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackCategorySheet.tsx:43
+#: src/stack/StackCategorySheet.tsx:45
 msgid "ui.{level} uses the recommended model: {model}."
 msgstr ""
 
@@ -412,7 +417,7 @@ msgid "ui.{model} is added. It is not chosen for any level yet."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackCategorySheet.tsx:155
+#: src/stack/StackCategorySheet.tsx:206
 msgid "ui.{model} was removed."
 msgstr ""
 
@@ -863,7 +868,7 @@ msgid "ui.Activity"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackDrives.tsx:122
+#: src/stack/StackDrives.tsx:91
 msgid "ui.Add"
 msgstr ""
 
@@ -899,8 +904,8 @@ msgid "ui.Add a clip"
 msgstr "Añadir un clip"
 
 #. js-lingui-explicit-id
-#: src/stack/StackDrives.tsx:90
-#: src/stack/StackDrives.tsx:115
+#: src/stack/StackDrives.tsx:67
+#: src/stack/StackDrives.tsx:84
 msgid "ui.Add a drive"
 msgstr ""
 
@@ -1388,7 +1393,7 @@ msgid "ui.Background removed"
 msgstr "Fondo eliminado"
 
 #. js-lingui-explicit-id
-#: src/stack/StackDrives.tsx:117
+#: src/stack/StackDrives.tsx:86
 msgid "ui.Backup drive"
 msgstr ""
 
@@ -1583,15 +1588,15 @@ msgstr "Puede ver"
 #: src/settings/SettingRow.tsx:277
 #: src/settings/SettingRow.tsx:376
 #: src/stack/StackAddModel.tsx:73
-#: src/stack/StackDrives.tsx:110
-#: src/stack/StackDrives.tsx:122
+#: src/stack/StackDrives.tsx:91
 #: src/stack/StackFreeSpace.tsx:110
+#: src/stack/StackMoveDialog.tsx:57
 #, needs-review
 msgid "ui.Cancel"
 msgstr "Cancelar"
 
 #. js-lingui-explicit-id
-#: src/stack/StackDrives.tsx:110
+#: src/stack/StackMoveDialog.tsx:57
 msgid "ui.Cancel move"
 msgstr ""
 
@@ -1646,7 +1651,7 @@ msgstr "Tamaño de la tarjeta"
 #: src/settings/SettingRow.tsx:263
 #: src/settings/SettingRow.tsx:385
 #: src/settings/SettingsShowcase.tsx:62
-#: src/stack/StackCategorySheet.tsx:64
+#: src/stack/StackCategorySheet.tsx:66
 #, needs-review
 msgid "ui.Change"
 msgstr "Cambiar"
@@ -1663,7 +1668,7 @@ msgid "ui.Change {level}"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackCategorySheet.tsx:64
+#: src/stack/StackCategorySheet.tsx:66
 msgid "ui.Change {level} for {profile}"
 msgstr ""
 
@@ -1736,8 +1741,9 @@ msgid "ui.Checking"
 msgstr "Comprobando"
 
 #. js-lingui-explicit-id
-#: src/stack/StackDrives.tsx:98
-#: src/stack/StackDrives.tsx:108
+#: src/stack/StackDrives.tsx:75
+#: src/stack/StackFeatureLocation.tsx:48
+#: src/stack/StackMoveDialog.tsx:55
 msgid "ui.Checking the copy"
 msgstr ""
 
@@ -1753,12 +1759,12 @@ msgid "ui.Chef hat"
 msgstr "Gorro de chef"
 
 #. js-lingui-explicit-id
-#: src/stack/StackDrives.tsx:106
+#: src/stack/StackMoveDialog.tsx:53
 msgid "ui.Choose a connected drive for these files."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackDrives.tsx:107
+#: src/stack/StackMoveDialog.tsx:54
 msgid "ui.Choose a drive"
 msgstr ""
 
@@ -2085,6 +2091,11 @@ msgid "ui.Confirm {label}"
 msgstr "Confirmar {label}"
 
 #. js-lingui-explicit-id
+#: src/stack/StackFeatureLocation.tsx:42
+msgid "ui.Connected"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/elements/voice-conversation.tsx:14
 #, needs-review
 msgid "ui.Connecting"
@@ -2182,8 +2193,9 @@ msgid "ui.Copy the ID of {name}"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackDrives.tsx:98
-#: src/stack/StackDrives.tsx:108
+#: src/stack/StackDrives.tsx:75
+#: src/stack/StackFeatureLocation.tsx:48
+#: src/stack/StackMoveDialog.tsx:55
 msgid "ui.Copying {done} of {total}"
 msgstr ""
 
@@ -2698,8 +2710,8 @@ msgstr ""
 #: src/primitives/BatchBar.tsx:40
 #: src/primitives/reorder.tsx:155
 #: src/stack/StackAddModel.tsx:47
-#: src/stack/StackDrives.tsx:110
 #: src/stack/StackFreeSpace.tsx:108
+#: src/stack/StackMoveDialog.tsx:57
 #: src/stack/StackRecommended.tsx:120
 #, needs-review
 msgid "ui.Done"
@@ -2768,7 +2780,7 @@ msgid "ui.Downloading"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackCategorySheet.tsx:150
+#: src/stack/StackCategorySheet.tsx:201
 msgid "ui.Downloading {model}. This can take a while; its status changes when it is ready."
 msgstr ""
 
@@ -2801,18 +2813,20 @@ msgid "ui.Drag the handles at each end to trim. Press S to cut at the playhead."
 msgstr "Arrastra los tiradores en cada extremo para recortar. Pulsa S para cortar en el cabezal de reproducción."
 
 #. js-lingui-explicit-id
-#: src/stack/StackDrives.tsx:98
+#: src/stack/StackDrives.tsx:75
+#: src/stack/StackFeatureLocation.tsx:47
 msgid "ui.Drive not connected. Plug in {drive}."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackDrives.tsx:81
+#: src/stack/StackDrives.tsx:58
 msgid "ui.Drive space"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackDrives.tsx:79
-#: src/stack/StackDrives.tsx:80
+#: src/stack/StackDrives.tsx:56
+#: src/stack/StackDrives.tsx:57
+#: src/stack/StackFeatureLocation.tsx:39
 msgid "ui.Drives"
 msgstr ""
 
@@ -3163,6 +3177,11 @@ msgid "ui.Favorites"
 msgstr "Favoritos"
 
 #. js-lingui-explicit-id
+#: src/stack/StackCategorySheet.tsx:128
+msgid "ui.Feature settings"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/schema/NodeRenderer.tsx:1859
 #, needs-review
 msgid "ui.Featured"
@@ -3174,7 +3193,7 @@ msgid "ui.Features"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackDrives.tsx:91
+#: src/stack/StackDrives.tsx:68
 msgid "ui.Features on drives"
 msgstr ""
 
@@ -3351,7 +3370,7 @@ msgid "ui.Folder"
 msgstr "Carpeta"
 
 #. js-lingui-explicit-id
-#: src/stack/StackDrives.tsx:118
+#: src/stack/StackDrives.tsx:87
 msgid "ui.Folder on this computer"
 msgstr ""
 
@@ -3890,7 +3909,7 @@ msgid "ui.It is deleted from your places. You can add it again by searching."
 msgstr "Se eliminó de tus lugares. Puedes añadirlo de nuevo buscando."
 
 #. js-lingui-explicit-id
-#: src/stack/StackCategorySheet.tsx:45
+#: src/stack/StackCategorySheet.tsx:47
 msgid "ui.It is downloading first and starts being used when it is ready."
 msgstr ""
 
@@ -4245,6 +4264,12 @@ msgid "ui.Loading…"
 msgstr "Cargando…"
 
 #. js-lingui-explicit-id
+#: src/stack/StackCategorySheet.tsx:131
+#: src/stack/StackFeatureLocation.tsx:36
+msgid "ui.Location"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/geolocationHelp.ts:11
 #, needs-review
 msgid "ui.Location is blocked. Allow it in your browser's site settings for this page, then try again."
@@ -4579,7 +4604,7 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/data-table.tsx:65
-#: src/stack/StackCategorySheet.tsx:58
+#: src/stack/StackCategorySheet.tsx:60
 #: src/stack/StackLevelList.tsx:90
 #, needs-review
 msgid "ui.Model"
@@ -4592,7 +4617,8 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/settings/SettingsShellShowcase.tsx:48
-#: src/stack/StackCategorySheet.tsx:143
+#: src/stack/StackCategorySheet.tsx:130
+#: src/stack/StackCategorySheet.tsx:194
 #: src/stack/StackModelList.tsx:111
 #, needs-review
 msgid "ui.Models"
@@ -4604,12 +4630,12 @@ msgid "ui.Models for {level}"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackCategorySheet.tsx:68
+#: src/stack/StackCategorySheet.tsx:70
 msgid "ui.Models for {level} on {profile}"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackCategorySheet.tsx:55
+#: src/stack/StackCategorySheet.tsx:57
 msgid "ui.Models for {profile}"
 msgstr ""
 
@@ -4641,7 +4667,7 @@ msgstr "Fase lunar"
 #: src/PhoneNav.tsx:145
 #: src/primitives/ArticleView.tsx:480
 #: src/schema/NodeRenderer.tsx:2482
-#: src/stack/StackCategorySheet.tsx:163
+#: src/stack/StackCategorySheet.tsx:155
 #: src/stack/StackModelsPage.tsx:248
 #: src/ui/breadcrumb.tsx:102
 #, needs-review
@@ -4695,14 +4721,16 @@ msgid "ui.More stories"
 msgstr "Más historias"
 
 #. js-lingui-explicit-id
-#: src/stack/StackDrives.tsx:99
-#: src/stack/StackDrives.tsx:110
+#: src/stack/StackDrives.tsx:76
+#: src/stack/StackFeatureLocation.tsx:51
+#: src/stack/StackMoveDialog.tsx:57
 msgid "ui.Move"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackDrives.tsx:99
-#: src/stack/StackDrives.tsx:106
+#: src/stack/StackDrives.tsx:76
+#: src/stack/StackFeatureLocation.tsx:51
+#: src/stack/StackMoveDialog.tsx:53
 msgid "ui.Move {feature}"
 msgstr ""
 
@@ -4757,7 +4785,7 @@ msgid "ui.Move down"
 msgstr "Mover abajo"
 
 #. js-lingui-explicit-id
-#: src/stack/StackDrives.tsx:108
+#: src/stack/StackMoveDialog.tsx:55
 msgid "ui.Move progress"
 msgstr ""
 
@@ -4775,7 +4803,7 @@ msgid "ui.Move the playhead onto a piece to split it."
 msgstr "Mueve el cabezal de reproducción sobre un fragmento para dividirlo."
 
 #. js-lingui-explicit-id
-#: src/stack/StackDrives.tsx:107
+#: src/stack/StackMoveDialog.tsx:54
 msgid "ui.Move to"
 msgstr ""
 
@@ -4792,18 +4820,20 @@ msgid "ui.Move up"
 msgstr "Mover arriba"
 
 #. js-lingui-explicit-id
-#: src/stack/StackDrives.tsx:100
-#: src/stack/StackDrives.tsx:108
+#: src/stack/StackDrives.tsx:77
+#: src/stack/StackFeatureLocation.tsx:50
+#: src/stack/StackMoveDialog.tsx:55
 msgid "ui.Moved to {drive}"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackDrives.tsx:107
+#: src/stack/StackMoveDialog.tsx:54
 msgid "ui.Moves {size} to {drive}. {feature} stops while it moves and starts again by itself."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackDrives.tsx:108
+#: src/stack/StackFeatureLocation.tsx:48
+#: src/stack/StackMoveDialog.tsx:55
 msgid "ui.Moving files"
 msgstr ""
 
@@ -4853,7 +4883,7 @@ msgid "ui.N (compass north)"
 msgstr "N"
 
 #. js-lingui-explicit-id
-#: src/stack/StackDrives.tsx:117
+#: src/stack/StackDrives.tsx:86
 msgid "ui.Name"
 msgstr ""
 
@@ -5086,6 +5116,11 @@ msgid "ui.No Components Found!"
 msgstr "No se encontraron componentes"
 
 #. js-lingui-explicit-id
+#: src/stack/StackFeatureLocation.tsx:53
+msgid "ui.No drive location is available for this feature."
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/elements/composer-trigger-popover.aui.tsx:195
 #, needs-review
 msgid "ui.No items available"
@@ -5265,7 +5300,8 @@ msgid "ui.Not available yet"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackDrives.tsx:85
+#: src/stack/StackDrives.tsx:62
+#: src/stack/StackFeatureLocation.tsx:42
 msgid "ui.Not connected"
 msgstr ""
 
@@ -5726,7 +5762,7 @@ msgid "ui.Orange"
 msgstr "Naranja"
 
 #. js-lingui-explicit-id
-#: src/stack/StackCategorySheet.tsx:167
+#: src/stack/StackCategorySheet.tsx:159
 msgid "ui.Order and fallbacks"
 msgstr ""
 
@@ -5753,7 +5789,7 @@ msgid "ui.Other"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackCategorySheet.tsx:173
+#: src/stack/StackCategorySheet.tsx:165
 msgid "ui.Other computer sizes"
 msgstr ""
 
@@ -5961,7 +5997,7 @@ msgid "ui.Pick a clip to open it in the Studio."
 msgstr "Elige un clip para abrirlo en el Studio."
 
 #. js-lingui-explicit-id
-#: src/stack/StackDrives.tsx:115
+#: src/stack/StackDrives.tsx:84
 msgid "ui.Pick a folder on the drive. Models you move there are kept in a maipai-models folder inside it."
 msgstr ""
 
@@ -6535,8 +6571,8 @@ msgstr "Búsquedas recientes"
 #. js-lingui-explicit-id
 #: src/elements/weather-advice.tsx:28
 #: src/elements/weather-advice.tsx:29
-#: src/stack/StackCategorySheet.tsx:63
-#: src/stack/StackCategorySheet.tsx:69
+#: src/stack/StackCategorySheet.tsx:65
+#: src/stack/StackCategorySheet.tsx:71
 #: src/stack/StackLevelList.tsx:25
 #: src/stack/stackWords.ts:68
 #, needs-review
@@ -6683,7 +6719,7 @@ msgstr "recordado {fresh}"
 #: src/primitives/Chip.tsx:77
 #: src/settings/LocationField.tsx:279
 #: src/settings/LocationField.tsx:307
-#: src/stack/StackDrives.tsx:86
+#: src/stack/StackDrives.tsx:63
 #: src/stack/StackFreeSpace.tsx:111
 #: src/stack/StackFreeSpace.tsx:119
 #: src/stack/StackModelList.tsx:70
@@ -6704,7 +6740,7 @@ msgid "ui.Remove {count, plural, one {# model} other {# models}} and free {size}
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackDrives.tsx:86
+#: src/stack/StackDrives.tsx:63
 msgid "ui.Remove {drive}"
 msgstr ""
 
@@ -7161,7 +7197,7 @@ msgid "ui.Saved"
 msgstr "Guardado"
 
 #. js-lingui-explicit-id
-#: src/stack/StackCategorySheet.tsx:186
+#: src/stack/StackCategorySheet.tsx:178
 msgid "ui.Saved for {profile}."
 msgstr ""
 
@@ -7598,7 +7634,8 @@ msgid "ui.seven"
 msgstr "siete"
 
 #. js-lingui-explicit-id
-#: src/stack/StackDrives.tsx:98
+#: src/stack/StackDrives.tsx:75
+#: src/stack/StackFeatureLocation.tsx:46
 msgid "ui.Several drives"
 msgstr ""
 
@@ -8362,7 +8399,8 @@ msgid "ui.That could not be saved. Nothing was changed. Try again."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackDrives.tsx:18
+#: src/stack/StackDrives.tsx:17
+#: src/stack/StackMoveDialog.tsx:11
 msgid "ui.That could not be saved. Try again."
 msgstr ""
 
@@ -8386,7 +8424,7 @@ msgid "ui.That is not available right now."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackCategorySheet.tsx:150
+#: src/stack/StackCategorySheet.tsx:201
 msgid "ui.That model is already installed."
 msgstr ""
 
@@ -8442,7 +8480,7 @@ msgid "ui.The best this computer can do."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackCategorySheet.tsx:174
+#: src/stack/StackCategorySheet.tsx:166
 msgid "ui.The choices kept for each amount of memory. They apply if this setup moves to a bigger or smaller computer."
 msgstr ""
 
@@ -8513,7 +8551,7 @@ msgid "ui.The new version could not be saved. Try again."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackCategorySheet.tsx:169
+#: src/stack/StackCategorySheet.tsx:161
 msgid "ui.The order was saved."
 msgstr ""
 
@@ -8556,7 +8594,7 @@ msgid "ui.The recommended setup is saved. {count, plural, one {# download has} o
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackCategorySheet.tsx:168
+#: src/stack/StackCategorySheet.tsx:160
 msgid "ui.The Stack tries models from the top. Switch one off and it is never used."
 msgstr ""
 
@@ -8646,7 +8684,7 @@ msgid "ui.this clip"
 msgstr "este clip"
 
 #. js-lingui-explicit-id
-#: src/stack/StackCategorySheet.tsx:54
+#: src/stack/StackCategorySheet.tsx:56
 msgid "ui.This computer"
 msgstr ""
 
@@ -8656,7 +8694,7 @@ msgid "ui.This computer has about {memory} GB of memory for AI and {disk} free o
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackDrives.tsx:119
+#: src/stack/StackDrives.tsx:88
 msgid "ui.This drive can be unplugged"
 msgstr ""
 
@@ -8734,6 +8772,11 @@ msgstr "tres"
 #. js-lingui-explicit-id
 #: src/elements/track-studio.tsx:800
 msgid "ui.Threshold"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackCategorySheet.tsx:129
+msgid "ui.Tiers"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -8863,6 +8906,11 @@ msgstr "Historias destacadas"
 #, needs-review
 msgid "ui.Total"
 msgstr "Total"
+
+#. js-lingui-explicit-id
+#: src/stack/StackFeatureLocation.tsx:38
+msgid "ui.Total size: {size}"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/trace-waterfall.tsx:64
@@ -9535,12 +9583,12 @@ msgid "ui.Which feature goes first"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackCategorySheet.tsx:126
+#: src/stack/StackCategorySheet.tsx:136
 msgid "ui.Which model each level uses"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackCategorySheet.tsx:126
+#: src/stack/StackCategorySheet.tsx:136
 msgid "ui.Which model it uses"
 msgstr ""
 
@@ -9715,8 +9763,9 @@ msgid "ui.Your choice"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackDrives.tsx:100
-#: src/stack/StackDrives.tsx:108
+#: src/stack/StackDrives.tsx:77
+#: src/stack/StackFeatureLocation.tsx:49
+#: src/stack/StackMoveDialog.tsx:55
 msgid "ui.Your files are still where they were."
 msgstr ""
 

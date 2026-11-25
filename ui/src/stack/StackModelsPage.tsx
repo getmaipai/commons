@@ -280,7 +280,7 @@ export function StackModelsPage({ client, extraSections, lockedItems, onNavigate
 
       {view && (
         <>
-          <StackCategorySheet category={open} state={state} labelOf={labelOf} locked={lockedItems} highlightId={highlightId} onClose={() => { setOpenId(null); setHighlightId(null); }} />
+          <StackCategorySheet category={open} state={state} labelOf={labelOf} locked={lockedItems} highlightId={highlightId} drives={client.drives} pollMs={pollMs} onClose={() => { setOpenId(null); setHighlightId(null); }} />
           <StackRecommendedSheet open={recommendedOpen} state={state} view={view} onClose={() => setRecommendedOpen(false)} />
           <StackFreeSpaceDialog open={freeOpen} state={state} view={view} onClose={() => setFreeOpen(false)} />
           <StackAddModelDialog open={addOpen} state={state} onClose={() => setAddOpen(false)} />

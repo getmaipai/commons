@@ -113,7 +113,12 @@ describe("search", () => {
     await click(await screen.findByText("Gemma 3 27B"));
     const sheet = await screen.findByRole("dialog");
     expect(within(sheet).getByRole("heading", { name: "Chat" })).toBeTruthy();
-    const row = sheet.querySelector("[data-highlight=true]");
+    await act(async () => { fireEvent.mouseDown(within(sheet).getByRole("tab", { name: "Models" })); fireEvent.click(within(sheet).getByRole("tab", { name: "Models" })); });
+    const row = await waitFor(() => {
+      const found = sheet.querySelector("[data-highlight=true]");
+      if (!found) throw new Error("Highlighted model is not visible");
+      return found;
+    });
     expect(row?.textContent).toContain("Gemma 3 27B");
   });
 });
@@ -228,6 +233,7 @@ describe("the details sheet", () => {
 
   test("each model shows its summary, size and state; its id is only in Details, with a copy button", async () => {
     const { sheet } = await openChat();
+    await act(async () => { fireEvent.mouseDown(within(sheet).getByRole("tab", { name: "Models" })); fireEvent.click(within(sheet).getByRole("tab", { name: "Models" })); });
     const models = within(sheet).getByRole("list", { name: "Models" });
     const row = within(models).getAllByRole("listitem").find((r) => r.textContent?.includes("Qwen3 8B"))!;
     expect(row.textContent).toContain("Fast everyday chat with clear answers.");
@@ -244,6 +250,7 @@ describe("the details sheet", () => {
 
   test("download starts a download and shows progress; remove asks first and frees the model", async () => {
     const { client, sheet } = await openChat();
+    await act(async () => { fireEvent.mouseDown(within(sheet).getByRole("tab", { name: "Models" })); fireEvent.click(within(sheet).getByRole("tab", { name: "Models" })); });
     await click(within(sheet).getByRole("button", { name: /Download Llama 3\.3 70B/ }));
     await waitFor(() => expect(calls(client, "installModel")).toEqual([{ method: "installModel", args: ["llama-33-70b-q4"] }]));
     expect((await within(sheet).findByRole("status")).textContent).toContain("Downloading Llama 3.3 70B.");
@@ -260,6 +267,7 @@ describe("the details sheet", () => {
 
   test("a model a level is using cannot be removed, and the Stack's sentence is shown", async () => {
     const { sheet } = await openChat();
+    await act(async () => { fireEvent.mouseDown(within(sheet).getByRole("tab", { name: "Models" })); fireEvent.click(within(sheet).getByRole("tab", { name: "Models" })); });
     await click(within(sheet).getByRole("button", { name: "Remove Qwen3 8B" }));
     await click(within(await screen.findByTestId("destructive-confirm")).getByRole("button", { name: "Remove" }));
     expect((await within(sheet).findByRole("alert")).textContent).toContain("Qwen3 8B is in use by a level. Choose another model for that level first.");
@@ -296,6 +304,7 @@ describe("the details sheet", () => {
     await screen.findByText("Chatterbox Turbo");
     await click(within(card("voice")).getByRole("button", { name: /Voice/ }));
     const sheet = await screen.findByRole("dialog");
+    await act(async () => { fireEvent.mouseDown(within(sheet).getByRole("tab", { name: "Models" })); fireEvent.click(within(sheet).getByRole("tab", { name: "Models" })); });
     const row = () => within(within(sheet).getByRole("list", { name: "Models" })).getAllByRole("listitem").find((r) => r.textContent?.includes("VoxCPM2"))!;
     await waitFor(() => expect(row().textContent).toMatch(/Downloading \d+%/));
     await waitFor(() => expect(row().textContent).not.toContain("Downloading"), { timeout: 3000 });
@@ -423,6 +432,7 @@ describe("add a chat model", () => {
     await click(within(dialog).getByRole("button", { name: "Done" }));
     await click(within(card("chat")).getByRole("button", { name: /Chat/ }));
     const sheet = await screen.findByRole("dialog");
+    await act(async () => { fireEvent.mouseDown(within(sheet).getByRole("tab", { name: "Models" })); fireEvent.click(within(sheet).getByRole("tab", { name: "Models" })); });
     expect(within(sheet).getByRole("list", { name: "Models" }).textContent).toContain("Mistral Small 3.2 24B Instruct 2506");
   });
 

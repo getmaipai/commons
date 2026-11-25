@@ -5,11 +5,13 @@ import { Button } from "@/kit/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/kit/ui/collapsible";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/kit/ui/sheet";
 import { Switch } from "@/kit/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/kit/ui/tabs";
 import { getIcon } from "@/kit/icons";
 import { i18n } from "@/kit/i18n";
 import { cn } from "@/kit/utils";
-import type { StackCategoryId, StackChoiceCategory, StackLevel, StackProfileAssignment } from "./StackClient";
+import type { StackCategoryId, StackChoiceCategory, StackDrivesClient, StackLevel, StackProfileAssignment } from "./StackClient";
 import { ChoiceList } from "./StackChoiceList";
+import { StackFeatureLocation } from "./StackFeatureLocation";
 import { LevelList } from "./StackLevelList";
 import { ModelList, OrderList } from "./StackModelList";
 import { IconChip, NoticeLine, Pill } from "./StackParts";
@@ -81,14 +83,15 @@ function ProfileBlock({ category, profile, labelOf, busy, lock, onChoose }: { ca
   );
 }
 
-export function StackCategorySheet({ category, state, labelOf, locked, highlightId, onClose }: {
-  category: StackChoiceCategory | null; state: StackChoicesState; labelOf: (id: string) => string; locked: Readonly<Record<string, string>> | undefined; highlightId: string | null; onClose: () => void;
+export function StackCategorySheet({ category, state, labelOf, locked, highlightId, onClose, drives, pollMs }: {
+  category: StackChoiceCategory | null; state: StackChoicesState; labelOf: (id: string) => string; locked: Readonly<Record<string, string>> | undefined; highlightId: string | null; onClose: () => void; drives?: StackDrivesClient; pollMs?: number;
 }) {
   const phone = useIsPhone();
   const [notice, setNotice] = useState<Notice | null>(null);
   const [more, setMore] = useState(false);
+  const [tab, setTab] = useState("tiers");
   const id: StackCategoryId | null = category?.id ?? null;
-  useEffect(() => { setNotice(null); setMore(false); }, [id]);
+  useEffect(() => { setNotice(null); setMore(false); setTab("tiers"); }, [id]);
   const say = (outcome: Outcome<unknown>, ok: string) => setNotice(outcome.ok ? { kind: "ok", text: ok } : { kind: "error", text: outcome.message });
 
   return (
@@ -121,6 +124,13 @@ export function StackCategorySheet({ category, state, labelOf, locked, highlight
                 {lockAll && <p className="flex items-center gap-1.5 text-sm text-muted-foreground"><LockIcon aria-hidden="true" className="size-4" />{lockAll}</p>}
                 <NoticeLine notice={notice} onDismiss={() => setNotice(null)} />
               </SheetHeader>
+              <Tabs value={tab} onValueChange={setTab}>
+                <TabsList aria-label={i18n._({ id: "ui.Feature settings", message: "Feature settings" })}>
+                  <TabsTrigger value="tiers">{i18n._({ id: "ui.Tiers", message: "Tiers" })}</TabsTrigger>
+                  <TabsTrigger value="models">{i18n._({ id: "ui.Models", message: "Models" })}</TabsTrigger>
+                  {drives && <TabsTrigger value="location">{i18n._({ id: "ui.Location", message: "Location" })}</TabsTrigger>}
+                </TabsList>
+                <TabsContent value="tiers">
               <div className="flex flex-col gap-6 px-4 pb-6">
                 <section aria-labelledby="sheet-levels" className="flex flex-col gap-1">
                   <h3 id="sheet-levels" className="text-base font-semibold">{category.tiered ? i18n._({ id: "ui.Which model each level uses", message: "Which model each level uses" }) : i18n._({ id: "ui.Which model it uses", message: "Which model it uses" })}</h3>
@@ -135,24 +145,6 @@ export function StackCategorySheet({ category, state, labelOf, locked, highlight
                         const used = candidateById(category, outcome.value.model);
                         setNotice({ kind: "ok", text: pickSentence(category.tiered ? levelName(level) : category.label, used?.label ?? (outcome.value.model ? labelOf(outcome.value.model) : null), value, outcome.value.note, outcome.value.install_job !== null) });
                       } else setNotice({ kind: "error", text: outcome.message });
-                      return outcome;
-                    }}
-                  />
-                </section>
-                <section aria-labelledby="sheet-models" className="flex flex-col gap-2">
-                  <h3 id="sheet-models" className="text-base font-semibold">{i18n._({ id: "ui.Models", message: "Models" })}</h3>
-                  <ModelList
-                    category={category}
-                    highlightId={highlightId}
-                    busyKeys={state.busy}
-                    onInstall={async (modelId) => {
-                      const outcome = await state.install(modelId);
-                      say(outcome, outcome.ok && outcome.value.already_installed ? i18n._({ id: "ui.That model is already installed.", message: "That model is already installed." }) : i18n._({ id: "ui.Downloading {model}. This can take a while; its status changes when it is ready.", message: "Downloading {model}. This can take a while; its status changes when it is ready.", values: { model: labelOf(modelId) } }));
-                      return outcome;
-                    }}
-                    onRemove={async (modelId) => {
-                      const outcome = await state.uninstall(modelId);
-                      say(outcome, i18n._({ id: "ui.{model} was removed.", message: "{model} was removed.", values: { model: labelOf(modelId) } }));
                       return outcome;
                     }}
                   />
@@ -194,7 +186,32 @@ export function StackCategorySheet({ category, state, labelOf, locked, highlight
                     </CollapsibleContent>
                   </Collapsible>
                 )}
-              </div>
+                </div>
+                </TabsContent>
+                <TabsContent value="models">
+                <div className="flex flex-col gap-6 px-4 pb-6">
+                <section aria-labelledby="sheet-models" className="flex flex-col gap-2">
+                  <h3 id="sheet-models" className="text-base font-semibold">{i18n._({ id: "ui.Models", message: "Models" })}</h3>
+                  <ModelList
+                    category={category}
+                    highlightId={highlightId}
+                    busyKeys={state.busy}
+                    onInstall={async (modelId) => {
+                      const outcome = await state.install(modelId);
+                      say(outcome, outcome.ok && outcome.value.already_installed ? i18n._({ id: "ui.That model is already installed.", message: "That model is already installed." }) : i18n._({ id: "ui.Downloading {model}. This can take a while; its status changes when it is ready.", message: "Downloading {model}. This can take a while; its status changes when it is ready.", values: { model: labelOf(modelId) } }));
+                      return outcome;
+                    }}
+                    onRemove={async (modelId) => {
+                      const outcome = await state.uninstall(modelId);
+                      say(outcome, i18n._({ id: "ui.{model} was removed.", message: "{model} was removed.", values: { model: labelOf(modelId) } }));
+                      return outcome;
+                    }}
+                  />
+                </section>
+                </div>
+                </TabsContent>
+                {drives && <TabsContent value="location"><div className="px-4 pb-6"><StackFeatureLocation featureId={category.id} client={drives} pollMs={pollMs} /></div></TabsContent>}
+              </Tabs>
             </>
           );
         })()}
