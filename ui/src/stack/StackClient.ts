@@ -43,7 +43,7 @@ export interface StackDriveFeatureLocation { id: string; label: string; connecte
 export interface StackDriveFeature { feature_id: string; label: string; bytes: number; drive_ids: string[]; drives: StackDriveFeatureLocation[] }
 export interface StackDriveMovePlan { model_ids: string[]; bytes: number; started: boolean }
 export type StackDriveMoveState = "planned" | "copying" | "verifying" | "switching" | "cleaning" | "done" | "failed";
-export interface StackDriveMove { id: string; model_id: string; from_disk: string; to_disk: string; state: StackDriveMoveState; bytes_done: number; bytes_total: number; error: string | null; updated_at: string }
+export interface StackDriveMove { id: string; model_id: string; feature_id: string | null; from_disk: string; to_disk: string; state: StackDriveMoveState; bytes_done: number; bytes_total: number; error: string | null; updated_at: string }
 export interface StackDrivesClient {
   list(): Promise<{ disks: StackDrive[] }>;
   features(): Promise<{ features: StackDriveFeature[] }>;

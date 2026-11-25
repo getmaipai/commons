@@ -38,7 +38,7 @@ export function StackDrives({ client, locked, pollMs = 2000 }: { client: StackDr
   }, [refresh, pollMs]);
 
   const diskById = useMemo(() => new Map(disks.map((disk) => [disk.id, disk])), [disks]);
-  const activeMove = active ? moves.find((move) => move.model_id.startsWith(`${active.feature_id}-`)) ?? null : null;
+  const activeMove = active ? moves.find((move) => move.feature_id === active.feature_id) ?? null : null;
   const connectedTargets = disks.filter((disk) => disk.connected && !active?.drive_ids.includes(disk.id));
   const running = activeMove && ["copying", "verifying"].includes(activeMove.state);
 
@@ -70,7 +70,7 @@ export function StackDrives({ client, locked, pollMs = 2000 }: { client: StackDr
       {features.map((feature) => {
         const names = [...new Set(feature.drives.map((drive) => drive.label))];
         const offline = feature.drives.find((drive) => !drive.connected);
-        const relatedMove = moves.find((move) => move.model_id.startsWith(`${feature.feature_id}-`));
+        const relatedMove = moves.find((move) => move.feature_id === feature.feature_id);
         return <li key={feature.feature_id}><Card className="gap-0 py-0"><div className="flex min-w-0 flex-wrap items-center gap-3 p-3">
           <DiskIcon aria-hidden="true" className="size-4 shrink-0 text-muted-foreground" />
           <span className="flex min-w-0 flex-1 flex-col gap-0.5"><span className="font-medium break-words">{feature.label}</span><span className="text-sm text-muted-foreground">{names.length > 1 ? i18n._({ id: "ui.Several drives", message: "Several drives" }) : names[0]} · {driveGb(feature.bytes)}</span>{offline && <span className="text-sm text-status-warning">{i18n._({ id: "ui.Drive not connected. Plug in {drive}.", message: "Drive not connected. Plug in {drive}.", values: { drive: offline.label } })}</span>}{relatedMove && ["copying", "verifying"].includes(relatedMove.state) && <span className="text-sm text-muted-foreground">{relatedMove.state === "copying" ? i18n._({ id: "ui.Copying {done} of {total}", message: "Copying {done} of {total}", values: { done: driveGb(relatedMove.bytes_done), total: driveGb(relatedMove.bytes_total) } }) : i18n._({ id: "ui.Checking the copy", message: "Checking the copy" })}</span>}</span>
