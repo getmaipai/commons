@@ -14,7 +14,7 @@ its own template render, never an estimate), the installable part record
 (`StackPart`, including optional chat turn fields for sampling, thinking mode,
 image input, turn budget and model cutoff), the parts list row and response (`StackPartView` and
 `StackPartList`), household part choices (`StackPartChoices`), status
-(`StackStatus`), and sizing (`StackSizing`).
+(`StackStatus`), sizing (`StackSizing`), and the connection record (`StackConnection`, STACK-CONNECTIONS-01: a paired Home or a custom MCP server).
 
 Each is a JSON Schema 2020-12 file under `../schemas/` (flat, alongside
 every other record and package shape), a hand-written Zod mirror under

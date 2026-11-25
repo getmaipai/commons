@@ -1,3 +1,7 @@
+## [spec-v0.1.484] - 2026-11-25
+
+- `StackConnection` (STACK-CONNECTIONS-01): the record the Stack keeps for each connection it manages, a paired Home (`kind: home`) or a custom MCP server (`kind: mcp`). Shared record fields (id, provenance, hlc); a home carries a key fingerprint only; an mcp carries its endpoint, tool list and `secret_ref`, an opaque name for a token in the Stack's secrets store, never the value. Additive.
+
 ## [spec-v0.1.483] - 2026-11-24
 
 - `access.tier.boost` and `access.tier.max` list `coding` (Home already honours it: coding Boost and Max follow the person's allowance), with its copy keys.

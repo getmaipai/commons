@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/stack-connection.schema.json",
+  "title": "StackConnection",
+  "description": "One connection the Stack manages (STACK-CONNECTIONS-01): a paired Home (kind `home`) or a custom MCP server the household added (kind `mcp`). The Stack owns the record; Home shows the same list and forwards every action. A `home` record carries a key fingerprint, never key material. An `mcp` record carries where it starts or lives, the tools it offers once tested, and `secret_ref`, an opaque name for a token kept in the Stack's secrets store; the token's value is never in this record or any reply. Who may call which tool stays in Home's age and surface gates.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "kind", "name", "reach", "state", "provenance", "hlc", "created_at"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^conn_[a-z0-9]{6,}$" },
+    "kind": { "type": "string", "enum": ["home", "mcp"] },
+    "name": { "type": "string", "minLength": 1, "maxLength": 60 },
+    "reach": { "type": "string", "enum": ["this_computer", "home_network", "tailscale", "command", "url"], "description": "How it reaches the Stack (home: this_computer, home_network or tailscale) or how the Stack reaches it (mcp: command or url)." },
+    "state": { "type": "string", "enum": ["connected", "not_seen_lately", "paused", "not_tested"], "description": "`not_tested` is an mcp record the Stack has not been able to start yet (the Stack does not run MCP servers in this phase)." },
+    "last_seen_at": { "type": ["string", "null"], "format": "date-time", "description": "A home: the last request the Stack admitted from it." },
+    "last_used_at": { "type": ["string", "null"], "format": "date-time", "description": "An mcp: the last tool call it served." },
+    "paired_at": { "type": ["string", "null"], "format": "date-time", "description": "A home: when it paired." },
+    "key_fingerprint": { "type": ["string", "null"], "pattern": "^SHA256:[A-Za-z0-9+/]{43}$", "description": "A home: the fingerprint of its public key. Null until the pairing helper reports it." },
+    "endpoint": {
+      "description": "An mcp: how it starts or where it is.",
+      "oneOf": [
+        { "type": "object", "additionalProperties": false, "required": ["type", "command"], "properties": { "type": { "const": "command" }, "command": { "type": "string", "minLength": 1 }, "args": { "type": "array", "items": { "type": "string" } } } },
+        { "type": "object", "additionalProperties": false, "required": ["type", "url"], "properties": { "type": { "const": "url" }, "url": { "type": "string", "format": "uri", "pattern": "^https?://" } } }
+      ]
+    },
+    "tools": {
+      "type": "array",
+      "description": "An mcp: the tools the server offers, read from it by Test. Empty until then.",
+      "items": { "type": "object", "additionalProperties": false, "required": ["name"], "properties": { "name": { "type": "string", "minLength": 1 }, "description": { "type": "string" } } }
+    },
+    "secret_ref": { "type": ["string", "null"], "pattern": "^secret_[a-z0-9]{6,}$", "description": "An mcp: the name of its token in the Stack's secrets store. Never the value." },
+    "created_at": { "type": "string", "format": "date-time" },
+    "provenance": { "type": "string", "minLength": 1 },
+    "hlc": { "type": "string", "pattern": "^[0-9]+:[0-9]+:[a-z0-9]{6,}$" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "kind": { "const": "mcp" } }, "required": ["kind"] },
+      "then": { "required": ["endpoint", "tools"], "properties": { "reach": { "enum": ["command", "url"] } } },
+      "else": { "not": { "anyOf": [{ "required": ["endpoint"] }, { "required": ["tools"] }, { "required": ["secret_ref"] }] }, "properties": { "reach": { "enum": ["this_computer", "home_network", "tailscale"] }, "state": { "enum": ["connected", "not_seen_lately", "paused"] } } }
+    }
+  ]
+}

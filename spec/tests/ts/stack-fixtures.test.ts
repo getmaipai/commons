@@ -28,6 +28,7 @@ import { RoleRequest } from "../../stack/ts/role-request";
 import { RoleReplyHeaders } from "../../stack/ts/role-reply-headers";
 import { StackEvent } from "../../stack/ts/stack-event";
 import { HealthItem } from "../../stack/ts/health-item";
+import { StackConnection } from "../../stack/ts/stack-connection";
 import { StackSetting } from "../../stack/ts/stack-setting";
 import { PreciousState } from "../../stack/ts/precious-state";
 import { SttWireEvent } from "../../stack/ts/stt-wire-event";
@@ -64,6 +65,7 @@ const SHAPES: Array<{ name: string; zod: ZodType }> = [
   { name: "role-reply-headers", zod: RoleReplyHeaders },
   { name: "stack-event", zod: StackEvent },
   { name: "health-item", zod: HealthItem },
+  { name: "stack-connection", zod: StackConnection },
   { name: "stack-setting", zod: StackSetting },
   { name: "precious-state", zod: PreciousState },
   { name: "stt-wire-event", zod: SttWireEvent },
