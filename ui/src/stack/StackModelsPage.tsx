@@ -20,6 +20,7 @@ import type { StackChoiceCategory, StackChoicesView, StackClient } from "./Stack
 import { StackAddModelDialog } from "./StackAddModel";
 import { StackCategorySheet } from "./StackCategorySheet";
 import { StackFreeSpaceDialog } from "./StackFreeSpace";
+import { StackDrives } from "./StackDrives";
 import { IconChip, NoticeLine, Pill } from "./StackParts";
 import type { Notice } from "./StackParts";
 import { StackRecommendedSheet } from "./StackRecommended";
@@ -50,7 +51,7 @@ export interface StackModelsPageProps {
   extraSections?: readonly StackExtraSection[];
   /**
    * What the host forbids, with the sentence to show. Keys: a feature id (`chat`, locks all of it), a feature and level (`chat:boost`, locks one level),
-   * or a page action (`recommended`, `free-space`, `add-model`, `priority`). A locked control is disabled and its sentence shown beside it.
+   * or a page action (`recommended`, `free-space`, `add-model`, `priority`, `move`). A locked control is disabled and its sentence shown beside it.
    */
   lockedItems?: Readonly<Record<string, string>>;
   /** Shown as quiet links under "More" when given. */
@@ -176,6 +177,7 @@ export function StackModelsPage({ client, extraSections, lockedItems, onNavigate
   const lockFree = lockFor(lockedItems, "free-space");
   const lockAdd = lockFor(lockedItems, "add-model");
   const lockPriority = lockFor(lockedItems, "priority");
+  const lockMove = lockFor(lockedItems, "move");
 
   return (
     <div className={cn("flex min-w-0 flex-col gap-6", className)}>
@@ -240,6 +242,7 @@ export function StackModelsPage({ client, extraSections, lockedItems, onNavigate
               <FeatureCard key={category.id} category={category} state={state} lock={lockFor(lockedItems, category.id)} onOpen={() => { setHighlightId(null); setOpenId(category.id); }} onNotice={setNotice} />
             ))}
           </ul>
+          {client.drives && <StackDrives client={client.drives} locked={lockMove} pollMs={pollMs} />}
           <Collapsible open={more} onOpenChange={setMore}>
             <CollapsibleTrigger asChild>
               <Button variant="ghost" size="sm" className="-ms-2 w-fit"><span>{i18n._({ id: "ui.More", message: "More" })}</span><ChevronIcon aria-hidden="true" className={cn("transition-transform", more && "rotate-180")} /></Button>

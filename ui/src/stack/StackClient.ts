@@ -38,7 +38,24 @@ export class StackClientError extends Error {
 export interface StackInstallStarted { job: string | null; part: string; already_installed?: true; joined?: boolean }
 export interface StackRemoved { part: string; freed_bytes: number; removed: boolean }
 
+export interface StackDrive { id: string; label: string; root_path: string; connected: boolean; free_bytes: number; total_bytes: number; removable: boolean }
+export interface StackDriveFeatureLocation { id: string; label: string; connected: boolean }
+export interface StackDriveFeature { feature_id: string; label: string; bytes: number; drive_ids: string[]; drives: StackDriveFeatureLocation[] }
+export interface StackDriveMovePlan { model_ids: string[]; bytes: number; started: boolean }
+export type StackDriveMoveState = "planned" | "copying" | "verifying" | "switching" | "cleaning" | "done" | "failed";
+export interface StackDriveMove { id: string; model_id: string; from_disk: string; to_disk: string; state: StackDriveMoveState; bytes_done: number; bytes_total: number; error: string | null; updated_at: string }
+export interface StackDrivesClient {
+  list(): Promise<{ disks: StackDrive[] }>;
+  features(): Promise<{ features: StackDriveFeature[] }>;
+  plan(featureId: string, toDiskId: string): Promise<StackDriveMovePlan>;
+  move(featureId: string, toDiskId: string): Promise<StackDriveMovePlan>;
+  moves(): Promise<{ moves: StackDriveMove[] }>;
+  cancel(): Promise<{ cancelled: boolean }>;
+}
+
 export interface StackClient {
+  /** Optional drive management routes. Hosts without them keep the existing page unchanged. */
+  drives?: StackDrivesClient;
   /** `GET /stack/v1/choices`: everything the page shows, in one read. Starts no work. */
   readChoices(): Promise<StackChoicesView>;
   /** `PUT /stack/v1/settings` with `stack.roles.<role>.enabled`. */

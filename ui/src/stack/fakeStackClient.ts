@@ -6,6 +6,7 @@ import { StackClientError } from "./StackClient";
 import type {
   StackAddModelBody, StackAddModelResult, StackCategoryId, StackCandidate, StackChoiceCategory, StackChoicesView, StackClient, StackInstallStarted, StackLevel, StackOrderBody, StackOrderResult,
   StackPickBody, StackPickResult, StackRecommendedResult, StackRemoveBody, StackRemoveResult, StackRemoved, StackUnused,
+  StackDrive, StackDriveFeature, StackDriveMove,
 } from "./StackClient";
 import { seedChoicesView, seedUnused } from "./fakeStackData";
 
@@ -26,11 +27,12 @@ export interface FakeStackClient extends StackClient {
   /** Every call the page made, in order. */
   readonly calls: FakeCall[];
   /** Make the next call to `method` fail with this sentence and code. */
-  failNext(method: keyof StackClient, message: string, code?: string): void;
+  failNext(method: keyof StackClient | "drives.plan" | "drives.move", message: string, code?: string): void;
   /** The current state, for assertions. */
   snapshot(): StackChoicesView;
   /** Call every subscriber, as the Stack's event feed would. */
   emitChange(): void;
+  drives: NonNullable<StackClient["drives"]> & { failMoveWith(sentence: string): void };
 }
 
 const clone = <T,>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
@@ -45,6 +47,28 @@ export function createFakeStackClient(options: FakeStackOptions = {}): FakeStack
   const listeners = new Set<() => void>();
   const step = options.downloadStep ?? 25;
   let jobs = 0;
+  const disks: StackDrive[] = [
+    { id: "main", label: "This computer", root_path: "/", connected: true, free_bytes: 412 * GB, total_bytes: 1000 * GB, removable: false },
+    { id: "backup", label: "Backup drive", root_path: "/media/backup", connected: true, free_bytes: 900 * GB, total_bytes: 2000 * GB, removable: true },
+    { id: "offline", label: "Offline drive", root_path: "/media/offline", connected: false, free_bytes: 30 * GB, total_bytes: 500 * GB, removable: true },
+  ];
+  const driveFeatures: StackDriveFeature[] = [
+    { feature_id: "chat", label: "Chat", bytes: 12.04 * GB, drive_ids: ["main"], drives: [{ id: "main", label: "This computer", connected: true }] },
+    { feature_id: "pictures", label: "Pictures", bytes: Math.round(6 * GB), drive_ids: ["offline"], drives: [{ id: "offline", label: "Backup drive", connected: false }] },
+    { feature_id: "music", label: "Music", bytes: Math.round(9 * GB), drive_ids: ["main", "backup"], drives: [{ id: "main", label: "This computer", connected: true }, { id: "backup", label: "Backup drive", connected: true }] },
+  ];
+  let moveJobs: StackDriveMove[] = [];
+  let moveFailure: string | null = null;
+  let moveTicks = 0;
+  const driveApi = {
+    async list() { await gate("drives.list", []); return { disks: clone(disks) }; },
+    async features() { await gate("drives.features", []); return { features: clone(driveFeatures) }; },
+    async plan(featureId: string, toDiskId: string) { await gate("drives.plan", [featureId, toDiskId]); const f = driveFeatures.find((x) => x.feature_id === featureId); if (!f) throw new StackClientError("The Stack does not know that feature."); return { model_ids: [`${featureId}-model`], bytes: f.bytes, started: false }; },
+    async move(featureId: string, toDiskId: string) { await gate("drives.move", [featureId, toDiskId]); const f = driveFeatures.find((x) => x.feature_id === featureId); if (!f) throw new StackClientError("The Stack does not know that feature."); const j: StackDriveMove = { id: "move-1", model_id: `${featureId}-model`, from_disk: f.drive_ids[0] ?? "main", to_disk: toDiskId, state: "copying", bytes_done: 3.1 * GB, bytes_total: 8.4 * GB, error: null, updated_at: new Date().toISOString() }; moveJobs = [j]; moveTicks = 0; return { model_ids: [j.model_id], bytes: f.bytes, started: true }; },
+    async moves() { await gate("drives.moves", []); if (moveJobs.length) { moveTicks += 1; const j = moveJobs[0]!; if (moveFailure) { j.state = "failed"; j.error = moveFailure; moveFailure = null; } else if (moveTicks <= 1) j.state = "copying"; else if (moveTicks === 2) j.state = "verifying"; else if (moveTicks >= 3) { j.state = "done"; const feature = driveFeatures.find((f) => f.feature_id === j.model_id.replace(/-model$/, "")); if (feature) { feature.drive_ids = [j.to_disk]; feature.drives = [{ id: j.to_disk, label: disks.find((d) => d.id === j.to_disk)?.label ?? j.to_disk, connected: true }]; } } } return { moves: clone(moveJobs) }; },
+    async cancel() { await gate("drives.cancel", []); moveJobs = []; return { cancelled: true }; },
+    failMoveWith(sentence: string) { moveFailure = sentence; },
+  };
 
   const emit = () => { for (const listener of listeners) listener(); };
   const gate = async (method: string, args: unknown[]) => {
@@ -80,6 +104,7 @@ export function createFakeStackClient(options: FakeStackOptions = {}): FakeStack
 
   const client: FakeStackClient = {
     calls,
+    drives: driveApi,
     failNext(method, message, code = "refused") { failures.set(method, new StackClientError(message, code)); },
     snapshot: () => clone(view),
     emitChange: emit,
