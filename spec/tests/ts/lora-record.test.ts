@@ -209,3 +209,19 @@ describe("File made_audience and lock (additive)", () => {
     expect(validateFileSchema(file({ made_audience: "teen" }))).toBe(false);
   });
 });
+
+describe("Lora disk_id and status (STACK-LORAS-01)", () => {
+  test("optional: an older record without them stays valid", () => {
+    expect(both(mut(() => {}))).toBe(true);
+  });
+  test("accepts a disk id and each status", () => {
+    for (const status of ["ready", "drive_missing", "installing", "failed"]) {
+      expect(both(mut((l) => { l.disk_id = "disk-b"; l.status = status; }))).toBe(true);
+    }
+    expect(both(mut((l) => { l.disk_id = null; }))).toBe(true);
+  });
+  test("refuses an unknown status or an empty disk id", () => {
+    expect(both(mut((l) => { l.status = "gone"; }))).toBe(false);
+    expect(both(mut((l) => { l.disk_id = ""; }))).toBe(false);
+  });
+});

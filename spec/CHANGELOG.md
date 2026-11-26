@@ -1,3 +1,7 @@
+## [spec-v0.1.486] - 2026-11-26
+
+- `Lora` gains optional `disk_id` (which Stack drive holds the file) and `status` (`ready`, `drive_missing`, `installing`, `failed`) for STACK-LORAS-01 (the Stack owns LoRAs). Additive: older records stay valid and absent status means ready.
+
 ## [spec-v0.1.485] - 2026-11-25
 
 - `indicator/indicator-standard.md`: the ring indicator standard now lives in the spec (StackChan carried a hand-placed copy). Rows added for `getting_data` (violet, breathe), `speaking` (cyan, steady), `thinking` (white, steady) and `face_seen` (yellow, double blink); `listening` changes from blue to green so the ring equals the icon (owner, 2026-11-25: one listening color; blue is kept for security alerts). A palette table lists the token for each meaning (listening, speaking, thinking, getting data, face seen, camera, healthy, trouble, down) with the ring row it maps to; `down` is the dot's red and the ring never shows red. Colour names `violet` and `yellow` are new; the `dance` row stays magenta and is now a true magenta apart from violet. Test: `tests/ts/indicator-standard.test.ts`. Additive except the listening colour.

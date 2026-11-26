@@ -241,6 +241,17 @@
       ],
       "description": "The card image, or null for none."
     },
+    "disk_id": {
+      "type": ["string", "null"],
+      "minLength": 1,
+      "maxLength": 64,
+      "description": "Which Stack drive holds the file (the Stack's disk id, same as models). Null or absent means the Stack's own data directory. Added by STACK-LORAS-01 slice 0; optional so older records stay valid."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["ready", "drive_missing", "installing", "failed"],
+      "description": "The Stack's state for the file. `drive_missing` means the drive named by disk_id is not mounted, and Home treats the style as unavailable. Absent means ready. Added by STACK-LORAS-01 slice 0."
+    },
     "removed_at": {
       "type": ["string", "null"],
       "format": "date-time",

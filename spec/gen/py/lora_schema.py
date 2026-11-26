@@ -320,6 +320,14 @@ class Lora(BaseModel):
     preview: Preview | None = Field(
         ..., description='The card image, or null for none.'
     )
+    disk_id: constr(min_length=1, max_length=64) | None = Field(
+        None,
+        description="Which Stack drive holds the file (the Stack's disk id, same as models). Null or absent means the Stack's own data directory. Added by STACK-LORAS-01 slice 0; optional so older records stay valid.",
+    )
+    status: Literal['ready', 'drive_missing', 'installing', 'failed'] | None = Field(
+        None,
+        description="The Stack's state for the file. `drive_missing` means the drive named by disk_id is not mounted, and Home treats the style as unavailable. Absent means ready. Added by STACK-LORAS-01 slice 0.",
+    )
     removed_at: AwareDatetime | None = Field(
         ...,
         description='Restorable trash (design 4.3). Set when an admin removes it; null while live. A removed LoRA is unusable and hidden except from Recently removed.',
