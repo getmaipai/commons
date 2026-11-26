@@ -17,6 +17,8 @@ import { Pill } from "./StackParts";
 
 const SearchIcon = getIcon("search");
 const fallback = () => i18n._({ id: "ui.That could not be saved. Try again.", message: "That could not be saved. Try again." });
+/** Until the Stack has answered `sources`, the two sites are listed by id; the Stack's own labels replace them. */
+const SITES_UNREAD: StackLoraSource[] = [{ site: "huggingface", label: "huggingface", has_key: false }, { site: "civitai", label: "civitai", has_key: false }];
 const looksLikeVideo = (base: string | null): boolean => /wan|ltx|hunyuan|video|svd|cogvideo|mochi/i.test(base ?? "");
 
 function AddDialog({ hit, drives, licences, locked, client, onStarted, onClose }: { hit: StackLoraHit | null; drives: StackDrive[]; licences?: StackLicencesClient; locked: boolean; client: StackLorasClient; onStarted: (job: string, label: string) => void; onClose: () => void }) {
@@ -85,7 +87,7 @@ export function StackLoraAdd({ client, drives, licences, locked, onStarted }: { 
     <h3 id="lora-add-heading" className="text-base font-semibold">{i18n._({ id: "ui.Add a style", message: "Add a style" })}</h3>
     <form className="flex min-w-0 flex-wrap items-end gap-2" onSubmit={(event) => { event.preventDefault(); void search(); }}>
       <div className="flex flex-col gap-1.5"><Label htmlFor="lora-site">{i18n._({ id: "ui.Search on", message: "Search on" })}</Label>
-        <Select value={site} onValueChange={(value) => { setSite(value as StackLoraSite); setHits(null); }}><SelectTrigger id="lora-site" className="min-w-40"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="huggingface">Hugging Face</SelectItem><SelectItem value="civitai">Civitai</SelectItem></SelectContent></Select></div>
+        <Select value={site} onValueChange={(value) => { setSite(value as StackLoraSite); setHits(null); }}><SelectTrigger id="lora-site" className="min-w-40"><SelectValue /></SelectTrigger><SelectContent>{(sources.length > 0 ? sources : SITES_UNREAD).map((source) => <SelectItem key={source.site} value={source.site}>{source.label}</SelectItem>)}</SelectContent></Select></div>
       <div className="flex min-w-0 flex-1 basis-48 flex-col gap-1.5"><Label htmlFor="lora-query">{i18n._({ id: "ui.Style name or look", message: "Style name or look" })}</Label><Input id="lora-query" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={i18n._({ id: "ui.watercolor", message: "watercolor" })} /></div>
       <Button type="submit" variant="outline" disabled={searching || !query.trim()}><SearchIcon aria-hidden="true" className="size-4" />{i18n._({ id: "ui.Search", message: "Search" })}</Button>
     </form>

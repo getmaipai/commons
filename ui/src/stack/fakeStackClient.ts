@@ -139,7 +139,7 @@ export function createFakeStackClient(options: FakeStackOptions = {}): FakeStack
     lora("archived", "Ink sketch", { disk_id: "offline", disk_label: "Offline drive", status: "drive_missing" }),
     lora("old", "Retro poster", { removed_at: "2026-11-10T10:00:00.000Z", trash_until: "2026-12-10T10:00:00.000Z" }),
   ];
-  const loraSources: StackLoraSource[] = [{ site: "huggingface", label: "Hugging Face", has_key: false }, { site: "civitai", label: "Civitai", has_key: true }];
+  const loraSources: StackLoraSource[] = [{ site: "huggingface", label: said("Hugging Face"), has_key: false }, { site: "civitai", label: said("Civitai"), has_key: true }];
   const loraHits: StackLoraHit[] = [
     { site: "huggingface", remote_id: "acme/paper-cut", name: "Paper cut", base_model: "SDXL 1.0", downloads: 12400, install_url: "https://huggingface.co/acme/paper-cut/resolve/main/paper.safetensors", file_name: "paper.safetensors", bytes: 170 * MB, audience_hint: "all-ages", licence: "apache-2.0", page_url: "https://huggingface.co/acme/paper-cut" },
     { site: "huggingface", remote_id: "acme/neon-night", name: "Neon night", base_model: "Wan 2.1", downloads: 980, install_url: "https://huggingface.co/acme/neon-night/resolve/main/neon.safetensors", file_name: "neon.safetensors", bytes: 300 * MB, audience_hint: "adult-only", licence: null, page_url: "https://huggingface.co/acme/neon-night" },
