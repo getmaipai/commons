@@ -57,9 +57,22 @@ export interface StackDrivesClient {
   remove(id: string): Promise<{ ok: true }>;
 }
 
+/** One model licence the Stack can install: its plain name, where to read it, and the points the household has to weigh (`summary`, short sentences). */
+export interface StackLicence { id: string; name: string; url: string; summary: readonly string[] }
+/** `GET /stack/v1/licences`: whether the household has accepted the model licences, and what they cover. One acceptance covers every model. */
+export interface StackLicences { terms_version: string; accepted: boolean; accepted_at: string | null; by: string | null; licences: readonly StackLicence[] }
+export interface StackLicencesClient {
+  /** `GET /stack/v1/licences`. Starts no work. */
+  read(): Promise<StackLicences>;
+  /** `POST /stack/v1/licences`: record that the person reading has accepted every licence shown. */
+  accept(): Promise<StackLicences>;
+}
+
 export interface StackClient {
   /** Optional drive management routes. Hosts without them keep the existing page unchanged. */
   drives?: StackDrivesClient;
+  /** Optional model-licence card. Hosts without it keep the existing page unchanged. */
+  licences?: StackLicencesClient;
   /** `GET /stack/v1/choices`: everything the page shows, in one read. Starts no work. */
   readChoices(): Promise<StackChoicesView>;
   /** `PUT /stack/v1/settings` with `stack.roles.<role>.enabled`. */

@@ -6,7 +6,7 @@ import { StackClientError } from "./StackClient";
 import type {
   StackAddModelBody, StackAddModelResult, StackCategoryId, StackCandidate, StackChoiceCategory, StackChoicesView, StackClient, StackInstallStarted, StackLevel, StackOrderBody, StackOrderResult,
   StackPickBody, StackPickResult, StackRecommendedResult, StackRemoveBody, StackRemoveResult, StackRemoved, StackUnused,
-  StackDrive, StackDriveFeature, StackDriveMove,
+  StackDrive, StackDriveFeature, StackDriveMove, StackLicence, StackLicences,
 } from "./StackClient";
 import { seedChoicesView, seedUnused } from "./fakeStackData";
 
@@ -27,12 +27,14 @@ export interface FakeStackClient extends StackClient {
   /** Every call the page made, in order. */
   readonly calls: FakeCall[];
   /** Make the next call to `method` fail with this sentence and code. */
-  failNext(method: keyof StackClient | "drives.plan" | "drives.move", message: string, code?: string): void;
+  failNext(method: keyof StackClient | "drives.plan" | "drives.move" | "licences.read" | "licences.accept", message: string, code?: string): void;
   /** The current state, for assertions. */
   snapshot(): StackChoicesView;
   /** Call every subscriber, as the Stack's event feed would. */
   emitChange(): void;
   drives: NonNullable<StackClient["drives"]> & { failMoveWith(sentence: string): void };
+  /** The licence state, for assertions (`accepted`, `accepted_at`). */
+  licences: NonNullable<StackClient["licences"]> & { snapshot(): StackLicences };
 }
 
 const clone = <T,>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
@@ -60,6 +62,12 @@ export function createFakeStackClient(options: FakeStackOptions = {}): FakeStack
   let moveJobs: StackDriveMove[] = [];
   let moveFailure: string | null = null;
   let moveTicks = 0;
+  // One acceptance covers every model, so it starts unanswered and flips once (STACK-LICENCE-01).
+  const licenceItems: StackLicence[] = [
+    { id: "qwen-research", name: "Qwen research licence", url: "https://example.com/qwen-licence", summary: ["Free to use, copy and share.", "Says who made the model whenever results are shown."] },
+    { id: "image-maker", name: "Image maker licence", url: "https://example.com/flux-licence", summary: ["Free while your business stays small.", "Pictures you make belong to you."] },
+  ];
+  let licenceState: StackLicences = { terms_version: "2026-05", accepted: false, accepted_at: null, by: null, licences: licenceItems };
   const driveApi = {
     async list() { await gate("drives.list", []); return { disks: clone(disks) }; },
     async features() { await gate("drives.features", []); return { features: clone(driveFeatures) }; },
@@ -104,9 +112,23 @@ export function createFakeStackClient(options: FakeStackOptions = {}): FakeStack
     for (const category of view.categories) for (const row of category.tiers) row.chosen_state = category.candidates.find((c) => c.id === row.chosen)?.state ?? null;
   };
 
+  const licenceApi = {
+    async read() { await gate("licences.read", []); return clone(licenceState); },
+    async accept() {
+      await gate("licences.accept", []);
+      licenceState = { ...licenceState, accepted: true, accepted_at: new Date().toISOString(), by: "sage" };
+      // The Stack's own behaviour: with the one acceptance recorded, no model is waiting on a licence any more.
+      for (const category of view.categories) for (const candidate of category.candidates) candidate.licence_needed = false;
+      emit();
+      return clone(licenceState);
+    },
+    snapshot: () => clone(licenceState),
+  };
+
   const client: FakeStackClient = {
     calls,
     drives: driveApi,
+    licences: licenceApi,
     failNext(method, message, code = "refused") { failures.set(method, new StackClientError(message, code)); },
     snapshot: () => clone(view),
     emitChange: emit,

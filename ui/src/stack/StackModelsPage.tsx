@@ -21,6 +21,7 @@ import { StackAddModelDialog } from "./StackAddModel";
 import { StackCategorySheet } from "./StackCategorySheet";
 import { StackFreeSpaceDialog } from "./StackFreeSpace";
 import { StackDrives } from "./StackDrives";
+import { StackLicences } from "./StackLicences";
 import { IconChip, NoticeLine, Pill } from "./StackParts";
 import type { Notice } from "./StackParts";
 import { StackRecommendedSheet } from "./StackRecommended";
@@ -237,6 +238,8 @@ export function StackModelsPage({ client, extraSections, lockedItems, onNavigate
 
       {view && !searching && (
         <>
+          {/* One acceptance covers every model, so it leads the page; after it the choices are read again and their "licence needed" markers clear. */}
+          {client.licences && <StackLicences client={client.licences} onAccepted={() => { void state.reload(); }} />}
           <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3" aria-label={i18n._({ id: "ui.Features", message: "Features" })}>
             {state.categories.map((category) => (
               <FeatureCard key={category.id} category={category} state={state} lock={lockFor(lockedItems, category.id)} onOpen={() => { setHighlightId(null); setOpenId(category.id); }} onNotice={setNotice} />

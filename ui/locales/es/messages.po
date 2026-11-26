@@ -74,7 +74,7 @@ msgid "ui.{count, plural, one {# minute} other {# minutes}}"
 msgstr "{count, plural, one {# minuto} other {# minutos}}"
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:106
+#: src/stack/StackModelsPage.tsx:107
 msgid "ui.{count, plural, one {# model matches} other {# models match}}"
 msgstr ""
 
@@ -205,29 +205,29 @@ msgstr "{favoriteCount} de {favoritesLimit} en la barra izquierda"
 
 #. js-lingui-explicit-id
 #: src/stack/StackCategorySheet.tsx:119
-#: src/stack/StackModelsPage.tsx:90
+#: src/stack/StackModelsPage.tsx:91
 msgid "ui.{feature} is off. Anything it was running has stopped."
 msgstr ""
 
 #. js-lingui-explicit-id
 #: src/stack/StackCategorySheet.tsx:119
-#: src/stack/StackModelsPage.tsx:90
+#: src/stack/StackModelsPage.tsx:91
 msgid "ui.{feature} is on."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:138
+#: src/stack/StackModelsPage.tsx:139
 msgid "ui.{feature} moved down."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:138
+#: src/stack/StackModelsPage.tsx:139
 msgid "ui.{feature} moved up."
 msgstr ""
 
 #. js-lingui-explicit-id
 #: src/stack/StackCategorySheet.tsx:119
-#: src/stack/StackModelsPage.tsx:92
+#: src/stack/StackModelsPage.tsx:93
 msgid "ui.{feature} on or off"
 msgstr ""
 
@@ -778,7 +778,7 @@ msgid "ui.A minor"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:172
+#: src/stack/StackModelsPage.tsx:173
 msgid "ui.a model"
 msgstr ""
 
@@ -829,6 +829,11 @@ msgstr "Sobre la banda"
 #, needs-review
 msgid "ui.Accept"
 msgstr "Aceptar"
+
+#. js-lingui-explicit-id
+#: src/stack/StackLicences.tsx:60
+msgid "ui.Accepting"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/settings/SettingsShellShowcase.tsx:25
@@ -892,8 +897,8 @@ msgstr "Añade {name} a favoritos"
 
 #. js-lingui-explicit-id
 #: src/stack/StackAddModel.tsx:40
-#: src/stack/StackModelsPage.tsx:253
 #: src/stack/StackModelsPage.tsx:256
+#: src/stack/StackModelsPage.tsx:259
 msgid "ui.Add a chat model"
 msgstr ""
 
@@ -1040,7 +1045,7 @@ msgid "ui.Ahead {seconds} seconds"
 msgstr "{seconds} segundos adelante"
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:187
+#: src/stack/StackModelsPage.tsx:188
 msgid "ui.AI and models"
 msgstr ""
 
@@ -1507,7 +1512,7 @@ msgid "ui.Brightness"
 msgstr "Brillo"
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:254
+#: src/stack/StackModelsPage.tsx:257
 msgid "ui.Bring your own from Hugging Face. The Stack checks its size and licence first."
 msgstr ""
 
@@ -2648,7 +2653,7 @@ msgid "ui.Discuss"
 msgstr "Discutir"
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:263
+#: src/stack/StackModelsPage.tsx:266
 msgid "ui.Disk space"
 msgstr ""
 
@@ -3188,7 +3193,7 @@ msgid "ui.Featured"
 msgstr "Destacados"
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:240
+#: src/stack/StackModelsPage.tsx:243
 msgid "ui.Features"
 msgstr ""
 
@@ -3412,7 +3417,7 @@ msgid "ui.Free"
 msgstr "Libre"
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:198
+#: src/stack/StackModelsPage.tsx:199
 msgid "ui.Free up {size}"
 msgstr ""
 
@@ -3544,7 +3549,7 @@ msgid "ui.Hazy"
 msgstr "Bruma"
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:265
+#: src/stack/StackModelsPage.tsx:268
 msgid "ui.Health"
 msgstr ""
 
@@ -3726,6 +3731,11 @@ msgstr "No pude crear esa canción."
 #, needs-review
 msgid "ui.I couldn't make that video."
 msgstr "No pude crear ese video."
+
+#. js-lingui-explicit-id
+#: src/stack/StackLicences.tsx:60
+msgid "ui.I have read and accept the licences of the models the Stack installs"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/project-mark.tsx:130
@@ -4144,6 +4154,16 @@ msgid "ui.Licence"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackLicences.tsx:49
+msgid "ui.Licences"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLicences.tsx:40
+msgid "ui.Licences accepted on {date}."
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/elements/image-editor.tsx:821
 msgid "ui.Light and colour adjusted"
 msgstr ""
@@ -4217,7 +4237,7 @@ msgstr "En vivo"
 #: src/primitives/PageSkeleton.tsx:22
 #: src/primitives/RouteSkeleton.tsx:15
 #: src/schema/MediaStageNodeView.tsx:38
-#: src/stack/StackModelsPage.tsx:223
+#: src/stack/StackModelsPage.tsx:224
 #, needs-review
 msgid "ui.Loading"
 msgstr "Cargando"
@@ -4547,7 +4567,7 @@ msgid "ui.Memory"
 msgstr "Memoria"
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:262
+#: src/stack/StackModelsPage.tsx:265
 msgid "ui.Memory and speed"
 msgstr ""
 
@@ -4616,6 +4636,11 @@ msgid "ui.Model in use"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackLicences.tsx:47
+msgid "ui.Model licences"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/settings/SettingsShellShowcase.tsx:48
 #: src/stack/StackCategorySheet.tsx:130
 #: src/stack/StackCategorySheet.tsx:194
@@ -4668,7 +4693,7 @@ msgstr "Fase lunar"
 #: src/primitives/ArticleView.tsx:480
 #: src/schema/NodeRenderer.tsx:2482
 #: src/stack/StackCategorySheet.tsx:155
-#: src/stack/StackModelsPage.tsx:248
+#: src/stack/StackModelsPage.tsx:251
 #: src/ui/breadcrumb.tsx:102
 #, needs-review
 msgid "ui.More"
@@ -4735,12 +4760,12 @@ msgid "ui.Move {feature}"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:151
+#: src/stack/StackModelsPage.tsx:152
 msgid "ui.Move {feature} down"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:150
+#: src/stack/StackModelsPage.tsx:151
 msgid "ui.Move {feature} up"
 msgstr ""
 
@@ -4888,7 +4913,7 @@ msgid "ui.Name"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:212
+#: src/stack/StackModelsPage.tsx:213
 msgid "ui.Name, version or licence"
 msgstr ""
 
@@ -5133,7 +5158,7 @@ msgid "ui.No matching items"
 msgstr "No hay elementos que coincidan"
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:102
+#: src/stack/StackModelsPage.tsx:103
 msgid "ui.No model matches \"{query}\". Try a name, a version such as 3.8, a licence or a feature."
 msgstr ""
 
@@ -5532,7 +5557,7 @@ msgstr "apagado"
 #: src/elements/switch-tile.tsx:6
 #: src/primitives/SleepTimer.tsx:76
 #: src/stack/StackLevelList.tsx:38
-#: src/stack/StackModelsPage.tsx:149
+#: src/stack/StackModelsPage.tsx:150
 #: src/stack/stackWords.ts:45
 #: src/stack/stackWords.ts:69
 #, needs-review
@@ -6381,7 +6406,7 @@ msgid "ui.Primary navigation"
 msgstr "Navegación principal"
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:144
+#: src/stack/StackModelsPage.tsx:145
 msgid "ui.Priority order"
 msgstr ""
 
@@ -6580,7 +6605,7 @@ msgid "ui.Recommended"
 msgstr "Recomendado"
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:196
+#: src/stack/StackModelsPage.tsx:197
 #: src/stack/StackRecommended.tsx:66
 msgid "ui.Recommended setup"
 msgstr ""
@@ -6662,7 +6687,7 @@ msgstr "Regenerar imagen"
 #. js-lingui-explicit-id
 #: src/primitives/ArticleView.tsx:299
 #: src/primitives/ArticleView.tsx:300
-#: src/stack/StackModelsPage.tsx:260
+#: src/stack/StackModelsPage.tsx:263
 #, needs-review
 msgid "ui.Related"
 msgstr "Relacionado"
@@ -7349,12 +7374,12 @@ msgid "ui.Search locations"
 msgstr "Buscar ubicaciones"
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:213
+#: src/stack/StackModelsPage.tsx:214
 msgid "ui.Search models"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:107
+#: src/stack/StackModelsPage.tsx:108
 msgid "ui.Search results"
 msgstr ""
 
@@ -7902,6 +7927,11 @@ msgid "ui.Solo {lane}"
 msgstr "Solo {lane}"
 
 #. js-lingui-explicit-id
+#: src/stack/StackLicences.tsx:48
+msgid "ui.Some models come with the maker's licence. Read them once and accept, and every model can then be installed."
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/schema/NodeRenderer.tsx:171
 #, needs-review
 msgid "ui.Someone"
@@ -8400,6 +8430,7 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/stack/StackDrives.tsx:17
+#: src/stack/StackLicences.tsx:11
 #: src/stack/StackMoveDialog.tsx:11
 msgid "ui.That could not be saved. Try again."
 msgstr ""
@@ -8529,7 +8560,7 @@ msgid "ui.The model list could not be read. Try again in a moment."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:230
+#: src/stack/StackModelsPage.tsx:231
 msgid "ui.The models could not be shown"
 msgstr ""
 
@@ -8689,7 +8720,7 @@ msgid "ui.This computer"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:190
+#: src/stack/StackModelsPage.tsx:191
 msgid "ui.This computer has about {memory} GB of memory for AI and {disk} free on disk."
 msgstr ""
 
@@ -8982,7 +9013,7 @@ msgstr "Recortar inicio de {label}"
 #: src/elements/music-track.tsx:35
 #: src/elements/video-player.tsx:118
 #: src/primitives/AsyncState.tsx:85
-#: src/stack/StackModelsPage.tsx:232
+#: src/stack/StackModelsPage.tsx:233
 #, needs-review
 msgid "ui.Try again"
 msgstr "Inténtalo de nuevo"
@@ -9206,7 +9237,7 @@ msgid "ui.Update"
 msgstr "Actualizar"
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:264
+#: src/stack/StackModelsPage.tsx:267
 msgid "ui.Updates"
 msgstr ""
 
@@ -9340,7 +9371,7 @@ msgstr "Versión {n} de {total}"
 
 #. js-lingui-explicit-id
 #: src/stack/StackModelList.tsx:52
-#: src/stack/StackModelsPage.tsx:120
+#: src/stack/StackModelsPage.tsx:121
 msgid "ui.Version {version}"
 msgstr ""
 
@@ -9544,6 +9575,11 @@ msgid "ui.What happened to each model"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackLicences.tsx:53
+msgid "ui.What the {licence} licence says"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/elements/band.tsx:60
 #, needs-review
 msgid "ui.What the band picture and logo should look like."
@@ -9567,7 +9603,7 @@ msgid "ui.What would change"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:142
+#: src/stack/StackModelsPage.tsx:143
 msgid "ui.When memory is tight, features higher in this list are served first."
 msgstr ""
 
@@ -9578,7 +9614,7 @@ msgid "ui.Where the reference library lives."
 msgstr "Dónde está la biblioteca de referencia."
 
 #. js-lingui-explicit-id
-#: src/stack/StackModelsPage.tsx:141
+#: src/stack/StackModelsPage.tsx:142
 msgid "ui.Which feature goes first"
 msgstr ""
 
