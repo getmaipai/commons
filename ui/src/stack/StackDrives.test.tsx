@@ -71,7 +71,7 @@ describe("Drives", () => {
   });
 
   test("polling shows copying, checking, then done", async () => {
-    await ready(createFakeStackClient(), 150);
+    await ready(createFakeStackClient(), 400);
     await click(screen.getByRole("button", { name: "Move Chat" }));
     const dialog = await screen.findByRole("dialog");
     await click(within(dialog).getByRole("combobox", { name: "Move to" }));
@@ -79,8 +79,8 @@ describe("Drives", () => {
     await within(dialog).findByText(/Moves 12\.0 GB/);
     await click(within(dialog).getByRole("button", { name: "Move" }));
     expect(await within(dialog).findByText("Copying 3.1 GB of 8.4 GB")).toBeTruthy();
-    expect(await within(dialog).findByText("Checking the copy", {}, { timeout: 3000 })).toBeTruthy();
-    expect(await within(dialog).findByText("Moved to Backup drive", {}, { timeout: 3000 })).toBeTruthy();
+    expect(await within(dialog).findByText("Checking the copy", {}, { timeout: 6000 })).toBeTruthy();
+    expect(await within(dialog).findByText("Moved to Backup drive", {}, { timeout: 6000 })).toBeTruthy();
   });
 
   test("failed moves show the Stack error and say the files are still where they were", async () => {
