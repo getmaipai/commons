@@ -92,6 +92,11 @@ msgid "ui.{count, plural, one {# try left.} other {# tries left.}}"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackLoraAdd.tsx:103
+msgid "ui.{count} downloads"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/dashboard/layouts/full/vertical/header/Notifications.tsx:57
 msgid "ui.{count} new"
 msgstr ""
@@ -497,8 +502,18 @@ msgid "ui.{seconds}s"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackLoraDialogs.tsx:119
+msgid "ui.{site} key"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/stack/stackWords.ts:31
 msgid "ui.{size} GB"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLoraRow.tsx:17
+msgid "ui.{size} MB"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -510,6 +525,16 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/elements/trace-waterfall.tsx:87
 msgid "ui.{status}, starts at {start}ms, runs {duration}ms"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLorasPage.tsx:91
+msgid "ui.{style} did not finish. {reason}"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLorasPage.tsx:103
+msgid "ui.{style} is in the trash. You can bring it back for {days} days."
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -647,6 +672,11 @@ msgid "ui.3. Music"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackLoraAdd.tsx:93
+msgid "ui.A {site} key is saved."
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/elements/track-studio-edit.ts:61
 msgid "ui.A film can be {seconds} seconds long. Shorten a piece to add more."
 msgstr ""
@@ -722,6 +752,11 @@ msgid "ui.Accept"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackLoraAdd.tsx:60
+msgid "ui.Accept the licences"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/stack/StackLicences.tsx:60
 msgid "ui.Accepting"
 msgstr ""
@@ -761,6 +796,7 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/stack/StackDrives.tsx:91
+#: src/stack/StackLoraAdd.tsx:106
 msgid "ui.Add"
 msgstr ""
 
@@ -781,6 +817,11 @@ msgid "ui.Add {name} to favorites"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackLoraAdd.tsx:106
+msgid "ui.Add {style}"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/stack/StackAddModel.tsx:40
 #: src/stack/StackModelsPage.tsx:256
 #: src/stack/StackModelsPage.tsx:259
@@ -796,6 +837,11 @@ msgstr ""
 #: src/stack/StackDrives.tsx:67
 #: src/stack/StackDrives.tsx:84
 msgid "ui.Add a drive"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLoraAdd.tsx:94
+msgid "ui.Add a key"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -823,6 +869,11 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/elements/image-editor.tsx:1777
 msgid "ui.Add a reference picture"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLoraAdd.tsx:85
+msgid "ui.Add a style"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -862,6 +913,16 @@ msgid "ui.Add music"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackLoraAdd.tsx:62
+msgid "ui.Add style"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLoraAdd.tsx:51
+msgid "ui.Add this style"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/elements/track-studio.tsx:753
 msgid "ui.Add title at the playhead"
 msgstr ""
@@ -882,6 +943,21 @@ msgid "ui.Added {added} phrases. {count} in the list."
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackLorasPage.tsx:61
+msgid "ui.Added {style}."
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLoraRow.tsx:53
+msgid "ui.Adding"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLorasPage.tsx:92
+msgid "ui.Adding {style}"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/schema/ImageEditorNodeView.tsx:171
 msgid "ui.Adding a picture is not available on this screen."
 msgstr ""
@@ -889,6 +965,12 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/elements/image-editor.tsx:298
 msgid "ui.Adjust"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLoraDialogs.tsx:50
+#: src/stack/StackLoraRow.tsx:61
+msgid "ui.Adults only"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -1259,6 +1341,11 @@ msgid "ui.Before and after divider"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackLoraRow.tsx:34
+msgid "ui.Being added now."
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/stack/stackWords.ts:21
 msgid "ui.Better results, and it uses more memory."
 msgstr ""
@@ -1398,6 +1485,11 @@ msgstr ""
 #: src/stack/StackAddModel.tsx:73
 #: src/stack/StackDrives.tsx:91
 #: src/stack/StackFreeSpace.tsx:110
+#: src/stack/StackLoraAdd.tsx:62
+#: src/stack/StackLoraDialogs.tsx:55
+#: src/stack/StackLoraDialogs.tsx:84
+#: src/stack/StackLoraDialogs.tsx:102
+#: src/stack/StackLoraDialogs.tsx:126
 #: src/stack/StackMoveDialog.tsx:57
 msgid "ui.Cancel"
 msgstr ""
@@ -1473,6 +1565,16 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/elements/chat-header.tsx:52
 msgid "ui.Change companion"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLoraDialogs.tsx:44
+msgid "ui.Change how this style is named and used."
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLoraAdd.tsx:94
+msgid "ui.Change key"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -1552,6 +1654,12 @@ msgid "ui.Choose a connected drive for these files."
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackLoraDialogs.tsx:79
+msgid "ui.Choose a connected drive for this style. It stays usable and is checked after the copy."
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLoraDialogs.tsx:63
 #: src/stack/StackMoveDialog.tsx:54
 msgid "ui.Choose a drive"
 msgstr ""
@@ -2195,6 +2303,22 @@ msgid "ui.Delete"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackLorasPage.tsx:118
+msgid "ui.Delete {style} for good"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLoraDialogs.tsx:100
+msgid "ui.Delete {style} for good?"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLoraDialogs.tsx:102
+#: src/stack/StackLorasPage.tsx:118
+msgid "ui.Delete for good"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/elements/track-studio.tsx:411
 msgid "ui.Delete piece"
 msgstr ""
@@ -2338,6 +2462,7 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/primitives/reorder.tsx:169
+#: src/stack/StackLorasPage.tsx:91
 #: src/stack/StackParts.tsx:62
 msgid "ui.Dismiss"
 msgstr ""
@@ -2482,6 +2607,21 @@ msgid "ui.Drag the handles at each end to trim. Press S to cut at the playhead."
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackLoraDialogs.tsx:63
+msgid "ui.Drive"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLoraRow.tsx:53
+msgid "ui.Drive not connected"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLoraRow.tsx:32
+msgid "ui.Drive not connected. Plug in {drive}, then this style works again."
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/stack/StackDrives.tsx:75
 #: src/stack/StackFeatureLocation.tsx:47
 msgid "ui.Drive not connected. Plug in {drive}."
@@ -2551,7 +2691,13 @@ msgstr ""
 #: src/elements/thread.aui.tsx:1645
 #: src/elements/track-studio.tsx:409
 #: src/elements/track-studio.tsx:499
+#: src/stack/StackLoraRow.tsx:68
 msgid "ui.Edit"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLoraRow.tsx:68
+msgid "ui.Edit {style}"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -2588,6 +2734,7 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/song-style.tsx:67
+#: src/stack/StackLoraDialogs.tsx:44
 msgid "ui.Edit style"
 msgstr ""
 
@@ -2771,6 +2918,11 @@ msgstr ""
 #: src/elements/todo-list.tsx:24
 #: src/elements/trace-waterfall.tsx:31
 msgid "ui.failed"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLoraRow.tsx:53
+msgid "ui.Failed"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -3482,6 +3634,11 @@ msgid "ui.Keep it"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackLoraAdd.tsx:56
+msgid "ui.Keep it on"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/elements/image-editor.tsx:431
 #: src/elements/image-editor.tsx:438
 msgid "ui.Keep proportions"
@@ -3503,7 +3660,13 @@ msgid "ui.Kept"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackLorasPage.tsx:116
+msgid "ui.Kept until {date}"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/elements/song-style.tsx:55
+#: src/stack/StackLoraDialogs.tsx:121
 msgid "ui.Key"
 msgstr ""
 
@@ -3641,6 +3804,11 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/stack/StackParts.tsx:100
 msgid "ui.Licence"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLoraAdd.tsx:57
+msgid "ui.Licence from the site: {licence}"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -3825,6 +3993,16 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/schema/NodeRenderer.tsx:2095
 msgid "ui.Looking for screens"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLoraAdd.tsx:104
+msgid "ui.Looks like adults only"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLorasPage.tsx:82
+msgid "ui.Looks you add to pictures and video. The Stack keeps every file, on the drive you choose."
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -4170,6 +4348,8 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/stack/StackDrives.tsx:76
 #: src/stack/StackFeatureLocation.tsx:51
+#: src/stack/StackLoraDialogs.tsx:84
+#: src/stack/StackLoraRow.tsx:69
 #: src/stack/StackMoveDialog.tsx:57
 msgid "ui.Move"
 msgstr ""
@@ -4209,6 +4389,16 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/primitives/reorder.tsx:144
 msgid "ui.Move {name} up"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLoraDialogs.tsx:79
+msgid "ui.Move {style}"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLoraRow.tsx:69
+msgid "ui.Move {style} to another drive"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -4258,6 +4448,11 @@ msgid "ui.Move up"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackLorasPage.tsx:61
+msgid "ui.Moved {style}."
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/stack/StackDrives.tsx:77
 #: src/stack/StackFeatureLocation.tsx:50
 #: src/stack/StackMoveDialog.tsx:55
@@ -4267,6 +4462,11 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/stack/StackMoveDialog.tsx:54
 msgid "ui.Moves {size} to {drive}. {feature} stops while it moves and starts again by itself."
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLorasPage.tsx:92
+msgid "ui.Moving {style}"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -4315,6 +4515,8 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/stack/StackDrives.tsx:86
+#: src/stack/StackLoraAdd.tsx:53
+#: src/stack/StackLoraDialogs.tsx:46
 msgid "ui.Name"
 msgstr ""
 
@@ -4469,6 +4671,11 @@ msgid "ui.No {lane} yet."
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackLoraAdd.tsx:93
+msgid "ui.No {site} key is saved. Most styles do not need one."
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/elements/share-dialog.tsx:30
 msgid "ui.No access"
 msgstr ""
@@ -4611,6 +4818,11 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/primitives/StoryFeed.tsx:422
 msgid "ui.No stories yet"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLorasPage.tsx:99
+msgid "ui.No styles yet. Add one below."
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -4768,6 +4980,11 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/stack/StackLevelList.tsx:60
 msgid "ui.Nothing fits this level yet."
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLoraAdd.tsx:98
+msgid "ui.Nothing found. Try another word."
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -4952,6 +5169,11 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/ui/status.tsx:31
 msgid "ui.Online"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLoraDialogs.tsx:51
+msgid "ui.Only Home can mark an adults only style as all ages, because it asks for the adult lock first."
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -5365,6 +5587,8 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/proposal-card.tsx:78
+#: src/stack/StackLoraAdd.tsx:55
+#: src/stack/StackLoraRow.tsx:27
 msgid "ui.Pictures"
 msgstr ""
 
@@ -5657,6 +5881,11 @@ msgid "ui.Profile"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackLorasPage.tsx:92
+msgid "ui.Progress"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/elements/project-settings.tsx:64
 #: src/elements/thread-list.aui.tsx:182
 msgid "ui.Project name"
@@ -5761,6 +5990,7 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/elements/companion-preview.tsx:45
 #: src/elements/job-progress.tsx:98
+#: src/stack/StackLoraRow.tsx:53
 #: src/stack/stackWords.ts:40
 #: src/stack/stackWords.ts:53
 msgid "ui.Ready"
@@ -5928,6 +6158,7 @@ msgstr ""
 #: src/stack/StackDrives.tsx:63
 #: src/stack/StackFreeSpace.tsx:111
 #: src/stack/StackFreeSpace.tsx:119
+#: src/stack/StackLoraRow.tsx:70
 #: src/stack/StackModelList.tsx:70
 #: src/stack/StackModelList.tsx:93
 msgid "ui.Remove"
@@ -5994,6 +6225,11 @@ msgid "ui.Remove {place}?"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackLoraRow.tsx:70
+msgid "ui.Remove {style}"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/elements/album.tsx:81
 msgid "ui.Remove {title} from the album"
 msgstr ""
@@ -6032,6 +6268,11 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/primitives/StoryFeed.tsx:90
 msgid "ui.Remove from Saved"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLoraDialogs.tsx:125
+msgid "ui.Remove key"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -6176,7 +6417,13 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/draft-restore.tsx:51
+#: src/stack/StackLorasPage.tsx:117
 msgid "ui.Restore"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLorasPage.tsx:117
+msgid "ui.Restore {style}"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -6321,6 +6568,8 @@ msgstr ""
 #: src/settings/SettingRow.tsx:186
 #: src/settings/SettingRow.tsx:278
 #: src/settings/SettingRow.tsx:365
+#: src/stack/StackLoraDialogs.tsx:55
+#: src/stack/StackLoraDialogs.tsx:127
 msgid "ui.Save"
 msgstr ""
 
@@ -6423,6 +6672,7 @@ msgstr ""
 #: src/schema/NodeRenderer.tsx:697
 #: src/settings/groupSettings.ts:44
 #: src/settings/SettingsShell.tsx:132
+#: src/stack/StackLoraAdd.tsx:90
 msgid "ui.Search"
 msgstr ""
 
@@ -6487,6 +6737,12 @@ msgid "ui.Search models"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackLoraAdd.tsx:87
+msgid "ui.Search on"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLoraAdd.tsx:99
 #: src/stack/StackModelsPage.tsx:108
 msgid "ui.Search results"
 msgstr ""
@@ -6515,6 +6771,7 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/settings/LocationField.tsx:133
+#: src/stack/StackLoraAdd.tsx:97
 msgid "ui.Searching"
 msgstr ""
 
@@ -6974,6 +7231,16 @@ msgid "ui.Some models come with the maker's licence. Read them once and accept, 
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackLorasPage.tsx:105
+msgid "ui.Some styles are locked. Open the adult lock to see them."
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLoraDialogs.tsx:119
+msgid "ui.Some styles only download with your own key from the site. It is stored on this computer and never shown again."
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/schema/NodeRenderer.tsx:171
 msgid "ui.Someone"
 msgstr ""
@@ -7227,6 +7494,11 @@ msgid "ui.Storyboard position"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackLoraDialogs.tsx:48
+msgid "ui.Strength (0 to 2)"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/settings/SettingsShowcase.tsx:54
 msgid "ui.Strict"
 msgstr ""
@@ -7244,6 +7516,11 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/elements/song-style.tsx:49
 msgid "ui.Style name"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLoraAdd.tsx:89
+msgid "ui.Style name or look"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -7266,6 +7543,17 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/elements/prompt-bar.tsx:320
 msgid "ui.Style: {name}"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLorasPage.tsx:74
+#: src/stack/StackLorasPage.tsx:81
+msgid "ui.Styles"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLorasPage.tsx:100
+msgid "ui.Styles list"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -7405,6 +7693,9 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/stack/StackDrives.tsx:17
 #: src/stack/StackLicences.tsx:11
+#: src/stack/StackLoraAdd.tsx:19
+#: src/stack/StackLoraDialogs.tsx:13
+#: src/stack/StackLorasPage.tsx:24
 #: src/stack/StackMoveDialog.tsx:11
 msgid "ui.That could not be saved. Try again."
 msgstr ""
@@ -7488,6 +7779,11 @@ msgid "ui.The current version"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackLoraRow.tsx:33
+msgid "ui.The download did not finish. Add the style again."
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/elements/track-studio-compare-bar.tsx:67
 msgid "ui.The earlier version"
 msgstr ""
@@ -7495,6 +7791,11 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/stack/stackWords.ts:20
 msgid "ui.The everyday choice."
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLoraDialogs.tsx:100
+msgid "ui.The file is deleted and cannot be brought back. You can add the style again from its source."
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -7583,8 +7884,23 @@ msgid "ui.The recommended setup is saved. {count, plural, one {# download has} o
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackLoraAdd.tsx:80
+msgid "ui.The search did not work. Try again in a moment."
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLoraAdd.tsx:51
+msgid "ui.The Stack downloads it, checks it and keeps it on the drive you choose."
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/stack/StackCategorySheet.tsx:160
 msgid "ui.The Stack tries models from the top. Switch one off and it is never used."
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLorasPage.tsx:56
+msgid "ui.The styles could not be read. Reload the page."
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -7725,6 +8041,16 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/geolocationHelp.ts:8
 msgid "ui.this site"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLorasPage.tsx:74
+msgid "ui.This Stack does not manage styles yet. Update the Stack to use this page."
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLoraAdd.tsx:58
+msgid "ui.This style looks like it is for adults, so it is added as adults only."
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -7912,6 +8238,26 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/elements/track-studio.tsx:724
 msgid "ui.Transition kind"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLorasPage.tsx:113
+msgid "ui.Trash"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLorasPage.tsx:112
+msgid "ui.Trash ({count})"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLoraDialogs.tsx:47
+msgid "ui.Trigger words, separated by commas"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLoraRow.tsx:64
+msgid "ui.Trigger words: {words}"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -8219,6 +8565,11 @@ msgid "ui.Use this version"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackLoraAdd.tsx:54
+msgid "ui.Used for"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/assistant-ui/tool-fallback.aui.tsx:148
 #: src/elements/tool-fallback.aui.tsx:146
 msgid "ui.Used tool"
@@ -8275,6 +8626,8 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/track-studio.tsx:111
+#: src/stack/StackLoraAdd.tsx:55
+#: src/stack/StackLoraRow.tsx:27
 msgid "ui.Video"
 msgstr ""
 
@@ -8359,6 +8712,11 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/elements/image-editor.tsx:308
 msgid "ui.Warmth"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLoraAdd.tsx:89
+msgid "ui.watercolor"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -8534,6 +8892,11 @@ msgid "ui.Wipe up"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackLorasPage.tsx:88
+msgid "ui.Work in progress"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/elements/robot-face.tsx:32
 msgid "ui.working"
 msgstr ""
@@ -8624,6 +8987,11 @@ msgstr ""
 #: src/stack/StackFeatureLocation.tsx:49
 #: src/stack/StackMoveDialog.tsx:55
 msgid "ui.Your files are still where they were."
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackLorasPage.tsx:97
+msgid "ui.Your styles"
 msgstr ""
 
 #. js-lingui-explicit-id

@@ -68,11 +68,56 @@ export interface StackLicencesClient {
   accept(): Promise<StackLicences>;
 }
 
+export type StackLoraMedia = "picture" | "video";
+export type StackLoraSite = "huggingface" | "civitai";
+export type StackLoraClass = "all-ages" | "adult-only";
+export type StackLoraStatus = "ready" | "drive_missing" | "installing" | "failed";
+/** One style (LoRA) in the Stack's one library: `GET /stack/v1/loras`. */
+export interface StackLora {
+  id: string; media: StackLoraMedia; name: string; base_model: string; classification: StackLoraClass; sha256: string; bytes: number; strength_default: number; trigger_words: string[]; licence: string; source_url: string | null; added_by: string | null; added_at: string;
+  /** The drive holding the file; null is the Stack's own data directory. */
+  disk_id: string | null; disk_label: string; status: StackLoraStatus; status_note: string | null; removed_at: string | null; trash_until: string | null; preview: string | null; home?: Record<string, unknown> | null;
+}
+/** What a host sends in place of an adult-only style the person may not see: no name, no id, no count. The page shows one quiet locked tile for it. */
+export interface StackLoraLocked { locked: true }
+export interface StackLoraSource { site: StackLoraSite; label: string; has_key: boolean }
+export interface StackLoraHit { site: StackLoraSite; remote_id: string; name: string; base_model: string | null; downloads: number; install_url: string; file_name: string | null; bytes: number | null; audience_hint: StackLoraClass; licence: string | null; page_url: string }
+export interface StackLoraPatch { name?: string; classification?: StackLoraClass; strength_default?: number; trigger_words?: string[]; source_url?: string | null; /** Home's fresh single-use adult-lock ticket; only a change from adult-only to all-ages needs one. */ ticket?: string }
+export interface StackLoraInstallBody { media: StackLoraMedia; source: StackLoraSite; url: string; name: string; licence?: string; audience?: StackLoraClass; strength_default?: number; trigger_words?: string[]; disk_id?: string | null; sha256?: string; source_url?: string; base_model?: string | null }
+/** The part of a Stack job the page shows (`GET /stack/v1/jobs/{id}`). */
+export interface StackLoraJob { id: string; state: "queued" | "running" | "waiting_for_you" | "paused" | "stalled" | "done" | "failed" | "cancelled"; percent: number; status: string; reason: string | null }
+export interface StackLorasClient {
+  /** `GET /stack/v1/loras`; `removed: true` lists the trash. A host that redacts may put one `{ locked: true }` tile in the list. */
+  list(options?: { removed?: boolean }): Promise<{ loras: Array<StackLora | StackLoraLocked>; trash_days: number }>;
+  /** `PATCH /stack/v1/loras/{id}`. */
+  patch(id: string, body: StackLoraPatch): Promise<StackLora>;
+  /** `DELETE /stack/v1/loras/{id}`: to the trash; `purge: true` deletes for good. */
+  remove(id: string, purge?: boolean): Promise<{ ok: true; purged: boolean }>;
+  /** `POST /stack/v1/loras/{id}/restore`. */
+  restore(id: string): Promise<StackLora>;
+  /** `POST /stack/v1/loras/{id}/move`: starts a `lora.move` job. */
+  move(id: string, diskId: string): Promise<{ job: string }>;
+  /** `POST /stack/v1/loras/install`: starts an install job. Refused with the Stack's own sentence (code `licence_not_accepted`) until the licences are accepted. */
+  install(body: StackLoraInstallBody): Promise<{ job: string }>;
+  /** `GET /stack/v1/loras/sources`: the two sites and whether a key is saved (never the key). */
+  sources(): Promise<{ sources: StackLoraSource[] }>;
+  /** `PUT /stack/v1/loras/sources/{site}/key`; `null` removes the key. */
+  setKey(site: StackLoraSite, key: string | null): Promise<{ sources: StackLoraSource[] }>;
+  /** `GET /stack/v1/loras/sources/{site}/search`. */
+  search(site: StackLoraSite, query: string): Promise<{ hits: StackLoraHit[] }>;
+  /** `GET /stack/v1/jobs/{id}`. Optional: without it the page shows "Working" and re-reads the list. */
+  job?(id: string): Promise<StackLoraJob>;
+  /** The address of a style's preview picture (`GET /stack/v1/loras/{id}/preview`), or null. Optional: without it the page shows an icon. */
+  previewUrl?(id: string): string | null;
+}
+
 export interface StackClient {
   /** Optional drive management routes. Hosts without them keep the existing page unchanged. */
   drives?: StackDrivesClient;
   /** Optional model-licence card. Hosts without it keep the existing page unchanged. */
   licences?: StackLicencesClient;
+  /** Optional style (LoRA) library for `StackLorasPage`. Hosts without it keep every other page unchanged. */
+  loras?: StackLorasClient;
   /** `GET /stack/v1/choices`: everything the page shows, in one read. Starts no work. */
   readChoices(): Promise<StackChoicesView>;
   /** `PUT /stack/v1/settings` with `stack.roles.<role>.enabled`. */

@@ -6,7 +6,7 @@ import { StackClientError } from "./StackClient";
 import type {
   StackAddModelBody, StackAddModelResult, StackCategoryId, StackCandidate, StackChoiceCategory, StackChoicesView, StackClient, StackInstallStarted, StackLevel, StackOrderBody, StackOrderResult,
   StackPickBody, StackPickResult, StackRecommendedResult, StackRemoveBody, StackRemoveResult, StackRemoved, StackUnused,
-  StackDrive, StackDriveFeature, StackDriveMove, StackLicence, StackLicences,
+  StackDrive, StackDriveFeature, StackDriveMove, StackLicence, StackLicences, StackLora, StackLoraHit, StackLoraJob, StackLoraSource,
 } from "./StackClient";
 import { seedChoicesView, seedUnused } from "./fakeStackData";
 
@@ -27,7 +27,7 @@ export interface FakeStackClient extends StackClient {
   /** Every call the page made, in order. */
   readonly calls: FakeCall[];
   /** Make the next call to `method` fail with this sentence and code. */
-  failNext(method: keyof StackClient | "drives.plan" | "drives.move" | "licences.read" | "licences.accept", message: string, code?: string): void;
+  failNext(method: keyof StackClient | "drives.plan" | "drives.move" | "licences.read" | "licences.accept" | `loras.${string}`, message: string, code?: string): void;
   /** The current state, for assertions. */
   snapshot(): StackChoicesView;
   /** Call every subscriber, as the Stack's event feed would. */
@@ -35,6 +35,8 @@ export interface FakeStackClient extends StackClient {
   drives: NonNullable<StackClient["drives"]> & { failMoveWith(sentence: string): void };
   /** The licence state, for assertions (`accepted`, `accepted_at`). */
   licences: NonNullable<StackClient["licences"]> & { snapshot(): StackLicences };
+  /** The style library, for assertions. A job it starts is over on the third read of `job`. */
+  loras: NonNullable<StackClient["loras"]> & { snapshot(): StackLora[]; hasKey(site: "huggingface" | "civitai"): boolean };
 }
 
 const clone = <T,>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
@@ -125,10 +127,75 @@ export function createFakeStackClient(options: FakeStackOptions = {}): FakeStack
     snapshot: () => clone(licenceState),
   };
 
+  const MB = 1024 ** 2;
+  const lora = (id: string, name: string, patch: Partial<StackLora> = {}): StackLora => ({
+    id, media: "picture", name, base_model: "SDXL 1.0", classification: "all-ages", sha256: `${id}`.padEnd(64, "0"), bytes: 144 * MB, strength_default: 0.8, trigger_words: [], licence: "creativeml-openrail-m", source_url: null, added_by: "sage", added_at: "2026-11-20T10:00:00.000Z",
+    disk_id: null, disk_label: "This computer", status: "ready", status_note: null, removed_at: null, trash_until: null, preview: null, home: null, ...patch,
+  });
+  const library: StackLora[] = [
+    lora("watercolor", "Soft watercolor", { trigger_words: ["watercolor style"], preview: "watercolor.png" }),
+    lora("clay", "Clay animation", { media: "video", base_model: "Wan 2.1", bytes: 310 * MB, trigger_words: ["claymation"] }),
+    lora("night", "Night market", { classification: "adult-only", trigger_words: [] }),
+    lora("archived", "Ink sketch", { disk_id: "offline", disk_label: "Offline drive", status: "drive_missing" }),
+    lora("old", "Retro poster", { removed_at: "2026-11-10T10:00:00.000Z", trash_until: "2026-12-10T10:00:00.000Z" }),
+  ];
+  const loraSources: StackLoraSource[] = [{ site: "huggingface", label: "Hugging Face", has_key: false }, { site: "civitai", label: "Civitai", has_key: true }];
+  const loraHits: StackLoraHit[] = [
+    { site: "huggingface", remote_id: "acme/paper-cut", name: "Paper cut", base_model: "SDXL 1.0", downloads: 12400, install_url: "https://huggingface.co/acme/paper-cut/resolve/main/paper.safetensors", file_name: "paper.safetensors", bytes: 170 * MB, audience_hint: "all-ages", licence: "apache-2.0", page_url: "https://huggingface.co/acme/paper-cut" },
+    { site: "huggingface", remote_id: "acme/neon-night", name: "Neon night", base_model: "Wan 2.1", downloads: 980, install_url: "https://huggingface.co/acme/neon-night/resolve/main/neon.safetensors", file_name: "neon.safetensors", bytes: 300 * MB, audience_hint: "adult-only", licence: null, page_url: "https://huggingface.co/acme/neon-night" },
+  ];
+  const loraJobs = new Map<string, { reads: number; after: () => void; failure: string | null }>();
+  const loraTicks = 2;
+  const loraApi: NonNullable<StackClient["loras"]> & { snapshot(): StackLora[]; hasKey(site: "huggingface" | "civitai"): boolean } = {
+    async list(options) { await gate("loras.list", [options]); const removed = options?.removed === true; return { loras: clone(library.filter((l) => (l.removed_at !== null) === removed)), trash_days: 30 }; },
+    async patch(id, body) {
+      await gate("loras.patch", [id, body]);
+      const found = library.find((l) => l.id === id); if (!found) throw new StackClientError("The Stack does not have that style. Reload the page.", "unknown_lora");
+      if (body.classification === "all-ages" && found.classification === "adult-only" && !body.ticket) throw new StackClientError("Marking an adults only style as all ages needs the adult lock. Ask in Home.", "ticket_required");
+      if (body.name !== undefined) found.name = body.name; if (body.classification) found.classification = body.classification; if (body.strength_default !== undefined) found.strength_default = body.strength_default; if (body.trigger_words) found.trigger_words = body.trigger_words;
+      return clone(found);
+    },
+    async remove(id, purge) {
+      await gate("loras.remove", [id, purge]);
+      const at = library.findIndex((l) => l.id === id); if (at < 0) throw new StackClientError("The Stack does not have that style. Reload the page.", "unknown_lora");
+      if (purge) { library.splice(at, 1); return { ok: true as const, purged: true }; }
+      library[at]!.removed_at = "2026-11-26T10:00:00.000Z"; library[at]!.trash_until = "2026-12-26T10:00:00.000Z"; return { ok: true as const, purged: false };
+    },
+    async restore(id) { await gate("loras.restore", [id]); const found = library.find((l) => l.id === id); if (!found) throw new StackClientError("The Stack does not have that style. Reload the page.", "unknown_lora"); found.removed_at = null; found.trash_until = null; return clone(found); },
+    async move(id, diskId) {
+      await gate("loras.move", [id, diskId]);
+      const found = library.find((l) => l.id === id); const disk = disks.find((d) => d.id === diskId);
+      if (!found || !disk) throw new StackClientError("The Stack does not know that style or drive.", "unknown_lora");
+      if (!disk.connected) throw new StackClientError(`${disk.label} is not connected. Plug it back in or choose another drive.`, "drive_missing");
+      const job = `lora-job-${++jobs}`; loraJobs.set(job, { reads: 0, failure: null, after: () => { found.disk_id = diskId === "main" ? null : diskId; found.disk_label = disk.label; } }); return { job };
+    },
+    async install(body) {
+      await gate("loras.install", [body]);
+      if (!licenceState.accepted) throw new StackClientError("Accept the licences in the Stack admin first (the Licences card on the AI and models page), then add the style again.", "licence_not_accepted");
+      const job = `lora-job-${++jobs}`; const id = body.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+      loraJobs.set(job, { reads: 0, failure: null, after: () => { library.push(lora(id, body.name, { media: body.media, base_model: body.base_model ?? "", classification: body.audience ?? "all-ages", disk_id: body.disk_id ?? null, disk_label: disks.find((d) => d.id === (body.disk_id ?? "main"))?.label ?? "This computer" })); } });
+      return { job };
+    },
+    async sources() { await gate("loras.sources", []); return { sources: clone(loraSources) }; },
+    async setKey(site, key) { await gate("loras.setKey", [site, key]); const found = loraSources.find((x) => x.site === site)!; found.has_key = key !== null; return { sources: clone(loraSources) }; },
+    async search(site, query) { await gate("loras.search", [site, query]); return { hits: clone(loraHits.filter((h) => h.site === site && `${h.name} ${h.base_model}`.toLowerCase().includes(query.toLowerCase().split(" ")[0] ?? ""))) }; },
+    async job(id): Promise<StackLoraJob> {
+      await gate("loras.job", [id]);
+      const entry = loraJobs.get(id); if (!entry) throw new StackClientError("No such job.", "unknown_job");
+      entry.reads += 1;
+      if (entry.reads > loraTicks) { entry.after(); loraJobs.delete(id); return { id, state: "done", percent: 100, status: "Done", reason: null }; }
+      return { id, state: "running", percent: Math.round(entry.reads / (loraTicks + 1) * 100), status: "Downloading", reason: null };
+    },
+    previewUrl: (id) => `/stack/v1/loras/${id}/preview`,
+    snapshot: () => clone(library),
+    hasKey: (site) => loraSources.find((x) => x.site === site)!.has_key,
+  };
+
   const client: FakeStackClient = {
     calls,
     drives: driveApi,
     licences: licenceApi,
+    loras: loraApi,
     failNext(method, message, code = "refused") { failures.set(method, new StackClientError(message, code)); },
     snapshot: () => clone(view),
     emitChange: emit,
