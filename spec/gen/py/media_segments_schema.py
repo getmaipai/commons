@@ -45,7 +45,9 @@ class Segment(BaseModel):
         extra='forbid',
     )
     id: constr(min_length=1)
-    kind: Literal['ad', 'sponsor', 'selfpromo', 'intro', 'outro', 'recap', 'filler']
+    kind: Literal[
+        'ad', 'sponsor', 'selfpromo', 'intro', 'outro', 'recap', 'filler', 'bumper'
+    ]
     startSec: confloat(ge=0.0)
     endSec: confloat(ge=0.0)
     confidence: confloat(ge=0.0, le=1.0)
@@ -62,6 +64,8 @@ class Segment(BaseModel):
     ) = None
     status: Literal['auto', 'held', 'confirmed', 'rejected']
     label: str | None = None
+    slotRole: Literal['lead-stinger', 'slot', 'tail-stinger'] | None = None
+    groupId: constr(min_length=1) | None = None
 
 
 class MediaSegments(BaseModel):

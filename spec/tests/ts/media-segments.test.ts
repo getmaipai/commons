@@ -27,6 +27,11 @@ describe("normalizeSegments",()=>{
     const a=seg(-5,20), out=normalizeSegments([a,seg(19,30,{status:"confirmed",confidence:.3}),seg(15,25,{kind:"intro"})],100);
     expect(a.startSec).toBe(-5); expect(out.find(s=>s.kind==="ad")?.status).toBe("confirmed"); expect(out).toHaveLength(2);
   });
+  test("keeps bumper parts separate from nearby ads and one another",()=>{
+    const bumper=seg(10,12,{kind:"bumper",groupId:"g",slotRole:"lead-stinger"});
+    const ad=seg(12.5,20);
+    expect(normalizeSegments([bumper,ad,seg(21,23,{kind:"bumper",groupId:"g",slotRole:"tail-stinger"})],100)).toHaveLength(3);
+  });
 });
 describe("skipPlan",()=>{
   const r=record([seg(10,20),seg(20.5,30),seg(100,110,{status:"held",confidence:.6}),seg(200,210,{status:"rejected"}),seg(300,310,{kind:"intro"}),seg(400,410,{confidence:.82})]);
@@ -39,5 +44,13 @@ describe("skipPlan",()=>{
     expect(skipPlan(record([seg(10,20,{status:"confirmed",confidence:.2})]),{kinds:["ad"],minConfidence:.9})).toHaveLength(1);
     expect(skipPlan(record([seg(90,130)],100),{kinds:["ad"]})).toEqual([{startSec:90,endSec:100}]);
     expect(skipPlan(record([seg(10,20),seg(21,30)]),{kinds:["ad"]})).toHaveLength(2);
+  });
+  test("bumper kind is explicit; adjacent skipped ads include the whole bumper group by default",()=>{
+    const g=[seg(100,102,{kind:"bumper",groupId:"g",slotRole:"lead-stinger"}),seg(110,120,{kind:"bumper",groupId:"g",slotRole:"slot"}),seg(121,123,{kind:"bumper",groupId:"g",slotRole:"tail-stinger"})];
+    const r=record([seg(103,109),...g]);
+    expect(skipPlan(r,{kinds:["ad"]})).toEqual([{startSec:103,endSec:109},{startSec:100,endSec:102},{startSec:110,endSec:120},{startSec:121,endSec:123}].sort((a,b)=>a.startSec-b.startSec));
+    expect(skipPlan(r,{kinds:["ad"],bumpersWithAds:false})).toEqual([{startSec:103,endSec:109}]);
+    expect(skipPlan(record(g),{kinds:["bumper"]})).toHaveLength(3);
+    expect(skipPlan(record(g),{kinds:["ad"]})).toHaveLength(0);
   });
 });

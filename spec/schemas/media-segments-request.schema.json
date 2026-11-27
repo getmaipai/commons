@@ -7,7 +7,7 @@
   "properties":{
     "url":{"type":"string","format":"uri"},"path":{"type":"string","minLength":1},
     "referenceUrl":{"type":"string","format":"uri"},"referencePath":{"type":"string","minLength":1},
-    "kinds":{"type":"array","items":{"type":"string","enum":["ad","sponsor","selfpromo","intro","outro","recap","filler"]}},
+    "kinds":{"type":"array","items":{"type":"string","enum":["ad","sponsor","selfpromo","intro","outro","recap","filler","bumper"]}},
     "fetch":{"type":"object","additionalProperties":false,"default":{},"properties":{"userAgent":{"type":"string","minLength":1,"maxLength":256}}},
     "keepCopy":{"type":"boolean","default":true},"expectedDurationSec":{"type":"number","exclusiveMinimum":0}
   },

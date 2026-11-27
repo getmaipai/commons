@@ -1,3 +1,7 @@
+## [spec-v0.1.489] - 2026-11-27
+
+- MEDIA-SEGMENTS-02, additive: add `bumper` segments with optional `slotRole` and `groupId` for a show's lead stinger, ad slot and tail stinger. `skipPlan` can include explicit bumpers; by default it also skips all parts of a bumper group when an adjacent (within 3 seconds) ad range is skipped. Set `bumpersWithAds: false` to disable that coupling. Normalization keeps bumper parts distinct from ads and each other.
+
 ## [spec-v0.1.487] - 2026-11-27
 
 - STACK-MENU-SYNC-01 slice 0. The household section `ai` ("AI and models") becomes `stack` ("Stack") with five tabs: General (view `stack.general`), Models (the old Overview and Engines cards, view `home.engine_admin`), Styles (moved from Media), Monitor (view `stack.monitor`) and Maintain (the old Advanced and Coding cards, view `stack.maintain`, admin only). Media drops to three tabs. Three new view ids. `legacy-sections.json` keeps `mappings` (now targeting `stack`) and gains `moved` rows for the old `settings/ai` places and `settings/media` Styles. New `spec/stack/screens.json` (schema `stack-screens`, fixtures, test): the Stack's 14 admin screens declared once, each with the Home Stack tab that shows it.

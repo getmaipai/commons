@@ -21,6 +21,7 @@ export const MediaSegments = z
             "outro",
             "recap",
             "filler",
+            "bumper",
           ]),
           startSec: z.number().gte(0),
           endSec: z.number().gte(0),
@@ -47,6 +48,8 @@ export const MediaSegments = z
             .optional(),
           status: z.enum(["auto", "held", "confirmed", "rejected"]),
           label: z.string().optional(),
+          slotRole: z.enum(["lead-stinger", "slot", "tail-stinger"]).optional(),
+          groupId: z.string().min(1).optional(),
         })
         .strict()
         .describe(

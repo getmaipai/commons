@@ -36,7 +36,18 @@ class MediaSegmentsRequest1(BaseModel):
     referenceUrl: AnyUrl | None = None
     referencePath: constr(min_length=1) | None = None
     kinds: (
-        list[Literal['ad', 'sponsor', 'selfpromo', 'intro', 'outro', 'recap', 'filler']]
+        list[
+            Literal[
+                'ad',
+                'sponsor',
+                'selfpromo',
+                'intro',
+                'outro',
+                'recap',
+                'filler',
+                'bumper',
+            ]
+        ]
         | None
     ) = None
     fetch: Fetch = Field({}, validate_default=True)
@@ -57,7 +68,18 @@ class MediaSegmentsRequest2(BaseModel):
     referenceUrl: AnyUrl | None = None
     referencePath: constr(min_length=1) | None = None
     kinds: (
-        list[Literal['ad', 'sponsor', 'selfpromo', 'intro', 'outro', 'recap', 'filler']]
+        list[
+            Literal[
+                'ad',
+                'sponsor',
+                'selfpromo',
+                'intro',
+                'outro',
+                'recap',
+                'filler',
+                'bumper',
+            ]
+        ]
         | None
     ) = None
     fetch: Fetch = Field({}, validate_default=True)

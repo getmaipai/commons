@@ -21,6 +21,7 @@ export const MediaSegmentsRequest = z
           "outro",
           "recap",
           "filler",
+          "bumper",
         ]),
       )
       .optional(),

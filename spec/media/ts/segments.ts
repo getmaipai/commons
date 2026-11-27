@@ -3,7 +3,7 @@ import { z } from "zod";
 import { MediaSegments } from "../../gen/ts/media-segments";
 import type { z as Zod } from "zod";
 
-export const SEGMENT_KINDS = ["ad", "sponsor", "selfpromo", "intro", "outro", "recap", "filler"] as const;
+export const SEGMENT_KINDS = ["ad", "sponsor", "selfpromo", "intro", "outro", "recap", "filler", "bumper"] as const;
 // Sections cold-open, theme, main, interview, pretape, credits and plugs are reserved for a future additive extension.
 export const SEGMENT_SOURCES = ["fingerprint", "text-pattern", "llm", "alignment", "person", "chapter"] as const;
 export const SEGMENT_STATUSES = ["auto", "held", "confirmed", "rejected"] as const;
@@ -38,7 +38,7 @@ export function normalizeSegments(segments: readonly MediaSegment[], durationSec
   const out: MediaSegment[] = [], lastOfKind = new Map<string, number>();
   for (const s of clamped) {
     const idx = lastOfKind.get(s.kind), prev = idx === undefined ? undefined : out[idx];
-    if (prev && s.startSec - prev.endSec < 2) {
+    if (prev && s.kind !== "bumper" && prev.kind !== "bumper" && s.startSec - prev.endSec < 2) {
       const sources = [...new Set([...(prev.sources ?? []), ...(s.sources ?? [])])];
       const best = s.confidence > prev.confidence ? s : prev;
       const merged: MediaSegment = { ...prev, endSec: Math.max(prev.endSec,s.endSec), confidence: best.confidence, source: best.source, sources,
@@ -51,11 +51,20 @@ export function normalizeSegments(segments: readonly MediaSegment[], durationSec
 }
 
 /** Sorted player jump ranges; rejected segments are excluded and confirmed segments bypass confidence. */
-export function skipPlan(record: MediaSegmentsRecord, opts: { kinds: readonly MediaSegment["kind"][]; minConfidence?: number; includeHeld?: boolean }): Range[] {
+export function skipPlan(record: MediaSegmentsRecord, opts: { kinds: readonly MediaSegment["kind"][]; minConfidence?: number; includeHeld?: boolean; bumpersWithAds?: boolean }): Range[] {
   const min = opts.minConfidence ?? 0, ranges: Range[] = [];
+  const eligible = (s: MediaSegment) => s.status !== "rejected" && !(s.status === "held" && !opts.includeHeld) && (s.status === "confirmed" || s.confidence >= min);
+  const skippedAds = record.segments.filter(s => s.kind === "ad" && opts.kinds.includes("ad") && eligible(s));
+  const bumperGroups = new Map<string, MediaSegment[]>();
+  for (const s of record.segments) if (s.kind === "bumper" && s.groupId) bumperGroups.set(s.groupId, [...(bumperGroups.get(s.groupId) ?? []), s]);
+  const adLinkedGroups = new Set<string>();
+  if (opts.bumpersWithAds !== false) for (const [groupId, parts] of bumperGroups) {
+    const start = Math.min(...parts.map(p => p.startSec)), end = Math.max(...parts.map(p => p.endSec));
+    if (skippedAds.some(a => a.endSec <= start ? start - a.endSec <= 3 : end <= a.startSec ? a.startSec - end <= 3 : true)) adLinkedGroups.add(groupId);
+  }
   for (const s of record.segments) {
-    if (!opts.kinds.includes(s.kind) || s.status === "rejected" || (s.status === "held" && !opts.includeHeld)) continue;
-    if (s.status !== "confirmed" && s.confidence < min) continue;
+    const groupSkipped = s.kind === "bumper" && Boolean(s.groupId && adLinkedGroups.has(s.groupId));
+    if (!(opts.kinds.includes(s.kind) || groupSkipped) || !eligible(s)) continue;
     const startSec=Math.max(0,s.startSec), endSec=Math.min(record.durationSec,s.endSec);
     if (endSec>startSec) ranges.push({startSec,endSec});
   }
