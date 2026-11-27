@@ -104,9 +104,9 @@ test("Home coding engine controls have their defaults, ranges and copy", () => {
 
 test("Coding sections follow the home and account audiences", () => {
   const areas = read("settings/areas.json").areas;
-  const home = areas.find((a: any) => a.id === "settings").sections.find((s: any) => s.id === "ai");
+  const home = areas.find((a: any) => a.id === "settings").sections.find((s: any) => s.id === "stack");
   const account = areas.find((a: any) => a.id === "settings").sections.find((s: any) => s.id === "chat");
-  expect(home.tabs.find((t: any) => t.id === "coding")).toMatchObject({ min_role: "admin" });
+  expect(home.tabs.find((t: any) => t.id === "maintain")).toMatchObject({ min_role: "admin" });
   expect(account.tabs.find((t: any) => t.id === "coding")).toMatchObject({ min_role: "child", view: "account.coding_keys", needs: ["coding.allowed_for_me"] });
 });
 
@@ -120,8 +120,8 @@ test("Home mode parses, matches its options, passes copy lint, and appears in th
   const baseline = read("settings/copy-lint-baseline.json");
   expect(lintSettingCopy(keys, baseline)).toEqual([]);
   const codingCard = read("settings/areas.json").areas.find((a: any) => a.id === "settings")
-    .sections.find((s: any) => s.id === "ai").cards;
-  expect(codingCard).toContainEqual({ label: "Coding", group: homeMode.lives_in, scope: "household", tab: "coding" });
+    .sections.find((s: any) => s.id === "stack").cards;
+  expect(codingCard).toContainEqual({ label: "Coding", group: homeMode.lives_in, scope: "household", tab: "maintain" });
   expect(SettingsKey.parse(read("fixtures/records/settings-key.coding-home-mode.example.json")))
     .toEqual(read("fixtures/records/settings-key.coding-home-mode.example.json"));
 });

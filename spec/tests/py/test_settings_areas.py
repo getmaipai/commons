@@ -92,7 +92,7 @@ def test_tab_view_and_audience_constraints_and_robot_detail():
     assert [s["id"] for s in home["sections"] if s["scope"] == "household"] == [
         "household",
         "privacy",
-        "ai",
+        "stack",
         "media",
         "home-voice",
         "search",
@@ -107,15 +107,16 @@ def test_tab_view_and_audience_constraints_and_robot_detail():
         "behaviour",
         "access",
     ]
-    ai = next(s for s in home["sections"] if s["id"] == "ai")
-    assert [t["id"] for t in ai["tabs"]] == [
-        "overview",
-        "engines",
-        "advanced",
-        "coding",
+    stack = next(s for s in home["sections"] if s["id"] == "stack")
+    assert [t["id"] for t in stack["tabs"]] == [
+        "general",
+        "models",
+        "styles",
+        "monitor",
+        "maintain",
     ]
     media = next(s for s in home["sections"] if s["id"] == "media")
-    assert [t["id"] for t in media["tabs"]] == ["pictures", "videos", "music", "styles"]
+    assert [t["id"] for t in media["tabs"]] == ["pictures", "videos", "music"]
     assert "media-library" not in {t["id"] for t in media["tabs"]}
 
 

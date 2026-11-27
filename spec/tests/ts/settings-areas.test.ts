@@ -16,7 +16,7 @@ const area=()=>file.areas[0]!;const page=(f:AreasFile,id:string)=>f.areas[0]!.se
 describe("single Settings area",()=>{
  test("has one guest-openable area with two exact groups and scoped page counts",()=>{
   expect(file.areas.map(a=>a.id)).toEqual(["settings"]); expect(area().audience.min_role).toBe("guest");
-  expect(area().groups).toEqual([{label:"Yours",sections:["profile","appearance","chat","voice","notifications","data"]},{label:"The home",sections:["household","privacy","ai","media","home-voice","search","apps","backups","advanced"]}]);
+  expect(area().groups).toEqual([{label:"Yours",sections:["profile","appearance","chat","voice","notifications","data"]},{label:"The home",sections:["household","privacy","stack","media","home-voice","search","apps","backups","advanced"]}]);
   expect(area().sections.filter(s=>s.scope==="person")).toHaveLength(6);expect(area().sections.filter(s=>s.scope==="household")).toHaveLength(9);
   expect(CENTRAL_AREA_IDS).toEqual(["settings"]);expect(RESERVED_AREA_IDS).toEqual(expect.arrayContaining(["home","account","chat","settings"]));
   expect(lintManifestSettings({id:"music",contributes:{settings_area:{...area(),id:"settings"}}}).join(" ")).toMatch(/reserved/);
@@ -24,18 +24,18 @@ describe("single Settings area",()=>{
  });
  test("schema, tabs, views, scope and audiences validate",()=>{
   for(const a of file.areas)expect(validate(a),JSON.stringify(validate.errors)).toBe(true);
-  const bad=clone(file);page(bad,"ai").tabs![0]!.view="home.unknown";expect(checkAreas(bad,registry).join(" ")).toMatch(/unknown view/);
-  const broad=clone(file);page(broad,"ai").min_role="adult";page(broad,"ai").tabs![0]!.min_role="guest";expect(checkAreas(broad,registry).join(" ")).toMatch(/broader than its page/);
+  const bad=clone(file);page(bad,"stack").tabs![0]!.view="home.unknown";expect(checkAreas(bad,registry).join(" ")).toMatch(/unknown view/);
+  const broad=clone(file);page(broad,"stack").min_role="adult";page(broad,"stack").tabs!.find(t=>t.id==="maintain")!.min_role="admin";expect(checkAreas(broad,registry).join(" ")).toMatch(/broader than its page/);
   const unguarded=clone(file);delete page(unguarded,"privacy").min_role;expect(checkAreas(unguarded,registry).join(" ")).toMatch(/household section must have min_role/);
   const scope=clone(file);page(scope,"household").scope="person";expect(checkAreas(scope,registry).join(" ")).toMatch(/disagrees with section scope/);
-  const sectionView=clone(file);page(sectionView,"ai").trail_view="home.engine_admin";expect(checkAreas(sectionView,registry).join(" ")).toMatch(/section-level views/);
+  const sectionView=clone(file);page(sectionView,"stack").trail_view="home.engine_admin";expect(checkAreas(sectionView,registry).join(" ")).toMatch(/section-level views/);
  });
  test("preserves gated tabs and robot detail",()=>{
-  expect(page(file,"media").tabs?.map(t=>t.min_role)).toEqual(["admin","admin","admin","admin"]);
+  expect(page(file,"media").tabs?.map(t=>t.min_role)).toEqual(["admin","admin","admin"]);
   expect(page(file,"voice").tabs?.find(t=>t.id==="robot")).toMatchObject({bands:["adult"],needs:["robot.paired","robots.enabled"]});
   expect(page(file,"chat").tabs?.find(t=>t.id==="skills")?.bands).toEqual(["teen","adult"]);
   expect(page(file,"apps").detail).toMatchObject({param:"id",view:"home.devices_admin",tabs:[{id:"overview"},{id:"behaviour"},{id:"access"}]});
-  expect(page(file,"ai").tabs?.map(t=>t.id)).toEqual(["overview","engines","advanced","coding"]);
+  expect(page(file,"stack").tabs?.map(t=>t.id)).toEqual(["general","models","styles","monitor","maintain"]);
  });
  test("every old origin/main and intermediate route maps once to an existing target",()=>{
   if(!existsSync("/tmp/areas-pre.json"))return; // one-off migration fixture, absent on a clean machine
@@ -73,9 +73,9 @@ describe("single Settings area",()=>{
 describe("VIDEO-SETTINGS-03: Pictures, videos and music",()=>{
  const keyOf=(k:string)=>registry.find(r=>r.key===k) as (RegistryKey&{range?:{options?:string[]};default?:unknown;secret?:boolean;copy?:{does?:string};label?:string})|undefined;
  const media=()=>page(file,"media");
- test("the area keeps its name and has the four tabs, no Media library, and no person Pictures and videos page",()=>{
+ test("the area keeps its name and has the three tabs, no Media library, and no person Pictures and videos page",()=>{
   expect(media().label).toBe("Media");
-  expect(media().tabs?.map(t=>[t.id,t.label])).toEqual([["pictures","Pictures"],["videos","Videos"],["music","Music"],["styles","Styles"]]);
+  expect(media().tabs?.map(t=>[t.id,t.label])).toEqual([["pictures","Pictures"],["videos","Videos"],["music","Music"]]);
   expect(media().tabs?.some(t=>t.id==="media-library"||t.view==="home.media_library")).toBe(false);
   expect(area().sections.some(s=>s.id==="pictures")).toBe(false);
   expect(legacy.mappings.find((m:any)=>m.old.area==="account"&&m.old.section==="pictures").new).toEqual({area:"settings",section:"profile",tab:"profile"});
@@ -84,9 +84,10 @@ describe("VIDEO-SETTINGS-03: Pictures, videos and music",()=>{
  test("every card sits in a tab, each Pictures, Videos, Music, Styles card names a view and one registry group",()=>{
   const cards=media().cards!;const tabs=new Set(media().tabs!.map(t=>t.id));
   for(const c of cards){expect(tabs.has(c.tab!),c.label).toBe(true);expect(c.group,c.label).toBeTruthy();}
-  const views:Record<string,string>={"household.media_pictures":"home.media_pictures","household.media_kids":"home.media_kids","household.media_videos":"home.media_videos","household.media_music":"home.media_music","household.media_styles":"home.media_styles"};
+  const views:Record<string,string>={"household.media_pictures":"home.media_pictures","household.media_kids":"home.media_kids","household.media_videos":"home.media_videos","household.media_music":"home.media_music"};
   for(const [g,v] of Object.entries(views)){const c=cards.filter(x=>x.group===g);expect(c,g).toHaveLength(1);expect(c[0]!.view).toBe(v);expect(ALLOWED_VIEW_IDS).toContain(v);}
-  expect(cards.find(c=>c.group==="household.media_styles")!.tab).toBe("styles");
+  expect(cards.some(c=>c.group==="household.media_styles")).toBe(false);
+  const moved=page(file,"stack").cards!.filter(c=>c.group==="household.media_styles");expect(moved).toHaveLength(1);expect(moved[0]!.tab).toBe("styles");expect(moved[0]!.view).toBe("home.media_styles");
   expect(cards.filter(c=>c.tab==="pictures").map(c=>c.group)).toEqual(["household.media_pictures","household.media_kids"]);
   expect(cards.filter(c=>c.tab==="music").map(c=>c.group)).toEqual(["household.media_music","household.media_online","household.media_lookups","synths"]);
   expect(cards.find(c=>c.group==="household.media_lookups")!.collapsed).toBe(true);
@@ -132,12 +133,12 @@ describe("VIDEO-SETTINGS-03: Pictures, videos and music",()=>{
  });
  test("checkAreas refuses a media tab with no card, a second home for a key and a drawn parked group",()=>{
   const empty=clone(file);page(empty,"media").tabs!.push({id:"extra",label:"Extra",min_role:"admin"});expect(checkAreas(empty,registry).join(" ")).toMatch(/holds nothing/);
-  const twice=clone(file);page(twice,"media").cards!.push({label:"Again",group:"household.media_styles",scope:"household",tab:"videos"});expect(checkAreas(twice,registry).join(" ")).toMatch(/more than one card/);
-  const both=clone(file);page(both,"media").cards!.push({label:"Old",group:"household.media_retired",scope:"household",tab:"styles"});expect(checkAreas(both,registry).join(" ")).toMatch(/not placed and also has a card/);
+  const twice=clone(file);page(twice,"media").cards!.push({label:"Again",group:"household.media_pictures",scope:"household",tab:"videos"});expect(checkAreas(twice,registry).join(" ")).toMatch(/more than one card/);
+  const both=clone(file);page(both,"media").cards!.push({label:"Old",group:"household.media_retired",scope:"household",tab:"music"});expect(checkAreas(both,registry).join(" ")).toMatch(/not placed and also has a card/);
   const unknown=clone(file);page(unknown,"media").cards![0]!.view="home.media_unknown";expect(checkAreas(unknown,registry).join(" ")).toMatch(/unknown view/);
  });
  test("the Styles copy fits the schema limits and says no resource words",()=>{
-  const styles=media().cards!.find(c=>c.group==="household.media_styles")!;
+  const styles=page(file,"stack").cards!.find(c=>c.group==="household.media_styles")!;
   expect(styles.description!.length).toBeLessThanOrEqual(160);
   for(const v of Object.values(styles.copy!)){expect(v.length).toBeLessThanOrEqual(200);expect(v).not.toMatch(/—/);}
   expect(validate(area()),JSON.stringify(validate.errors)).toBe(true);
@@ -155,4 +156,14 @@ describe("section scope: required in the central file, optional for a package ar
     const defs = schemaSection.definitions ?? schemaSection.$defs ?? {};
     expect(defs.section?.required ?? []).not.toContain("scope");
   });
+});
+
+describe("STACK-MENU-SYNC-01: the Stack page replaces AI and models",()=>{
+ test("every former ai tab and media styles place redirects to an existing Stack tab",()=>{
+  const stack=page(file,"stack");expect(stack.label).toBe("Stack");expect(stack.min_role).toBe("admin");expect(page(file,"ai")).toBeUndefined();
+  const rows=legacy.moved as any[];const key=(r:any)=>`${r.old.section}/${r.old.tab??""}`;
+  expect(rows.map(key).sort()).toEqual(["ai/","ai/advanced","ai/coding","ai/engines","ai/overview","media/styles"]);
+  for(const r of rows){expect(r.old.area).toBe("settings");expect(r.new.section).toBe("stack");expect(stack.tabs!.some(t=>t.id===r.new.tab),key(r)).toBe(true);}
+  for(const r of legacy.mappings)if((r.new??r.replacement)?.section==="ai")throw new Error("a legacy mapping still targets the removed ai section");
+ });
 });

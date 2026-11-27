@@ -7,6 +7,8 @@ export const STACK_SCHEMA_NAMES: ReadonlySet<string> = new Set([
   "health-item.schema.json",
   // STACK-CONNECTIONS-01: hand-written mirror (kind-conditional rules the generators drop).
   "stack-connection.schema.json",
+  // STACK-MENU-SYNC-01: menu data, checked by its own test.
+  "stack-screens.schema.json",
   "precious-state.schema.json",
   "role-reply-headers.schema.json",
   "role-request.schema.json",

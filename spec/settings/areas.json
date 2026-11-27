@@ -23,7 +23,7 @@
           "sections": [
             "household",
             "privacy",
-            "ai",
+            "stack",
             "media",
             "home-voice",
             "search",
@@ -438,11 +438,21 @@
           "min_role": "admin"
         },
         {
-          "id": "ai",
-          "label": "AI and models",
+          "id": "stack",
+          "label": "Stack",
           "icon": "cpu",
           "kind": "keys",
           "cards": [
+            {
+              "label": "Search and memory",
+              "tab": "general",
+              "links": [
+                {
+                  "label": "Web search and memory settings",
+                  "href": "/settings/search"
+                }
+              ]
+            },
             {
               "label": "AI and models",
               "groups": [
@@ -674,91 +684,125 @@
                 "not_tested": "Not tested by MaiPai",
                 "added_description": "Not tested by MaiPai. An admin added it from a link; MaiPai checked its file but has not measured it."
               },
-              "tab": "overview"
+              "tab": "models"
             },
             {
               "label": "Chat pause",
               "group": "household.chat_pause",
               "scope": "household",
-              "tab": "overview"
-            },
-            {
-              "label": "Model per job",
-              "group": "household.ai_models",
-              "scope": "household",
-              "tab": "advanced"
-            },
-            {
-              "label": "AI settings",
-              "group": "household.ai_advanced",
-              "scope": "household",
-              "tab": "advanced"
-            },
-            {
-              "label": "Engines",
-              "group": "household.ai_runtime",
-              "scope": "household",
-              "tab": "engines"
-            },
-            {
-              "label": "Search and memory",
-              "tab": "overview",
-              "links": [
-                {
-                  "label": "Web search and memory settings",
-                  "href": "/settings/search"
-                }
-              ]
+              "tab": "models"
             },
             {
               "label": "Always on",
               "view": "ai.always_on",
               "description": "The parts Home needs, so they cannot be turned off.",
-              "tab": "overview"
+              "tab": "models"
+            },
+            {
+              "label": "Model per job",
+              "group": "household.ai_models",
+              "scope": "household",
+              "tab": "models"
+            },
+            {
+              "label": "Engines",
+              "group": "household.ai_runtime",
+              "scope": "household",
+              "tab": "models"
+            },
+            {
+              "label": "Styles",
+              "group": "household.media_styles",
+              "scope": "household",
+              "tab": "styles",
+              "view": "home.media_styles",
+              "description": "A style gives pictures and videos a look, like old film or clay. Only admins add styles. A new style is for admins only until you say who else can use it.",
+              "copy": {
+                "browse_button": "Browse styles",
+                "add_file_button": "Add from a file",
+                "empty": "No styles yet. Browse styles to find one, or add one from a file.",
+                "locked_note": "Adult-only styles stay locked until you enter your own passcode.",
+                "unlocked_note": "Unlocked on this page only. It locks again when you leave or after 2 minutes without a touch.",
+                "sources_title": "Where styles come from",
+                "huggingface_note": "On. Search and download styles from Hugging Face. A token is only needed for styles that ask you to accept terms: add it in AI and models, Advanced. Home sends it only for those files.",
+                "civitai_off_note": "On by default. This computer contacts civitai.com only when an admin searches or installs a style.",
+                "civitai_notice_title": "Turn on Civitai?",
+                "civitai_notice_body_1": "When you search or install, this computer contacts civitai.com. It sends what you typed and your key, nothing about your family.",
+                "civitai_notice_body_2": "Civitai has its own rules. Some styles there are for adults only, and some may show real people. You choose what to install.",
+                "civitai_notice_cancel": "Not now",
+                "civitai_notice_confirm": "Turn on",
+                "civitai_key_replace": "Replace",
+                "civitai_key_remove": "Remove",
+                "removed_title": "Recently removed",
+                "removed_line": "Removed {days} days ago. Deleted for good in {left} days.",
+                "restore_button": "Restore",
+                "delete_now_button": "Delete now"
+              }
+            },
+            {
+              "label": "AI settings",
+              "group": "household.ai_advanced",
+              "scope": "household",
+              "tab": "maintain"
             },
             {
               "label": "Coding",
               "group": "household.coding",
               "scope": "household",
-              "tab": "coding"
+              "tab": "maintain"
             },
             {
               "label": "Who can code",
               "group": "household.coding_people",
               "scope": "household",
-              "tab": "coding"
+              "tab": "maintain"
             },
             {
               "label": "Sharing the computer",
               "group": "household.coding_limits",
               "scope": "household",
-              "tab": "coding"
+              "tab": "maintain"
             }
           ],
           "tabs": [
             {
-              "id": "overview",
-              "label": "Overview",
+              "id": "general",
+              "label": "General",
+              "view": "stack.general"
+            },
+            {
+              "id": "models",
+              "label": "Models",
               "view": "home.engine_admin"
             },
             {
-              "id": "engines",
-              "label": "Engines"
+              "id": "styles",
+              "label": "Styles"
             },
             {
-              "id": "advanced",
-              "label": "Advanced"
+              "id": "monitor",
+              "label": "Monitor",
+              "view": "stack.monitor"
             },
             {
-              "id": "coding",
-              "label": "Coding",
+              "id": "maintain",
+              "label": "Maintain",
+              "view": "stack.maintain",
               "min_role": "admin"
             }
           ],
           "keywords": [
+            "stack",
             "teen gate",
             "context",
-            "model"
+            "model",
+            "styles",
+            "lora",
+            "adapters",
+            "civitai",
+            "updates",
+            "health",
+            "connections"
           ],
           "scope": "household",
           "min_role": "admin"
@@ -834,35 +878,6 @@
               "collapsed": true
             },
             {
-              "label": "Styles",
-              "group": "household.media_styles",
-              "scope": "household",
-              "tab": "styles",
-              "view": "home.media_styles",
-              "description": "A style gives pictures and videos a look, like old film or clay. Only admins add styles. A new style is for admins only until you say who else can use it.",
-              "copy": {
-                "browse_button": "Browse styles",
-                "add_file_button": "Add from a file",
-                "empty": "No styles yet. Browse styles to find one, or add one from a file.",
-                "locked_note": "Adult-only styles stay locked until you enter your own passcode.",
-                "unlocked_note": "Unlocked on this page only. It locks again when you leave or after 2 minutes without a touch.",
-                "sources_title": "Where styles come from",
-                "huggingface_note": "On. Search and download styles from Hugging Face. A token is only needed for styles that ask you to accept terms: add it in AI and models, Advanced. Home sends it only for those files.",
-                "civitai_off_note": "On by default. This computer contacts civitai.com only when an admin searches or installs a style.",
-                "civitai_notice_title": "Turn on Civitai?",
-                "civitai_notice_body_1": "When you search or install, this computer contacts civitai.com. It sends what you typed and your key, nothing about your family.",
-                "civitai_notice_body_2": "Civitai has its own rules. Some styles there are for adults only, and some may show real people. You choose what to install.",
-                "civitai_notice_cancel": "Not now",
-                "civitai_notice_confirm": "Turn on",
-                "civitai_key_replace": "Replace",
-                "civitai_key_remove": "Remove",
-                "removed_title": "Recently removed",
-                "removed_line": "Removed {days} days ago. Deleted for good in {left} days.",
-                "restore_button": "Restore",
-                "delete_now_button": "Delete now"
-              }
-            },
-            {
               "label": "Synths",
               "group": "synths",
               "scope": "household",
@@ -884,20 +899,11 @@
               "id": "music",
               "label": "Music",
               "min_role": "admin"
-            },
-            {
-              "id": "styles",
-              "label": "Styles",
-              "min_role": "admin"
             }
           ],
           "keywords": [
             "images",
             "pictures",
-            "styles",
-            "lora",
-            "adapters",
-            "civitai",
             "generate",
             "video",
             "videos",

@@ -1,0 +1,12 @@
+{
+  "screens": [
+    {
+      "id": "overview",
+      "label": "Overview",
+      "question": "Is everything working?",
+      "group": "elsewhere",
+      "tab": "monitor",
+      "kit": null
+    }
+  ]
+}

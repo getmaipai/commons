@@ -1,0 +1,116 @@
+{
+  "screens": [
+    {
+      "id": "overview",
+      "label": "Overview",
+      "question": "Is everything working?",
+      "group": "monitor",
+      "tab": "monitor",
+      "kit": null
+    },
+    {
+      "id": "health",
+      "label": "Health",
+      "question": "Does anything need fixing?",
+      "group": "monitor",
+      "tab": "monitor",
+      "kit": null
+    },
+    {
+      "id": "resources",
+      "label": "Resources",
+      "question": "Is there enough memory?",
+      "group": "monitor",
+      "tab": "monitor",
+      "kit": null
+    },
+    {
+      "id": "models",
+      "label": "AI and models",
+      "question": "Which features are on, and which model does each one use?",
+      "group": "setup",
+      "tab": "models",
+      "kit": "StackModelsPage"
+    },
+    {
+      "id": "styles",
+      "label": "Styles",
+      "question": "Looks you add to pictures and video, and where their files live.",
+      "group": "setup",
+      "tab": "styles",
+      "kit": "StackLorasPage"
+    },
+    {
+      "id": "modes",
+      "label": "Modes",
+      "question": "Normal or Max coding, and which features are on.",
+      "group": "setup",
+      "tab": "models",
+      "kit": null
+    },
+    {
+      "id": "drives",
+      "label": "Drives",
+      "question": "Where the Stack keeps its files, and how full each drive is.",
+      "group": "setup",
+      "tab": "models",
+      "kit": "StackDrives"
+    },
+    {
+      "id": "connections",
+      "label": "Connections",
+      "question": "Which Homes and tools can use this Stack?",
+      "group": "maintain",
+      "tab": "maintain",
+      "kit": null
+    },
+    {
+      "id": "licences",
+      "label": "Licences",
+      "question": "Which model terms have been accepted?",
+      "group": "setup",
+      "tab": "models",
+      "kit": "StackLicences"
+    },
+    {
+      "id": "engines",
+      "label": "Engines",
+      "question": "What is doing the work behind the scenes?",
+      "group": "setup",
+      "tab": "models",
+      "kit": null
+    },
+    {
+      "id": "updates",
+      "label": "Updates",
+      "question": "Is anything out of date?",
+      "group": "maintain",
+      "tab": "maintain",
+      "kit": null
+    },
+    {
+      "id": "settings",
+      "label": "Settings",
+      "question": "Fine tuning. The defaults are fine for most people.",
+      "group": "maintain",
+      "tab": "maintain",
+      "kit": null
+    },
+    {
+      "id": "tools",
+      "label": "Tools",
+      "question": "Restart, check, and repair.",
+      "group": "maintain",
+      "tab": "maintain",
+      "kit": null
+    },
+    {
+      "id": "helper",
+      "label": "Helper",
+      "question": "Ask in plain words. Nothing changes until you approve.",
+      "group": "assist",
+      "tab": "maintain",
+      "kit": null
+    }
+  ]
+}

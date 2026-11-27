@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/stack-screens.schema.json",
+  "title": "StackScreens",
+  "description": "The Stack's admin screens, declared once (STACK-MENU-SYNC-01). The Stack's admin menu and Home's Stack section both draw their menu from this file, so the two cannot drift. It holds menu data only: ids, labels, the one-line question each screen answers, its group, which Home Stack tab shows it, and the name of the shared kit page that draws it (null until one exists). It holds no model, drive, style or health value.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["screens"],
+  "properties": {
+    "screens": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "label", "question", "group", "tab", "kit"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$", "description": "The screen's address in the Stack admin (#/<id>)." },
+          "label": { "type": "string", "minLength": 1, "maxLength": 40 },
+          "question": { "type": "string", "minLength": 1, "maxLength": 100, "description": "The one-line question the screen answers, shown under its title." },
+          "group": { "type": "string", "enum": ["monitor", "setup", "maintain", "assist"] },
+          "tab": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$", "description": "The id of the tab of Home's Stack settings section that shows this screen. A test requires it to be a tab of that section." },
+          "kit": { "type": ["string", "null"], "pattern": "^[A-Z][A-Za-z0-9]*$", "description": "The name of the shared kit page that draws the screen, or null when only the Stack admin has it." }
+        }
+      }
+    }
+  }
+}

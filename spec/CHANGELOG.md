@@ -1,3 +1,7 @@
+## [spec-v0.1.487] - 2026-11-27
+
+- STACK-MENU-SYNC-01 slice 0. The household section `ai` ("AI and models") becomes `stack` ("Stack") with five tabs: General (view `stack.general`), Models (the old Overview and Engines cards, view `home.engine_admin`), Styles (moved from Media), Monitor (view `stack.monitor`) and Maintain (the old Advanced and Coding cards, view `stack.maintain`, admin only). Media drops to three tabs. Three new view ids. `legacy-sections.json` keeps `mappings` (now targeting `stack`) and gains `moved` rows for the old `settings/ai` places and `settings/media` Styles. New `spec/stack/screens.json` (schema `stack-screens`, fixtures, test): the Stack's 14 admin screens declared once, each with the Home Stack tab that shows it.
+
 ## [spec-v0.1.486] - 2026-11-26
 
 - `Lora` gains optional `disk_id` (which Stack drive holds the file) and `status` (`ready`, `drive_missing`, `installing`, `failed`) for STACK-LORAS-01 (the Stack owns LoRAs). Additive: older records stay valid and absent status means ready.

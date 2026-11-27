@@ -161,8 +161,8 @@
       },
       "new": {
         "area": "settings",
-        "section": "ai",
-        "tab": "overview"
+        "section": "stack",
+        "tab": "models"
       }
     },
     {
@@ -293,8 +293,8 @@
       },
       "new": {
         "area": "settings",
-        "section": "ai",
-        "tab": "coding"
+        "section": "stack",
+        "tab": "maintain"
       }
     },
     {
@@ -392,7 +392,7 @@
       },
       "replacement": {
         "area": "settings",
-        "section": "ai"
+        "section": "stack"
       },
       "reason": "Old Chat link row; retain its replacement target."
     },
@@ -416,6 +416,79 @@
         "area": "settings",
         "section": "profile",
         "tab": "profile"
+      }
+    }
+  ],
+  "moved": [
+    {
+      "old": {
+        "area": "settings",
+        "section": "ai"
+      },
+      "new": {
+        "area": "settings",
+        "section": "stack",
+        "tab": "models"
+      }
+    },
+    {
+      "old": {
+        "area": "settings",
+        "section": "ai",
+        "tab": "overview"
+      },
+      "new": {
+        "area": "settings",
+        "section": "stack",
+        "tab": "models"
+      }
+    },
+    {
+      "old": {
+        "area": "settings",
+        "section": "ai",
+        "tab": "engines"
+      },
+      "new": {
+        "area": "settings",
+        "section": "stack",
+        "tab": "models"
+      }
+    },
+    {
+      "old": {
+        "area": "settings",
+        "section": "ai",
+        "tab": "advanced"
+      },
+      "new": {
+        "area": "settings",
+        "section": "stack",
+        "tab": "maintain"
+      }
+    },
+    {
+      "old": {
+        "area": "settings",
+        "section": "ai",
+        "tab": "coding"
+      },
+      "new": {
+        "area": "settings",
+        "section": "stack",
+        "tab": "maintain"
+      }
+    },
+    {
+      "old": {
+        "area": "settings",
+        "section": "media",
+        "tab": "styles"
+      },
+      "new": {
+        "area": "settings",
+        "section": "stack",
+        "tab": "styles"
       }
     }
   ]

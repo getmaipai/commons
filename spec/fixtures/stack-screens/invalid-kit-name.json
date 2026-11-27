@@ -1,0 +1,12 @@
+{
+  "screens": [
+    {
+      "id": "models",
+      "label": "AI and models",
+      "question": "Which features are on, and which model does each one use?",
+      "group": "setup",
+      "tab": "models",
+      "kit": "models-page"
+    }
+  ]
+}
