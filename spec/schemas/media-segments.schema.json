@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getmaipai.github.io/shared/spec/schemas/media-segments.schema.json",
+  "title": "MediaSegments",
+  "description": "One segment analysis for one stored media file, keyed by its content hash and duration. Never keyed by episode: dynamic ad insertion changes bytes and therefore creates a new analysis.",
+  "type": "object", "additionalProperties": false,
+  "required": ["fileSha256", "durationSec", "segments", "producedBy", "created_at", "hlc", "provenance"],
+  "properties": {
+    "fileSha256": {"type":"string", "pattern":"^[0-9a-fA-F]{64}$"},
+    "durationSec": {"type":"number", "exclusiveMinimum":0},
+    "segments": {"type":"array", "items":{"$ref":"#/$defs/segment"}},
+    "producedBy": {"$ref":"#/$defs/producedBy"},
+    "cleanCopy": {"oneOf":[{"type":"boolean"},{"const":"unknown"}]},
+    "created_at":{"type":"string","format":"date-time"},
+    "hlc":{"type":"string","pattern":"^[0-9]+:[0-9]+:[a-z0-9]{6,}$"},
+    "provenance":{"type":"string","minLength":1}
+  },
+  "$defs": {
+    "segment": {"type":"object","additionalProperties":false,"required":["id","kind","startSec","endSec","confidence","source","status"],"properties":{
+      "id":{"type":"string","minLength":1},
+      "kind":{"type":"string","enum":["ad","sponsor","selfpromo","intro","outro","recap","filler"]},
+      "startSec":{"type":"number","minimum":0}, "endSec":{"type":"number","minimum":0},
+      "confidence":{"type":"number","minimum":0,"maximum":1},
+      "source":{"$ref":"#/$defs/source"},
+      "sources":{"type":"array","items":{"$ref":"#/$defs/source"}},
+      "status":{"type":"string","enum":["auto","held","confirmed","rejected"]},
+      "label":{"type":"string"}
+    },"description":"Section labels cold-open, theme, main, interview, pretape, credits and plugs are reserved for an additive enum extension."},
+    "source":{"type":"string","enum":["fingerprint","text-pattern","llm","alignment","person","chapter"]},
+    "producedBy":{"type":"object","additionalProperties":false,"required":["transcriptRevision","modelId","pipelineVersion","createdAt"],"properties":{
+      "transcriptRevision":{"type":"string","minLength":1},"modelId":{"type":"string","minLength":1},"pipelineVersion":{"type":"string","minLength":1},"createdAt":{"type":"string","minLength":1}
+    }}
+  }
+}

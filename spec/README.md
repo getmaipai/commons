@@ -1,5 +1,13 @@
 # spec: the household's shapes
 
+Added 2026-11-27 (MEDIA-SEGMENTS-01): **MediaSegments**, one analysis for
+one stored media file, identified by `fileSha256` and `durationSec` rather
+than an episode (dynamic ad insertion changes the bytes). Segment records,
+the Stack `media.segments` job wire shape, and pure TypeScript helpers live
+in `schemas/media-segments.schema.json` and `media/ts/segments.ts`.
+Section labels `cold-open`, `theme`, `main`, `interview`, `pretape`,
+`credits` and `plugs` are reserved for an additive enum extension.
+
 Source of truth for everything the hub and robot agree on. Platform plan
 chapter 3. This is **spec v0.1**: Person, Setting, Memory/Entity/Episode,
 the package manifest/recipe/result shapes, the settings registry, the

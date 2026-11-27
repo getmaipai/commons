@@ -2184,3 +2184,7 @@ Additive throughout; every existing fixture still validates unchanged.
 ## [spec-v0.1.372] - 2026-11-13
 
 - VIDEO-LD-01, additive. `media_shelf.look` accepts `default` or `backdrop` (default `default`); backdrop draws blurred art behind the contained image.
+## [spec-v0.1.488] - 2026-11-27
+
+- MEDIA-SEGMENTS-01: add `MediaSegments`, keyed by stored file SHA-256 and duration (never episode), with segment kinds/sources/statuses, production stamp, provenance and clock fields. Add Stack `media.segments` request/result shapes plus pure `normalizeSegments` and `skipPlan` helpers with ported behavior tests. Reserved section kinds are documented for a future additive extension.
+

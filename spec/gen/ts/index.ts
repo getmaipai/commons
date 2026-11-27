@@ -52,6 +52,8 @@ export * from "./media-item.js";
 export * from "./media-presence.js";
 export * from "./media-production.js";
 export * from "./media-progress.js";
+export * from "./media-segments-request.js";
+export * from "./media-segments.js";
 export * from "./media-source.js";
 export * from "./media-subject.js";
 export * from "./media-template.js";
