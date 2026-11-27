@@ -92,7 +92,7 @@ msgid "ui.{count, plural, one {# try left.} other {# tries left.}}"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackLoraAdd.tsx:103
+#: src/stack/StackLoraAdd.tsx:105
 msgid "ui.{count} downloads"
 msgstr ""
 
@@ -601,6 +601,11 @@ msgid "ui.{used} of {limit} used"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackMemoryNow.tsx:55
+msgid "ui.{used} of {total}"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/elements/music-track.tsx:36
 #: src/elements/video-player.tsx:578
 msgid "ui.{value} percent"
@@ -672,7 +677,7 @@ msgid "ui.3. Music"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackLoraAdd.tsx:93
+#: src/stack/StackLoraAdd.tsx:95
 msgid "ui.A {site} key is saved."
 msgstr ""
 
@@ -752,7 +757,7 @@ msgid "ui.Accept"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackLoraAdd.tsx:60
+#: src/stack/StackLoraAdd.tsx:62
 msgid "ui.Accept the licences"
 msgstr ""
 
@@ -796,7 +801,7 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/stack/StackDrives.tsx:91
-#: src/stack/StackLoraAdd.tsx:106
+#: src/stack/StackLoraAdd.tsx:108
 msgid "ui.Add"
 msgstr ""
 
@@ -817,7 +822,7 @@ msgid "ui.Add {name} to favorites"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackLoraAdd.tsx:106
+#: src/stack/StackLoraAdd.tsx:108
 msgid "ui.Add {style}"
 msgstr ""
 
@@ -840,7 +845,7 @@ msgid "ui.Add a drive"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackLoraAdd.tsx:94
+#: src/stack/StackLoraAdd.tsx:96
 msgid "ui.Add a key"
 msgstr ""
 
@@ -872,7 +877,7 @@ msgid "ui.Add a reference picture"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackLoraAdd.tsx:85
+#: src/stack/StackLoraAdd.tsx:87
 msgid "ui.Add a style"
 msgstr ""
 
@@ -913,12 +918,12 @@ msgid "ui.Add music"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackLoraAdd.tsx:62
+#: src/stack/StackLoraAdd.tsx:64
 msgid "ui.Add style"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackLoraAdd.tsx:51
+#: src/stack/StackLoraAdd.tsx:53
 msgid "ui.Add this style"
 msgstr ""
 
@@ -1485,7 +1490,7 @@ msgstr ""
 #: src/stack/StackAddModel.tsx:73
 #: src/stack/StackDrives.tsx:91
 #: src/stack/StackFreeSpace.tsx:110
-#: src/stack/StackLoraAdd.tsx:62
+#: src/stack/StackLoraAdd.tsx:64
 #: src/stack/StackLoraDialogs.tsx:55
 #: src/stack/StackLoraDialogs.tsx:84
 #: src/stack/StackLoraDialogs.tsx:102
@@ -1573,7 +1578,7 @@ msgid "ui.Change how this style is named and used."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackLoraAdd.tsx:94
+#: src/stack/StackLoraAdd.tsx:96
 msgid "ui.Change key"
 msgstr ""
 
@@ -1841,6 +1846,11 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/elements/project-mark.tsx:131
 msgid "ui.Colour"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/stackMemory.ts:46
+msgid "ui.Comfortable"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -2217,6 +2227,11 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/elements/thread-list.aui.tsx:197
 msgid "ui.Create"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/stackMemory.ts:44
+msgid "ui.Critical"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -3152,6 +3167,7 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/elements/image-editor.tsx:302
 #: src/primitives/StorageBar.tsx:35
+#: src/stack/stackMemory.ts:35
 msgid "ui.Free"
 msgstr ""
 
@@ -3204,6 +3220,11 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/elements/music-track.tsx:148
 msgid "ui.Generation stages"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/stackMemory.ts:45
+msgid "ui.Getting tight"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -3494,6 +3515,11 @@ msgid "ui.In step"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackMemoryNow.tsx:32
+msgid "ui.in use"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/dashboard/layouts/full/vertical/header/Header.tsx:71
 #: src/dashboard/layouts/full/vertical/rail/RailProfileMenu.tsx:208
 msgid "ui.Incognito"
@@ -3634,7 +3660,7 @@ msgid "ui.Keep it"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackLoraAdd.tsx:56
+#: src/stack/StackLoraAdd.tsx:58
 msgid "ui.Keep it on"
 msgstr ""
 
@@ -3807,7 +3833,7 @@ msgid "ui.Licence"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackLoraAdd.tsx:57
+#: src/stack/StackLoraAdd.tsx:59
 msgid "ui.Licence from the site: {licence}"
 msgstr ""
 
@@ -3878,6 +3904,11 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/primitives/Player.tsx:189
 msgid "ui.Live"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackMemoryNow.tsx:33
+msgid "ui.loading"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -3996,7 +4027,7 @@ msgid "ui.Looking for screens"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackLoraAdd.tsx:104
+#: src/stack/StackLoraAdd.tsx:106
 msgid "ui.Looks like adults only"
 msgstr ""
 
@@ -4186,6 +4217,16 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/stack/StackModelsPage.tsx:265
 msgid "ui.Memory and speed"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackMemoryNow.tsx:47
+msgid "ui.Memory in use right now"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackMemoryNow.tsx:62
+msgid "ui.Memory split: {split}"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -4515,7 +4556,7 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/stack/StackDrives.tsx:86
-#: src/stack/StackLoraAdd.tsx:53
+#: src/stack/StackLoraAdd.tsx:55
 #: src/stack/StackLoraDialogs.tsx:46
 msgid "ui.Name"
 msgstr ""
@@ -4671,7 +4712,7 @@ msgid "ui.No {lane} yet."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackLoraAdd.tsx:93
+#: src/stack/StackLoraAdd.tsx:95
 msgid "ui.No {site} key is saved. Most styles do not need one."
 msgstr ""
 
@@ -4723,6 +4764,11 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/stack/StackFeatureLocation.tsx:53
 msgid "ui.No drive location is available for this feature."
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackMemoryNow.tsx:110
+msgid "ui.No engine is loaded right now, so the Stack itself holds almost nothing. A feature loads its engine the first time it is used."
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -4778,6 +4824,11 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/primitives/articleReader.tsx:124
 msgid "ui.No preview for this page."
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackMemoryNow.tsx:55
+msgid "ui.No reading yet"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -4983,7 +5034,7 @@ msgid "ui.Nothing fits this level yet."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackLoraAdd.tsx:98
+#: src/stack/StackLoraAdd.tsx:100
 msgid "ui.Nothing found. Try another word."
 msgstr ""
 
@@ -5338,6 +5389,11 @@ msgid "ui.Other"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/stackMemory.ts:34
+msgid "ui.Other apps and the system"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/stack/StackCategorySheet.tsx:165
 msgid "ui.Other computer sizes"
 msgstr ""
@@ -5587,7 +5643,7 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/proposal-card.tsx:78
-#: src/stack/StackLoraAdd.tsx:55
+#: src/stack/StackLoraAdd.tsx:57
 #: src/stack/StackLoraRow.tsx:27
 msgid "ui.Pictures"
 msgstr ""
@@ -5985,6 +6041,11 @@ msgstr ""
 #: src/primitives/ReadingSettings.tsx:83
 #: src/primitives/ReadingSettings.tsx:83
 msgid "ui.Reading settings"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackMemoryNow.tsx:35
+msgid "ui.ready"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -6672,7 +6733,7 @@ msgstr ""
 #: src/schema/NodeRenderer.tsx:697
 #: src/settings/groupSettings.ts:44
 #: src/settings/SettingsShell.tsx:132
-#: src/stack/StackLoraAdd.tsx:90
+#: src/stack/StackLoraAdd.tsx:92
 msgid "ui.Search"
 msgstr ""
 
@@ -6737,12 +6798,12 @@ msgid "ui.Search models"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackLoraAdd.tsx:87
+#: src/stack/StackLoraAdd.tsx:89
 msgid "ui.Search on"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackLoraAdd.tsx:99
+#: src/stack/StackLoraAdd.tsx:101
 #: src/stack/StackModelsPage.tsx:108
 msgid "ui.Search results"
 msgstr ""
@@ -6771,7 +6832,7 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/settings/LocationField.tsx:133
-#: src/stack/StackLoraAdd.tsx:97
+#: src/stack/StackLoraAdd.tsx:99
 msgid "ui.Searching"
 msgstr ""
 
@@ -7007,6 +7068,12 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/elements/share-dialog.tsx:133
 msgid "ui.Share anyway"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackMemoryNow.tsx:103
+#: src/stack/StackMemoryNow.tsx:104
+msgid "ui.Share of the AI budget in use"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -7519,7 +7586,7 @@ msgid "ui.Style name"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackLoraAdd.tsx:89
+#: src/stack/StackLoraAdd.tsx:91
 msgid "ui.Style name or look"
 msgstr ""
 
@@ -7884,18 +7951,28 @@ msgid "ui.The recommended setup is saved. {count, plural, one {# download has} o
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackLoraAdd.tsx:80
+#: src/stack/StackLoraAdd.tsx:82
 msgid "ui.The search did not work. Try again in a moment."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackLoraAdd.tsx:51
+#: src/stack/StackLoraAdd.tsx:53
 msgid "ui.The Stack downloads it, checks it and keeps it on the drive you choose."
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackMemoryNow.tsx:112
+msgid "ui.The Stack has not taken its first memory reading yet. It samples every 5 seconds, so this fills in on its own."
 msgstr ""
 
 #. js-lingui-explicit-id
 #: src/stack/StackCategorySheet.tsx:160
 msgid "ui.The Stack tries models from the top. Switch one off and it is never used."
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackMemoryNow.tsx:106
+msgid "ui.The Stack's engines hold {held} of their {cap} budget. The budget is the most memory the Stack lets itself use, so there is always room left for everything else."
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -8049,7 +8126,7 @@ msgid "ui.This Stack does not manage styles yet. Update the Stack to use this pa
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackLoraAdd.tsx:58
+#: src/stack/StackLoraAdd.tsx:60
 msgid "ui.This style looks like it is for adults, so it is added as adults only."
 msgstr ""
 
@@ -8394,6 +8471,11 @@ msgid "ui.Undo stroke"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/stackMemory.ts:43
+msgid "ui.Unknown"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/primitives/Player.tsx:195
 msgid "ui.Unlike"
 msgstr ""
@@ -8565,7 +8647,7 @@ msgid "ui.Use this version"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackLoraAdd.tsx:54
+#: src/stack/StackLoraAdd.tsx:56
 msgid "ui.Used for"
 msgstr ""
 
@@ -8626,7 +8708,7 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/track-studio.tsx:111
-#: src/stack/StackLoraAdd.tsx:55
+#: src/stack/StackLoraAdd.tsx:57
 #: src/stack/StackLoraRow.tsx:27
 msgid "ui.Video"
 msgstr ""
@@ -8688,6 +8770,11 @@ msgid "ui.Wait for the current change to finish."
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/stack/StackMemoryNow.tsx:34
+msgid "ui.waiting"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/elements/job-progress.tsx:99
 #: src/elements/music-track.tsx:35
 #: src/elements/video-player.tsx:112
@@ -8715,7 +8802,7 @@ msgid "ui.Warmth"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/stack/StackLoraAdd.tsx:89
+#: src/stack/StackLoraAdd.tsx:91
 msgid "ui.watercolor"
 msgstr ""
 
@@ -8803,6 +8890,11 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/stack/StackModelsPage.tsx:143
 msgid "ui.When memory is tight, features higher in this list are served first."
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/stack/StackMemoryNow.tsx:77
+msgid "ui.Where memory is going"
 msgstr ""
 
 #. js-lingui-explicit-id
