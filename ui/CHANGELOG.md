@@ -1,3 +1,7 @@
+## [ui-v0.5.760] - 2026-11-28
+
+- Version alignment: the skip-range Player (`skipRanges`, `onRangeSelect`, overlay slots, skipped-time display), the Player node's `skip_ranges`, `skip_bar` and `skip_actions` mapping, and the action-reply directives (seek, play once, announce, refresh) are all in this version. The tags ui-v0.5.757, ui-v0.5.758 and ui-v0.5.759 were cut before this version number matched; use ui-v0.5.760.
+
 ## [ui-v0.5.757] - 2026-11-27
 
 - Apply optional Player directives from action replies: seek, play through a boundary once, announce, and refresh.
