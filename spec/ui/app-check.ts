@@ -248,6 +248,9 @@ function walk(node: unknown, packageId: string, data: Map<string, AppDataEntry>,
   }
   if (type === "player") {
     checkBinding(node.bind, `${where} player`, data, "list", out);
+    if (node.skip_ranges !== undefined) checkBinding(node.skip_ranges, `${where} player.skip_ranges`, data, "list", out);
+    if (node.skip_bar !== undefined) checkBinding(node.skip_bar, `${where} player.skip_bar`, data, "list", out);
+    if (isObject(node.skip_actions)) for (const [name, action] of Object.entries(node.skip_actions)) checkAction(action, packageId, `${where} player.skip_actions.${name}`, out);
     checkAction(node.on_progress, packageId, `${where} player.on_progress`, out);
     checkAction(node.on_next, packageId, `${where} player.on_next`, out, true);
     if (Array.isArray(node.actions)) node.actions.forEach((b, i) => isObject(b) && checkAction(b.action, packageId, `${where} player.actions[${i}]`, out));

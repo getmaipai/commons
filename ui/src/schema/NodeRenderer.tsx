@@ -15,7 +15,7 @@ import { Billboard } from "@/kit/primitives/Billboard";
 import { ArtGradient } from "@/kit/primitives/ArtGradient";
 import { Chip } from "@/kit/primitives/Chip";
 import { TranscriptPanel, type TranscriptLine } from "@/kit/primitives/TranscriptPanel";
-import { Player, type PlayerChapter, type PlayerTextTrack, type PlayerUpNext } from "@/kit/primitives/Player";
+import { Player, type PlayerChapter, type PlayerTextTrack, type PlayerUpNext, type PlayerSkipRange } from "@/kit/primitives/Player";
 import { SafeImage, type ImageFallbackKind } from "@/kit/primitives/SafeImage";
 import { Reader } from "@/kit/primitives/Reader";
 import { readerLocator, sameOriginBookUrl } from "@/kit/primitives/readerLogic";
@@ -1922,6 +1922,8 @@ function ReaderNodeView({ node, state }: { node: ReaderNode; state: Row }) {
 
 function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
   const query = useBinding<Row | Row[]>(node.bind, state);
+  const skipRangesQuery = useBinding<Row[] | { rows?: Row[] }>(node.skip_ranges ?? node.bind, state);
+  const skipBarQuery = useBinding<Row | Row[]>(node.skip_bar ?? node.bind, state);
   const { dispatch, lastError } = useDispatchAction();
   const host = useContext(MediaHostContext);
   const mediaEl = useRef<HTMLMediaElement | null>(null);
@@ -1951,6 +1953,24 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
     >
       {(row) => {
         const r = row as Row;
+        const rawRanges = node.skip_ranges ? (Array.isArray(skipRangesQuery.data) ? skipRangesQuery.data : skipRangesQuery.data?.rows ?? []) : [];
+        const allowedKinds = new Set(["ad", "sponsor", "bumper", "selfpromo", "intro", "outro", "recap", "filler", "interaction", "preview"]);
+        const allowedStatuses = new Set(["auto", "held", "confirmed", "rejected"]);
+        const skipRanges: PlayerSkipRange[] = rawRanges.filter((x): x is Row => !!x && typeof x === "object").flatMap((x) => {
+          if (typeof x.id !== "string" || typeof x.kind !== "string" || !allowedKinds.has(x.kind) || typeof x.start_sec !== "number" || typeof x.end_sec !== "number") return [];
+          if (x.status !== undefined && (typeof x.status !== "string" || !allowedStatuses.has(x.status))) return [];
+          return [{ id: x.id, kind: x.kind as PlayerSkipRange["kind"], startSec: x.start_sec, endSec: x.end_sec, ...(typeof x.status === "string" ? { status: x.status as PlayerSkipRange["status"] } : {}) }];
+        });
+        const rawBar = Array.isArray(skipBarQuery.data) ? skipBarQuery.data[0] : skipBarQuery.data;
+        const bar = node.skip_bar && rawBar && typeof rawBar === "object" && typeof rawBar.saved_label === "string" && typeof rawBar.undo_available === "boolean" && Array.isArray(rawBar.buttons) ? rawBar : undefined;
+        const dispatchSkip = (action: NonNullable<NonNullable<PlayerNode["skip_actions"]>["undo"]> | undefined, extra: Row) => { if (action) dispatch(action, [{ ...r, ...extra }]); };
+        const barButtons = Array.isArray(bar?.buttons) ? bar.buttons.filter((b): b is Row => !!b && typeof b === "object") : [];
+        const skipOverlay = bar ? <div className="flex flex-wrap items-center gap-2 rounded-md bg-muted p-2 text-sm" data-slot="schema-skip-overlay">
+          {typeof bar.saved_label === "string" ? <span>{bar.saved_label}</span> : null}
+          {bar.undo_available === true && node.skip_actions?.undo ? <Button type="button" variant="ghost" size="sm" onClick={() => dispatchSkip(node.skip_actions?.undo, { action_id: "undo" })}>{i18n._({ id: "ui.Undo", message: "Undo" })}</Button> : null}
+          {barButtons.map((b) => <Button key={String(b.id)} type="button" variant="secondary" size="sm" onClick={() => dispatchSkip(node.skip_actions?.skip_button, { id: b.id, label: b.label, kind: b.kind, action_id: "skip_button" })}>{String(b.label ?? i18n._({ id: "ui.Skip", message: "Skip" }))}</Button>)}
+          {(["hear_anyway", "wrong", "missed"] as const).map((actionId) => node.skip_actions?.[actionId] ? <Button key={actionId} type="button" variant="ghost" size="sm" onClick={() => dispatchSkip(node.skip_actions?.[actionId], { action_id: actionId })}>{actionId === "hear_anyway" ? i18n._({ id: "ui.Hear anyway", message: "Hear anyway" }) : actionId === "wrong" ? i18n._({ id: "ui.Wrong", message: "Wrong" }) : i18n._({ id: "ui.Missed", message: "Missed" })}</Button> : null)}
+        </div> : undefined;
         const upNext = readField(r, field("up_next", "up_next")) as PlayerUpNext | undefined;
         const position = readField(r, field("position", "position_s"));
         const src = localPicture(readField(r, field("src", "src")))!;
@@ -2017,6 +2037,13 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
               onRateChange={node.rate?.on_change ? (rate) => dispatch(node.rate!.on_change!, [{ ...r, rate }], undefined, { quiet: true, typedArgs: true }) : undefined}
               sleepTimer={node.sleep_timer}
               skip={node.skip}
+              skipRanges={skipRanges}
+              onRangeSelect={node.skip_actions?.range_select ? (id) => {
+                const selected = skipRanges.find((range) => range.id === id);
+                if (selected) dispatchSkip(node.skip_actions?.range_select, { ...selected, start_sec: selected.startSec, end_sec: selected.endSec, action_id: "range_select" });
+              } : undefined}
+              skipOverlay={skipOverlay}
+              compactSkipOverlay={skipOverlay}
               doubleTapSeek={node.double_tap_seek}
               longPressSpeed={node.long_press_speed}
               pip={node.pip}

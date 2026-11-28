@@ -76,6 +76,12 @@ describe("UI schema", () => {
     expect(validate({ type: "search", type_chips: opt })).toBe(true);
     expect(validate({ type: "search", type_chips: { ...opt, options: [] } })).toBe(false);
   });
+  test("MEDIA-SKIP-01: player skip plan bindings and actions validate", () => {
+    const player = { type: "player", bind: { source: "package", path: "item" }, skip_ranges: { source: "package", path: "ranges" }, skip_bar: { source: "package", path: "skip-bar" }, skip_actions: Object.fromEntries(["range_select", "undo", "skip_button", "hear_anyway", "wrong", "missed"].map((id) => [id, { call: { target: `/api/plugins/podcasts/${id}` } }])) };
+    expect(validate(player)).toBe(true);
+    expect(validate({ ...player, skip_actions: { nope: { call: { target: "/api/plugins/podcasts/nope" } } } })).toBe(false);
+    expect(validate({ ...player, skip_ranges: { source: "package", path: "" } })).toBe(false);
+  });
 
   test("MEDIA-PARITY-02: reorder, dot badge, search suggest, confirm status and widget_tiles", () => {
     const opts = { call: { call: { target: "/api/x/order" } }, id_param: "ids" };

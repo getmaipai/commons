@@ -1188,6 +1188,15 @@
           "description": "PARITY-01: skip buttons that jump back and forward by this many seconds (a podcast: 15 and 30).",
           "properties": { "back": { "type": "number", "minimum": 1, "maximum": 120 }, "forward": { "type": "number", "minimum": 1, "maximum": 120 } }
         },
+        "skip_ranges": { "$ref": "#/$defs/binding", "description": "Optional binding returning ranges `{id, kind, start_sec, end_sec, status?}`. `kind` is one of ad, sponsor, bumper, selfpromo, intro, outro, recap, filler, interaction or preview; `status` is auto, held, confirmed or rejected." },
+        "skip_bar": { "$ref": "#/$defs/binding", "description": "Optional binding returning `{saved_label, undo_available, buttons:[{id,label,kind}]}` for the saved skip pill and skip buttons." },
+        "skip_actions": {
+          "type": "object", "additionalProperties": false, "minProperties": 1,
+          "description": "Actions for skip range selection, undo, skip button press, hear anyway, wrong and missed feedback. Each action receives the bound item and fields from the selected range or button.",
+          "properties": {
+            "range_select": { "$ref": "#/$defs/action" }, "undo": { "$ref": "#/$defs/action" }, "skip_button": { "$ref": "#/$defs/action" }, "hear_anyway": { "$ref": "#/$defs/action" }, "wrong": { "$ref": "#/$defs/action" }, "missed": { "$ref": "#/$defs/action" }
+          }
+        },
         "transcript_bind": { "$ref": "#/$defs/binding", "description": "PARITY-01: the call returning the transcript as rows [{start_s, text}] (or {rows}); the first row of the bound item is not used. Absent: the item's own `transcript` field, if any." },
         "marks": {
           "type": "object", "additionalProperties": false, "minProperties": 1,

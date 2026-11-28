@@ -1,3 +1,7 @@
+## [spec-v0.1.490] - 2026-11-27
+
+- MEDIA-SKIP-01: `player` gains optional `skip_ranges` and `skip_bar` bindings plus `skip_actions` (`range_select`, `undo`, `skip_button`, `hear_anyway`, `wrong`, `missed`). The kit Player renderer maps range records into marked timeline ranges and draws the bound saved label, undo and skip controls in its skip overlays. Additive; old Player nodes are unchanged.
+
 ## [spec-v0.1.489] - 2026-11-27
 
 - MEDIA-SEGMENTS-02, additive: add `bumper` segments with optional `slotRole` and `groupId` for a show's lead stinger, ad slot and tail stinger. `skipPlan` can include explicit bumpers; by default it also skips all parts of a bumper group when an adjacent (within 3 seconds) ad range is skipped. Set `bumpersWithAds: false` to disable that coupling. Normalization keeps bumper parts distinct from ads and each other.
