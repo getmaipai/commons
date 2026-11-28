@@ -21,6 +21,7 @@ function answer() {
   globalThis.fetch = mock((input: RequestInfo | URL, init?: RequestInit) => {
     const url = String(input); const body = typeof init?.body === "string" ? JSON.parse(init.body) : undefined; calls.push({ url, body });
     if (url.endsWith("/data/episode")) return Promise.resolve(new Response(JSON.stringify([{ id: "e1", src: "/episode.mp3", title: "Field Notes", skip_ranges: ranges, skip_bar: { saved_label: "Skipped 2:15", undo_available: true, buttons: [{ id: "skip-all", label: "Skip", kind: "all" }] } }])));
+    if (url.endsWith("/data/single")) return Promise.resolve(new Response(JSON.stringify({ id: "e1", src: "/episode.mp3", title: "Field Notes", skip_ranges: ranges, skip_bar: { saved_label: "Skipped 2:15", undo_available: true, buttons: [] } })));
     if (url.endsWith("/data/ranges")) return Promise.resolve(new Response(JSON.stringify(ranges)));
     if (url.endsWith("/data/skip-bar")) return Promise.resolve(new Response(JSON.stringify({ saved_label: "Skipped 2:15", undo_available: true, buttons: [{ id: "skip-all", label: "Skip", kind: "all" }] })));
     return Promise.resolve(new Response(JSON.stringify({ ok: true })));
@@ -48,6 +49,13 @@ describe("player skip plan node", () => {
     answer();
     const rowBound = parse({ type: "player", kind: "audio", bind: { source: "package", path: "episode" }, skip_ranges: { source: "package", path: "episode" }, skip_bar: { source: "package", path: "episode" }, skip_actions: actions });
     const view = renderWithQueryClient(<MemoryRouter><PackageScopeContext.Provider value={{ packageId: "podcasts" }}><NodeRenderer node={rowBound} state={{}} /></PackageScopeContext.Provider></MemoryRouter>);
+    await waitFor(() => expect(view.container.querySelectorAll('[data-slot="player-skip-ranges"] button').length).toBe(4));
+    expect(view.getByText("Skipped 2:15")).toBeTruthy();
+  });
+  test("reads ranges and bar fields when the bound data is one row object", async () => {
+    answer();
+    const single = parse({ type: "player", kind: "audio", bind: { source: "package", path: "single" }, skip_ranges: { source: "package", path: "single" }, skip_bar: { source: "package", path: "single" }, skip_actions: actions });
+    const view = renderWithQueryClient(<MemoryRouter><PackageScopeContext.Provider value={{ packageId: "podcasts" }}><NodeRenderer node={single} state={{}} /></PackageScopeContext.Provider></MemoryRouter>);
     await waitFor(() => expect(view.container.querySelectorAll('[data-slot="player-skip-ranges"] button').length).toBe(4));
     expect(view.getByText("Skipped 2:15")).toBeTruthy();
   });

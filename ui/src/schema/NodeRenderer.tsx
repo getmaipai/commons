@@ -1987,9 +1987,12 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
       {(row) => {
         const r = row as Row;
         const rangesBinding = skipRangesQuery.data;
-        const boundRangeRow = Array.isArray(rangesBinding) ? rangesBinding.find((x) => !!x && typeof x === "object") : undefined;
+        // The bound data may be the ranges themselves, `{ rows }`, one row object, or a list of rows whose row carries a `skip_ranges` field.
+        const boundRangeRow = Array.isArray(rangesBinding)
+          ? rangesBinding.find((x) => !!x && typeof x === "object")
+          : rangesBinding && typeof rangesBinding === "object" && !("rows" in rangesBinding) ? rangesBinding as Row : undefined;
         const rawRanges = node.skip_ranges
-          ? (Array.isArray(rangesBinding) ? (Array.isArray(boundRangeRow?.skip_ranges) ? boundRangeRow.skip_ranges : rangesBinding) : rangesBinding?.rows ?? [])
+          ? (Array.isArray(boundRangeRow?.skip_ranges) ? boundRangeRow.skip_ranges : Array.isArray(rangesBinding) ? rangesBinding : (rangesBinding as { rows?: Row[] } | undefined)?.rows ?? [])
           : [];
         const allowedKinds = new Set(["ad", "sponsor", "bumper", "selfpromo", "intro", "outro", "recap", "filler", "interaction", "preview"]);
         const allowedStatuses = new Set(["auto", "held", "confirmed", "rejected"]);
@@ -1998,7 +2001,9 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
           if (x.status !== undefined && (typeof x.status !== "string" || !allowedStatuses.has(x.status))) return [];
           return [{ id: x.id, kind: x.kind as PlayerSkipRange["kind"], startSec: x.start_sec, endSec: x.end_sec, ...(typeof x.status === "string" ? { status: x.status as PlayerSkipRange["status"] } : {}) }];
         });
-        const boundBarRow = Array.isArray(skipBarQuery.data) ? skipBarQuery.data.find((x) => !!x && typeof x === "object") : undefined;
+        const boundBarRow = Array.isArray(skipBarQuery.data)
+          ? skipBarQuery.data.find((x) => !!x && typeof x === "object")
+          : skipBarQuery.data && typeof skipBarQuery.data === "object" ? skipBarQuery.data as Row : undefined;
         const rawBar: Row | undefined = boundBarRow?.skip_bar && typeof boundBarRow.skip_bar === "object" && !Array.isArray(boundBarRow.skip_bar)
           ? boundBarRow.skip_bar as Row
           : (Array.isArray(skipBarQuery.data) ? skipBarQuery.data[0] : skipBarQuery.data) as Row | undefined;
