@@ -1,6 +1,6 @@
 import { describe, expect, test, afterEach } from "bun:test";
 import { render, cleanup } from "@testing-library/react";
-import { SplitView } from "@/kit/primitives/SplitView";
+import { SplitView, SplitViewLayoutContext, sideBySideFor } from "@/kit/primitives/SplitView";
 
 afterEach(cleanup);
 
@@ -17,6 +17,9 @@ function renderSplit(detailOpen: boolean) {
 }
 
 describe("SplitView", () => {
+  test("sideBySideFor uses main minimum, aside width, and gap", () => {
+    expect([[907, 360], [908, 360], [967, 420], [968, 420], [1000, 420]].map(([w, a]) => sideBySideFor(w!, a!))).toEqual([false, true, false, true, true]);
+  });
   test("renders both halves, so tablet and desktop show them side by side", () => {
     const { getByText } = renderSplit(false);
     expect(getByText("The list")).toBeInTheDocument();
@@ -78,22 +81,49 @@ describe("SplitView", () => {
   });
 
   describe("MEDIA-POLISH-01 main and aside", () => {
-    test("draws both columns, the aside named, two columns from lg and stacked below", () => {
+    test("draws both columns and begins stacked before measuring", () => {
       const { getByText, getByRole, container } = render(<SplitView main={<p>Player</p>} aside={<p>Up next list</p>} asideLabel="Up next" />);
       expect(getByText("Player")).toBeInTheDocument();
       expect(getByRole("region", { name: "Up next" }).textContent).toBe("Up next list");
       const root = container.querySelector('[data-slot="split-view"]')!;
       expect(root.getAttribute("data-layout")).toBe("main-aside");
       expect(root.className).toContain("grid-cols-1");
-      expect(root.className).toContain("lg:grid-cols-[minmax(0,1fr)_minmax(0,360px)]");
+      expect(root.className).toContain("grid-cols-1");
     });
-    test("VIDEO-UI-12: aside_width wide is 420 px at lg on either side; the default stays 360 px", () => {
+    test("VIDEO-UI-12: aside_width wide is 420 px on either side; the default stays 360 px", () => {
       const grid = (props: object) => render(<SplitView main={<p>Feed</p>} aside={<p>Panel</p>} {...props} />).container.querySelector('[data-slot="split-view"]')!;
-      expect(grid({ asideWidth: "wide" }).className).toContain("lg:grid-cols-[minmax(0,1fr)_minmax(0,420px)]");
-      expect(grid({ asideWidth: "wide", asideSide: "start" }).className).toContain("lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]");
+      expect(grid({ asideWidth: "wide" }).className).toContain("grid-cols-1");
+      expect(grid({ asideWidth: "wide", asideSide: "start" }).className).toContain("grid-cols-1");
       expect(grid({ asideWidth: "wide", asideSide: "start" }).getAttribute("data-aside-width")).toBe("wide");
-      expect(grid({ asideSide: "start" }).className).toContain("lg:grid-cols-[minmax(0,360px)_minmax(0,1fr)]");
+      expect(grid({ asideSide: "start" }).className).toContain("grid-cols-1");
       expect(grid({}).getAttribute("data-aside-width")).toBe("default");
+    });
+    test("ResizeObserver switches layout and context at the measured container width", () => {
+      let callback: ResizeObserverCallback | undefined;
+      class FakeResizeObserver {
+        constructor(cb: ResizeObserverCallback) { callback = cb; }
+        observe() {}
+        disconnect() {}
+        unobserve() {}
+      }
+      const previous = globalThis.ResizeObserver;
+      globalThis.ResizeObserver = FakeResizeObserver as unknown as typeof ResizeObserver;
+      function Probe() { return <SplitViewLayoutContext.Consumer>{(v) => <span data-testid="layout">{v}</span>}</SplitViewLayoutContext.Consumer>; }
+      const view = render(<SplitView main={<p>m</p>} aside={<Probe />} />);
+      const grid = view.container.querySelector('[data-slot="split-view"]')!;
+      expect(view.getByTestId("layout").textContent).toBe("stacked");
+      const measure = (width: number) => {
+        callback!([{ contentRect: { width } as DOMRectReadOnly } as ResizeObserverEntry], {} as ResizeObserver);
+      };
+      measure(700);
+      view.rerender(<SplitView main={<p>m</p>} aside={<Probe />} />);
+      expect(view.getByTestId("layout").textContent).toBe("stacked");
+      expect(grid.className).toContain("grid-cols-1");
+      measure(1000);
+      view.rerender(<SplitView main={<p>m</p>} aside={<Probe />} />);
+      expect(view.getByTestId("layout").textContent).toBe("side");
+      expect(grid.className).toContain("grid-cols-[minmax(0,1fr)_minmax(0,360px)]");
+      globalThis.ResizeObserver = previous;
     });
     test("the list and detail form is unchanged", () => {
       const { container } = renderSplit(true);

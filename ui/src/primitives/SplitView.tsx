@@ -1,9 +1,8 @@
-import { createContext, useContext, useSyncExternalStore, type ReactNode } from "react";
+import { createContext, useContext, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { cn, FOCUS_RING } from "@/kit/utils";
-import { SURFACE_MIN_WIDTH_PX } from "@/kit/responsive";
 
-/** VIDEO-UI-03: how the enclosing main and aside form is laid out right now. `side` is the aside beside the main column (the kit's
- * desktop breakpoint, `lg`, 960 px, and up); `stacked` is the aside under it. A part inside the aside that must change shape with
+/** VIDEO-UI-03: how the enclosing main and aside form is laid out right now. `side` is the aside beside the main column when its
+ * container has room for both columns; `stacked` is the aside under it. A part inside the aside that must change shape with
  * the layout (the `prompt_bar` panel and dock) reads this instead of running a media query of its own, so there is one definition
  * of the breakpoint. `null` outside a main and aside SplitView. */
 export type SplitViewLayout = "side" | "stacked";
@@ -12,15 +11,25 @@ export function useSplitViewLayout(): SplitViewLayout | null {
   return useContext(SplitViewLayoutContext);
 }
 
-const SIDE_QUERY = `(min-width: ${SURFACE_MIN_WIDTH_PX.desktop}px)`;
-function subscribeSide(onChange: () => void) {
-  if (typeof window === "undefined" || typeof window.matchMedia !== "function") return () => {};
-  const list = window.matchMedia(SIDE_QUERY);
-  list.addEventListener?.("change", onChange);
-  return () => list.removeEventListener?.("change", onChange);
+const MAIN_MIN_WIDTH_PX = 520;
+const GAP_WIDTH_PX = 28;
+export function sideBySideFor(widthPx: number, asideWidth: number): boolean {
+  return widthPx >= MAIN_MIN_WIDTH_PX + asideWidth + GAP_WIDTH_PX;
 }
-function useSideBySide(): boolean {
-  return useSyncExternalStore(subscribeSide, () => typeof window !== "undefined" && typeof window.matchMedia === "function" && window.matchMedia(SIDE_QUERY).matches, () => false);
+function useSideBySide(asideWidth: number) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState<number | null>(null);
+  useLayoutEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (entry) setWidth(entry.contentRect.width);
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+  return { ref, side: width !== null && sideBySideFor(width, asideWidth) };
 }
 
 interface ListDetailProps {
@@ -39,17 +48,16 @@ interface ListDetailProps {
 }
 
 /** MEDIA-POLISH-01: the main and aside form: a wide column with a narrow one
- * beside it from the kit's `lg` breakpoint, 960 px (a player with Up next,
- * YouTube's watch page), the aside stacked under the main column below that. */
+ * beside it when the container can fit both at useful widths, otherwise stacked. */
 interface MainAsideProps {
   main: ReactNode;
   aside: ReactNode;
   /** The aside column's accessible name ("Up next"). */
   asideLabel?: string;
-  /** VIDEO-UI-03: the side the aside takes at `lg` and up. Default `end`; `start` puts it on the left (a control panel beside a feed).
+  /** VIDEO-UI-03: the side the aside takes when columns fit. Default `end`; `start` puts it on the left (a control panel beside a feed).
    * Stacked, the aside stays under the main column either way. */
   asideSide?: "start" | "end";
-  /** VIDEO-UI-12: the aside column's width at `lg` and up. Default `default`, 360 px, unchanged; `wide` is 420 px. Stacked, no effect. */
+  /** VIDEO-UI-12: the aside column's width when side by side. Default `default`, 360 px; `wide` is 420 px. Stacked, no effect. */
   asideWidth?: "default" | "wide";
   /** VIDEO-UI-13: `stage` draws the main column as a recessed pane on `--surface-stage`. Default `page`: no surface. */
   mainSurface?: "page" | "stage";
@@ -73,20 +81,25 @@ export function SplitView(props: SplitViewProps) {
 }
 
 function MainAside({ main, aside, asideLabel, asideSide = "end", asideWidth = "default", mainSurface = "page" }: MainAsideProps) {
-  const side = useSideBySide();
   const start = asideSide === "start";
   const wide = asideWidth === "wide";
+  const asideWidthPx = wide ? 420 : 360;
+  const { ref, side } = useSideBySide(asideWidthPx);
+  const columns = start
+    ? (wide ? "grid-cols-[minmax(0,420px)_minmax(0,1fr)]" : "grid-cols-[minmax(0,360px)_minmax(0,1fr)]")
+    : (wide ? "grid-cols-[minmax(0,1fr)_minmax(0,420px)]" : "grid-cols-[minmax(0,1fr)_minmax(0,360px)]");
   return (
     <SplitViewLayoutContext.Provider value={side ? "side" : "stacked"}>
       <div
-        className={cn("grid w-full min-w-0 grid-cols-1 gap-x-7 gap-y-6", start ? (wide ? "lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]" : "lg:grid-cols-[minmax(0,360px)_minmax(0,1fr)]") : (wide ? "lg:grid-cols-[minmax(0,1fr)_minmax(0,420px)]" : "lg:grid-cols-[minmax(0,1fr)_minmax(0,360px)]"))}
+        ref={ref}
+        className={cn("grid w-full min-w-0 gap-x-7 gap-y-6", side ? columns : "grid-cols-1")}
         data-slot="split-view"
         data-layout="main-aside"
         data-aside-side={asideSide}
         data-aside-width={asideWidth}
       >
         <div data-surface={mainSurface === "stage" ? "stage" : undefined} className={cn("flex min-w-0 flex-col gap-4", mainSurface === "stage" && "rounded-2xl border border-border bg-[var(--surface-stage)] p-4 text-foreground sm:p-5")}>{main}</div>
-        <div role={asideLabel ? "region" : undefined} aria-label={asideLabel} className={cn("flex min-w-0 flex-col gap-4", start && "lg:order-first")}>
+        <div role={asideLabel ? "region" : undefined} aria-label={asideLabel} className={cn("flex min-w-0 flex-col gap-4", side && start && "order-first")}>
           {aside}
         </div>
       </div>

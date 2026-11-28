@@ -166,29 +166,22 @@ describe("SplitView layout context", () => {
   function Probe() {
     return <SplitViewLayoutContext.Consumer>{(v) => <p data-testid="layout">{String(v)}</p>}</SplitViewLayoutContext.Consumer>;
   }
-  test("side by side from the kit's lg width (960 px), stacked below it", () => {
-    stubMatchMedia({ "(min-width: 960px)": true });
-    expect(render(<SplitView main={<p>m</p>} aside={<Probe />} />).getByTestId("layout").textContent).toBe("side");
-    cleanup();
-    stubMatchMedia({ "(min-width: 960px)": false });
+  test("starts stacked until its container has been measured", () => {
     expect(render(<SplitView main={<p>m</p>} aside={<Probe />} />).getByTestId("layout").textContent).toBe("stacked");
   });
 
-  test("a prompt bar in the aside takes its mode from the SplitView, and runs no media query of its own", () => {
-    const queries: string[] = [];
-    window.matchMedia = ((query: string) => { queries.push(query); return { matches: query === "(min-width: 960px)", media: query, addEventListener: () => {}, removeEventListener: () => {}, addListener: () => {}, removeListener: () => {}, dispatchEvent: () => false, onchange: null }; }) as typeof window.matchMedia;
+  test("a prompt bar in the aside takes its mode from the measured SplitView layout", () => {
     const view = render(<SplitView main={<p>feed</p>} aside={<PromptBar label="Describe" placement="panel" value="x" onValueChange={() => {}} onSubmit={() => {}} />} asideSide="start" />);
-    expect(view.container.querySelector('[data-slot="prompt-bar"]')!.getAttribute("data-mode")).toBe("panel");
-    expect(queries.filter((q) => !q.startsWith("(min-width: 960px)") && !q.includes("max-width: 639") && !q.includes("pointer: coarse"))).toEqual([]);
+    expect(view.container.querySelector('[data-slot="prompt-bar"]')!.getAttribute("data-mode")).toBe("dock");
   });
 
-  test("aside_side start puts the aside first at lg and swaps the columns; end is unchanged", () => {
+  test("aside_side start uses order-first and swaps the columns when measured; end is unchanged", () => {
     const start = render(<SplitView main={<p>m</p>} aside={<p>a</p>} asideLabel="Panel" asideSide="start" />);
-    expect(start.container.querySelector('[data-slot="split-view"]')!.className).toContain("lg:grid-cols-[minmax(0,360px)_minmax(0,1fr)]");
-    expect(start.getByRole("region", { name: "Panel" }).className).toContain("lg:order-first");
+    expect(start.container.querySelector('[data-slot="split-view"]')!.className).toContain("grid-cols-1");
+    expect(start.getByRole("region", { name: "Panel" }).className).not.toContain("order-first");
     cleanup();
     const end = render(<SplitView main={<p>m</p>} aside={<p>a</p>} asideLabel="Panel" />);
-    expect(end.container.querySelector('[data-slot="split-view"]')!.className).toContain("lg:grid-cols-[minmax(0,1fr)_minmax(0,360px)]");
+    expect(end.container.querySelector('[data-slot="split-view"]')!.className).toContain("grid-cols-1");
     expect(end.getByRole("region", { name: "Panel" }).className).not.toContain("order-first");
   });
 });

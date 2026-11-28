@@ -1,3 +1,7 @@
+## [ui-v0.5.763] - 2026-11-27
+
+- Fix: `SplitView` main and aside now switch to side-by-side based on the available container width, keeping the main column at least 520 px wide.
+
 ## [ui-v0.5.762] - 2026-11-28
 
 - The Player node also reads `skip_ranges` and `skip_bar` when the bound package data is one row object (not only a list of rows), which is what the Podcasts `item` data call returns.
