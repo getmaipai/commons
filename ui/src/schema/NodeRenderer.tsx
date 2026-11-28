@@ -1928,6 +1928,8 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
   const host = useContext(MediaHostContext);
   const mediaEl = useRef<HTMLMediaElement | null>(null);
   const [castError, setCastError] = useState<string | null>(null);
+  const [announcement, setAnnouncement] = useState("");
+  const playOnceCleanup = useRef<(() => void) | null>(null);
   const [lyricsLoading, setLyricsLoading] = useState(false);
   const phone = useIsPhoneLayout();
   const [editOpen, setEditOpen] = useState(false);
@@ -1936,6 +1938,37 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
   useEffect(() => { if (lastError !== null && editOpen) setEditError(i18n._({ id: "ui.Could not save. Check that you are online, then try again.", message: "Could not save. Check that you are online, then try again." })); }, [lastError, editOpen]);
   const field = (name: keyof NonNullable<PlayerNode["fields"]>, fallback: string) => node.fields?.[name] ?? fallback;
   const item = Array.isArray(query.data) ? query.data[0] : query.data;
+  useEffect(() => () => playOnceCleanup.current?.(), []);
+  const dispatchPlayer: ReturnType<typeof useDispatchAction>["dispatch"] = (action, items, onSettled, options = {}) => dispatch(action, items, onSettled, {
+    ...options,
+    onReply: (reply) => {
+      if (!reply || typeof reply !== "object" || Array.isArray(reply)) return;
+      const directives = (reply as Row).player;
+      if (!directives || typeof directives !== "object" || Array.isArray(directives)) return;
+      const player = directives as Row;
+      if (typeof player.announce === "string") setAnnouncement(player.announce);
+      const media = mediaEl.current;
+      if (media && typeof player.seek_to_sec === "number" && Number.isFinite(player.seek_to_sec) && player.seek_to_sec >= 0) media.currentTime = player.seek_to_sec;
+      if (media && typeof player.play_once_until_sec === "number" && Number.isFinite(player.play_once_until_sec) && player.play_once_until_sec >= 0) {
+        playOnceCleanup.current?.();
+        const boundary = player.play_once_until_sec;
+        const onTime = () => {
+          if (media.currentTime < boundary) return;
+          media.removeEventListener("timeupdate", onTime);
+          playOnceCleanup.current = null;
+          media.pause();
+          if (player.resume_after === true) {
+            media.currentTime = boundary;
+            void media.play().catch(() => undefined);
+          }
+        };
+        playOnceCleanup.current = () => media.removeEventListener("timeupdate", onTime);
+        media.addEventListener("timeupdate", onTime);
+        if (player.resume_after === true) void media.play().catch(() => undefined);
+      }
+      if (player.refresh === true) void query.refetch();
+    },
+  });
   return (
     <AsyncState
       errorLayout="row"
@@ -1963,7 +1996,7 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
         });
         const rawBar = Array.isArray(skipBarQuery.data) ? skipBarQuery.data[0] : skipBarQuery.data;
         const bar = node.skip_bar && rawBar && typeof rawBar === "object" && typeof rawBar.saved_label === "string" && typeof rawBar.undo_available === "boolean" && Array.isArray(rawBar.buttons) ? rawBar : undefined;
-        const dispatchSkip = (action: NonNullable<NonNullable<PlayerNode["skip_actions"]>["undo"]> | undefined, extra: Row) => { if (action) dispatch(action, [{ ...r, ...extra }]); };
+        const dispatchSkip = (action: NonNullable<NonNullable<PlayerNode["skip_actions"]>["undo"]> | undefined, extra: Row) => { if (action) dispatchPlayer(action, [{ ...r, ...extra }]); };
         const barButtons = Array.isArray(bar?.buttons) ? bar.buttons.filter((b): b is Row => !!b && typeof b === "object") : [];
         const skipOverlay = bar ? <div className="flex flex-wrap items-center gap-2 rounded-md bg-muted p-2 text-sm" data-slot="schema-skip-overlay">
           {typeof bar.saved_label === "string" ? <span>{bar.saved_label}</span> : null}
@@ -2019,7 +2052,8 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
               lyricsLoading={lyricsLoading}
               onLyricsOpen={node.on_lyrics_open ? () => {
                 setLyricsLoading(true);
-                dispatch(node.on_lyrics_open!, [r], () => setLyricsLoading(false), { onSuccess: () => { setLyricsLoading(false); void query.refetch(); } });
+                dispatchPlayer(node.on_lyrics_open!, [r]);
+                setLyricsLoading(false);
               } : undefined}
               chapters={(readField(r, field("chapters", "chapters")) as PlayerChapter[] | undefined) ?? undefined}
               captions={(readField(r, field("captions", "captions")) as PlayerTextTrack[] | undefined) ?? undefined}
@@ -2068,9 +2102,10 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
                 transcript={node.details_show?.includes("transcript") ? { bind: node.transcript_bind, state, fallback: readField(r, field("transcript", "transcript")), getMedia: () => mediaEl.current, phone } : undefined}
               />
             ) : null}
-            {node.actions && node.actions.length > 0 || (editButton && !audioLayout) ? <PlayerActions actions={node.actions ?? []} item={r} dispatch={dispatch} wrap={node.actions_wrap === true} getPosition={() => mediaEl.current?.currentTime ?? 0}>{!audioLayout ? editButton : null}</PlayerActions> : null}
+            {node.actions && node.actions.length > 0 || (editButton && !audioLayout) ? <PlayerActions actions={node.actions ?? []} item={r} dispatch={dispatchPlayer} wrap={node.actions_wrap === true} getPosition={() => mediaEl.current?.currentTime ?? 0}>{!audioLayout ? editButton : null}</PlayerActions> : null}
             {node.marks ? <PlayerMarks config={node.marks} state={state} item={r} seek={(time) => { if (mediaEl.current) mediaEl.current.currentTime = time; }} /> : null}
             {node.edit ? <EditPlayerSheet open={editOpen} onOpenChange={setEditOpen} phone={phone} definition={node.edit} item={r} values={editValues} setValues={setEditValues} error={editError} onSave={() => { const id = readField(r, field("id", "id")); const changed = Object.fromEntries(node.edit!.fields.filter(f => JSON.stringify(editValues[f.name] ?? "") !== JSON.stringify(readField(r, f.name) ?? "")).map(f => [f.name, editValues[f.name]])); if (!Object.keys(changed).length) { setEditOpen(false); return; } setEditError(null); const save = node.edit!.on_save; const action: Action = "call" in save ? { call: { ...save.call, args: { ...changed, id } } } : save; dispatch(action, [{ ...changed, id }], undefined, { onSuccess: () => setEditOpen(false) }); }} /> : null}
+            <span role="status" aria-live="polite" className="sr-only">{announcement}</span>
             {lastError ? <p role="status" className="text-base text-destructive">{lastError}</p> : null}
             {castError ? <p role="status" className="text-base text-destructive">{castError}</p> : null}
           </>

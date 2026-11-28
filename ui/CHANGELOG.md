@@ -1,3 +1,7 @@
+## [ui-v0.5.757] - 2026-11-27
+
+- Apply optional Player directives from action replies: seek, play through a boundary once, announce, and refresh.
+
 ## [ui-v0.5.740] - 2026-11-22
 
 - Fix: on a device with no hover (a phone or tablet) the "..." menu of every project row and chat row in the thread list is visible, and the row title leaves room for it; before, it showed only on hover or for the open chat.

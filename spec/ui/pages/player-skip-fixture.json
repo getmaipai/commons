@@ -5,17 +5,50 @@
   "body": [
     {
       "type": "player",
-      "bind": { "source": "package", "path": "episode" },
+      "bind": {
+        "source": "package",
+        "path": "episode"
+      },
       "kind": "audio",
-      "skip_ranges": { "source": "package", "path": "ranges" },
-      "skip_bar": { "source": "package", "path": "skip-bar" },
+      "skip_ranges": {
+        "source": "package",
+        "path": "ranges"
+      },
+      "skip_bar": {
+        "source": "package",
+        "path": "skip-bar"
+      },
       "skip_actions": {
-        "range_select": { "call": { "target": "/api/plugins/podcasts/range" } },
-        "undo": { "call": { "target": "/api/plugins/podcasts/undo" } },
-        "skip_button": { "call": { "target": "/api/plugins/podcasts/skip" } },
-        "hear_anyway": { "call": { "target": "/api/plugins/podcasts/hear-anyway" } },
-        "wrong": { "call": { "target": "/api/plugins/podcasts/wrong" } },
-        "missed": { "call": { "target": "/api/plugins/podcasts/missed" } }
+        "range_select": {
+          "call": {
+            "target": "/api/plugins/podcasts/range"
+          }
+        },
+        "undo": {
+          "call": {
+            "target": "/api/plugins/podcasts/undo"
+          }
+        },
+        "skip_button": {
+          "call": {
+            "target": "/api/plugins/podcasts/skip"
+          }
+        },
+        "hear_anyway": {
+          "call": {
+            "target": "/api/plugins/podcasts/hear-anyway"
+          }
+        },
+        "wrong": {
+          "call": {
+            "target": "/api/plugins/podcasts/wrong"
+          }
+        },
+        "missed": {
+          "call": {
+            "target": "/api/plugins/podcasts/missed"
+          }
+        }
       }
     }
   ]

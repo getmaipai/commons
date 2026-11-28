@@ -1,3 +1,7 @@
+## [spec-v0.1.491] - 2026-11-27
+
+- UI action results may include `player` directives: `seek_to_sec`, `play_once_until_sec`, `resume_after`, `announce` and `refresh`. Generated TypeScript and Python models remain schema derived.
+
 ## [spec-v0.1.490] - 2026-11-27
 
 - MEDIA-SKIP-01: `player` gains optional `skip_ranges` and `skip_bar` bindings plus `skip_actions` (`range_select`, `undo`, `skip_button`, `hear_anyway`, `wrong`, `missed`). The kit Player renderer maps range records into marked timeline ranges and draws the bound saved label, undo and skip controls in its skip overlays. Additive; old Player nodes are unchanged.
