@@ -24,7 +24,8 @@ function stubContainerWidth(width: number) {
 }
 
 const realMatchMedia = window.matchMedia;
-afterEach(() => { cleanup(); window.matchMedia = realMatchMedia; });
+const realResizeObserver = globalThis.ResizeObserver;
+afterEach(() => { cleanup(); window.matchMedia = realMatchMedia; globalThis.ResizeObserver = realResizeObserver; });
 
 interface Call { url: string; method: string; body: unknown }
 let calls: Call[] = [];
