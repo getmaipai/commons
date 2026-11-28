@@ -106,7 +106,7 @@ batch action is about to act on).
 
 ### Player skip plan
 
-`player.skip_ranges` optionally binds to a list of `{ id, kind, start_sec, end_sec, status? }` ranges. Kinds are the kit Player's skip kinds; status is `auto`, `held`, `confirmed` or `rejected`. `player.skip_bar` optionally binds to one `{ saved_label, undo_available, buttons }` object; each button is `{ id, label, kind }`. These bindings draw the saved skip pill and its skip buttons with the kit Player. `player.skip_actions` names optional actions `range_select`, `undo`, `skip_button`, `hear_anyway`, `wrong` and `missed`. Each action receives the bound media item's fields plus the selected range/button fields and an `action_id` naming the operation.
+`player.skip_ranges` optionally binds to a list of `{ id, kind, start_sec, end_sec, status? }` ranges, or to a row whose `skip_ranges` field contains that list. Kinds are the kit Player's skip kinds; status is `auto`, `held`, `confirmed` or `rejected`. `player.skip_bar` optionally binds to one `{ saved_label, undo_available, buttons }` object, or to a row whose `skip_bar` field contains that object; each button is `{ id, label, kind }`. These bindings draw the saved skip pill and its skip buttons with the kit Player. `player.skip_actions` names optional actions `range_select`, `undo`, `skip_button`, `hear_anyway`, `wrong` and `missed`. Each action receives the bound media item's fields plus the selected range/button fields and an `action_id` naming the operation.
 
 A package that lists `contributes.pages[]` in its manifest is a launchable app. Each page names `pages/<module>.json` in the
 package, a `page` document written against this schema. Three things are added for them:

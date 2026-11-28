@@ -1986,7 +1986,11 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
     >
       {(row) => {
         const r = row as Row;
-        const rawRanges = node.skip_ranges ? (Array.isArray(skipRangesQuery.data) ? skipRangesQuery.data : skipRangesQuery.data?.rows ?? []) : [];
+        const rangesBinding = skipRangesQuery.data;
+        const boundRangeRow = Array.isArray(rangesBinding) ? rangesBinding.find((x) => !!x && typeof x === "object") : undefined;
+        const rawRanges = node.skip_ranges
+          ? (Array.isArray(rangesBinding) ? (Array.isArray(boundRangeRow?.skip_ranges) ? boundRangeRow.skip_ranges : rangesBinding) : rangesBinding?.rows ?? [])
+          : [];
         const allowedKinds = new Set(["ad", "sponsor", "bumper", "selfpromo", "intro", "outro", "recap", "filler", "interaction", "preview"]);
         const allowedStatuses = new Set(["auto", "held", "confirmed", "rejected"]);
         const skipRanges: PlayerSkipRange[] = rawRanges.filter((x): x is Row => !!x && typeof x === "object").flatMap((x) => {
@@ -1994,7 +1998,10 @@ function PlayerNodeView({ node, state }: { node: PlayerNode; state: Row }) {
           if (x.status !== undefined && (typeof x.status !== "string" || !allowedStatuses.has(x.status))) return [];
           return [{ id: x.id, kind: x.kind as PlayerSkipRange["kind"], startSec: x.start_sec, endSec: x.end_sec, ...(typeof x.status === "string" ? { status: x.status as PlayerSkipRange["status"] } : {}) }];
         });
-        const rawBar = Array.isArray(skipBarQuery.data) ? skipBarQuery.data[0] : skipBarQuery.data;
+        const boundBarRow = Array.isArray(skipBarQuery.data) ? skipBarQuery.data.find((x) => !!x && typeof x === "object") : undefined;
+        const rawBar: Row | undefined = boundBarRow?.skip_bar && typeof boundBarRow.skip_bar === "object" && !Array.isArray(boundBarRow.skip_bar)
+          ? boundBarRow.skip_bar as Row
+          : (Array.isArray(skipBarQuery.data) ? skipBarQuery.data[0] : skipBarQuery.data) as Row | undefined;
         const bar = node.skip_bar && rawBar && typeof rawBar === "object" && typeof rawBar.saved_label === "string" && typeof rawBar.undo_available === "boolean" && Array.isArray(rawBar.buttons) ? rawBar : undefined;
         const dispatchSkip = (action: NonNullable<NonNullable<PlayerNode["skip_actions"]>["undo"]> | undefined, extra: Row) => { if (action) dispatchPlayer(action, [{ ...r, ...extra }]); };
         const barButtons = Array.isArray(bar?.buttons) ? bar.buttons.filter((b): b is Row => !!b && typeof b === "object") : [];

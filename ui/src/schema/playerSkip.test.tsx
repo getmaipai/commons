@@ -15,12 +15,12 @@ const parse = (node: unknown) => PageNodeSchema.parse({ type: "page", id: "p", t
 const calls: Array<{ url: string; body: unknown }> = [];
 const ranges = [{ id: "ad-a", kind: "ad", start_sec: 90, end_sec: 120 }, { id: "sponsor-a", kind: "sponsor", start_sec: 360, end_sec: 390, status: "confirmed" }, { id: "bumper-a", kind: "bumper", start_sec: 720, end_sec: 735 }, { id: "intro", kind: "intro", start_sec: 0, end_sec: 45 }];
 const actions = Object.fromEntries(["range_select", "undo", "skip_button", "hear_anyway", "wrong", "missed"].map((name) => [name, { call: { target: `/api/plugins/podcasts/${name}`, args: { action_id: "{action_id}", id: "{id}" } } }]));
-const node = () => parse({ type: "player", kind: "audio", bind: { source: "package", path: "episode" }, skip_ranges: { source: "package", path: "ranges" }, skip_bar: { source: "package", path: "skip-bar" }, skip_actions: actions });
+const node = (rangePath = "ranges", barPath = "skip-bar") => parse({ type: "player", kind: "audio", bind: { source: "package", path: "episode" }, skip_ranges: { source: "package", path: rangePath }, skip_bar: { source: "package", path: barPath }, skip_actions: actions });
 function answer() {
   calls.length = 0;
   globalThis.fetch = mock((input: RequestInfo | URL, init?: RequestInit) => {
     const url = String(input); const body = typeof init?.body === "string" ? JSON.parse(init.body) : undefined; calls.push({ url, body });
-    if (url.endsWith("/data/episode")) return Promise.resolve(new Response(JSON.stringify([{ id: "e1", src: "/episode.mp3", title: "Field Notes" }])));
+    if (url.endsWith("/data/episode")) return Promise.resolve(new Response(JSON.stringify([{ id: "e1", src: "/episode.mp3", title: "Field Notes", skip_ranges: ranges, skip_bar: { saved_label: "Skipped 2:15", undo_available: true, buttons: [{ id: "skip-all", label: "Skip", kind: "all" }] } }])));
     if (url.endsWith("/data/ranges")) return Promise.resolve(new Response(JSON.stringify(ranges)));
     if (url.endsWith("/data/skip-bar")) return Promise.resolve(new Response(JSON.stringify({ saved_label: "Skipped 2:15", undo_available: true, buttons: [{ id: "skip-all", label: "Skip", kind: "all" }] })));
     return Promise.resolve(new Response(JSON.stringify({ ok: true })));
@@ -43,6 +43,19 @@ describe("player skip plan node", () => {
     const view = renderWithQueryClient(<MemoryRouter><PackageScopeContext.Provider value={{ packageId: "podcasts" }}><NodeRenderer node={node()} state={{}} /></PackageScopeContext.Provider></MemoryRouter>);
     fireEvent.click(await view.findByRole("button", { name: "Undo" }));
     await waitFor(() => expect(calls.some((call) => call.url.endsWith("/undo"))).toBe(true));
+  });
+  test("reads ranges and bar fields from the bound row", async () => {
+    answer();
+    const rowBound = parse({ type: "player", kind: "audio", bind: { source: "package", path: "episode" }, skip_ranges: { source: "package", path: "episode" }, skip_bar: { source: "package", path: "episode" }, skip_actions: actions });
+    const view = renderWithQueryClient(<MemoryRouter><PackageScopeContext.Provider value={{ packageId: "podcasts" }}><NodeRenderer node={rowBound} state={{}} /></PackageScopeContext.Provider></MemoryRouter>);
+    await waitFor(() => expect(view.container.querySelectorAll('[data-slot="player-skip-ranges"] button').length).toBe(4));
+    expect(view.getByText("Skipped 2:15")).toBeTruthy();
+  });
+  test("keeps direct range lists and filters invalid kinds", async () => {
+    answer();
+    const view = renderWithQueryClient(<MemoryRouter><PackageScopeContext.Provider value={{ packageId: "podcasts" }}><NodeRenderer node={node()} state={{}} /></PackageScopeContext.Provider></MemoryRouter>);
+    await waitFor(() => expect(view.container.querySelectorAll('[data-slot="player-skip-ranges"] button').length).toBe(4));
+    expect(view.container.querySelector('[aria-label^="invalid"]')).toBeNull();
   });
   test("skip button, hear anyway, wrong and missed actions dispatch", async () => {
     answer();
