@@ -667,7 +667,7 @@ msgid "ui.2. Voice"
 msgstr "2. Voice"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:188
+#: src/primitives/Player.tsx:192
 msgid "ui.2x speed"
 msgstr "2x speed"
 
@@ -996,7 +996,7 @@ msgid "ui.agent"
 msgstr "agent"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:167
+#: src/primitives/Player.tsx:171
 msgid "ui.Ahead {seconds} seconds"
 msgstr "Ahead {seconds} seconds"
 
@@ -1290,7 +1290,7 @@ msgid "ui.Back"
 msgstr "Back"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:166
+#: src/primitives/Player.tsx:170
 msgid "ui.Back {seconds} seconds"
 msgstr "Back {seconds} seconds"
 
@@ -1479,7 +1479,7 @@ msgstr "Can view"
 #: src/elements/thread.aui.tsx:1681
 #: src/elements/tier-segment.tsx:55
 #: src/elements/video-player.tsx:124
-#: src/primitives/Player.tsx:187
+#: src/primitives/Player.tsx:191
 #: src/schema/ConfirmDialog.tsx:83
 #: src/schema/NodeRenderer.tsx:2261
 #: src/settings/LocationField.tsx:179
@@ -1532,7 +1532,7 @@ msgid "ui.Cancelled. Nothing was changed."
 msgstr "Cancelled. Nothing was changed."
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:170
+#: src/primitives/Player.tsx:174
 msgid "ui.Captions"
 msgstr "Captions"
 
@@ -1605,7 +1605,7 @@ msgid "ui.Changing this shot"
 msgstr "Changing this shot"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:169
+#: src/primitives/Player.tsx:173
 #: src/schema/NodeRenderer.tsx:2167
 #: src/schema/NodeRenderer.tsx:2174
 msgid "ui.Chapters"
@@ -1794,7 +1794,7 @@ msgid "ui.Close editor"
 msgstr "Close editor"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:177
+#: src/primitives/Player.tsx:181
 msgid "ui.Close player"
 msgstr "Close player"
 
@@ -2274,6 +2274,11 @@ msgstr "Current temperature"
 #: src/elements/track-studio.tsx:721
 msgid "ui.Cut"
 msgstr "Cut"
+
+#. js-lingui-explicit-id
+#: src/primitives/PlayerSkipRangesShowcase.tsx:18
+msgid "ui.Dark theme"
+msgstr "Dark theme"
 
 #. js-lingui-explicit-id
 #: src/elements/elicitation-form.tsx:166
@@ -2779,6 +2784,11 @@ msgid "ui.Ellipse"
 msgstr "Ellipse"
 
 #. js-lingui-explicit-id
+#: src/primitives/PlayerSkipRangesShowcase.tsx:15
+msgid "ui.Empty plan"
+msgstr "Empty plan"
+
+#. js-lingui-explicit-id
 #: src/primitives/SleepTimer.tsx:64
 #: src/primitives/SleepTimer.tsx:77
 msgid "ui.End of episode"
@@ -3192,7 +3202,7 @@ msgid "ui.Full Moon"
 msgstr "Full Moon"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:172
+#: src/primitives/Player.tsx:176
 msgid "ui.Full screen"
 msgstr "Full screen"
 
@@ -3310,6 +3320,11 @@ msgstr "Heating"
 #: src/elements/image-editor.tsx:441
 msgid "ui.Height"
 msgstr "Height"
+
+#. js-lingui-explicit-id
+#: src/primitives/PlayerSkipRangesShowcase.tsx:17
+msgid "ui.Held range · light theme · phone width · RTL"
+msgstr "Held range · light theme · phone width · RTL"
 
 #. js-lingui-explicit-id
 #: src/dashboard/layouts/full/vertical/header/Profile.tsx:16
@@ -3859,7 +3874,7 @@ msgstr "Lighter and quicker, for when the computer is busy."
 
 #. js-lingui-explicit-id
 #: src/elements/clip-feed.tsx:43
-#: src/primitives/Player.tsx:194
+#: src/primitives/Player.tsx:198
 msgid "ui.Like"
 msgstr "Like"
 
@@ -3902,7 +3917,7 @@ msgid "ui.Listening for you"
 msgstr "Listening for you"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:189
+#: src/primitives/Player.tsx:193
 msgid "ui.Live"
 msgstr "Live"
 
@@ -4017,7 +4032,7 @@ msgid "ui.Look"
 msgstr "Look"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:1533
+#: src/primitives/Player.tsx:1587
 msgid "ui.Looking for lyrics..."
 msgstr "Looking for lyrics..."
 
@@ -4066,7 +4081,7 @@ msgstr "Lower under speech"
 #. js-lingui-explicit-id
 #: src/elements/lyrics-list.tsx:55
 #: src/elements/music-track.tsx:35
-#: src/primitives/Player.tsx:420
+#: src/primitives/Player.tsx:452
 #: src/schema/NodeRenderer.tsx:1995
 msgid "ui.Lyrics"
 msgstr "Lyrics"
@@ -4525,7 +4540,7 @@ msgstr "Music"
 #. js-lingui-explicit-id
 #: src/elements/clip-compare.tsx:61
 #: src/elements/clip-feed.tsx:39
-#: src/primitives/Player.tsx:173
+#: src/primitives/Player.tsx:177
 msgid "ui.Mute"
 msgstr "Mute"
 
@@ -4655,7 +4670,7 @@ msgstr "next"
 #: src/elements/music-track.tsx:35
 #: src/elements/question-flow.tsx:47
 #: src/elements/thread.aui.tsx:1721
-#: src/primitives/Player.tsx:179
+#: src/primitives/Player.tsx:183
 #: src/primitives/Tour.tsx:46
 msgid "ui.Next"
 msgstr "Next"
@@ -5311,7 +5326,7 @@ msgid "ui.Open the assistant"
 msgstr "Open the assistant"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:176
+#: src/primitives/Player.tsx:180
 msgid "ui.Open the player"
 msgstr "Open the player"
 
@@ -5494,7 +5509,7 @@ msgstr "Paste the new value"
 #: src/elements/track-studio-compare-bar.tsx:62
 #: src/elements/track-studio.tsx:525
 #: src/elements/track-studio.tsx:525
-#: src/primitives/Player.tsx:165
+#: src/primitives/Player.tsx:169
 #: src/schema/NodeRenderer.tsx:1872
 msgid "ui.Pause"
 msgstr "Pause"
@@ -5627,7 +5642,7 @@ msgid "ui.Picture for: {caption}"
 msgstr "Picture for: {caption}"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:171
+#: src/primitives/Player.tsx:175
 msgid "ui.Picture in picture"
 msgstr "Picture in picture"
 
@@ -5727,7 +5742,7 @@ msgstr "Planning"
 #: src/elements/track-studio.tsx:525
 #: src/elements/video-player.tsx:127
 #: src/primitives/MediaShelf.tsx:238
-#: src/primitives/Player.tsx:164
+#: src/primitives/Player.tsx:168
 #: src/schema/ClipFeedNodeView.tsx:26
 #: src/schema/NodeRenderer.tsx:150
 msgid "ui.Play"
@@ -5757,12 +5772,12 @@ msgid "ui.play all"
 msgstr "play all"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:186
+#: src/primitives/Player.tsx:190
 msgid "ui.Play now"
 msgstr "Play now"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:174
+#: src/primitives/Player.tsx:178
 #: src/schema/NodeRenderer.tsx:2088
 #: src/schema/NodeRenderer.tsx:2093
 msgid "ui.Play on another screen"
@@ -5770,7 +5785,7 @@ msgstr "Play on another screen"
 
 #. js-lingui-explicit-id
 #: src/elements/music-track.tsx:35
-#: src/primitives/Player.tsx:168
+#: src/primitives/Player.tsx:172
 msgid "ui.Playback speed"
 msgstr "Playback speed"
 
@@ -5875,7 +5890,7 @@ msgstr "Preview: {label}"
 #: src/elements/media-viewer.tsx:112
 #: src/elements/music-track.tsx:35
 #: src/elements/thread.aui.tsx:1713
-#: src/primitives/Player.tsx:178
+#: src/primitives/Player.tsx:182
 msgid "ui.Previous"
 msgstr "Previous"
 
@@ -6010,6 +6025,11 @@ msgstr "Quote"
 #: src/elements/climate-tile.tsx:62
 msgid "ui.Raise {name}"
 msgstr "Raise {name}"
+
+#. js-lingui-explicit-id
+#: src/primitives/Player.tsx:361
+msgid "ui.Range types"
+msgstr "Range types"
 
 #. js-lingui-explicit-id
 #: src/elements/track-studio.tsx:801
@@ -6398,17 +6418,17 @@ msgid "ui.Reorder"
 msgstr "Reorder"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:192
+#: src/primitives/Player.tsx:196
 msgid "ui.Repeat all"
 msgstr "Repeat all"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:191
+#: src/primitives/Player.tsx:195
 msgid "ui.Repeat off"
 msgstr "Repeat off"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:193
+#: src/primitives/Player.tsx:197
 msgid "ui.Repeat one"
 msgstr "Repeat one"
 
@@ -6517,7 +6537,7 @@ msgid "ui.Resume {name}"
 msgstr "Resume {name}"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:180
+#: src/primitives/Player.tsx:184
 msgid "ui.Resuming from {time}"
 msgstr "Resuming from {time}"
 
@@ -6890,6 +6910,11 @@ msgid "ui.Select all rows"
 msgstr "Select all rows"
 
 #. js-lingui-explicit-id
+#: src/primitives/PlayerSkipRangesShowcase.tsx:16
+msgid "ui.Selected range"
+msgstr "Selected range"
+
+#. js-lingui-explicit-id
 #: src/elements/option-list.tsx:81
 msgid "ui.Selected:"
 msgstr "Selected:"
@@ -7061,7 +7086,7 @@ msgstr "Several drives"
 #: src/elements/video-player.tsx:116
 #: src/primitives/ArticleView.tsx:460
 #: src/primitives/ArticleView.tsx:472
-#: src/primitives/Player.tsx:196
+#: src/primitives/Player.tsx:200
 msgid "ui.Share"
 msgstr "Share"
 
@@ -7128,6 +7153,11 @@ msgid "ui.Show all {count}"
 msgstr "Show all {count}"
 
 #. js-lingui-explicit-id
+#: src/primitives/Player.tsx:359
+msgid "ui.Show chapters"
+msgstr "Show chapters"
+
+#. js-lingui-explicit-id
 #: src/primitives/ArticleView.tsx:272
 msgid "ui.Show fewer"
 msgstr "Show fewer"
@@ -7187,12 +7217,12 @@ msgid "ui.Showing {percent}% of the before"
 msgstr "Showing {percent}% of the before"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:175
+#: src/primitives/Player.tsx:179
 msgid "ui.Shrink the player"
 msgstr "Shrink the player"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:190
+#: src/primitives/Player.tsx:194
 msgid "ui.Shuffle"
 msgstr "Shuffle"
 
@@ -7222,25 +7252,36 @@ msgid "ui.Size"
 msgstr "Size"
 
 #. js-lingui-explicit-id
+#: src/primitives/PlayerSkipRangesShowcase.tsx:13
 #: src/primitives/Tour.tsx:43
 #: src/primitives/Wizard.tsx:350
 msgid "ui.Skip"
 msgstr "Skip"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:183
+#: src/primitives/Player.tsx:187
 msgid "ui.Skip credits"
 msgstr "Skip credits"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:182
+#: src/primitives/Player.tsx:186
 msgid "ui.Skip intro"
 msgstr "Skip intro"
+
+#. js-lingui-explicit-id
+#: src/primitives/Player.tsx:363
+msgid "ui.Skip range legend"
+msgstr "Skip range legend"
 
 #. js-lingui-explicit-id
 #: src/elements/trace-waterfall.tsx:32
 msgid "ui.skipped"
 msgstr "skipped"
+
+#. js-lingui-explicit-id
+#: src/primitives/PlayerSkipRangesShowcase.tsx:13
+msgid "ui.Skipped time"
+msgstr "Skipped time"
 
 #. js-lingui-explicit-id
 #: src/primitives/SleepTimer.tsx:45
@@ -7426,7 +7467,7 @@ msgid "ui.Start a conversation"
 msgstr "Start a conversation"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:181
+#: src/primitives/Player.tsx:185
 msgid "ui.Start over"
 msgstr "Start over"
 
@@ -8141,6 +8182,11 @@ msgid "ui.three"
 msgstr "three"
 
 #. js-lingui-explicit-id
+#: src/primitives/PlayerSkipRangesShowcase.tsx:16
+msgid "ui.Three breaks and an intro"
+msgstr "Three breaks and an intro"
+
+#. js-lingui-explicit-id
 #: src/elements/track-studio.tsx:800
 msgid "ui.Threshold"
 msgstr "Threshold"
@@ -8301,7 +8347,7 @@ msgid "ui.Transcribing"
 msgstr "Transcribing"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:459
+#: src/primitives/Player.tsx:491
 #: src/primitives/TranscriptPanel.tsx:75
 #: src/schema/NodeRenderer.tsx:2127
 msgid "ui.Transcript"
@@ -8455,6 +8501,7 @@ msgstr "Under 0.1 GB"
 #: src/elements/image-editor.tsx:1033
 #: src/elements/image-editor.tsx:1575
 #: src/elements/track-studio.tsx:501
+#: src/primitives/PlayerSkipRangesShowcase.tsx:13
 msgid "ui.Undo"
 msgstr "Undo"
 
@@ -8476,7 +8523,7 @@ msgid "ui.Unknown"
 msgstr "Unknown"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:195
+#: src/primitives/Player.tsx:199
 msgid "ui.Unlike"
 msgstr "Unlike"
 
@@ -8537,12 +8584,12 @@ msgid "ui.Unused models"
 msgstr "Unused models"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:184
+#: src/primitives/Player.tsx:188
 msgid "ui.Up next"
 msgstr "Up next"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:185
+#: src/primitives/Player.tsx:189
 msgid "ui.Up next in {seconds}"
 msgstr "Up next in {seconds}"
 

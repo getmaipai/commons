@@ -2854,6 +2854,22 @@ html[data-ease-motion="calm"] [data-slot="weather-sky"] [data-weather-group] { a
   --lyrics-distance-max: 4;
 }
 
+/* HOME-SKIP-KIT-01: color-blind-safe skip range tokens. */
+:root {
+  /* HOME-SKIP-KIT-01: distinct, color-blind safe hues plus patterns/labels for marked ranges. */
+  --skip-range-outline: color-mix(in srgb, var(--foreground) 72%, transparent);
+  --skip-range-ad: #0072b2;
+  --skip-range-sponsor: #e69f00;
+  --skip-range-bumper: #56b4e9;
+  --skip-range-selfpromo: #d55e00;
+  --skip-range-intro: #009e73;
+  --skip-range-outro: #cc79a7;
+  --skip-range-recap: #f0e442;
+  --skip-range-filler: #6c6c6c;
+  --skip-range-interaction: #332288;
+  --skip-range-preview: #aa4499;
+}
+
 /* MEDIA-BOOKS-01: reading tones stay independent of the surrounding app tone.
  * EPUB iframe styles read the resolved values; PDF canvases read the filter. */
 :root {

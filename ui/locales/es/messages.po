@@ -762,7 +762,7 @@ msgid "ui.2. Voice"
 msgstr "2. Voz"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:188
+#: src/primitives/Player.tsx:192
 #, needs-review
 msgid "ui.2x speed"
 msgstr "Velocidad 2x"
@@ -1126,7 +1126,7 @@ msgid "ui.agent"
 msgstr "agente"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:167
+#: src/primitives/Player.tsx:171
 #, needs-review
 msgid "ui.Ahead {seconds} seconds"
 msgstr "{seconds} segundos adelante"
@@ -1465,7 +1465,7 @@ msgid "ui.Back"
 msgstr "Volver"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:166
+#: src/primitives/Player.tsx:170
 #, needs-review
 msgid "ui.Back {seconds} seconds"
 msgstr "{seconds} segundos atrás"
@@ -1676,7 +1676,7 @@ msgstr "Puede ver"
 #: src/elements/thread.aui.tsx:1681
 #: src/elements/tier-segment.tsx:55
 #: src/elements/video-player.tsx:124
-#: src/primitives/Player.tsx:187
+#: src/primitives/Player.tsx:191
 #: src/schema/ConfirmDialog.tsx:83
 #: src/schema/NodeRenderer.tsx:2261
 #: src/settings/LocationField.tsx:179
@@ -1735,7 +1735,7 @@ msgid "ui.Cancelled. Nothing was changed."
 msgstr "Cancelado. No se cambió nada."
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:170
+#: src/primitives/Player.tsx:174
 #, needs-review
 msgid "ui.Captions"
 msgstr "Subtítulos"
@@ -1816,7 +1816,7 @@ msgid "ui.Changing this shot"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:169
+#: src/primitives/Player.tsx:173
 #: src/schema/NodeRenderer.tsx:2167
 #: src/schema/NodeRenderer.tsx:2174
 #, needs-review
@@ -2023,7 +2023,7 @@ msgid "ui.Close editor"
 msgstr "Cerrar editor"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:177
+#: src/primitives/Player.tsx:181
 msgid "ui.Close player"
 msgstr ""
 
@@ -2566,6 +2566,11 @@ msgstr "Temperatura actual"
 #, needs-review
 msgid "ui.Cut"
 msgstr "Corte"
+
+#. js-lingui-explicit-id
+#: src/primitives/PlayerSkipRangesShowcase.tsx:18
+msgid "ui.Dark theme"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/elicitation-form.tsx:166
@@ -3134,6 +3139,11 @@ msgid "ui.Ellipse"
 msgstr "Elipse"
 
 #. js-lingui-explicit-id
+#: src/primitives/PlayerSkipRangesShowcase.tsx:15
+msgid "ui.Empty plan"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/primitives/SleepTimer.tsx:64
 #: src/primitives/SleepTimer.tsx:77
 msgid "ui.End of episode"
@@ -3606,7 +3616,7 @@ msgid "ui.Full Moon"
 msgstr "Luna llena"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:172
+#: src/primitives/Player.tsx:176
 #, needs-review
 msgid "ui.Full screen"
 msgstr "Pantalla completa"
@@ -3743,6 +3753,11 @@ msgstr "Calentando"
 #, needs-review
 msgid "ui.Height"
 msgstr "Altura"
+
+#. js-lingui-explicit-id
+#: src/primitives/PlayerSkipRangesShowcase.tsx:17
+msgid "ui.Held range · light theme · phone width · RTL"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/dashboard/layouts/full/vertical/header/Profile.tsx:16
@@ -4369,7 +4384,7 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/clip-feed.tsx:43
-#: src/primitives/Player.tsx:194
+#: src/primitives/Player.tsx:198
 msgid "ui.Like"
 msgstr ""
 
@@ -4416,7 +4431,7 @@ msgid "ui.Listening for you"
 msgstr "Te escucho"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:189
+#: src/primitives/Player.tsx:193
 #, needs-review
 msgid "ui.Live"
 msgstr "En vivo"
@@ -4547,7 +4562,7 @@ msgid "ui.Look"
 msgstr "Apariencia"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:1533
+#: src/primitives/Player.tsx:1587
 #, needs-review
 msgid "ui.Looking for lyrics..."
 msgstr "Buscando letra..."
@@ -4603,7 +4618,7 @@ msgstr "Bajar bajo el habla"
 #. js-lingui-explicit-id
 #: src/elements/lyrics-list.tsx:55
 #: src/elements/music-track.tsx:35
-#: src/primitives/Player.tsx:420
+#: src/primitives/Player.tsx:452
 #: src/schema/NodeRenderer.tsx:1995
 #, needs-review
 msgid "ui.Lyrics"
@@ -5113,7 +5128,7 @@ msgstr "Música"
 #. js-lingui-explicit-id
 #: src/elements/clip-compare.tsx:61
 #: src/elements/clip-feed.tsx:39
-#: src/primitives/Player.tsx:173
+#: src/primitives/Player.tsx:177
 #, needs-review
 msgid "ui.Mute"
 msgstr "Silenciar"
@@ -5263,7 +5278,7 @@ msgstr "siguiente"
 #: src/elements/music-track.tsx:35
 #: src/elements/question-flow.tsx:47
 #: src/elements/thread.aui.tsx:1721
-#: src/primitives/Player.tsx:179
+#: src/primitives/Player.tsx:183
 #: src/primitives/Tour.tsx:46
 #, needs-review
 msgid "ui.Next"
@@ -6000,7 +6015,7 @@ msgid "ui.Open the assistant"
 msgstr "Abrir el asistente"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:176
+#: src/primitives/Player.tsx:180
 #, needs-review
 msgid "ui.Open the player"
 msgstr "Abrir el reproductor"
@@ -6206,7 +6221,7 @@ msgstr "Pega el nuevo valor"
 #: src/elements/track-studio-compare-bar.tsx:62
 #: src/elements/track-studio.tsx:525
 #: src/elements/track-studio.tsx:525
-#: src/primitives/Player.tsx:165
+#: src/primitives/Player.tsx:169
 #: src/schema/NodeRenderer.tsx:1872
 #, needs-review
 msgid "ui.Pause"
@@ -6360,7 +6375,7 @@ msgid "ui.Picture for: {caption}"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:171
+#: src/primitives/Player.tsx:175
 #, needs-review
 msgid "ui.Picture in picture"
 msgstr "Imagen en imagen"
@@ -6474,7 +6489,7 @@ msgstr "Planeando"
 #: src/elements/track-studio.tsx:525
 #: src/elements/video-player.tsx:127
 #: src/primitives/MediaShelf.tsx:238
-#: src/primitives/Player.tsx:164
+#: src/primitives/Player.tsx:168
 #: src/schema/ClipFeedNodeView.tsx:26
 #: src/schema/NodeRenderer.tsx:150
 #, needs-review
@@ -6508,13 +6523,13 @@ msgid "ui.play all"
 msgstr "reproducir todo"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:186
+#: src/primitives/Player.tsx:190
 #, needs-review
 msgid "ui.Play now"
 msgstr "Reproducir ahora"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:174
+#: src/primitives/Player.tsx:178
 #: src/schema/NodeRenderer.tsx:2088
 #: src/schema/NodeRenderer.tsx:2093
 #, needs-review
@@ -6523,7 +6538,7 @@ msgstr "Reproducir en otra pantalla"
 
 #. js-lingui-explicit-id
 #: src/elements/music-track.tsx:35
-#: src/primitives/Player.tsx:168
+#: src/primitives/Player.tsx:172
 #, needs-review
 msgid "ui.Playback speed"
 msgstr "Velocidad de reproducción"
@@ -6643,7 +6658,7 @@ msgstr "Vista previa: {label}"
 #: src/elements/media-viewer.tsx:112
 #: src/elements/music-track.tsx:35
 #: src/elements/thread.aui.tsx:1713
-#: src/primitives/Player.tsx:178
+#: src/primitives/Player.tsx:182
 #, needs-review
 msgid "ui.Previous"
 msgstr "Anterior"
@@ -6802,6 +6817,11 @@ msgstr "Cotización"
 #, needs-review
 msgid "ui.Raise {name}"
 msgstr "Subir {name}"
+
+#. js-lingui-explicit-id
+#: src/primitives/Player.tsx:361
+msgid "ui.Range types"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/track-studio.tsx:801
@@ -7240,17 +7260,17 @@ msgid "ui.Reorder"
 msgstr "Reordenar"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:192
+#: src/primitives/Player.tsx:196
 msgid "ui.Repeat all"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:191
+#: src/primitives/Player.tsx:195
 msgid "ui.Repeat off"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:193
+#: src/primitives/Player.tsx:197
 msgid "ui.Repeat one"
 msgstr ""
 
@@ -7376,7 +7396,7 @@ msgid "ui.Resume {name}"
 msgstr "Reanudar {name}"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:180
+#: src/primitives/Player.tsx:184
 #, needs-review
 msgid "ui.Resuming from {time}"
 msgstr "Reanudando desde {time}"
@@ -7794,6 +7814,11 @@ msgid "ui.Select all rows"
 msgstr "Selecciona todas las filas"
 
 #. js-lingui-explicit-id
+#: src/primitives/PlayerSkipRangesShowcase.tsx:16
+msgid "ui.Selected range"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/elements/option-list.tsx:81
 #, needs-review
 msgid "ui.Selected:"
@@ -7990,7 +8015,7 @@ msgstr ""
 #: src/elements/video-player.tsx:116
 #: src/primitives/ArticleView.tsx:460
 #: src/primitives/ArticleView.tsx:472
-#: src/primitives/Player.tsx:196
+#: src/primitives/Player.tsx:200
 #, needs-review
 msgid "ui.Share"
 msgstr "Compartir"
@@ -8067,6 +8092,11 @@ msgid "ui.Show all {count}"
 msgstr "Mostrar todos los {count}"
 
 #. js-lingui-explicit-id
+#: src/primitives/Player.tsx:359
+msgid "ui.Show chapters"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/primitives/ArticleView.tsx:272
 #, needs-review
 msgid "ui.Show fewer"
@@ -8135,13 +8165,13 @@ msgid "ui.Showing {percent}% of the before"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:175
+#: src/primitives/Player.tsx:179
 #, needs-review
 msgid "ui.Shrink the player"
 msgstr "Reducir el reproductor"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:190
+#: src/primitives/Player.tsx:194
 msgid "ui.Shuffle"
 msgstr ""
 
@@ -8173,6 +8203,7 @@ msgid "ui.Size"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/primitives/PlayerSkipRangesShowcase.tsx:13
 #: src/primitives/Tour.tsx:43
 #: src/primitives/Wizard.tsx:350
 #, needs-review
@@ -8180,22 +8211,32 @@ msgid "ui.Skip"
 msgstr "Omitir"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:183
+#: src/primitives/Player.tsx:187
 #, needs-review
 msgid "ui.Skip credits"
 msgstr "Saltar créditos"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:182
+#: src/primitives/Player.tsx:186
 #, needs-review
 msgid "ui.Skip intro"
 msgstr "Saltar introducción"
+
+#. js-lingui-explicit-id
+#: src/primitives/Player.tsx:363
+msgid "ui.Skip range legend"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/elements/trace-waterfall.tsx:32
 #, needs-review
 msgid "ui.skipped"
 msgstr "omitido"
+
+#. js-lingui-explicit-id
+#: src/primitives/PlayerSkipRangesShowcase.tsx:13
+msgid "ui.Skipped time"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/primitives/SleepTimer.tsx:45
@@ -8400,7 +8441,7 @@ msgid "ui.Start a conversation"
 msgstr "Iniciar una conversación"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:181
+#: src/primitives/Player.tsx:185
 #, needs-review
 msgid "ui.Start over"
 msgstr "Empezar de nuevo"
@@ -9204,6 +9245,11 @@ msgid "ui.three"
 msgstr "tres"
 
 #. js-lingui-explicit-id
+#: src/primitives/PlayerSkipRangesShowcase.tsx:16
+msgid "ui.Three breaks and an intro"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/elements/track-studio.tsx:800
 msgid "ui.Threshold"
 msgstr ""
@@ -9382,7 +9428,7 @@ msgid "ui.Transcribing"
 msgstr "Transcribiendo"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:459
+#: src/primitives/Player.tsx:491
 #: src/primitives/TranscriptPanel.tsx:75
 #: src/schema/NodeRenderer.tsx:2127
 msgid "ui.Transcript"
@@ -9554,6 +9600,7 @@ msgstr ""
 #: src/elements/image-editor.tsx:1033
 #: src/elements/image-editor.tsx:1575
 #: src/elements/track-studio.tsx:501
+#: src/primitives/PlayerSkipRangesShowcase.tsx:13
 #, needs-review
 msgid "ui.Undo"
 msgstr "Deshacer"
@@ -9578,7 +9625,7 @@ msgid "ui.Unknown"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:195
+#: src/primitives/Player.tsx:199
 msgid "ui.Unlike"
 msgstr ""
 
@@ -9647,13 +9694,13 @@ msgid "ui.Unused models"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:184
+#: src/primitives/Player.tsx:188
 #, needs-review
 msgid "ui.Up next"
 msgstr "A continuación"
 
 #. js-lingui-explicit-id
-#: src/primitives/Player.tsx:185
+#: src/primitives/Player.tsx:189
 #, needs-review
 msgid "ui.Up next in {seconds}"
 msgstr "A continuación en {seconds}"

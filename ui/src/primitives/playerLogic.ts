@@ -8,6 +8,32 @@ export interface PlayerChapter {
   title: string;
 }
 
+export type PlayerSkipKind = "ad" | "sponsor" | "bumper" | "selfpromo" | "intro" | "outro" | "recap" | "filler" | "interaction" | "preview";
+export interface PlayerSkipRange { id: string; kind: PlayerSkipKind; startSec: number; endSec: number; status?: "auto" | "held" | "confirmed" | "rejected" }
+/** A clipped range expressed as a percent of the media duration. Invalid and empty ranges return null. */
+export function skipRangeGeometry(range: PlayerSkipRange, duration: number): { left: number; width: number } | null {
+  if (!Number.isFinite(duration) || duration <= 0 || !Number.isFinite(range.startSec) || !Number.isFinite(range.endSec)) return null;
+  const start = Math.max(0, Math.min(duration, range.startSec));
+  const end = Math.max(0, Math.min(duration, range.endSec));
+  if (end <= start) return null;
+  return { left: start / duration * 100, width: (end - start) / duration * 100 };
+}
+export function skippedTimeRanges(ranges: readonly PlayerSkipRange[] | undefined, duration: number): Array<{ startSec: number; endSec: number }> {
+  return (ranges ?? []).map(r => ({ startSec: Math.max(0, r.startSec), endSec: Math.min(duration, r.endSec) }))
+    .filter(r => Number.isFinite(r.startSec) && Number.isFinite(r.endSec) && r.endSec > r.startSec && r.startSec < duration)
+    .sort((a, b) => a.startSec - b.startSec);
+}
+export function skippedElapsedTime(time: number, ranges: readonly PlayerSkipRange[] | undefined, duration: number): number {
+  let skipped = 0;
+  let lastEnd = 0;
+  for (const range of skippedTimeRanges(ranges, duration)) {
+    const start = Math.max(range.startSec, lastEnd);
+    skipped += Math.max(0, Math.min(time, range.endSec) - start);
+    lastEnd = Math.max(lastEnd, range.endSec);
+  }
+  return Math.max(0, time - skipped);
+}
+
 /** The playback rates the rate menu offers (0.5 to 2). */
 export const PLAYBACK_RATES = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2] as const;
 

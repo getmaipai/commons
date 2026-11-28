@@ -172,6 +172,26 @@ describe("Player > live stream (RADIO-07)", () => {
 
 describe("Player", () => {
 
+  test("skip ranges have accessible selection, legend, and optional overlay slots", () => {
+    const onRangeSelect = mock(() => {});
+    const view = render(<Player src="/song" kind="audio" title="Episode" skipRanges={[{ id: "sponsor-1", kind: "sponsor", startSec: 10, endSec: 25, status: "held" }]} onRangeSelect={onRangeSelect} skipOverlay={<span>Skipped · Skip</span>} compactSkipOverlay={<span>Dock skip</span>} />);
+    const range = view.getByRole("button", { name: "sponsor, held, 0:10–0:25" });
+    fireEvent.click(range);
+    expect(onRangeSelect).toHaveBeenCalledWith("sponsor-1");
+    expect(view.getByText("Skipped · Skip")).toBeTruthy();
+    expect(view.getByRole("button", { name: "Show chapters" })).toBeTruthy();
+    fireEvent.click(view.getByRole("button", { name: "Show chapters" }));
+    expect(view.getByText("Sponsor")).toBeTruthy();
+    expect(view.container.querySelector('[data-slot="player-compact-skip-overlay"]')).toBeNull();
+    view.rerender(<Player src="/song" kind="audio" layout="mini" title="Episode" compactSkipOverlay={<span>Dock skip</span>} />);
+    expect(view.getByText("Dock skip")).toBeTruthy();
+  });
+
+  test("skipped timeline uses the supplied map while the default remains original", () => {
+    const view = render(<Player src="/song" kind="audio" title="Episode" timeline="skipped" skipMap={{ toSkipped: t => t - 20, toOriginal: t => t + 20 }} />);
+    expect(view.container.querySelector('[data-slot="player-scrubber"]')).not.toBeNull();
+  });
+
   test("audio artwork stays square and is capped on narrow screens", () => {
     const { container } = render(<Player src="/song" kind="audio" title="Song" poster="/cover.png" />);
     const cover = container.querySelector("img");

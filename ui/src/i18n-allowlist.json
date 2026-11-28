@@ -1,7 +1,7 @@
 [
   {
     "file": "settings/SettingsShell.tsx",
-    "text": "⌘/Ctrl+B",
+    "text": "\u2318/Ctrl+B",
     "reason": "A keyboard shortcut glyph string, the same in every language."
   },
   {
@@ -63,5 +63,30 @@
     "file": "elements/image-editor.tsx",
     "text": "px",
     "reason": "A pixel unit symbol (px) after a number, the same in every language."
+  },
+  {
+    "file": "primitives/PlayerSkipRangesShowcase.tsx",
+    "text": "A quiet episode",
+    "reason": "Sample media metadata in the Player showcase, not interface copy."
+  },
+  {
+    "file": "primitives/PlayerSkipRangesShowcase.tsx",
+    "text": "Field Notes",
+    "reason": "Sample media metadata in the Player showcase, not interface copy."
+  },
+  {
+    "file": "primitives/PlayerSkipRangesShowcase.tsx",
+    "text": "Episode 14",
+    "reason": "Sample media metadata in the Player showcase, not interface copy."
+  },
+  {
+    "file": "primitives/PlayerSkipRangesShowcase.tsx",
+    "text": "A held sponsor",
+    "reason": "Sample media metadata in the Player showcase, not interface copy."
+  },
+  {
+    "file": "primitives/PlayerSkipRangesShowcase.tsx",
+    "text": "Dark theme episode",
+    "reason": "Sample media metadata in the Player showcase, not interface copy."
   }
 ]

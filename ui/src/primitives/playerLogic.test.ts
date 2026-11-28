@@ -13,6 +13,8 @@ import {
   TAP_CHAIN_MS,
   TapChain,
   tapZone,
+  skipRangeGeometry,
+  skippedElapsedTime,
 } from "@/kit/primitives/playerLogic";
 
 const CHAPTERS = normalizeChapters([
@@ -24,6 +26,17 @@ const CHAPTERS = normalizeChapters([
 ]);
 
 describe("playerLogic", () => {
+  test("skip range geometry clips to duration and omits invalid ranges", () => {
+    expect(skipRangeGeometry({ id: "a", kind: "ad", startSec: 10, endSec: 30 }, 100)).toEqual({ left: 10, width: 20 });
+    expect(skipRangeGeometry({ id: "a", kind: "ad", startSec: -10, endSec: 120 }, 100)).toEqual({ left: 0, width: 100 });
+    expect(skipRangeGeometry({ id: "a", kind: "ad", startSec: 20, endSec: 20 }, 100)).toBeNull();
+  });
+  test("skipped elapsed time counts overlapped marked intervals once", () => {
+    expect(skippedElapsedTime(50, [
+      { id: "a", kind: "ad", startSec: 10, endSec: 20 },
+      { id: "b", kind: "sponsor", startSec: 18, endSec: 30 },
+    ], 100)).toBe(30);
+  });
   test("formatTime reads m:ss and h:mm:ss", () => {
     expect(formatTime(760)).toBe("12:40");
     expect(formatTime(3723)).toBe("1:02:03");

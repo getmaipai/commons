@@ -64,6 +64,9 @@ import {
   TapChain,
   tapZone,
   type PlayerChapter,
+  type PlayerSkipRange,
+  type PlayerSkipKind,
+  skipRangeGeometry,
   type ProgressReason,
 } from "@/kit/primitives/playerLogic";
 import { ArtGradient } from "@/kit/primitives/ArtGradient";
@@ -76,6 +79,7 @@ import { i18n } from "@/kit/i18n";
 
 export type { TranscriptLine } from "@/kit/primitives/TranscriptPanel";
 export type { PlayerChapter, ProgressReason } from "@/kit/primitives/playerLogic";
+export type { PlayerSkipRange, PlayerSkipKind } from "@/kit/primitives/playerLogic";
 
 /** A captions or subtitles track (WebVTT). */
 export interface PlayerTextTrack {
@@ -225,6 +229,13 @@ export interface PlayerProps {
   lyricsLoading?: boolean;
   onLyricsOpen?: () => void;
   chapters?: readonly PlayerChapter[];
+  /** Marked ranges on the scrubber. */
+  skipRanges?: readonly PlayerSkipRange[];
+  onRangeSelect?: (id: string) => void;
+  skipOverlay?: ReactNode;
+  compactSkipOverlay?: ReactNode;
+  timeline?: "original" | "skipped";
+  skipMap?: { toSkipped(t: number): number; toOriginal(t: number): number };
   /** A storyboard WebVTT (sprite `#xywh=` cues) for preview thumbnails on the time range. */
   thumbnails?: string;
   captions?: readonly PlayerTextTrack[];
@@ -335,6 +346,27 @@ export function parkMedia(el: HTMLMediaElement): void {
     document.body.appendChild(spot);
   }
   if (el.parentNode !== spot) spot.appendChild(el);
+}
+
+const SKIP_KIND_LABELS: Record<PlayerSkipKind, string> = {
+  ad: "Ad", sponsor: "Sponsor", bumper: "Bumper", selfpromo: "Self-promotion", intro: "Intro",
+  outro: "Outro", recap: "Recap", filler: "Filler", interaction: "Interaction", preview: "Preview",
+};
+function SkipRangeLegend({ ranges }: { ranges: readonly PlayerSkipRange[] }) {
+  const [open, setOpen] = useState(false);
+  const kinds = [...new Set(ranges.map(range => range.kind))];
+  return <div data-slot="player-range-legend" className="text-muted-foreground text-xs">
+    <Button type="button" variant="ghost" size="sm" aria-expanded={open} aria-label={i18n._({ id: "ui.Show chapters", message: "Show chapters" })} onClick={() => setOpen(value => !value)}>
+      <Icon name="layout-list" className="size-4" />
+      {i18n._({ id: "ui.Range types", message: "Range types" })}
+    </Button>
+    {open ? <ul className="flex flex-wrap gap-x-3 gap-y-1" aria-label={i18n._({ id: "ui.Skip range legend", message: "Skip range legend" })}>
+      {kinds.map(kind => <li key={kind} className="inline-flex items-center gap-1.5" data-kind={kind}>
+        <span aria-hidden className="inline-flex size-3 items-center justify-center rounded-sm border border-[var(--skip-range-outline)]" style={{ background: `var(--skip-range-${kind})` }} />
+        <span aria-hidden className="sr-only">{kind}</span>{SKIP_KIND_LABELS[kind]}
+      </li>)}
+    </ul> : null}
+  </div>;
 }
 
 function setRef<T>(ref: Ref<T> | undefined, value: T | null) {
@@ -468,6 +500,12 @@ export function Player(props: PlayerProps) {
     onLike,
     onQueue,
     onShare,
+    skipRanges,
+    onRangeSelect,
+    skipOverlay,
+    compactSkipOverlay,
+    timeline = "original",
+    skipMap,
   } = props;
   const copy = { ...defaultPlayerCopy(), ...props.copy };
   const liveProp = props.live === true;
@@ -1053,6 +1091,20 @@ export function Player(props: PlayerProps) {
   const chapterIndex = chapterIndexAt(chapters, time);
   const offer = skipOffer(chapters, time, duration);
   const progressPct = Number.isFinite(duration) && duration > 0 ? Math.min(100, (time / duration) * 100) : 0;
+  const shownTime = timeline === "skipped" && skipMap ? skipMap.toSkipped(time) : time;
+  const shownDuration = timeline === "skipped" && skipMap ? skipMap.toSkipped(duration) : duration;
+
+  const rangesLayer = skipRanges?.length ? <div data-slot="player-skip-ranges" className="pointer-events-none absolute inset-x-2.5 top-1/2 z-[2] h-1 -translate-y-1/2">
+    {skipRanges.map(range => {
+      const geometry = skipRangeGeometry(range, Number.isFinite(duration) && duration > 0 ? duration : Math.max(...skipRanges.map(item => item.endSec)));
+      if (!geometry) return null;
+      const label = `${range.kind}${range.status ? `, ${range.status}` : ""}, ${formatTime(range.startSec)}–${formatTime(range.endSec)}`;
+      return <button key={range.id} type="button" data-kind={range.kind} data-status={range.status ?? "auto"}
+        aria-label={label} title={label} onClick={() => onRangeSelect?.(range.id)}
+        className="pointer-events-auto absolute -top-2 h-5 min-w-2 rounded-sm border-2 border-[var(--skip-range-outline)] focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+        style={{ left: `${geometry.left}%`, width: `${geometry.width}%`, background: `var(--skip-range-${range.kind})` }} />;
+    })}
+  </div> : null;
 
   const liveBadge = (
     <Badge variant="secondary" data-slot="player-live">
@@ -1307,7 +1359,8 @@ export function Player(props: PlayerProps) {
           ) : null}
           {ended && upNext ? null : <div slot="centered-chrome">{playButton(true)}</div>}
           <div className="dark flex w-full flex-col bg-transparent pt-8" data-slot="player-controls">
-            {live ? null : <MediaTimeRange aria-label={title} className="p-2.5 w-full" />}
+            {live ? null : <div className="relative w-full" data-slot="player-range-track"><MediaTimeRange aria-label={title} className="p-2.5 w-full" />{rangesLayer}</div>}
+            {skipOverlay ? <div data-slot="player-skip-overlay" className="px-2.5">{skipOverlay}</div> : null}
             <MediaControlBar className="w-full">
               {playButton()}
               {live ? null : (
@@ -1471,6 +1524,7 @@ export function Player(props: PlayerProps) {
             <div className="h-full bg-[var(--progress-accent)]" style={{ width: `${progressPct}%` }} />
           </div>
         )}
+        {compactSkipOverlay ? <div data-slot="player-compact-skip-overlay" className="relative z-[2] px-3">{compactSkipOverlay}</div> : null}
         <MediaController key="controller" ref={controllerRef as never} audio noHotkeys autohide="-1" defaultStreamType="on-demand" style={audioVars}>
           {mediaElement}
           {spectrum ? <PlayerSpectrum levels={spectrum.levels} active={playing} /> : null}
@@ -1541,13 +1595,15 @@ export function Player(props: PlayerProps) {
               <div className="flex justify-center">{liveBadge}</div>
             ) : (
               <div className="flex flex-col" data-slot="player-scrubber">
-                <MediaTimeRange aria-label={title} className="p-2.5 w-full" />
+                <div className="relative w-full" data-slot="player-range-track"><MediaTimeRange aria-label={title} className="p-2.5 w-full" />{rangesLayer}</div>
                 <div className="text-muted-foreground flex justify-between px-2.5 text-sm tabular-nums">
-                  <span>{formatTime(time)}</span>
-                  <span>-{formatTime(Number.isFinite(duration) ? Math.max(0, duration - time) : 0)}</span>
+                  <span>{formatTime(shownTime)}</span>
+                  <span>-{formatTime(Number.isFinite(shownDuration) ? Math.max(0, shownDuration - shownTime) : 0)}</span>
                 </div>
               </div>
             )}
+            {skipOverlay ? <div data-slot="player-skip-overlay">{skipOverlay}</div> : null}
+            {skipRanges?.length ? <SkipRangeLegend ranges={skipRanges} /> : null}
             <div className="flex flex-wrap items-center justify-center gap-1 sm:gap-3" data-slot="player-transport">
               {onShuffle ? (
                 <Button type="button" variant="ghost" size="icon" className={cn(tool, shuffle && "text-primary")} aria-label={copy.shuffle} aria-pressed={shuffle === true} data-slot="player-shuffle" onClick={onShuffle}>
